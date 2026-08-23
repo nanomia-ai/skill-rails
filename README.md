@@ -2,54 +2,59 @@
 
 English · [한국어](README.ko.md)
 
-Turn a growing skill from a pile of instructions into a system an AI can maintain and follow.
+Skill Rails does not manage a complex skill as one long prompt. It records requirements item by item, lets code and tests decide repeatable rules mechanically, and gives the AI only the instructions it needs now.
+
+| What goes wrong today | What Skill Rails actually does | What changes immediately |
+| --- | --- | --- |
+| User requirements scatter across long conversations and many paragraphs. | Record each requirement and link it to where it appears and how it can be checked. | Missing requirements and the places to change become visible. |
+| The AI reinterprets even exact, repeatable rules on every use. | Process the same input in code and check the result with tests. | The same rule is applied the same way when the model or session changes. |
+| The AI rereads the whole rulebook for every task. | Return only the currently allowed actions, forbidden actions, and required evidence. | Prompts use less context, and key rules are less likely to disappear in long conversations. |
 
 An agent skill usually begins with a `SKILL.md`: a document that tells an AI how to handle a recurring kind of work. That works well while the skill is small. Trouble begins when every missed condition, new exception, and safety rule is added as another paragraph.
 
 The document grows, but its behavior does not become more precise. A later agent may read the same sentence differently, miss a rule buried in the middle, or forget an early requirement after a long conversation. Fixing that miss with more prose often makes the next miss more likely.
 
-Skill Rails takes a different approach. It keeps the parts that genuinely require judgment in short, readable prose, but moves anything that can be repeated or checked exactly into scripts, tests, or an executable behavior specification. The result is still a normal, standalone skill—just no longer one undifferentiated block of text.
+Skill Rails takes a different approach. It keeps the parts that genuinely require judgment in short, readable prose and moves rules that should produce the same result from the same input into scripts and tests. For a complex skill whose next action changes with its state, code calculates that flow as well. The result is still one standalone skill, but its rules no longer have to be recovered from one large block of prose.
 
 ## The problem, and the way out
 
 ```mermaid
 flowchart LR
-    A["A rule is missed"] --> B["Add another paragraph"]
-    B --> C["Rules grow, overlap,<br/>and sink deeper into context"]
-    C --> D["The next agent reads them<br/>differently or misses one"]
-    D --> A
-    C --> E["Skill Rails"]
-    E --> F["Keep every requirement<br/>as a trackable item"]
-    E --> G["Move repeatable rules<br/>into code and tests"]
-    E --> H["Show the agent only<br/>what matters now"]
-    F --> I["A skill that can be<br/>maintained and checked"]
-    G --> I
-    H --> I
+    A["Start a small skill<br/>as prose in SKILL.md"] --> B["Add another paragraph<br/>for every feature and exception"]
+    B --> C["One requirement spreads<br/>across overlapping sentences"]
+    C --> D["The AI reinterprets<br/>the long document on every use"]
+    D --> E["Conditions are missed<br/>or applied inconsistently"]
+    E -->|Add more explanation| B
+    C -->|Change the structure| F["Skill Rails"]
+    F --> G["Record user requirements<br/>as individual file entries"]
+    F --> H["Check repeatable decisions<br/>with code and tests"]
+    F --> I["Give the AI only the actions<br/>for the current stage"]
+    G --> J["A skill with clear places<br/>to change and check"]
+    H --> J
+    I --> J
 ```
 
 Skill Rails breaks the cycle in three steps.
 
-### 1. Remember the design outside the conversation
+### 1. Write down every user requirement before building the skill
 
-Before generating files, it records the original problem, intended uses, requests that should not trigger the skill, inputs, outputs, safety boundaries, and completion evidence. Each requirement becomes a trackable item in an obligation ledger: where was it implemented, and which test or evaluation checks it?
+Skill Rails first records the request item by item in `.skill-rails/intent.json`. For example, “never modify the source files” becomes one independent item. A tracking table in `obligation-ledger.json` links that item to where it is implemented and how it can be checked. That check may point to the exact file section containing the rule or to a test that runs it. If either the implementation or the check is missing, the requirement remains unfinished. When another AI continues the work, it can read these files instead of reconstructing the request from an old conversation.
 
-This matters when another AI continues the work. It can read the design from disk instead of guessing what an earlier conversation meant.
+### 2. Put repeatable rules in code and leave judgment in prose
 
-### 2. Give each rule the right owner
+The destination follows from what the rule actually does.
 
-Every rule is examined with three practical questions.
-
-| Question | Where the rule belongs | Why |
+| Example rule | Where the rule goes | What changes |
 | --- | --- | --- |
-| Can the same input always be checked or transformed the same way? | A helper, validator, template, and test | The AI should run it, not reinterpret it every time. |
-| Does the next action depend on state, approval, order, or evidence? | A P2 behavior spec and runtime | The current branch can be calculated instead of rediscovered in prose. |
-| Does the answer depend on context, trade-offs, or human meaning? | A short, addressable prose section | Pretending judgment is deterministic would make the system confidently wrong. |
+| “The output must contain exactly three fields.” | An output-checking script and an expected-result test | Code checks the field count every time. |
+| “If approval is missing, ask before continuing.” | A tested P2 condition that reads approval and returns `ASK` | The next action no longer depends on how the AI rereads the sentence. |
+| “Decide whether the explanation is appropriate for this reader.” | Short prose guidance | The AI keeps the judgment that cannot be calculated honestly. |
 
-This is the core rule: **mechanize everything that can be mechanized truthfully, and keep only real judgment in prose.**
+The rule is simple: **if a machine can check it reliably, do not leave it as prose that the AI must reinterpret.**
 
-### 3. Give the using agent a small current view
+### 3. During use, give the AI only the instructions it needs now
 
-Authoring records, tests, and the full behavior model remain available for maintenance, but they do not all enter the model's context during normal use. A simple skill stays short. A deterministic skill runs its helper. A stateful skill asks its runtime for the current decision and loads only the guidance and template needed for that decision.
+Suppose a P2 skill is waiting for fresh test results. The execution script generated with the skill—the runtime—returns `WAIT`, allows tests to run, forbids release, and requires a fresh test result. Planning and completion rules do not need to enter the AI's context at that moment. All rules remain in files, while the using AI receives only what it may do now and what evidence is still missing.
 
 ## A concrete example
 
@@ -59,14 +64,14 @@ Imagine a release-check skill written only as prose:
 
 This looks clear at first. After several edge cases are added, the important questions become harder to answer: What counts as old? Which rule wins when approval exists but the environment is read-only? What proves that tests actually ran?
 
-With Skill Rails, the same intent is separated into things that can be checked:
+With Skill Rails, each sentence is separated into inputs, decision code, and tests:
 
-- the original requirements remain in the intent and obligation ledger;
-- test freshness, approval, and read-only status become named inputs called observations;
-- a P2 table maps those observations to `BLOCK`, `WAIT`, `ASK`, or `DONE`;
-- fixed test cases, called fixtures, replay every important branch;
-- the runtime gives the agent one small result for the current state;
-- an execution trace is compared with the required evidence, so an unsupported “done” does not become success.
+- the original requirements remain in `intent.json`, while `obligation-ledger.json` records where each one is implemented and how it can be checked;
+- test freshness, approval, and read-only status become input values that describe the current state, called observations;
+- a condition table maps those input combinations to `BLOCK`, `WAIT`, `ASK`, or `DONE`;
+- fixed inputs and expected results, called fixtures, replay every important branch;
+- the execution script gives the agent one small result for the current state;
+- the actual execution record, or trace, is checked against the required evidence, so an unsupported “done” does not become success.
 
 The agent might receive a result as simple as:
 
@@ -80,23 +85,23 @@ The agent might receive a result as simple as:
 }
 ```
 
-If “fresh” later changes from 24 hours to 12, the maintainer changes the rule at its stable address and reruns the affected fixtures. There is no need to hunt through several paragraphs and hope every paraphrase was updated.
+If “fresh” later changes from 24 hours to 12, the maintainer changes the one piece of code that defines that threshold and reruns the related tests. There is no need to hunt through several paragraphs and hope every paraphrase was updated.
 
-## P0, P1, and P2 do not reduce rigor
+## P0, P1, and P2 are not levels of rigor
 
-The profiles are not permission to leave machine-checkable rules in prose. Every generated skill starts with structured intent, trigger and near-miss cases, an obligation ledger, and an evaluation surface. If a repeatable rule appears, the skill moves to at least P1. If behavior depends on state or evidence, it moves to P2.
+The three profiles describe how a skill enforces its rules, not how strictly it follows them. Every generated skill records the user's requirements in files, gives examples of when the skill should and should not run, and tracks where each requirement appears and how it can be checked. One repeatable, machine-checkable rule moves the skill to at least P1. If the next action depends on the current state or evidence, it moves to P2.
 
-The profile only prevents a state machine from being added where it would create complexity without adding truth.
+A judgment-only skill with no state changes does not become more accurate when a P2 runtime is added; it only gains more files and code to maintain. The profiles avoid that unnecessary structure without leaving rules unmechanized when code can check them.
 
-| Profile | What kind of skill is it? | What Skill Rails adds | What the using agent does |
+| Profile | When to choose it | What gets created | What the using agent does |
 | --- | --- | --- | --- |
-| **P0 — structured judgment** | The useful work is interpretation, critique, or advice, and there is no exact transform to execute. | Durable intent, explicit boundaries, tracked requirements, trigger and near-miss cases, and fresh-agent test cases. | Reads concise guidance and applies judgment. |
-| **P1 — executable mechanics** | Part of the work has an exact format, validation rule, or repeatable transformation. | The same authoring record as P0, plus helpers, templates, rejection rules, and expected-output tests. | Uses judgment where needed, but delegates exact work to code. |
-| **P2 — executable behavior flow** | The correct action changes with state, approval, evidence, order, or an irreversible boundary. | The same authoring record and exact mechanics where needed, plus named facts, entry conditions, stages, condition tables, replayable cases, execution records, and evidence checks. | Calls the runtime and follows the current Decision instead of rereading the whole rulebook. |
+| **P0 — structured judgment** | Interpretation, critique, or advice is the real work, with no transformation that code can repeat exactly. | A requirements file, explicit boundaries, a requirement tracking table, examples of when to invoke or not invoke the skill, and cases a fresh AI can try. | Reads the short guidance and requirements, then applies judgment. |
+| **P1 — executable mechanics** | Some part needs an exact format, input check, or repeatable transformation. | The P0 files plus validation or transformation scripts, templates, rejected-input tests, and expected-result tests. | Handles judgment directly and runs code for work that must repeat exactly. |
+| **P2 — executable behavior flow** | Approval, evidence, order, or current state changes what may happen next. | The mechanics needed from P1 plus state inputs, stage conditions, an execution script that calculates the next action, execution records, and evidence checks. | Gives the runtime the current facts and follows the returned allowed actions, forbidden actions, and evidence requirements. |
 
 A profile belongs to one skill, not to an entire plugin or repository. A plugin can contain a small P0 brainstorming skill, a P1 formatter, and a P2 implementation workflow side by side. They remain separate skills; Skill Rails does not chain them together.
 
-Suppose the user says, “Never modify the source files,” but the authoring agent forgets to carry that condition into the intent and obligation ledger. The validator and runtime cannot check a rule that is absent from the design. Skill Rails therefore breaks the request into individual requirements first, then checks where each one was implemented and tested. If a requirement is unclear, it stays open for review instead of being quietly discarded.
+No later check can recover a user requirement that the authoring AI failed to record. For example, if “never modify the source files” is missing from `.skill-rails/intent.json`, the validation code cannot know that this condition disappeared. Skill Rails therefore separates the request into individual items before creating files, then checks the recorded implementation and verification location for each item. An unclear item stays open for review instead of being quietly discarded.
 
 ## What gets created
 
@@ -107,29 +112,31 @@ my-skill/
 ├─ SKILL.md                    # discovery and the short entry procedure
 ├─ references/                # judgment and knowledge, loaded when needed
 ├─ scripts/ templates/ tests/ # added when P1 mechanics are needed
-├─ spec.mjs body.md fixtures/ # added when P2 behavior flow is needed
-├─ scripts/skill-rails/       # self-contained P2 runtime
+├─ spec.mjs                   # P2 conditions and next actions for each state
+├─ body.md                    # P2 guidance that still requires AI judgment
+├─ fixtures/                  # P2 fixed test inputs and expected results
+├─ scripts/skill-rails/       # P2 code that calculates the next action
 └─ .skill-rails/
    ├─ intent.json             # what the user originally asked for
-   ├─ obligation-ledger.json  # where each requirement went
-   └─ eval-cases.json         # positive and near-miss behavior cases
+   ├─ obligation-ledger.json  # implementation and check location for each requirement
+   └─ eval-cases.json         # requests that should trigger the skill and similar ones that should not
 ```
 
-P1 and P2 begin as fail-closed scaffolds. They are not finished until the authoring agent replaces generic markers with the real domain rules and proves them with tests.
+A new P1 script keeps a marker that says its real helper is not implemented yet. A new P2 package keeps unresolved rules in `review-required` and `DEFERRED`. Until the authoring agent replaces them with real rules and passes the tests, `eval.mjs` does not report the package as ready to release. This prevents an empty skeleton from being reported as a finished skill.
 
 ## Context stays proportional too
 
 ```text
-P0  concise SKILL.md ───────────────────────────────→ agent judgment
-P1  concise SKILL.md → deterministic helper ───────→ exact result
-P2  thin SKILL.md → runtime → current Decision ────→ current guidance only
+P0  concise SKILL.md ───────────────────────────────→ agent decides
+P1  concise SKILL.md → validation/transform script → code-checked result
+P2  entry SKILL.md → next-action script ───────────→ current-step instructions
 ```
 
-For P2, `spec.mjs` is the behavior source, but the model does not need to read the entire file during ordinary use. The runtime validates it, calculates the current stage, and returns a compact Decision: current status, allowed and forbidden actions, material to load, and proof still required.
+For P2, all behavior rules live in `spec.mjs`, but the AI does not read that entire file every time it uses the skill. The execution script calculates the current stage and next action, then returns a small JSON result called a Decision. It contains only the current status, allowed and forbidden actions, material to read now, and evidence still required.
 
 ## Current platform support
 
-The authoring model is not tied to one agent product. An adapter is the thin platform-specific layer that tells an agent where to discover the skill, how to resolve its installed path, and which metadata it needs. The adapter does not own the behavior contract, so adding another platform should not require a second copy of the skill's rules.
+The authoring model is not tied to one agent product. Platforms differ in where they look for skills and what metadata they require, so an adapter handles only those differences. The generated skill keeps one copy of its actual behavior rules. Supporting another platform should not require another copy of those rules.
 
 The adapters currently implemented and tested are:
 
@@ -164,7 +171,7 @@ It must stop when test evidence is missing, ask when approval is absent,
 and never claim completion without proof.
 ```
 
-The authoring agent should clarify only decisions that change the product boundary, then record the answers on disk, select the profile, implement the real behavior, run the checks, and separate verified facts from what still needs a forward test.
+The authoring agent asks a follow-up only when the answer would change what the skill must do, must not do, or produce. It records those answers in files, selects the profile, implements the real rules and tests, and runs the checks. Its final report separates what it actually executed from what still needs to be tried in the real installation environment.
 
 To work directly from an intent file, start with [`templates/intent-brief.json`](templates/intent-brief.json). Replace `<skill-rails>` with the installed directory:
 
@@ -188,7 +195,7 @@ node "<skill-rails>/scripts/eval.mjs" --skill ./my-skill
 
 ## What has been verified
 
-The repository currently passes its lint, 35/35 tests, and frozen evaluation gate. Compatibility runs passed on Node.js 20, 22, and 24. Fresh project-local sessions created a P1 skill and a P2 skill, then used each generated package through the other current adapter. P2 also passed its L0–L18 validators, mutation checks, deterministic scenario replay, trace, and evidence alignment tests.
+The repository currently passes code linting and all 35 tests. It also distinguishes the expected results in a fixed suite of normal and deliberately broken cases. Compatibility runs passed on Node.js 20, 22, and 24. Fresh project-local sessions created P1 and P2 skills and used the same generated packages through both current installation layouts. P2 also passed required-file and reference checks (L0–L18), tests that deliberately break rules and expect failure, repeatable state scenarios, and comparisons between execution records and required evidence.
 
 Those results support the tested Windows project-local path. They do not yet prove global installation, marketplace distribution, Linux/macOS behavior, broad trigger precision, or recovery after real long-session compaction.
 
@@ -201,9 +208,9 @@ npm run verify
 
 ## Product boundary
 
-Skill Rails creates and maintains one standalone skill at a time. It does not automatically decompose a whole plugin, chain skills together, or replace the host agent with a general orchestration runtime.
+Skill Rails creates and maintains one standalone skill at a time. It does not split an entire plugin into skills, call another skill automatically when one finishes, or replace the host agent with a system that manages the execution order of many skills.
 
-The P2 runtime computes decisions and checks evidence; it does not perform the domain work itself. It is also not a security sandbox or a physical tool-call interceptor. It can make an unsupported completion visible as `unproven`, while actual tool permissions remain the host's responsibility.
+The P2 execution script calculates the next action and checks whether evidence exists; it does not perform that action itself. For example, it can allow `run-tests`, but the AI still runs the test command. It is not a security layer and cannot physically stop a forbidden tool call. It can mark unsupported completion as `unproven`, while the host platform remains responsible for actual tool permissions.
 
 ## Documentation
 
