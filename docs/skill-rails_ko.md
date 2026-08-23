@@ -96,7 +96,7 @@ Skill Rails 자체도 하나의 스킬이며, 한 번의 제작 결과도 하나
 4. 현재 단계에 필요한 context만 모델에 제공한다.
 5. 유지보수 변경을 stable ID와 의미 단위로 추적한다.
 6. 증거가 없을 때 성공을 추론하지 않는다.
-7. Codex와 Claude Code에서 같은 단일 스킬 패키지를 사용한다.
+7. File-based host마다 행동 정본을 복제하지 않고 같은 단일 스킬 패키지를 사용한다.
 8. 단순한 스킬에는 복잡한 runtime을 강요하지 않는다.
 
 ### 3.2 비목표
@@ -172,7 +172,7 @@ Codex와 Claude Code의 발견 경로 및 skill-root 표현 차이는 adapter가
 19. validator 실패 시 산문으로 결정을 복원하지 않는다.
 20. 단순한 스킬은 P0/P1로 남겨 P2 복잡성을 피한다.
 21. 마이그레이션 원문은 coverage와 별도 삭제 승인 전까지 보존한다.
-22. Codex와 Claude Code는 동일 portable core를 공유한다.
+22. 현재 또는 이후의 모든 adapter는 동일 portable core를 공유한다.
 23. V5 핵심을 삭제·축소·변경하면 [구현·검증 기록](implementation-verification_ko.md)의 변경 원장에 이유와 동등성 검사를 먼저 기록한다.
 
 ---
@@ -541,33 +541,37 @@ Intent-backed P0/P1은 `update-intent` operation만 허용한다. 현재 intent�
    └─ obligation-ledger.json
 ```
 
-P2 runtime은 생성 skill 안에 포함되므로 전역 설치기나 creator 저장소가 없어도 동작한다. Parser의 vendored source는 Acorn과 Acorn-walk 공식 배포 파일이며 각 license를 함께 포함한다. 그 외 validator, runtime, generator, trace 형식은 이 프로젝트의 독자 구현이다.
+P2 runtime은 생성 skill 안에 포함되므로 전역 설치기나 creator 저장소가 없어도 동작한다. P2 parser의 vendored source는 Acorn과 Acorn-walk 공식 배포 파일이며 각 license를 함께 포함한다. Creator의 migration parser도 공식 `markdown-it` standalone 배포물과 그 bundle에 포함된 dependency notice를 package 안에 둔다. 따라서 Node.js가 있으면 설치된 creator의 정상 작업 경로에서 별도 package install이 필요 없다. Vendor artifact는 고정된 sync script와 `vendor:check`가 소유하며 손으로 편집하지 않는다. 그 외 validator, runtime, generator, trace 형식은 이 프로젝트의 독자 구현이다.
 
 ---
 
-## 15. Codex와 Claude Code 지원
+## 15. Portable 설치와 현재 adapter
 
 ### 15.1 공통 package
 
 Portable `SKILL.md`의 `name`과 `description`을 공통 정본으로 사용한다. 플랫폼별로 행동 body를 따로 만들지 않는다.
 
+File-based installer는 이 단일 package를 지원하는 host의 발견 경로에 copy 또는 symlink할 수 있다. Installer는 runtime이나 행동 정본이 아니며 skill body를 변환하지 않는다. Node.js 20 이상은 Skill Rails의 실행 전제다. 현재 `skills` installer 자체가 더 높은 Node 버전을 요구하는 경우에는 manual project-local clone을 사용해도 같은 package가 동작해야 한다.
+
 ### 15.2 Skill root
 
 - Codex: available-skill metadata가 제공한 절대 skill path
 - Claude Code: `${CLAUDE_SKILL_DIR}`
+- 기타 file-based host: host가 발견한 active `SKILL.md`의 directory
 
-Script는 사용자 project의 현재 directory가 아니라 active `SKILL.md`가 있는 directory를 `<skill-root>`로 사용한다.
+Script는 사용자 project의 현재 directory가 아니라 active `SKILL.md`가 있는 directory를 `<skill-root>`로 사용한다. Host가 stable skill location을 제공하지 않으면 cwd에서 추측하지 않고 중단한다.
 
-### 15.3 설치 위치
+### 15.3 설치 경계
 
-- Codex project-local: `.agents/skills/<name>`
-- Claude Code project-local: `.claude/skills/<name>`
+범용 설치 명령은 `npx skills@latest add nanomia-ai/skill-rails`이며, 정확한 target directory와 copy/symlink 방식은 installer가 소유한다. Manual 설치에서는 host가 정한 project-local discovery directory에 같은 package를 둔다. 설치된 정상 creator 명령은 package-local dependency만 사용하며 `npm ci`를 요구하지 않는다. Repository 자체의 test와 frozen self-evaluation을 실행하는 개발 경로는 dev dependency 설치 뒤 검증한다.
 
-개인·관리형·plugin 배포는 각 플랫폼이 지원할 수 있지만 이 release의 installer 범위는 아니다.
+Root `SKILL.md`를 package boundary로 쓰므로 현재 범용 installer는 tests와 설계 문서도 함께 복사한다. 이 파일들은 AI의 조건부 읽기 경로에 자동 포함되지 않아 행동과 context 계약을 바꾸지 않지만, 배포 byte 수는 늘린다. 이를 줄이기 위한 nested distribution layout은 source와 generated distribution의 ownership을 먼저 설계해야 하는 별도 repository migration이다.
+
+Claude plugin, marketplace manifest, hook은 단순 설치를 위해 추가하지 않는다. Managed marketplace는 package 구조, update, submission, 실제 host 검증을 별도로 소유해야 하는 후속 distribution 제품이다.
 
 ### 15.4 지원 주장의 소유권
 
-Codex와 Claude Code는 현재 구현된 project-local adapter지만 제품의 영구 플랫폼 경계는 아니다. 정확히 어떤 흐름을 실행했고 무엇이 아직 `unproven`인지에 대한 최신 표는 [구현·검증 기록](implementation-verification_ko.md)이 소유한다. 새 adapter를 추가해도 portable core를 복제하거나 이 문서의 제품 정체성을 특정 플랫폼으로 바꾸지 않는다.
+Codex와 Claude Code는 현재 fresh 행동 증거가 있는 project-local adapter지만 제품의 영구 플랫폼 경계는 아니다. 범용 installer가 다른 host directory에 package를 배치했다는 구조 증거와, 그 host의 AI가 trigger·skill-root·task output을 올바르게 처리했다는 행동 증거를 구분한다. 정확히 어떤 흐름을 실행했고 무엇이 아직 `unproven`인지에 대한 최신 표는 [구현·검증 기록](implementation-verification_ko.md)이 소유한다. 새 adapter를 추가해도 portable core를 복제하거나 이 문서의 제품 정체성을 특정 플랫폼으로 바꾸지 않는다.
 
 ---
 
@@ -733,7 +737,7 @@ Repository 유지보수를 이어받는 새 세션은 `AGENTS.md`, `CLAUDE.md`, 
 - [ ] 현재 context만 제공하는 progressive read 유지
 - [ ] P0/P1에 P2 복잡성 누수 없음
 - [ ] generated artifact ownership과 atomic build 유지
-- [ ] Codex와 Claude 공통 core 유지
+- [ ] 모든 adapter가 공통 core를 유지하며 현재 검증 범위를 과장하지 않음
 - [ ] creator usability와 generated-skill usability 모두 검토
 - [ ] 결과 품질 주장을 구조 검증과 혼동하지 않음
 - [ ] 외부 project 코드·문법·wire format 복사 없음
@@ -751,7 +755,7 @@ Skill Rails의 목적은 코드량을 늘리거나 모든 판단을 기계화하
 - AI 작성자가 의도를 잃지 않고 skill을 만든다.
 - AI 유지보수자가 stable ID와 evidence로 의미를 바꾼다.
 - AI 소비자가 P0/P1에서는 일치하는 판단 주제만, P2에서는 현재 Decision만 읽는다.
-- 생성된 skill이 Codex와 Claude에서 같은 핵심 의미로 동작한다.
+- 생성된 skill이 검증된 adapter에서 같은 핵심 의미로 동작하고, 미검증 host는 `unproven`으로 남는다.
 - 증명되지 않은 성공은 성공으로 보고되지 않는다.
 
 이 기준을 만족하지 못하는 기능 확장, multi-skill 분해, hook 강제, 새 DSL, 문서 증식은 현재 제품의 발전이 아니라 방향 이탈로 간주한다.

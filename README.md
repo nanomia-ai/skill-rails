@@ -138,32 +138,19 @@ P0/P1 routing appears only when the intent declares a stable topic ID, a concise
 
 For P2, all behavior rules live in `spec.mjs`, but the AI does not read that entire file every time it uses the skill. The execution script calculates the current stage and next action, then returns a small JSON result called a Decision. It contains only the current status, allowed and forbidden actions, material to read now, and evidence still required.
 
-## Current platform support
+## Install
 
-The authoring model is not tied to one agent product. Platforms differ in where they look for skills and what metadata they require, so an adapter handles only those differences. The generated skill keeps one copy of its actual behavior rules. Supporting another platform should not require another copy of those rules.
-
-The adapters currently implemented and tested are:
-
-- **Codex:** project-local discovery from `.agents/skills`;
-- **Claude Code:** project-local discovery from `.claude/skills`.
-
-The same generated package was used across both adapters without maintaining two behavior files.
-
-### Install the current Codex adapter
+Skill Rails is one portable, file-based package. The installer can place it in Codex, Claude Code, Cursor, OpenCode, or another discovery path it supports without maintaining a different behavior file for each host:
 
 ```bash
-git clone https://github.com/nanomia-ai/skill-rails.git .agents/skills/skill-rails
-npm --prefix .agents/skills/skill-rails ci
+npx skills@latest add nanomia-ai/skill-rails
 ```
 
-### Install the current Claude Code adapter
+Choose `skill-rails`, the target agents, and project or global scope in the installer. Skill Rails itself requires Node.js 20 or newer. The currently tested `skills` 1.5.23 installer requires Node.js 22.20 or newer; if the installer cannot run on your Node version, use Git to clone the repository directly into your host's project-local skill directory instead. For example, use `.agents/skills/skill-rails` for Codex or `.claude/skills/skill-rails` for Claude Code.
 
-```bash
-git clone https://github.com/nanomia-ai/skill-rails.git .claude/skills/skill-rails
-npm --prefix .claude/skills/skill-rails ci
-```
+The installed creator carries its migration parser. Normal `init`, `migrate`, `maintain`, `lint`, `build`, and `eval --skill` use does not need a separate `npm ci`. Contributors running this repository's own test and frozen evaluation corpus still start with `npm ci`.
 
-Requirements are Node.js 20 or newer and Git. Project-local installation on Windows is the path verified by the current evidence.
+Codex and Claude Code are the hosts with current fresh-agent, trigger, and cross-consumption evidence. Installation into other file-based hosts is structurally available through the installer, but their triggering, skill-root handling, and task output remain unverified. No marketplace plugin or host hook is required by the portable core.
 
 ## Create your first skill
 
@@ -199,9 +186,9 @@ node "<skill-rails>/scripts/eval.mjs" --skill ./my-skill
 
 ## What has been verified
 
-The current environment passes code linting and all 49 tests. It also distinguishes the expected results in a fixed suite of normal and deliberately broken cases. Earlier compatibility runs on Node.js 20, 22, and 24 each passed the then-current 35-test suite. Fresh project-local sessions created P1 and P2 skills and used the same generated packages through both current installation layouts. P2 also passed required-file and reference checks (L0–L18), tests that deliberately break rules and expect failure, repeatable state scenarios, and comparisons between execution records and required evidence. A separate fresh author/consumer pair read only the one relevant topic from a five-topic P0 package; multi-match, no-match, near-miss, and large-index routing recall remain unverified.
+The current environment passes code linting and all 49 tests, including a dependency-blocked run of the normal creator commands and parser-backed migration. It also distinguishes the expected results in a fixed suite of normal and deliberately broken cases. Earlier compatibility runs on Node.js 20, 22, and 24 each passed the then-current 35-test suite. Fresh project-local sessions created P1 and P2 skills and used the same generated packages through both current installation layouts. P2 also passed required-file and reference checks (L0–L18), tests that deliberately break rules and expect failure, repeatable state scenarios, and comparisons between execution records and required evidence. A separate fresh author/consumer pair read only the one relevant topic from a five-topic P0 package; multi-match, no-match, near-miss, and large-index routing recall remain unverified.
 
-Those results support the tested Windows project-local path. They do not yet prove global installation, marketplace distribution, Linux/macOS behavior, broad trigger precision, or recovery after real long-session compaction.
+Those results support the tested Windows project-local path. The universal installer release smoke is reported separately when executed; a successful copy does not prove fresh-agent behavior on every target. Marketplace distribution, Linux/macOS behavior, broad trigger precision, and recovery after real long-session compaction remain unverified.
 
 Run the repository checks with:
 

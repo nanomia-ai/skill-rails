@@ -1,12 +1,13 @@
 import { readFile } from "node:fs/promises";
 import { basename, join, relative, resolve } from "node:path";
-import MarkdownIt from "markdown-it";
-import referenceRule from "markdown-it/lib/rules_block/reference.mjs";
+import MarkdownIt from "../vendor/markdown-it.cjs";
 import { listFiles, readJson, writeJsonAtomic } from "./io.mjs";
 import { parseSkillMarkdown } from "./frontmatter.mjs";
 import { sha256 } from "../runtime/hash.mjs";
 
 const markdown = new MarkdownIt({ html: true });
+const referenceRule = markdown.block.ruler.__rules__.find((rule) => rule.name === "reference")?.fn;
+if (typeof referenceRule !== "function") throw new Error("SR_MIGRATION_PARSER: vendored markdown-it reference rule is unavailable.");
 const utf8Decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 // The stock rule consumes valid definitions into env without a token; retain its accepted span in the same parser pass.
 markdown.block.ruler.before("reference", "skillRailsMigrationReference", (state, startLine, endLine, silent) => {

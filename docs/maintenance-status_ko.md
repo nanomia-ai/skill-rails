@@ -13,9 +13,9 @@
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 시작 기준 commit: `9691f107bc08ac7657bca3bc6160f0d2aa3159eb`
-- 시작 시 `origin/main`과 동기화된 clean 상태 확인
-- 현재 milestone은 아직 commit·push·publish하지 않은 working-tree 변경
+- 이전 완료 milestone commit: `d9aac0a` (`feat: add progressive guidance for simple skills`)
+- 작업 시작 시 `origin/main`은 `9691f107bc08ac7657bca3bc6160f0d2aa3159eb`였고 local `main`은 한 commit 앞섰음
+- 현재 milestone은 portable universal installation이며 최종 commit·push·원격 release smoke 전 상태
 - 최초 구현 기획과 통합 문서는 Git commit `4929b5b`에서 복구 가능
 
 다른 프로젝트, 특히 `D:/Projects/Private/nanomia/nanomia-skills/devflow/`, 는 이 작업 범위 밖이며 read-only다.
@@ -24,60 +24,70 @@
 
 ## 2. 마지막 완료 milestone
 
-목적은 큰 P0/P1 판단형 skill에서도 profile을 올리지 않고 현재 요청에 필요한 산문만 점진적으로 읽게 하는 것이었다.
+목적은 Node.js가 있는 환경에서 Skill Rails의 기능을 줄이지 않고 한 번의 file-based installer 명령으로 여러 host에 같은 portable creator를 설치할 수 있게 하는 것이다.
 
 완료된 구현:
 
-- `intent.judgment_points`가 기존 문자열과 `{ id, when, points }` conditional topic을 함께 지원
-- 조건부 topic이 있을 때만 작은 guidance index와 stable topic file 생성
-- universal boundary, exact format, stop rule, P1 helper gate는 항상 읽는 `SKILL.md`에 유지
-- profile 선택과 prose routing을 독립 축으로 유지
-- intent, profile decision, obligation ledger, index, topic, adapter, `SKILL.md`의 projection과 ownership을 fail-closed 검증
-- P0/P1 intent-only maintenance를 atomic하게 수행하면서 authored helper와 비소유 파일 보존
-- strict UTF-8, path containment, symlink/junction, orphan, duplicate, escaping, CRLF 경계를 검증
-- P2/V5, migration, portable core와 adapter 경계는 변경하지 않음
+- `markdown-it` 공식 standalone bundle을 creator package 안에 vendoring하고 bundle에 포함된 dependency notice를 함께 보존
+- 고정 sync script와 `vendor:check`가 vendor byte를 소유하며 수동 편집을 거부
+- migration이 package-local parser를 사용하되 기존 stock reference rule과 semantic atom 계약을 유지
+- portable creator test가 외부 runtime import를 차단한 상태에서 `init`, `migrate`, `maintain`, `lint`, `build`, `eval --skill`을 실행
+- `npx skills@latest add nanomia-ai/skill-rails`를 기본 설치 경로로 문서화하고 Node runtime과 installer의 version requirement를 분리
+- 다른 file-based host의 구조적 설치 가능성과 Codex·Claude의 fresh 행동 evidence를 분리
+- marketplace plugin, hook, platform별 행동 body를 추가하지 않음
+- Windows checkout이 vendor byte를 바꾸지 않도록 `scripts/**/vendor/** -text`를 Git 계약으로 고정
 
-설계·코드 판단은 Claude Opus xhigh와 Codex Sol xhigh의 독립 감사를 거쳤고, 마지막 Opus xhigh 재검토는 blocking finding 없이 PASS했다. Medium 모델은 fresh 실제 사용 피시험자에만 사용했다.
+P0/P1 profile, conditional guidance, P2 `spec.mjs`, V5 runtime, obligation ledger, generated-package shape는 변경하지 않았다. Root `SKILL.md` package boundary 때문에 installer가 tests와 설계 기록까지 함께 복사하는 186-file payload는 알려진 비차단 비용이다. 이 파일들은 자동 prompt loading 경로가 아니며, 이를 줄이기 위한 nested distribution layout은 별도 repository migration으로 남긴다.
+
+설계 경계는 Claude Opus xhigh read-only audit로 먼저 검토했고, 구현 뒤 fresh Opus xhigh diff audit를 수행했다. 최종 audit는 Windows line-ending 문제 한 건을 blocking으로 찾아냈으며 `.gitattributes`로 보정했다. 그 외 기존 행동 의미, V5, P0/P1, license notice, 문서 주장에는 blocking finding이 없었다.
 
 ---
 
 ## 3. 마지막 검증
 
-- 현재 working tree에서 전체 `npm run verify`가 통과했다.
-- xhigh 설계·코드 감사와 fresh medium-model author/consumer 실측을 완료했다.
-- 정확한 test 수, G0.5 수치, 모델별 실행 범위와 한계는 [구현·검증 기록](implementation-verification_ko.md)이 단독으로 소유한다.
+- `npm run verify`: `vendor:check`, lint, 49/49 tests, frozen eval pass
+- 외부 runtime dependency를 차단한 portable creator command test pass
+- Node 24.18.0 + `skills` 1.5.23의 node_modules-free clone-shaped package 설치 smoke pass
+- Codex, Claude Code, Cursor, OpenCode target 선택으로 installer copy 성공
+- `.agents`와 `.claude` 설치 tree fingerprint byte-identical
+- 설치된 creator의 migration이 12개 semantic atom과 기존 kind/order를 보존
+- 설치된 creator가 만든 P2 package의 L0–L18 full lint pass
+- 독립 audit가 old-import와 vendored-import migration 결과를 5개 corpus(12/726/331/3/1693 atoms)에서 full JSON 비교해 동일함을 확인
+- local Markdown link와 `git diff --check` pass
 
-이 fresh 소비 결과는 positive single-match 한 사례다. 더 넓은 행동 주장을 만들지 않는다.
+현재 설치 smoke는 local clone-shaped source를 사용했다. GitHub 원격 배포본을 다시 내려받는 release smoke는 push 뒤 수행해야 하며 아직 성공 증거로 기록하지 않는다. Cursor·OpenCode의 fresh trigger와 실제 task output도 `unproven`이다.
 
 ---
 
 ## 4. 이번 maintenance 종료 상태
 
-- Conditional guidance 구현, P0/P1 maintenance, ownership guard와 regression test 완료
-- 제품 설계, 구현·검증 기록, 유지보수 snapshot의 문서 소유권 분리 완료
-- 최초 xhigh 문서 감사의 blocking 2개와 high 6개를 보정하고 좁은 xhigh 재검토 PASS
-- 두 번째 검토의 경미한 문구 차이 3개까지 실제 코드와 정합
-- local link, README 한국어·영어 주장 동등성, `git diff --check` 확인
-- 임시 실측 경계 `.skill-rails/test-runs/progressive-consumer-20260823` 제거 완료
-
-현재 blocking finding과 필수 구현 작업은 없다. Working tree는 사용자가 요청한 변경을 포함한 uncommitted 상태이며 commit·push·publish는 수행하지 않았다.
+- Portable dependency 구현과 회귀검증 완료
+- README 영문·한글, adapter reference, 제품 설계, 구현·검증 기록 정합화 완료
+- Root package payload 증가는 의도적으로 수용한 비차단 packaging limitation
+- Claude plugin 또는 official marketplace 등록은 구현하지 않음
+- 코드 blocking finding 없음
+- 최종 commit, push, 원격 release smoke가 남아 있음
 
 ---
 
 ## 5. 다음에 선택할 수 있는 검증
 
-현재 blocking implementation finding은 없다. 다음 단계는 새 기능 구현보다 아직 일반화하지 않은 범위를 선택적으로 실측하는 것이다.
+이번 milestone을 닫기 전에 필요한 마지막 단계:
 
-가치가 높은 순서:
+1. commit과 `origin/main` push
+2. 별도 임시 project에서 `npx skills@latest add nanomia-ai/skill-rails` 원격 설치
+3. 원격 설치본에 `node_modules`가 없는 상태로 migration과 L0–L18 재실행
 
-1. P0/P1 conditional guidance의 multi-match, no-match, near-miss 소비
-2. topic 수가 많은 실제 대형 skill의 routing recall과 고정 context 비용
-3. 장기 session/compaction 뒤 핵심 경계 복구
-4. 최신 전체 suite의 Node 20/22/24 재실행
-5. Linux/macOS filesystem과 project-local adapter 확인
+그 뒤의 선택적 범위:
+
+1. Cursor·OpenCode 등 추가 host의 fresh trigger, skill-root 해석, 실제 task output
+2. Node 20에서 manual clone 설치 smoke와 최신 49개 suite 재실행
+3. Linux/macOS installer와 filesystem 경계
+4. 186-file root payload가 실제 배포 문제일 때만 nested distribution layout 설계
+5. P0/P1 conditional guidance의 multi-match, no-match, near-miss와 장기 compaction
 6. 실제 대형 기존 skill migration
 
-증거가 필요하지 않은 항목을 관성적으로 실행하지 않는다. 사용자가 다음 목표를 정하면 그 주장에 필요한 최소 fresh 시험만 고른다.
+증거가 필요하지 않은 항목을 관성적으로 실행하지 않는다. 구조적 설치와 fresh AI 행동을 같은 지원 주장으로 합치지 않는다.
 
 ---
 

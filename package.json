@@ -12,7 +12,9 @@
     "eval": "node scripts/eval.mjs",
     "lint": "node scripts/lint.mjs --self",
     "test": "node --test tests/*.test.mjs",
-    "verify": "npm run lint && npm test && npm run eval"
+    "vendor:sync": "node scripts/lib/sync-vendor.mjs",
+    "vendor:check": "node scripts/lib/sync-vendor.mjs --check",
+    "verify": "npm run vendor:check && npm run lint && npm test && npm run eval"
   },
   "devDependencies": {
     "acorn": "^8.15.0",

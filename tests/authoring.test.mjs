@@ -59,10 +59,10 @@ test("README guidance remains conditional and reachable from agent entry points"
   }
 });
 
-test("creator generation paths use only package-local runtime dependencies", async (t) => {
+test("portable creator commands use only package-local runtime dependencies", async (t) => {
   const base = await makeTestDir("thin-dependency-boundary");
   t.after(() => removeTestDir(base));
-  const loader = pathToFileURL(join(ROOT, "fixtures", "reject-p2-dependencies-loader.mjs")).href;
+  const loader = pathToFileURL(join(ROOT, "fixtures", "reject-external-runtime-dependencies-loader.mjs")).href;
   const run = (script, args) => spawnSync(process.execPath, ["--experimental-loader", loader, join(ROOT, "scripts", script), ...args], { cwd: ROOT, encoding: "utf8", windowsHide: true });
   for (const profile of ["p0", "p1", "p2"]) {
     const result = run("init.mjs", ["--intent", join(ROOT, "fixtures", "intents", `${profile}.json`), "--out", join(base, profile)]);
@@ -71,8 +71,14 @@ test("creator generation paths use only package-local runtime dependencies", asy
   for (const [script, args, expected] of [["lint.mjs", ["--self"], 0], ["build.mjs", ["--self"], 0], ["eval.mjs", ["--skill", ROOT], 1]]) {
     const result = run(script, args);
     assert.equal(result.status, expected, result.stderr);
-    assert.doesNotMatch(result.stderr, /P2 dependency loaded/);
+    assert.doesNotMatch(result.stderr, /External runtime dependency loaded/);
   }
+  const maintenance = run("maintain.mjs", ["--skill", join(base, "p2"), "--diagnose", "--query", "stage:operate"]);
+  assert.equal(maintenance.status, 0, maintenance.stderr);
+  assert.doesNotMatch(maintenance.stderr, /External runtime dependency loaded/);
+  const migration = run("migrate.mjs", ["--source", join(ROOT, "fixtures", "migration-structures"), "--out", join(base, "migration"), "--no-build"]);
+  assert.equal(migration.status, 0, migration.stderr);
+  assert.doesNotMatch(migration.stderr, /External runtime dependency loaded/);
 });
 
 test("conservative migration records every atom and leaves the source unchanged", async (t) => {

@@ -138,32 +138,19 @@ P0/P1 라우팅은 intent에 stable topic ID, 짧은 `when` 조건, 그 주제�
 
 P2의 전체 행동 규칙은 `spec.mjs`에 있습니다. 하지만 스킬을 사용할 때마다 AI가 이 파일 전체를 읽지는 않습니다. 실행 스크립트가 현재 상태에 맞는 단계와 다음 행동을 계산해 작은 JSON 결과(Decision)로 돌려줍니다. 그 결과에는 지금 허용된 행동, 금지된 행동, 읽어야 할 자료, 아직 필요한 증거만 들어 있습니다.
 
-## 현재 지원하는 플랫폼
+## 설치
 
-스킬을 작성하고 검증하는 핵심 구조는 특정 에이전트 제품에 고정되어 있지 않습니다. 플랫폼마다 스킬을 찾는 폴더와 필요한 메타데이터가 다르므로, 플랫폼 연결부(adapter)가 그 차이만 처리합니다. 실제 행동 규칙은 생성된 스킬 안에 한 번만 둡니다. 이후 다른 플랫폼을 지원하더라도 같은 규칙을 플랫폼마다 다시 작성하지 않기 위한 구조입니다.
-
-현재 구현과 실측을 마친 설치 방식은 다음 두 가지입니다.
-
-- **Codex:** `.agents/skills`의 프로젝트 로컬 스킬 발견
-- **Claude Code:** `.claude/skills`의 프로젝트 로컬 스킬 발견
-
-양쪽에서 서로 다른 행동 파일을 관리하지 않고 동일한 생성 패키지를 사용했습니다.
-
-### Codex에 설치
+Skill Rails는 하나의 portable file-based 패키지입니다. 플랫폼마다 다른 행동 파일을 만들지 않고, installer가 지원하는 Codex, Claude Code, Cursor, OpenCode 또는 다른 발견 경로에 같은 패키지를 설치할 수 있습니다.
 
 ```bash
-git clone https://github.com/nanomia-ai/skill-rails.git .agents/skills/skill-rails
-npm --prefix .agents/skills/skill-rails ci
+npx skills@latest add nanomia-ai/skill-rails
 ```
 
-### Claude Code에 설치
+Installer에서 `skill-rails`, 대상 agent, project 또는 global 범위를 선택합니다. Skill Rails 자체는 Node.js 20 이상이 필요합니다. 현재 확인한 `skills` 1.5.23 installer는 Node.js 22.20 이상을 요구하므로, 현재 Node 버전에서 installer가 실행되지 않으면 Git으로 저장소를 해당 host의 project-local skill directory에 직접 clone하면 됩니다. 예를 들어 Codex는 `.agents/skills/skill-rails`, Claude Code는 `.claude/skills/skill-rails`를 사용합니다.
 
-```bash
-git clone https://github.com/nanomia-ai/skill-rails.git .claude/skills/skill-rails
-npm --prefix .claude/skills/skill-rails ci
-```
+설치된 creator에는 migration parser가 포함됩니다. 일반적인 `init`, `migrate`, `maintain`, `lint`, `build`, `eval --skill` 사용에는 별도의 `npm ci`가 필요하지 않습니다. 이 저장소 자체의 테스트와 동결 평가 corpus를 실행하는 기여자만 먼저 `npm ci`를 실행합니다.
 
-Node.js 20 이상과 Git이 필요합니다. 지금까지 실제로 확인한 범위는 Windows의 프로젝트 로컬 설치입니다.
+Fresh agent, trigger, cross-consumption 증거가 있는 host는 현재 Codex와 Claude Code입니다. 다른 file-based host도 installer로 배치할 수 있지만, 그 host에서의 trigger, skill-root 해석, 실제 task output은 아직 검증하지 않았습니다. Portable core는 marketplace plugin이나 host hook을 요구하지 않습니다.
 
 ## 첫 스킬 만들기
 
@@ -199,9 +186,9 @@ node "<skill-rails>/scripts/eval.mjs" --skill ./my-skill
 
 ## 지금까지 검증한 범위
 
-현재 환경은 코드 형식 검사와 전체 테스트 49/49를 통과했습니다. 미리 고정해 둔 정상 사례는 통과시키고, 일부러 결함을 심은 사례는 모두 실패로 찾아내는지도 확인했습니다. 앞서 진행한 Node.js 20·22·24 호환성 검사에서는 당시의 35개 테스트가 각 버전에서 모두 통과했습니다. 새 프로젝트에서 시작한 에이전트 세션으로 P1과 P2 스킬을 각각 만든 뒤, 현재 지원하는 두 설치 방식에서 같은 생성 결과를 사용했습니다. P2는 필수 파일과 참조 관계 검사(L0–L18), 일부 규칙을 고의로 망가뜨렸을 때 실패하는지 확인하는 테스트, 상태별 반복 실행, 실행 기록과 증거 대조도 통과했습니다. 별도의 fresh author와 consumer 한 쌍은 P0의 다섯 조건부 주제 중 현재 요청과 일치하는 한 주제만 읽었지만, 다중 일치·no-match·near-miss와 큰 index의 routing recall은 아직 검증하지 않았습니다.
+현재 환경은 코드 형식 검사와 전체 테스트 49/49를 통과했습니다. 여기에는 외부 runtime dependency를 차단한 상태에서 일반 creator 명령과 parser-backed migration을 실행한 검사도 포함됩니다. 미리 고정해 둔 정상 사례는 통과시키고, 일부러 결함을 심은 사례는 모두 실패로 찾아내는지도 확인했습니다. 앞서 진행한 Node.js 20·22·24 호환성 검사에서는 당시의 35개 테스트가 각 버전에서 모두 통과했습니다. 새 프로젝트에서 시작한 에이전트 세션으로 P1과 P2 스킬을 각각 만든 뒤, 현재 지원하는 두 설치 방식에서 같은 생성 결과를 사용했습니다. P2는 필수 파일과 참조 관계 검사(L0–L18), 일부 규칙을 고의로 망가뜨렸을 때 실패하는지 확인하는 테스트, 상태별 반복 실행, 실행 기록과 증거 대조도 통과했습니다. 별도의 fresh author와 consumer 한 쌍은 P0의 다섯 조건부 주제 중 현재 요청과 일치하는 한 주제만 읽었지만, 다중 일치·no-match·near-miss와 큰 index의 routing recall은 아직 검증하지 않았습니다.
 
-이 결과가 뒷받침하는 범위는 Windows의 프로젝트 로컬 실행입니다. 전역 설치, 마켓플레이스 배포, Linux/macOS, 다양한 사용자 요청에서 스킬이 정확히 호출되는지, 긴 대화가 실제로 압축된 뒤에도 규칙을 빠짐없이 복구하는지까지 검증했다고 주장하지는 않습니다.
+이 결과가 뒷받침하는 범위는 Windows의 프로젝트 로컬 실행입니다. Universal installer의 release smoke는 실제 실행 뒤 별도로 기록하며, 설치 복사가 성공해도 모든 대상 host의 fresh-agent 행동을 증명하지는 않습니다. Marketplace 배포, Linux/macOS, 다양한 사용자 요청에서 스킬이 정확히 호출되는지, 긴 대화가 실제로 압축된 뒤에도 규칙을 빠짐없이 복구하는지는 아직 검증하지 않았습니다.
 
 저장소 검증은 다음과 같이 실행합니다.
 

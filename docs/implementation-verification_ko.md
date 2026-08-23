@@ -12,6 +12,7 @@
 
 ## 1. 현재 결정적 검증
 
+- `npm run vendor:check`: pass
 - `npm run lint`: pass
 - 현재 환경 전체 test: 49/49 pass
 - 현재 환경 `npm run eval`: pass
@@ -41,6 +42,26 @@ Node 20·22·24 결과를 현재 49개 suite의 결과로 확대하지 않는다
 | hook 기반 effect interception | unsupported | unsupported |
 
 Codex와 Claude Code는 현재 검증된 project-local adapter다. 제품의 영구 경계나 모든 플랫폼 지원을 뜻하지 않는다.
+
+### 2.1 범용 installer와 package-local dependency smoke
+
+2026-08-23 KST에 Node 24.18.0과 `skills` 1.5.23으로 저장소의 clone-shaped 복제본을 검사했다. 복제본에는 `node_modules`가 없었다.
+
+- Root `SKILL.md`에서 정확히 한 개의 `skill-rails`를 발견
+- `--copy`로 Codex, Claude Code, Cursor, OpenCode를 선택해 설치 명령 성공
+- `.agents/skills/skill-rails`와 `.claude/skills/skill-rails`의 186개 파일 tree fingerprint 일치
+- 설치 package에 `node_modules` 없음
+- 설치된 creator에서 parser-backed migration을 실행해 12개 semantic atom 생성
+- Atom kind가 frontmatter, heading, paragraph, nested list item, GFM row, reference definition, fenced code를 기존 fixture와 같은 순서로 보존
+- 생성된 P2 package의 L0–L18 full lint pass
+
+이 결과는 Windows에서 installer가 root package를 발견·복사하고, 별도 `npm ci` 없이 설치된 creator의 migration과 P2 build가 동작한다는 구조·실행 증거다. 아직 GitHub 원격 배포본을 내려받은 release smoke는 아니며, Cursor·OpenCode에서 fresh AI가 trigger하고 skill root를 해석해 실제 산출물을 만드는 행동 증거도 아니다.
+
+별도의 Claude Opus xhigh read-only audit는 기존 external-import migration과 vendored-import migration의 전체 `inspectProseSkill()` JSON을 5개 corpus(12/726/331/3/1693 atoms)에서 비교했고 모두 동일했다. Bundle은 upstream `markdown-it` 14.3.0 standalone distribution과 byte-identical이고 runtime `require`/`import`가 없음을 확인했다. Audit가 발견한 Windows `core.autocrlf` checkout byte drift는 `scripts/**/vendor/** -text`로 고정했다. 이 규칙은 creator의 Markdown parser와 기존 P2 Acorn vendor를 함께 보호한다.
+
+설치 payload는 186 files, 1,313,275 bytes였다. Root `SKILL.md`가 package boundary이므로 repository test와 설계 기록도 함께 복사된다. 이 파일들은 자동 prompt loading 경로가 아니어서 context 동작을 바꾸지 않지만, nested distribution layout보다 설치 byte 수가 크다. 이를 줄이는 repository relocation은 이번 설치 hotfix에 포함하지 않았다.
+
+`skills` 1.5.23 자체는 Node 22.20 이상을 요구한다. Skill Rails runtime 계약은 Node 20 이상이므로, Node 20 사용자는 manual project-local clone으로 같은 package를 설치할 수 있다.
 
 ---
 
