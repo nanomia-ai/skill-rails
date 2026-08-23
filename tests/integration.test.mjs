@@ -307,7 +307,7 @@ test("non-git snapshot fallback hashes nested same-size content changes", async 
   t.after(() => removeTestDir(base));
   const project = join(base, "project");
   await mkdir(join(project, "nested"), { recursive: true });
-  await mkdir(join(project, ".git"), { recursive: true });
+  await writeFile(join(project, ".git"), "gitdir: .git-missing\n", "utf8");
   const watched = join(project, "nested", "watched.txt");
   await writeFile(watched, "AAAA", "utf8");
   const before = await captureSnapshot(project);
