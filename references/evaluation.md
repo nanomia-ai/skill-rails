@@ -4,6 +4,7 @@
 
 - Separate targets
 - Clean testing
+- Fresh downstream testing
 - Evidence authority
 - Context surface
 - Release interpretation
@@ -15,6 +16,16 @@ Evaluate creator usability, generated-skill usability, and task-output quality s
 ## Clean testing
 
 Use fresh contexts and provide only the raw skill, task, and input artifact. Hide intended fixes, prior failures, and expected answers. Compare with no-skill or old-skill baselines, include trigger near misses and held-out states, and inspect transcripts, tool order, evidence, and outputs.
+
+## Fresh downstream testing
+
+When a generated skill produces a durable output intended for later AI consumption, test that handoff separately from the skill-consumer run. Give a fresh context only the output and the durable dependencies that the output explicitly identifies. Do not also provide the original task, generated skill, producer transcript, or expected interpretation unless the output declares one of them as a required dependency.
+
+This limits the handoff context supplied for interpretation, not the files or tools the interpreted work legitimately requires.
+
+Ask the fresh consumer to interpret the output or continue the intended work. Check that it recovers the information needed for correct use, which may include the applicable purpose, terms, input identity and scope, constraints, evidence or uncertainty, result or status, and next action. Do not require irrelevant fields or repeated background.
+
+A valid template, a declared artifact reader, or a successful producing run does not prove downstream understanding. Missing handoff context remains `unproven`; do not expect the consumer to scan the skill package or unrelated project files to reconstruct it.
 
 ## Evidence authority
 
