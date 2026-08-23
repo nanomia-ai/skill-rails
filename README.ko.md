@@ -138,23 +138,19 @@ P0/P1 라우팅은 intent에 stable topic ID, 짧은 `when` 조건, 그 주제�
 
 P2의 전체 행동 규칙은 `spec.mjs`에 있습니다. 하지만 스킬을 사용할 때마다 AI가 이 파일 전체를 읽지는 않습니다. 실행 스크립트가 현재 상태에 맞는 단계와 다음 행동을 계산해 작은 JSON 결과(Decision)로 돌려줍니다. 그 결과에는 지금 허용된 행동, 금지된 행동, 읽어야 할 자료, 아직 필요한 증거만 들어 있습니다.
 
-## 설치
+## 설치하고 바로 사용하기
 
-Skill Rails는 하나의 portable file-based 패키지입니다. 플랫폼마다 다른 행동 파일을 만들지 않고, installer가 지원하는 Codex, Claude Code, Cursor, OpenCode 또는 다른 발견 경로에 같은 패키지를 설치할 수 있습니다.
+Node.js 22.20 이상이 준비된 프로젝트에서 다음 명령을 실행합니다. 이 버전 요구사항은 현재 `skills` installer가 정한 조건입니다.
 
 ```bash
 npx skills@latest add nanomia-ai/skill-rails
 ```
 
-Installer에서 `skill-rails`, 대상 agent, project 또는 global 범위를 선택합니다. Skill Rails 자체는 Node.js 20 이상이 필요합니다. 현재 확인한 `skills` 1.5.23 installer는 Node.js 22.20 이상을 요구하므로, 현재 Node 버전에서 installer가 실행되지 않으면 Git으로 저장소를 해당 host의 project-local skill directory에 직접 clone하면 됩니다. 예를 들어 Codex는 `.agents/skills/skill-rails`, Claude Code는 `.claude/skills/skill-rails`를 사용합니다.
+설치 화면에서 `skill-rails`, 사용하는 AI 도구, 현재 프로젝트 또는 전역 범위를 선택합니다. Installer가 같은 Skill Rails 패키지를 Claude Code의 `.claude/skills/`, Codex의 `.agents/skills/`처럼 각 도구가 스킬을 찾는 위치에 배치합니다. 별도의 의존성 설치나 설정은 필요하지 않습니다.
 
-설치된 creator에는 migration parser가 포함됩니다. 일반적인 `init`, `migrate`, `maintain`, `lint`, `build`, `eval --skill` 사용에는 별도의 `npm ci`가 필요하지 않습니다. 이 저장소 자체의 테스트와 동결 평가 corpus를 실행하는 기여자만 먼저 `npm ci`를 실행합니다.
+처음 설치하면서 스킬 디렉터리가 새로 생겼고 이미 AI 세션을 열어 둔 상태라면, 설치한 스킬이 보이지 않을 때 그 세션만 한 번 다시 시작합니다. 이는 스킬 목록을 다시 발견하기 위한 것이며 추가 설치 단계가 아닙니다.
 
-Fresh agent, trigger, cross-consumption 증거가 있는 host는 현재 Codex와 Claude Code입니다. 다른 file-based host도 installer로 배치할 수 있지만, 그 host에서의 trigger, skill-root 해석, 실제 task output은 아직 검증하지 않았습니다. Portable core는 marketplace plugin이나 host hook을 요구하지 않습니다.
-
-## 첫 스킬 만들기
-
-설치한 Skill Rails에 평소 말하듯 요청하면 됩니다.
+이제 설치한 Skill Rails에 평소 말하듯 요청하면 됩니다.
 
 ```text
 Skill Rails를 사용해서 ./skills/release-check에 release-check 스킬을 만들어 줘.
@@ -163,6 +159,12 @@ Skill Rails를 사용해서 ./skills/release-check에 release-check 스킬을 �
 ```
 
 작성 AI는 답에 따라 스킬이 해야 할 일, 하지 말아야 할 일, 만들어야 할 결과물이 달라지는 경우에만 추가로 질문합니다. 그 답을 파일에 기록하고, 알맞은 프로필을 선택하고, 실제 규칙과 테스트를 만든 뒤 검증을 실행합니다. 마지막에는 이미 실행해서 확인한 내용과 실제 설치 환경에서 추가로 시험해야 할 내용을 구분해 보고합니다.
+
+Node.js 20 또는 설치 프로그램을 사용할 수 없는 환경의 수동 설치 방법과 도구별 경로는 [플랫폼 설치 참고 문서](references/platform-adapters.md)에서 확인할 수 있습니다.
+
+## 스크립트를 직접 실행하는 경우
+
+대부분의 사용자는 아래 명령을 직접 실행할 필요가 없습니다. 의도 파일로 자동화를 시작하거나 생성 결과를 별도 작업에서 검사할 때만 사용합니다.
 
 의도 파일에서 직접 시작하려면 [`templates/intent-brief.json`](templates/intent-brief.json)을 사용합니다. 아래 `<skill-rails>`는 설치된 경로로 바꿉니다.
 

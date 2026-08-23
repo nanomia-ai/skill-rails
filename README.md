@@ -138,23 +138,19 @@ P0/P1 routing appears only when the intent declares a stable topic ID, a concise
 
 For P2, all behavior rules live in `spec.mjs`, but the AI does not read that entire file every time it uses the skill. The execution script calculates the current stage and next action, then returns a small JSON result called a Decision. It contains only the current status, allowed and forbidden actions, material to read now, and evidence still required.
 
-## Install
+## Install and use it
 
-Skill Rails is one portable, file-based package. The installer can place it in Codex, Claude Code, Cursor, OpenCode, or another discovery path it supports without maintaining a different behavior file for each host:
+From a project with Node.js 22.20 or newer, run the following command. This version requirement comes from the current `skills` installer.
 
 ```bash
 npx skills@latest add nanomia-ai/skill-rails
 ```
 
-Choose `skill-rails`, the target agents, and project or global scope in the installer. Skill Rails itself requires Node.js 20 or newer. The currently tested `skills` 1.5.23 installer requires Node.js 22.20 or newer; if the installer cannot run on your Node version, use Git to clone the repository directly into your host's project-local skill directory instead. For example, use `.agents/skills/skill-rails` for Codex or `.claude/skills/skill-rails` for Claude Code.
+Choose `skill-rails`, the AI tools you use, and project or global scope. The installer places the same Skill Rails package where each tool discovers skills, such as `.claude/skills/` for Claude Code and `.agents/skills/` for Codex. No separate dependency installation or configuration is required.
 
-The installed creator carries its migration parser. Normal `init`, `migrate`, `maintain`, `lint`, `build`, and `eval --skill` use does not need a separate `npm ci`. Contributors running this repository's own test and frozen evaluation corpus still start with `npm ci`.
+If this is the first skill installed while an AI session is already open, restart that session once only if the skill does not appear. This refreshes skill discovery; it is not another installation step.
 
-Codex and Claude Code are the hosts with current fresh-agent, trigger, and cross-consumption evidence. Installation into other file-based hosts is structurally available through the installer, but their triggering, skill-root handling, and task output remain unverified. No marketplace plugin or host hook is required by the portable core.
-
-## Create your first skill
-
-Ask the installed Skill Rails skill in ordinary language:
+Then ask the installed Skill Rails skill in ordinary language:
 
 ```text
 Use Skill Rails to create a release-check skill in ./skills/release-check.
@@ -163,6 +159,12 @@ and never claim completion without proof.
 ```
 
 The authoring agent asks a follow-up only when the answer would change what the skill must do, must not do, or produce. It records those answers in files, selects the profile, implements the real rules and tests, and runs the checks. Its final report separates what it actually executed from what still needs to be tried in the real installation environment.
+
+For manual installation on Node.js 20 or in an environment where the installer cannot run, see the [platform installation reference](references/platform-adapters.md).
+
+## Run the scripts directly
+
+Most users do not need to run the commands below. Use them only when starting automation from an intent file or checking a generated package in a separate workflow.
 
 To work directly from an intent file, start with [`templates/intent-brief.json`](templates/intent-brief.json). Replace `<skill-rails>` with the installed directory:
 
