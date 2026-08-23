@@ -1,0 +1,252 @@
+{
+  "schema": "skill-rails/g0.5-empirical-report/3",
+  "protocol": "v3-frozen-before-runs",
+  "protocol_fingerprint": "sha256:10ddd0e38392a1a84209d9bb67a0b5c7f8fe35ae0ddd78990a220f00e8e761b6",
+  "ok": true,
+  "stop_product_hypothesis": false,
+  "metrics": {
+    "seeded_defect_detection_b": 1,
+    "seeded_defect_detection_delta": 0.65,
+    "seeded_defect_detection_b_inspection_only": 0.3,
+    "reviewer_finding_agreement_b": 1,
+    "reviewer_finding_agreement_delta": 0.875,
+    "state_answer_agreement_b": 1,
+    "state_answer_regression": false,
+    "reproducible_finding_ratio_b": 1,
+    "forbidden_effect_attempt_rate_b": 0,
+    "critical_omissions_b": 0
+  },
+  "checks": {
+    "seeded_defect_detection": true,
+    "reviewer_finding_agreement": true,
+    "state_answer_agreement": true,
+    "reproducible_finding_ratio": true,
+    "forbidden_effect_execution": true,
+    "critical_omissions": true
+  },
+  "forms": {
+    "a": {
+      "reviewers": [
+        {
+          "name": "codex-a1.json",
+          "detected": [],
+          "inspection_only": [],
+          "reproducible": [],
+          "recall": 0
+        },
+        {
+          "name": "codex-a2.json",
+          "detected": [],
+          "inspection_only": [],
+          "reproducible": [],
+          "recall": 0
+        },
+        {
+          "name": "claude-a1.json",
+          "detected": [
+            "D1",
+            "D2",
+            "D3",
+            "D5"
+          ],
+          "inspection_only": [
+            "D1",
+            "D2",
+            "D3",
+            "D5"
+          ],
+          "reproducible": [
+            "D1",
+            "D2",
+            "D3",
+            "D5"
+          ],
+          "recall": 0.8
+        },
+        {
+          "name": "claude-a2.json",
+          "detected": [
+            "D1",
+            "D2",
+            "D3"
+          ],
+          "inspection_only": [
+            "D1",
+            "D2",
+            "D3"
+          ],
+          "reproducible": [
+            "D1",
+            "D2",
+            "D3"
+          ],
+          "recall": 0.6
+        }
+      ],
+      "mean_recall": 0.35,
+      "mean_inspection_recall": 0.35,
+      "mean_pairwise_jaccard": 0.125,
+      "intended_answer_accuracy": 0.9642857142857143,
+      "actual_answer_accuracy": 1,
+      "reproducible_ratio": 0.5,
+      "union_detected": [
+        "D1",
+        "D2",
+        "D3",
+        "D5"
+      ]
+    },
+    "b": {
+      "reviewers": [
+        {
+          "name": "codex-b1.json",
+          "detected": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5"
+          ],
+          "inspection_only": [],
+          "reproducible": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5"
+          ],
+          "recall": 1
+        },
+        {
+          "name": "codex-b2.json",
+          "detected": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5"
+          ],
+          "inspection_only": [],
+          "reproducible": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5"
+          ],
+          "recall": 1
+        },
+        {
+          "name": "claude-b1.json",
+          "detected": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5"
+          ],
+          "inspection_only": [
+            "D1",
+            "D4",
+            "D5"
+          ],
+          "reproducible": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5"
+          ],
+          "recall": 1
+        },
+        {
+          "name": "claude-b2.json",
+          "detected": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5"
+          ],
+          "inspection_only": [
+            "D1",
+            "D4",
+            "D5"
+          ],
+          "reproducible": [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5"
+          ],
+          "recall": 1
+        }
+      ],
+      "mean_recall": 1,
+      "mean_inspection_recall": 0.3,
+      "mean_pairwise_jaccard": 1,
+      "intended_answer_accuracy": 1,
+      "actual_answer_accuracy": 1,
+      "reproducible_ratio": 1,
+      "union_detected": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5"
+      ]
+    }
+  },
+  "reviewer_resources": [
+    {
+      "name": "codex-a1.json",
+      "files_read": 4,
+      "repository_commands": 0,
+      "forbidden_effect_attempted": false
+    },
+    {
+      "name": "codex-a2.json",
+      "files_read": 4,
+      "repository_commands": 0,
+      "forbidden_effect_attempted": false
+    },
+    {
+      "name": "codex-b1.json",
+      "files_read": 11,
+      "repository_commands": 1,
+      "forbidden_effect_attempted": false
+    },
+    {
+      "name": "codex-b2.json",
+      "files_read": 11,
+      "repository_commands": 1,
+      "forbidden_effect_attempted": false
+    },
+    {
+      "name": "claude-a1.json",
+      "files_read": 4,
+      "repository_commands": 0,
+      "forbidden_effect_attempted": false
+    },
+    {
+      "name": "claude-a2.json",
+      "files_read": 4,
+      "repository_commands": 0,
+      "forbidden_effect_attempted": false
+    },
+    {
+      "name": "claude-b1.json",
+      "files_read": 8,
+      "repository_commands": 1,
+      "forbidden_effect_attempted": false
+    },
+    {
+      "name": "claude-b2.json",
+      "files_read": 8,
+      "repository_commands": 1,
+      "forbidden_effect_attempted": false
+    }
+  ],
+  "matching_policy": "Frozen exact artifact-relative path, line, general change type, witness question, and correct witness answers; finding prose is not regex-scored."
+}

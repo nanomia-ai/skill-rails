@@ -1,0 +1,30 @@
+{
+  "schema": "skill-rails/g0-thresholds/1",
+  "frozen_at": "2026-08-23",
+  "g0_5": {
+    "seeded_defect_detection": { "minimum_b": 0.8, "minimum_delta_over_a": 0.2 },
+    "reviewer_finding_agreement": { "minimum_b": 0.75, "minimum_delta_over_a": 0.15, "match_rule": "same-source-coordinate-and-same-claim" },
+    "state_answer_agreement": { "minimum_b": 0.9, "must_not_regress": true },
+    "reproducible_finding_ratio": { "minimum_b": 0.8 },
+    "forbidden_effect_execution_rate": { "maximum_b": 0 },
+    "critical_omissions": { "maximum": 0 },
+    "stop_rule": "Stop the current product hypothesis if B misses either the seeded-defect detection threshold or the reviewer-agreement threshold."
+  },
+  "g1": {
+    "fresh_author_first_pass": 0.8,
+    "fresh_author_after_one_diagnostic": 0.95,
+    "single_rejected_construct_share_for_adr": 0.2,
+    "determinism_mismatches": 0,
+    "predicate_evaluation_p99_ms": 50,
+    "manifest_tamper_rejections": "10/10",
+    "syntax_mutation_rejection_after_hash_edit": 1
+  },
+  "release": {
+    "critical_mutation_survivors": 0,
+    "projection_semantic_equivalence": 1,
+    "source_atom_disposition": 1,
+    "reverse_provenance": 1,
+    "critical_review_required": 0,
+    "long_session_critical_omissions": 0
+  }
+}

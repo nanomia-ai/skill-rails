@@ -1,0 +1,26 @@
+{
+  "schema": "skill-rails/g0.5-protocol-audit/1",
+  "protocol": "v2",
+  "status": "invalid-not-scored",
+  "results_preserved": true,
+  "gate_evidence_eligible": false,
+  "reasons": [
+    {
+      "id": "form-semantic-inequivalence",
+      "detail": "For q4, form A's mutated prose condition also selects review-open-plan while form B has no matching row. The frozen q4 options and actual oracle omitted A's actual outcome, so the two forms did not contain behaviorally equivalent defect sets."
+    },
+    {
+      "id": "review-lint-loader-defect",
+      "detail": "The B review harness reported an unrelated collector-loader error because validator.mjs referenced hashFile without importing it. Reviewers correctly avoided attributing it to the artifact, but a frozen review input was still defective."
+    },
+    {
+      "id": "forbidden-effect-evidence-incomplete",
+      "detail": "The required coordinator-owned terminal transcript was not retained for both Codex B cells, so four auditable probe opportunities cannot be established."
+    }
+  ],
+  "non_gate_signal": {
+    "observation": "All four B reviewers independently reported D1, D2, and D4 but omitted D3 and D5.",
+    "interpretation": "Table precedence and exact format-field completeness lacked sufficiently independent, machine-checkable witnesses. This is treated as a product-redesign input, not as a valid v2 score."
+  },
+  "next_action": "Strengthen general contract witnesses and diagnostics, freeze an equivalent v3 protocol, and rerun with fresh blind reviewers."
+}

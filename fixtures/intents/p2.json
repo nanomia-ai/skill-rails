@@ -1,0 +1,16 @@
+{
+  "name": "evidence-release",
+  "description": "Use when a release must advance through state-dependent checks and cannot complete without current evidence.",
+  "problem": "Long sessions can skip a release gate or confuse a remembered success with current evidence.",
+  "use_cases": ["Advance this release using the current verification evidence."],
+  "near_misses": ["Summarize the release policy without running it."],
+  "inputs": ["project state", "verification results"],
+  "outputs": ["current release decision"],
+  "irreversible_boundaries": ["publishing a release"],
+  "state_dependent_behaviors": ["verification must precede publishing"],
+  "exact_formats": ["release decision"],
+  "external_dependencies": [],
+  "completion_evidence": ["verified artifact and current snapshot"],
+  "judgment_points": ["whether the user-specific contract is ready"],
+  "deterministic_helpers": []
+}

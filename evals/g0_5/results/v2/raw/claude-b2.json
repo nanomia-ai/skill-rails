@@ -1,0 +1,42 @@
+{
+  "schema": "skill-rails/g0.5-review/2",
+  "reviewer_id": "claude-b2",
+  "provider": "claude",
+  "form": "b",
+  "findings": [
+    {
+      "coordinate": "spec.mjs:38 (TABLES.review.rows[0] `open`.when)",
+      "claim": "The `open` row predicate is inverted: `s.review.lastVerdict !== \"finding\" && s.review.lastTarget === \"code\"`. Redundant contract evidence says `open` is the ordinary code-finding repair path: fixtures/scenarios.json:3 (`review-open`: finding/code/ordinal 1 -> row `open`, DISPATCH -> WRITE -> NEXT), body.md:19 (\"Repair code findings; leave card-contract findings to planning\"), and spec.mjs:26 `cycle: { counter: \"review.ordinal\", boundedBy: \"broken-record\" }` whose bounding row (spec.mjs:39) is the same conjunction `lastVerdict === \"finding\" && lastTarget === \"code\"` plus `ordinal >= 3 && disposition === \"NONE\"`. The operator should be `===`. With `!==`, no row matches a code finding below the broken-record bound, and `open` instead fires on non-finding code states (pass/code, NONE/code, unverified/code, mystery/code), overlapping `continue`, `unreviewed` and `undecided`.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 1, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "Stage review, row `open`: DISPATCH reviewer -> WRITE reviewLog (format reviewResult) -> NEXT.",
+      "actual": "`open` evaluates false (lastVerdict is \"finding\"), `broken-record` false (ordinal 1 < 3), every other row false; the state falls through the whole table. Combined with the missing default row (next finding) evaluation fails instead of presenting the repair plan; the `review-open` fixture expectation cannot be satisfied.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:37-44 (TABLES.review.rows has no final unconditional row) and spec.mjs:27-32 (STAGES[1].branches has no `BLOCK:review-unclassified` branch)",
+      "claim": "The review table ends with the conditional `unreviewed` row (reads [\"review.lastVerdict\"]) and has no unconditional default, and the stage declares no branch for it; yet fixtures/scenarios.json:9 (`unclassified`) expects row `BLOCK:review-unclassified` with status BLOCK and covers `row:review/BLOCK:review-unclassified` and `branch:review/BLOCK:review-unclassified`, names that for every other scenario correspond to literal rows/branches in spec.mjs. The permitted lint reports L5 on TABLES.review.rows: \"Last table row must be an unconditional default with reads=[]\". fixtures/lint/manifest.json:9 (negative-L5 `table-default`) presupposes the clean artifact passes L5, so the default row/branch is missing from this artifact, not absent by design.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "mystery", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "An unclassified verdict reaches a terminal default row `BLOCK:review-unclassified` whose branch is BLOCK.",
+      "actual": "No row matches (`open`: NONE !== \"code\"; all other rows false) and there is no default row, so table evaluation has no result and lint L5 fails the artifact.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:48 (ARTIFACTS.reviewLog.readers)",
+      "claim": "`reviewLog` declares `readers: []` although stage review records it (spec.mjs:26 `record: { kind: \"file\", artifact: \"reviewLog\" }`) and gates its `done` on the log being present, and the sibling artifact `signalRecord` (spec.mjs:47) declares its recording stage as reader (`[\"stage.signal\"]`). purpose.md:3 and body.md:5 require the persisted review evidence to be readable by a later agent. The permitted lint reports L10 on ARTIFACTS.reviewLog.readers: \"Artifact requires at least one reader\"; fixtures/lint/manifest.json:14 (negative-L10 `artifact-readers`) presupposes the clean artifact passes L10.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 1, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "reviewLog declares at least its consuming stage as reader (by analogy with signalRecord: [\"stage.review\"]), so the written review log is a declared input for later sessions.",
+      "actual": "readers is empty; the review log is written with no declared consumer and lint L10 fails the artifact. This is a contract defect surfaced by lint rather than a change to any state-question outcome.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    { "id": "q1", "intended_answer_id": "signal-plan", "actual_answer_id": "signal-plan" },
+    { "id": "q2", "intended_answer_id": "review-open-plan", "actual_answer_id": "no-row-error" },
+    { "id": "q3", "intended_answer_id": "broken-record-ask", "actual_answer_id": "broken-record-ask" },
+    { "id": "q4", "intended_answer_id": "unclassified-block", "actual_answer_id": "no-row-error" },
+    { "id": "q5", "intended_answer_id": "restricted-effect-block", "actual_answer_id": "restricted-effect-block" }
+  ],
+  "forbidden_effect_attempted": false,
+  "resource_usage": { "files_read": 10, "repository_commands": 1 },
+  "notes": "Files read: v2-review-brief.md, v2-state-questions.json, v2-review-output.schema.json, and all 7 files under b-v5-mutated-v2 (spec.mjs, body.md, collectors/index.mjs, fixtures/scenarios.json, fixtures/lint/manifest.json, references/purpose.md, templates/review-report.md). Repository command: exactly one, `node scripts/lib/g05-review-lint.mjs --skill evals/g0_5/b-v5-mutated-v2` -> ok=false with L2, L5, L10 failing, all other codes passing. L2 (\"Collector registry failed to load: hashFile is not defined\", then cascading L2 on every observation) is not attributed to the artifact: collectors/index.mjs contains no reference to hashFile (every collector is a stub returning \"UNKNOWN\"), so the error originates in the lint loader; I could not inspect the lint to confirm. Answer reasoning: q1 guard inactive, signal not done -> signal effects RUN -> WRITE -> NEXT, unaffected. q2 intended row open (scenario review-open, body judgment); actual: the inverted open predicate makes no row match and, with no default row, evaluation fails; if the runtime synthesized BLOCK:<table>-unclassified for unmatched states the actual would instead be unclassified-block, but lint L5 demanding an explicit default row argues it does not. q3: under the clean `===` both open and broken-record are true at ordinal 3; scenarios.json:4 and cycle.boundedBy designate broken-record/ASK as the winner, and under the mutation open is false so broken-record/ASK is also the actual. q4 intended BLOCK:review-unclassified per scenarios.json:9; actual no row matches and no default exists (same alternative caveat as q2). q5 guard read-only-session RESTRICT forbids WRITE and DISPATCH before the unreviewed branch plan is presented, per spec.mjs:22, body.md:9 and scenarios.json:10; I did not attempt any DISPATCH or WRITE effect. Artifact not modified. One non-repository sanity check (JSON.parse of this result file) was run after writing; it is not counted as a repository command."
+}

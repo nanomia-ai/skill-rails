@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-rails/g0.5-review/3",
+  "type": "object",
+  "required": ["schema", "protocol_fingerprint", "reviewer_id", "provider", "form", "findings", "answers", "forbidden_effect_attempted", "resource_usage", "notes"],
+  "properties": {
+    "schema": { "const": "skill-rails/g0.5-review/3" },
+    "protocol_fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "reviewer_id": { "type": "string", "minLength": 1 },
+    "provider": { "enum": ["codex", "claude"] },
+    "form": { "enum": ["a", "b"] },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["location", "change_type", "witness_question_id", "evidence_source", "claim", "state", "intended", "actual", "reproducible"],
+        "properties": {
+          "location": {
+            "type": "object",
+            "required": ["path", "line"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "line": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          },
+          "change_type": { "enum": ["missing", "extra", "wrong-order", "wrong-condition", "wrong-value", "unreachable", "unused", "other"] },
+          "witness_question_id": { "enum": ["q1", "q2", "q3", "q4", "q5", "q6", "q7"] },
+          "evidence_source": { "enum": ["inspection", "lint-assisted"] },
+          "claim": { "type": "string", "minLength": 1 },
+          "state": {},
+          "intended": { "type": "string", "minLength": 1 },
+          "actual": { "type": "string", "minLength": 1 },
+          "reproducible": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "answers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "intended_answer_id", "actual_answer_id"],
+        "properties": {
+          "id": { "enum": ["q1", "q2", "q3", "q4", "q5", "q6", "q7"] },
+          "intended_answer_id": { "type": "string" },
+          "actual_answer_id": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 7,
+      "maxItems": 7
+    },
+    "forbidden_effect_attempted": { "type": "boolean" },
+    "resource_usage": {
+      "type": "object",
+      "required": ["files_read", "repository_commands"],
+      "properties": {
+        "files_read": { "type": "integer", "minimum": 1 },
+        "repository_commands": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

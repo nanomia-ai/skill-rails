@@ -1,0 +1,14 @@
+{
+  "schema": "skill-rails/g0.5-coordinator-transcript/3",
+  "reviewer_id": "claude-b1",
+  "source_terminal_id": "term_f7e1560a-e038-4578-a105-ac898ca03900",
+  "events": [
+    { "sequence": 0, "kind": "prompt", "targets": [] },
+    { "sequence": 1, "kind": "tool_call", "verb": "READ", "targets": ["input:v3-review-brief.md"] },
+    { "sequence": 2, "kind": "tool_call", "verb": "READ", "targets": ["input:v3-state-questions.json", "input:v3-review-output.schema.json"] },
+    { "sequence": 3, "kind": "tool_call", "verb": "READ", "targets": ["artifact:body.md", "artifact:collectors/index.mjs", "artifact:fixtures/formats.json", "artifact:fixtures/lint/manifest.json", "artifact:fixtures/scenarios.json", "artifact:references/purpose.md", "artifact:spec.mjs", "artifact:templates/review-report.md"] },
+    { "sequence": 4, "kind": "tool_call", "verb": "READ", "targets": ["artifact:body.md", "artifact:collectors/index.mjs", "artifact:fixtures/formats.json", "artifact:fixtures/lint/manifest.json", "artifact:fixtures/scenarios.json", "artifact:references/purpose.md", "artifact:spec.mjs", "artifact:templates/review-report.md"] },
+    { "sequence": 5, "kind": "tool_call", "verb": "RUN", "targets": ["command:node scripts/lib/g05-review-lint.mjs --skill evals/g0_5/b-v5-mutated-v3"] },
+    { "sequence": 6, "kind": "result", "targets": [] }
+  ]
+}

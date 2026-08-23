@@ -1,0 +1,100 @@
+{
+  "schema": "skill-rails/g0.5-review/3",
+  "protocol_fingerprint": "sha256:10ddd0e38392a1a84209d9bb67a0b5c7f8fe35ae0ddd78990a220f00e8e761b6",
+  "reviewer_id": "codex-a1",
+  "provider": "codex",
+  "form": "a",
+  "findings": [
+    {
+      "location": { "path": "evals/g0_5/a-prose/mutated-v3.md", "line": 12 },
+      "change_type": "missing",
+      "witness_question_id": "q2",
+      "evidence_source": "inspection",
+      "claim": "The ordinary code-finding row dispatches a clean reviewer but omits writing reviewLog before re-entering.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "Dispatch the reviewer, write reviewLog, then proceed to NEXT.",
+      "actual": "Dispatch the reviewer and re-enter without writing reviewLog.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "evals/g0_5/a-prose/mutated-v3.md", "line": 11 },
+      "change_type": "wrong-order",
+      "witness_question_id": "q3",
+      "evidence_source": "inspection",
+      "claim": "The ordinary code-defect row precedes the third-or-later finding boundary, so first-match evaluation captures the ordinary row first.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 3,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "Select the broken-record row and ask the human.",
+      "actual": "Select the ordinary open row and dispatch a clean reviewer after repair.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "evals/g0_5/a-prose/mutated-v3.md", "line": 21 },
+      "change_type": "missing",
+      "witness_question_id": "q4",
+      "evidence_source": "inspection",
+      "claim": "The review table has no row handling an unclassified latest verdict.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "mystery",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "Block with reason review-unclassified.",
+      "actual": "No row matches and evaluation fails.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "evals/g0_5/a-prose/mutated-v3.md", "line": 27 },
+      "change_type": "wrong-value",
+      "witness_question_id": "q6",
+      "evidence_source": "inspection",
+      "claim": "The declared consumer is incorrectly stated as absent.",
+      "state": { "artifact.reviewLogPresent": "yes" },
+      "intended": "The review stage reads reviewLog to establish completion.",
+      "actual": "No later component reads the review record.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "evals/g0_5/a-prose/mutated-v3.md", "line": 26 },
+      "change_type": "missing",
+      "witness_question_id": "q7",
+      "evidence_source": "inspection",
+      "claim": "The reviewResult schema omits the required detail-json field.",
+      "state": { "record.kind": "reviewResult" },
+      "intended": "Require timestamp, head, verdict, and detail-json.",
+      "actual": "Require only timestamp, head, and verdict.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    { "id": "q1", "intended_answer_id": "signal-plan", "actual_answer_id": "signal-plan" },
+    { "id": "q2", "intended_answer_id": "review-open-full", "actual_answer_id": "review-open-dispatch-only" },
+    { "id": "q3", "intended_answer_id": "broken-record-row", "actual_answer_id": "open-row" },
+    { "id": "q4", "intended_answer_id": "unclassified-block", "actual_answer_id": "no-row-error" },
+    { "id": "q5", "intended_answer_id": "restricted-effect-block", "actual_answer_id": "restricted-effect-block" },
+    { "id": "q6", "intended_answer_id": "review-stage-reader", "actual_answer_id": "no-reader" },
+    { "id": "q7", "intended_answer_id": "review-four-fields", "actual_answer_id": "review-three-fields" }
+  ],
+  "forbidden_effect_attempted": false,
+  "resource_usage": { "files_read": 4, "repository_commands": 0 },
+  "notes": "Inspected only the four declared artifact files. No repository commands or lint were used, and no files were modified."
+}

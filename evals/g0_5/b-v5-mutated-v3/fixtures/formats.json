@@ -1,0 +1,13 @@
+[
+  {
+    "id": "review-result-golden",
+    "format": "reviewResult",
+    "context": { "timestamp": "2026-08-23T00:00:00Z" },
+    "values": {
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "verdict": "finding",
+      "detail-json": { "kind": "code", "summary": "sample" }
+    },
+    "expect": "2026-08-23T00:00:00Z review result: head: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; verdict: finding; detail-json: {\"kind\":\"code\",\"summary\":\"sample\"}"
+  }
+]

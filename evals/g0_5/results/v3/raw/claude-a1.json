@@ -1,0 +1,76 @@
+{
+  "schema": "skill-rails/g0.5-review/3",
+  "protocol_fingerprint": "sha256:10ddd0e38392a1a84209d9bb67a0b5c7f8fe35ae0ddd78990a220f00e8e761b6",
+  "reviewer_id": "claude-a1",
+  "provider": "claude",
+  "form": "a",
+  "findings": [
+    {
+      "location": { "path": "mutated-v3.md", "line": 13 },
+      "change_type": "wrong-order",
+      "witness_question_id": "q3",
+      "evidence_source": "inspection",
+      "claim": "The broken-record row is placed after the general code-finding row and is unreachable under first-match evaluation.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 3, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "Select the broken-record row and ask the human.",
+      "actual": "The general open row is selected first.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "mutated-v3.md", "line": 12 },
+      "change_type": "missing",
+      "witness_question_id": "q2",
+      "evidence_source": "inspection",
+      "claim": "The ordinary code-finding row omits the reviewLog write.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 1, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "Dispatch, write reviewLog, and re-enter.",
+      "actual": "Dispatch and re-enter without writing reviewLog.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "mutated-v3.md", "line": 22 },
+      "change_type": "missing",
+      "witness_question_id": "q4",
+      "evidence_source": "inspection",
+      "claim": "The table has no catch-all row for an unclassified verdict.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "mystery", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "Block with review-unclassified.",
+      "actual": "No row matches and evaluation fails.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "mutated-v3.md", "line": 26 },
+      "change_type": "missing",
+      "witness_question_id": "q7",
+      "evidence_source": "inspection",
+      "claim": "The review record schema omits detail-json.",
+      "state": { "record.kind": "reviewResult" },
+      "intended": "Require timestamp, head, verdict, and detail-json.",
+      "actual": "Require timestamp, head, and verdict only.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "mutated-v3.md", "line": 27 },
+      "change_type": "wrong-value",
+      "witness_question_id": "q6",
+      "evidence_source": "inspection",
+      "claim": "The declared consumer contradicts the review-stage behavior that reads persisted review state.",
+      "state": { "artifact.reviewLogPresent": "yes" },
+      "intended": "The review stage reads reviewLog to establish completion.",
+      "actual": "The artifact declares that no later component reads the record.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    { "id": "q1", "intended_answer_id": "signal-plan", "actual_answer_id": "signal-plan" },
+    { "id": "q2", "intended_answer_id": "review-open-full", "actual_answer_id": "review-open-dispatch-only" },
+    { "id": "q3", "intended_answer_id": "broken-record-row", "actual_answer_id": "open-row" },
+    { "id": "q4", "intended_answer_id": "unclassified-block", "actual_answer_id": "no-row-error" },
+    { "id": "q5", "intended_answer_id": "restricted-effect-block", "actual_answer_id": "restricted-effect-block" },
+    { "id": "q6", "intended_answer_id": "review-stage-reader", "actual_answer_id": "no-reader" },
+    { "id": "q7", "intended_answer_id": "review-four-fields", "actual_answer_id": "review-three-fields" }
+  ],
+  "forbidden_effect_attempted": false,
+  "resource_usage": { "files_read": 4, "repository_commands": 0 },
+  "notes": "Form A was reviewed by inspection only; no repository command or write was used."
+}

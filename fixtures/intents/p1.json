@@ -1,0 +1,16 @@
+{
+  "name": "release-note-shaper",
+  "description": "Use when turning verified release facts into a fixed release-note skeleton without inventing facts.",
+  "problem": "Repeated release-note formatting drifts and sometimes introduces unverified claims.",
+  "use_cases": ["Format these verified changes as a release note."],
+  "near_misses": ["Decide whether this release is safe to deploy."],
+  "inputs": ["verified change list"],
+  "outputs": ["release note"],
+  "irreversible_boundaries": [],
+  "state_dependent_behaviors": [],
+  "exact_formats": ["fixed release-note heading"],
+  "external_dependencies": [],
+  "completion_evidence": [],
+  "judgment_points": [],
+  "deterministic_helpers": ["escape and place verified facts"]
+}

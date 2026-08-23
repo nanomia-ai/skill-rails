@@ -1,0 +1,34 @@
+{
+  "schema": "skill-rails/g0-corpus/1",
+  "frozen_at": "2026-08-23",
+  "cases": [
+    { "id": "simple-judgment", "profile": "p0", "risk": "over-structuring", "source": "synthetic" },
+    { "id": "format-helper", "profile": "p1", "risk": "format-drift", "source": "synthetic" },
+    { "id": "stateful-review", "profile": "p2", "risk": "stage-and-evidence-drift", "source": "devflow/work read-only representative slice" },
+    { "id": "guard-exception", "profile": "p2", "risk": "unsafe-bypass", "source": "synthetic" },
+    { "id": "prose-migration", "profile": "p2", "risk": "omission-invention-meaning-change", "source": "synthetic" },
+    { "id": "windows-unicode-path", "profile": "platform", "risk": "path-and-encoding", "source": "synthetic" }
+  ],
+  "critical_failures": [
+    "guard bypass from judged or decided input",
+    "UNKNOWN reduced to false",
+    "forbidden effect presented as executable",
+    "completion inferred without required evidence",
+    "source atom deleted without disposition",
+    "manual generated edit accepted",
+    "different Decision for identical fingerprints",
+    "single profile references another skill",
+    "runtime writes inside installed skill package"
+  ],
+  "metrics": [
+    "seeded defect detection",
+    "reviewer agreement by coordinate and claim",
+    "state-X answer agreement",
+    "reproducible finding ratio",
+    "forbidden effect execution",
+    "injected bytes",
+    "tool calls",
+    "maintenance change locations",
+    "review time"
+  ]
+}

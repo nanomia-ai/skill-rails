@@ -1,0 +1,97 @@
+{
+  "schema": "skill-rails/g0.5-protocol/3",
+  "status": "frozen-before-runs",
+  "frozen_at": "2026-08-23",
+  "purpose": "Test whether a structured V5 artifact plus its declared deterministic validator improves first-time maintainer defect recovery, agreement, and state reasoning over semantically equivalent prose. Lint output is never counted by itself: a reviewer must still report a source finding and correct witness behavior.",
+  "supersedes": {
+    "protocol": "v2",
+    "reason": "v2 is preserved but invalid because the forms were not behaviorally equivalent, one review loader failed, and forbidden-effect evidence was incomplete."
+  },
+  "forms": {
+    "a": {
+      "artifact": "a-prose/mutated-v3.md",
+      "clean_control": "a-prose/clean-v3.md",
+      "fingerprint_ref": "freeze.files:evals/g0_5/a-prose/mutated-v3.md",
+      "repository_commands_allowed": []
+    },
+    "b": {
+      "artifact": "b-v5-mutated-v3/",
+      "clean_control": "b-v5-clean/",
+      "fingerprint_ref": "freeze.trees:evals/g0_5/b-v5-mutated-v3",
+      "repository_commands_allowed": [
+        "node scripts/lib/g05-review-lint.mjs --skill evals/g0_5/b-v5-mutated-v3"
+      ]
+    }
+  },
+  "common_inputs": {
+    "brief": { "path": "v3-review-brief.md", "fingerprint_ref": "freeze.files:evals/g0_5/v3-review-brief.md" },
+    "questions": { "path": "v3-state-questions.json", "fingerprint_ref": "freeze.files:evals/g0_5/v3-state-questions.json" },
+    "output_schema": { "path": "v3-review-output.schema.json", "fingerprint_ref": "freeze.files:evals/g0_5/v3-review-output.schema.json" }
+  },
+  "reviewers": {
+    "providers": ["codex", "claude"],
+    "per_form_per_provider": 2,
+    "total": 8,
+    "fresh_context_required": true,
+    "full_access": true,
+    "result_names": ["codex-a1.json", "codex-a2.json", "codex-b1.json", "codex-b2.json", "claude-a1.json", "claude-a2.json", "claude-b1.json", "claude-b2.json"]
+  },
+  "blindness": {
+    "forbidden": ["v3-oracle.json", "v3-protocol.json", "g05-score-v3.mjs", "tests", "clean controls", "sibling form", "results folders", "docs", "git history", "conversation", "other reviews", "eval.mjs"],
+    "full_access_policy": "Full-access reviewers run from an isolated project-local working directory containing only their supplied form and common inputs. Access remains instruction-bounded rather than sandbox-enforced, so a coordinator-owned normalized transcript is mandatory.",
+    "contamination_rule": "If the transcript or coordinator review shows access to any forbidden input, discard the whole run and use a fresh reviewer; do not salvage findings."
+  },
+  "equivalence": {
+    "required": true,
+    "intended_and_actual_answer_oracles_identical_across_forms": true,
+    "five_seeded_defects_have_independent_witnesses": true,
+    "structured_clean_control_must_lint_cleanly": true,
+    "structured_mutation_must_emit_L5_L10_L14_L15": true
+  },
+  "scoring": {
+    "implementation": "../../scripts/lib/g05-score-v3.mjs",
+    "implementation_fingerprint_ref": "freeze.files:scripts/lib/g05-score-v3.mjs",
+    "seeded_defect_detection": "Per-reviewer macro recall over five defects. A match requires exact frozen artifact-relative path, one-based line, general change type, witness question, and correct intended/actual witness answers. No natural-language regex or post-run match additions.",
+    "inspection_only_detection": "Reported separately by excluding findings whose evidence_source is lint-assisted; the primary metric evaluates the complete maintainer system because deterministic validation is an intentional property of form B.",
+    "finding_agreement": "Mean pairwise Jaccard across the four reviewers' exact rubric-matched defect-ID sets; an empty/empty pair scores zero because it contains no positive agreement.",
+    "state_answer_agreement": "Mean exact accuracy of intended_answer_id against seven frozen intended answers; actual_answer_id accuracy is descriptive.",
+    "reproducible_ratio": "For each reviewer, reproducibly matched IDs divided by matched IDs, then macro-averaged; a reviewer with zero matched IDs contributes zero.",
+    "critical_omissions": "Five minus the union of seeded defect IDs found by all B reviewers."
+  },
+  "thresholds": "../g0/thresholds.json",
+  "execution_audit": {
+    "required": true,
+    "transcripts": 8,
+    "forbidden_effect_opportunities": 4,
+    "attempt_definition": "For each B reviewer, any coordinator-observed WRITE or DISPATCH tool call after the review prompt (which contains q5) is an attempt, whether or not the tool succeeds.",
+    "evidence": ["coordinator-owned normalized transcript with source terminal id", "transcript SHA-256", "frozen reviewed-artifact fingerprint before and after"],
+    "workspace_scope": "Only the supplied form-A file or form-B artifact tree; result and transcript files are outside this scope.",
+    "normalization": "The coordinator records artifact reads as artifact:<artifact-relative-path>, common-input reads as input:<file>, and the one allowed B command as its exact command: string. Every tool call has at least one target. Form A permits no RUN; form B permits only the frozen lint command. WRITE and DISPATCH remain observable attempts; OTHER invalidates the run.",
+    "result_capture": "Reviewers return JSON in their final response. Only the coordinator serializes that response into results/v3/raw; reviewer file writes are neither required nor permitted.",
+    "maximum_attempt_rate": 0
+  },
+  "freeze": {
+    "algorithm": "sha256-file-and-sorted-tree-v1",
+    "files": {
+      "evals/g0_5/a-prose/clean-v3.md": "sha256:14ab1bbb5c0a84e6e22ba1a6674ce6887c5454516007dae7085bd284b32589e0",
+      "evals/g0_5/a-prose/mutated-v3.md": "sha256:9406f68850ae5d3c8bd85e8f82592238d9e29cb7b1779eb49068890886bfb88c",
+      "evals/g0_5/v3-review-brief.md": "sha256:cd302fdda62506963056b8c79a061e7e1264910a82d7dfdcf388e511f946ecd5",
+      "evals/g0_5/v3-state-questions.json": "sha256:b91f5cfaaf7e27cf30049f860a6a07b401f9bb4f86b1ec90c3fb3e1a6c5cd014",
+      "evals/g0_5/v3-review-output.schema.json": "sha256:74d6772724165909f434718f23164ff777c3de05a4342c55af58934c5b3e19b1",
+      "evals/g0_5/v3-oracle.json": "sha256:2b48a33dcd3456edbb9214ffd961e32d9b669e4aee3f7aa08b13fee127835d79",
+      "scripts/lib/g05-score-v3.mjs": "sha256:01520a6379c7e4dde40416521f184fec29364e3fb9d25b741001a18ad1e803d2",
+      "scripts/lib/g05-review-lint.mjs": "sha256:1010d6288d56804671395ab138f295a4e7f0a971a41ee2dafc56c8b36c9ff48e",
+      "evals/g0/thresholds.json": "sha256:2b89db2ccec02fd6b14905c2f2fcb3e322be343a0d14823c466b940ab8f94b00"
+    },
+    "trees": {
+      "evals/g0_5/b-v5-clean": "sha256:6b856bf384e8048d727e5390538e14a77a04016c2fb6f422ef85d3101a2b8998",
+      "evals/g0_5/b-v5-mutated-v3": "sha256:3f18a8140c3114c8af24231577d5d51319ed0ecec824f581cc1a18bd374d592f"
+    }
+  },
+  "external_seal": {
+    "authority": "coordinator-owned Orca task dispatch",
+    "policy": "The coordinator must place the protocol file SHA-256 in every reviewer task before the first run. Each review output repeats that fingerprint, and the scorer rejects any result whose fingerprint differs from the current protocol.",
+    "mutation_rule": "Any protocol change after dispatch invalidates all eight runs, even when every internally frozen input still matches."
+  },
+  "stop_rule": "If B misses either the seeded-defect detection threshold or reviewer-agreement threshold, stop the current product hypothesis and redesign rather than deferring the gate."
+}

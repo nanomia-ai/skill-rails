@@ -1,0 +1,17 @@
+{
+  "schema": "skill-rails/g0.5-oracle/1",
+  "seeded_defects": [
+    { "id": "D1", "kind": "condition-inversion", "a_coordinate": "a-prose/mutated.md#review-row-open", "b_coordinate": "b-v5-mutated/spec.mjs:TABLES.review/open" },
+    { "id": "D2", "kind": "default-row-deleted", "a_coordinate": "a-prose/mutated.md#review-table", "b_coordinate": "b-v5-mutated/spec.mjs:TABLES.review" },
+    { "id": "D3", "kind": "priority-row-reordered", "a_coordinate": "a-prose/mutated.md#review-table", "b_coordinate": "b-v5-mutated/spec.mjs:TABLES.review.rows" },
+    { "id": "D4", "kind": "artifact-readers-removed", "a_coordinate": "a-prose/mutated.md#review-record", "b_coordinate": "b-v5-mutated/spec.mjs:ARTIFACTS.reviewLog.readers" },
+    { "id": "D5", "kind": "format-field-omitted", "a_coordinate": "a-prose/mutated.md#review-record", "b_coordinate": "b-v5-mutated/spec.mjs:FORMATS.reviewResult" }
+  ],
+  "expected_answers": {
+    "q1": "signal; RUN(check=completion) -> WRITE(signalRecord) -> NEXT",
+    "q2": "open; DISPATCH(reviewer) -> WRITE(reviewLog, reviewResult) -> NEXT",
+    "q3": "broken-record; ASK",
+    "q4": "BLOCK:review-unclassified",
+    "q5": "BLOCK:restricted-effect DISPATCH by read-only-session"
+  }
+}

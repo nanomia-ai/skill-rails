@@ -1,0 +1,58 @@
+{
+  "schema": "skill-rails/g0.5-review/1",
+  "reviewer_id": "codex-b1",
+  "provider": "codex",
+  "form": "b",
+  "findings": [
+    {
+      "coordinate": "spec.mjs:1",
+      "claim": "The DSL import is rooted inside the artifact directory, so the supplied skill cannot be loaded by the required full-lint entry point.",
+      "state": {
+        "working_directory": "repository root",
+        "command": "node scripts/lint.mjs --skill evals/g0_5/b-v5-mutated --full --json"
+      },
+      "expected": "The relative import resolves to the repository DSL module, allowing the linter to import SPEC and evaluate the artifact.",
+      "actual": "The import resolves to evals/g0_5/b-v5-mutated/scripts/skill-rails/dsl.mjs, which does not exist; full lint reports L0 and leaves spec null.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:38 (contradicts fixtures/scenarios.json:3 and body.md:19)",
+      "claim": "The review/open predicate negates the finding verdict, so an ordinary code finding is routed to the unclassified blocker instead of the declared repair path.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "The review stage selects row open and orders DISPATCH reviewer, WRITE reviewLog in reviewResult format, then NEXT, matching the review-open scenario.",
+      "actual": "The open predicate requires review.lastVerdict !== finding, broken-record is false at ordinal 1, and every other row is false, so the state falls to BLOCK:review-unclassified with BLOCK.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    {
+      "id": "q1",
+      "answer": "The selected next stage is signal, with ordered effects RUN the completion check, WRITE/append signalRecord to state/signal.log, then NEXT."
+    },
+    {
+      "id": "q2",
+      "answer": "No declared review row matches: open rejects finding, broken-record rejects ordinal 1, and the remaining predicates are false; therefore BLOCK:review-unclassified applies with BLOCK and no DISPATCH, WRITE, or NEXT effects."
+    },
+    {
+      "id": "q3",
+      "answer": "The broken-record boundary wins: review selects broken-record and presents ASK only, rather than the ordinary repair effects."
+    },
+    {
+      "id": "q4",
+      "answer": "The state falls through to the synthetic BLOCK:review-unclassified row and terminates as BLOCK without state-changing effects."
+    },
+    {
+      "id": "q5",
+      "answer": "No; read-only-session returns RESTRICT and forbids both DISPATCH and WRITE, so the skill may inspect and explain the restriction but may not present those state-changing effects."
+    }
+  ],
+  "notes": "The permitted full-lint command stopped at the mechanically reproducible L0 import failure, so no later check is treated as evidence of success; the routing defect and state answers are derived directly from the supplied predicates, branches, guard, and scenarios."
+}

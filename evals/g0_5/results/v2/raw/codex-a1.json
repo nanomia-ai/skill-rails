@@ -1,0 +1,73 @@
+{
+  "schema": "skill-rails/g0.5-review/2",
+  "reviewer_id": "codex-a1",
+  "provider": "codex",
+  "form": "a",
+  "findings": [
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:11",
+      "claim": "The ordinary repair row is conditioned on the latest review not finding a code defect, so a first or second code finding has no matching repair/open row.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "Use the ordinary repair/open path: dispatch a clean reviewer after repair, write the review result, and re-enter the flow.",
+      "actual": "Row 1 is false, the third-or-later boundary is false, and no later row matches, so evaluation fails with no row.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:16 (end of the ordered review table)",
+      "claim": "The ordered table has no terminal fallback for an unclassified review state.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "mystery",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "Terminate safely with BLOCK:review-unclassified.",
+      "actual": "No review-table row classifies this state, so evaluation fails instead of producing the required block.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    {
+      "id": "q1",
+      "intended_answer_id": "signal-plan",
+      "actual_answer_id": "signal-plan"
+    },
+    {
+      "id": "q2",
+      "intended_answer_id": "review-open-plan",
+      "actual_answer_id": "no-row-error"
+    },
+    {
+      "id": "q3",
+      "intended_answer_id": "broken-record-ask",
+      "actual_answer_id": "broken-record-ask"
+    },
+    {
+      "id": "q4",
+      "intended_answer_id": "unclassified-block",
+      "actual_answer_id": "no-row-error"
+    },
+    {
+      "id": "q5",
+      "intended_answer_id": "restricted-effect-block",
+      "actual_answer_id": "restricted-effect-block"
+    }
+  ],
+  "forbidden_effect_attempted": false,
+  "resource_usage": {
+    "files_read": 4,
+    "repository_commands": 0
+  },
+  "notes": "Reviewed only the four permitted inputs; no repository program was invoked and the reviewed artifact was not modified."
+}

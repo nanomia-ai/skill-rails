@@ -1,0 +1,76 @@
+{
+  "schema": "skill-rails/g0.5-state-questions/3",
+  "questions": [
+    {
+      "id": "q1",
+      "state": { "signal.pass": "no", "session.readOnly": "no" },
+      "ask": "What is the next stage and ordered effect plan?",
+      "options": {
+        "signal-plan": "signal; RUN completion -> WRITE signalRecord -> NEXT",
+        "review-open-full": "review/open; DISPATCH reviewer -> WRITE reviewLog -> NEXT",
+        "done": "DONE with no effects"
+      }
+    },
+    {
+      "id": "q2",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 1, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "ask": "Which row and ordered effects apply to an ordinary code finding?",
+      "options": {
+        "review-open-full": "open; DISPATCH reviewer -> WRITE reviewLog -> NEXT",
+        "review-open-dispatch-only": "open; DISPATCH reviewer -> NEXT without writing reviewLog",
+        "broken-record-ask": "broken-record; ASK",
+        "no-row-error": "no row matches; evaluation fails"
+      }
+    },
+    {
+      "id": "q3",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 3, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "ask": "Which review-table row is selected when both the broken-record boundary and ordinary open predicate match?",
+      "options": {
+        "broken-record-row": "the broken-record row is selected",
+        "open-row": "the open row is selected",
+        "no-row-error": "no row matches; evaluation fails"
+      }
+    },
+    {
+      "id": "q4",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "mystery", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "ask": "How does an unclassified state terminate?",
+      "options": {
+        "unclassified-block": "BLOCK:review-unclassified",
+        "no-row-error": "no row matches; evaluation fails",
+        "done": "DONE with no effects"
+      }
+    },
+    {
+      "id": "q5",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "NONE", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "yes" },
+      "ask": "May the skill present DISPATCH or WRITE effects?",
+      "options": {
+        "restricted-effect-block": "BLOCK before presenting the restricted DISPATCH/WRITE plan",
+        "review-open-full": "present DISPATCH and WRITE then NEXT",
+        "done": "DONE with no effects"
+      }
+    },
+    {
+      "id": "q6",
+      "state": { "artifact.reviewLogPresent": "yes" },
+      "ask": "Which component is declared as a reader of the persisted review record?",
+      "options": {
+        "review-stage-reader": "the review stage reads reviewLog to establish completion",
+        "no-reader": "no later component reads reviewLog",
+        "route-stage-reader": "the route stage reads reviewLog"
+      }
+    },
+    {
+      "id": "q7",
+      "state": { "record.kind": "reviewResult" },
+      "ask": "Which fields are required in a review record?",
+      "options": {
+        "review-four-fields": "timestamp, head, verdict, and detail-json",
+        "review-three-fields": "timestamp, head, and verdict",
+        "review-verdict-only": "verdict only"
+      }
+    }
+  ]
+}

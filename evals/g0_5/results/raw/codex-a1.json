@@ -1,0 +1,21 @@
+{
+  "schema": "skill-rails/g0.5-review/1",
+  "reviewer_id": "codex-a1",
+  "provider": "codex",
+  "form": "a",
+  "findings": [
+    { "coordinate": "evals/g0_5/a-prose/mutated.md:11-16", "claim": "The review table has no transition for an ordinary first or second code finding.", "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 1, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" }, "expected": "Select a defined ordinary code-repair path, with an explicit post-repair review plan.", "actual": "Rows 1 through 6 are all false, so no row or effect applies and the flow falls through.", "reproducible": true },
+    { "coordinate": "evals/g0_5/a-prose/mutated.md:11,13,15", "claim": "Row 1's negative code-defect predicate precedes and shadows the specialized card-contract and unrecorded-pass rows.", "state": { "signal.pass": "yes", "review.lastVerdict": "pass", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" }, "expected": "Row 5 should WRITE the existing review result and RE-ENTER without commissioning another review.", "actual": "Row 1 matches first and prescribes a new clean-reviewer DISPATCH after an inapplicable repair, followed by WRITE.", "reproducible": true },
+    { "coordinate": "evals/g0_5/a-prose/mutated.md:9-16", "claim": "The first-match table has no catch-all termination for an unclassified review state.", "state": { "signal.pass": "yes", "review.lastVerdict": "mystery", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" }, "expected": "Block with an unclassified-state reason and STOP.", "actual": "Without treating an unknown verdict as evidence that no code defect exists, no row matches and no terminal behavior is defined.", "reproducible": true },
+    { "coordinate": "evals/g0_5/a-prose/mutated.md:16", "claim": "The no-review branch records a dispatched review but defines neither re-entry nor termination for a non-pass result.", "state": { "signal.pass": "yes", "review.lastVerdict": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no", "dispatchedReview.verdict": "finding", "dispatchedReview.target": "card-contract" }, "expected": "After WRITE, RE-ENTER so the card-contract finding can route to planning.", "actual": "Row 6 ends after DISPATCH and WRITE, while the only global post-record action covers passes.", "reproducible": true },
+    { "coordinate": "evals/g0_5/a-prose/mutated.md:15,20,22", "claim": "Declaring that no later component reads review records conflicts with transitions that depend on record presence and a recorded pass.", "state": { "signal.pass": "yes", "review.lastVerdict": "pass", "artifact.reviewLogPresent": "yes", "session.readOnly": "no", "invocation": "later re-entry" }, "expected": "Read the persisted review record and report completion for the recorded pass.", "actual": "The record is explicitly unread by later components, so the later invocation cannot derive the recorded-pass completion condition from it.", "reproducible": true }
+  ],
+  "answers": [
+    { "id": "q1", "answer": "Next stage: completion check; ordered effects: RUN the completion check, WRITE its evidence record, then RE-ENTER the flow." },
+    { "id": "q2", "answer": "No review row matches and no effects are defined; the ordinary first-code-finding repair path is missing." },
+    { "id": "q3", "answer": "The broken-record boundary wins at row 2: ASK the human for a disposition, then STOP, with no repair, dispatch, or write effects." },
+    { "id": "q4", "answer": "It does not terminate deterministically: an unknown verdict is not evidence for row 1's negative predicate, all rows fail, and the table has no fallback." },
+    { "id": "q5", "answer": "No; the read-only precondition blocks the plan before it is shown, so neither DISPATCH nor WRITE may be presented." }
+  ],
+  "notes": "Reviewed only the three authorized experiment inputs; coordinates use 1-based lines in a-prose/mutated.md, and unknown evidence was not treated as a successful negative classification."
+}

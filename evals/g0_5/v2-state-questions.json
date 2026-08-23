@@ -1,0 +1,56 @@
+{
+  "schema": "skill-rails/g0.5-state-questions/2",
+  "questions": [
+    {
+      "id": "q1",
+      "state": { "signal.pass": "no", "session.readOnly": "no" },
+      "ask": "What is the next stage and ordered effect plan?",
+      "options": {
+        "signal-plan": "signal; RUN completion -> WRITE signalRecord -> NEXT",
+        "review-open-plan": "review/open; DISPATCH reviewer -> WRITE reviewLog -> NEXT",
+        "done": "DONE with no effects"
+      }
+    },
+    {
+      "id": "q2",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 1, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "ask": "Which row and effects apply?",
+      "options": {
+        "review-open-plan": "open; DISPATCH reviewer -> WRITE reviewLog -> NEXT",
+        "broken-record-ask": "broken-record; ASK",
+        "unclassified-block": "BLOCK:review-unclassified",
+        "no-row-error": "no row matches; evaluation fails"
+      }
+    },
+    {
+      "id": "q3",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 3, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "ask": "Does the broken-record boundary or ordinary repair path win?",
+      "options": {
+        "broken-record-ask": "broken-record; ASK",
+        "review-open-plan": "open; DISPATCH reviewer -> WRITE reviewLog -> NEXT",
+        "no-row-error": "no row matches; evaluation fails"
+      }
+    },
+    {
+      "id": "q4",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "mystery", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "ask": "How does an unclassified state terminate?",
+      "options": {
+        "unclassified-block": "BLOCK:review-unclassified",
+        "no-row-error": "no row matches; evaluation fails",
+        "done": "DONE with no effects"
+      }
+    },
+    {
+      "id": "q5",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "NONE", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "yes" },
+      "ask": "May the skill present DISPATCH or WRITE effects?",
+      "options": {
+        "restricted-effect-block": "BLOCK before presenting the restricted DISPATCH/WRITE plan",
+        "review-open-plan": "present DISPATCH and WRITE then NEXT",
+        "done": "DONE with no effects"
+      }
+    }
+  ]
+}

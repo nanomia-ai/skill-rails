@@ -1,0 +1,21 @@
+{
+  "schema": "skill-rails/resource-probe/1",
+  "status": "verified-local-with-open-platform-cases",
+  "targets": ["codex", "claude-code"],
+  "checks": {
+    "absolute-skill-root script invocation": "verified-local",
+    "working-directory independence": "verified-local",
+    "read-only package operation": "verified-by-tree-hash",
+    "external state directory": "verified-local",
+    "non-ASCII path": "verified-windows",
+    "codex skill-path metadata": "verified-cold-agent",
+    "claude CLAUDE_SKILL_DIR substitution": "verified-cold-agent",
+    "explicit trigger": "verified-codex-and-claude",
+    "implicit trigger": "verified-codex-and-claude",
+    "near-miss non-trigger": "verified-codex-only-claude-unproven",
+    "cross-platform generated-package consumption": "verified-both-directions",
+    "cross-install tree equality": "verified-byte-identical",
+    "long-session compaction recovery": "unproven",
+    "linux filesystem": "pending-ci"
+  }
+}

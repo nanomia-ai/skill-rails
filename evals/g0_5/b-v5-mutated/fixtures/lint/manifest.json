@@ -1,0 +1,24 @@
+{
+  "schema": "skill-rails/lint-mutations/1",
+  "cases": [
+    { "id": "negative-L0", "expected_code": "L0", "mutation": { "operation": "extra-export" } },
+    { "id": "negative-L1", "expected_code": "L1", "mutation": { "operation": "ambient-authority" } },
+    { "id": "negative-L2", "expected_code": "L2", "mutation": { "operation": "observation-source" } },
+    { "id": "negative-L3", "expected_code": "L3", "mutation": { "operation": "invalid-domain" } },
+    { "id": "negative-L4", "expected_code": "L4", "mutation": { "operation": "reads-mismatch" } },
+    { "id": "negative-L5", "expected_code": "L5", "mutation": { "operation": "table-default" } },
+    { "id": "negative-L6", "expected_code": "L6", "mutation": { "operation": "stage-contract" } },
+    { "id": "negative-L7", "expected_code": "L7", "mutation": { "operation": "body-section" } },
+    { "id": "negative-L8", "expected_code": "L8", "mutation": { "operation": "body-duplicate-procedure" } },
+    { "id": "negative-L9", "expected_code": "L9", "mutation": { "operation": "stage-signature" } },
+    { "id": "negative-L10", "expected_code": "L10", "mutation": { "operation": "artifact-readers" } },
+    { "id": "negative-L11", "expected_code": "L11", "mutation": { "operation": "template-placeholder" } },
+    { "id": "negative-L12", "expected_code": "L12", "mutation": { "operation": "role-state-effect" } },
+    { "id": "negative-L13", "expected_code": "L13", "mutation": { "operation": "language-parity" } },
+    { "id": "negative-L14", "expected_code": "L14", "mutation": { "operation": "fixture-coverage" } },
+    { "id": "negative-L15", "expected_code": "L15", "mutation": { "operation": "format-domain" } },
+    { "id": "negative-L16", "expected_code": "L16", "mutation": { "operation": "deferred-shape" } },
+    { "id": "negative-L17", "expected_code": "L17", "mutation": { "operation": "mutation-manifest" } },
+    { "id": "negative-L18", "expected_code": "L18", "mutation": { "operation": "unsafe-bypass" } }
+  ]
+}

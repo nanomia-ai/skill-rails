@@ -1,0 +1,16 @@
+{
+  "name": "review-tone",
+  "description": "Use when reviewing prose for a precise, calm, and evidence-aware tone without changing its meaning.",
+  "problem": "Tone review can silently rewrite meaning or claim unsupported correctness.",
+  "use_cases": ["Review this explanation for tone while preserving its claims."],
+  "near_misses": ["Rewrite this program as a state machine."],
+  "inputs": ["prose"],
+  "outputs": ["review notes"],
+  "irreversible_boundaries": [],
+  "state_dependent_behaviors": [],
+  "exact_formats": [],
+  "external_dependencies": [],
+  "completion_evidence": [],
+  "judgment_points": ["Whether the tone is calm without becoming vague."],
+  "deterministic_helpers": []
+}

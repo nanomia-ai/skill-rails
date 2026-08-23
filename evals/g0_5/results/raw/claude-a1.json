@@ -1,0 +1,191 @@
+{
+  "schema": "skill-rails/g0.5-review/1",
+  "reviewer_id": "claude-a1",
+  "provider": "claude",
+  "form": "a",
+  "findings": [
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:11 (Review table, row 1)",
+      "claim": "Row 1's guard is negated (\"does not find a code defect\"), so an ordinary code finding matches no row in the table at all and the flow has no defined behavior.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "The ordinary repair path fires: repair the code defect, dispatch a clean reviewer, and write the review result.",
+      "actual": "Row 1 fails (the review DOES find a code defect); row 2 fails (ordinal 1 < 3); row 3 fails (target is code, not card-contract); row 4 fails (verdict is finding, not unverified); row 5 fails (not a pass); row 6 fails (a review exists). The table falls through with zero matches, and the only post-table prose (line 22) requires a recorded pass, which is also false. The state is undefined.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:11 vs :22",
+      "claim": "Because row 1 matches every non-code-defect verdict, a recorded passing review is captured by row 1 before the terminal on line 22 can be reached, so the flow never reports completion and never stops.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "pass",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "yes",
+        "session.readOnly": "no"
+      },
+      "expected": "Line 22 fires: report completion and stop.",
+      "actual": "A passing review 'does not find a code defect', so row 1 matches first under the stated top-to-bottom first-match rule: dispatch a clean reviewer after repair and write the review result. The freshly dispatched review passes and is recorded, which returns the identical state, so row 1 matches again. Line 22 is unreachable and the flow livelocks on repair+dispatch+write.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:11 vs :14 (row 1 shadows row 4)",
+      "claim": "An unverified review is absorbed by row 1 and silently repaired and re-dispatched instead of blocking, which is a fail-open on the one row whose job is to fail closed.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "unverified",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "Row 4 fires: block with the review's reason for being unverified.",
+      "actual": "An unverified review 'does not find a code defect', so row 1 matches first and the flow repairs, dispatches a clean reviewer, and writes a review result. Row 4 is unreachable, so an unverifiable review is treated as a routine repair and its blocking reason is never surfaced.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:11 vs :13 (row 1 shadows row 3)",
+      "claim": "A card-contract defect is absorbed by row 1 and re-reviewed instead of being routed to planning, so contract defects are never escalated out of the review loop.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "card",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "Row 3 fires: route to planning and stop.",
+      "actual": "A card-contract defect is not a code defect, so row 1 matches first: dispatch a clean reviewer after repair and write the review result. Row 3 is unreachable. The card contract is never revised, so every re-review re-finds the same contract defect.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:11 vs :15 (row 1 shadows row 5)",
+      "claim": "A passing-but-unrecorded review is absorbed by row 1, triggering a repair and a fresh reviewer dispatch when the only missing action was writing the record.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "pass",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "Row 5 fires: write the review result and re-enter.",
+      "actual": "A pass 'does not find a code defect', so row 1 matches first and the flow performs a repair with nothing to repair, plus an unnecessary reviewer dispatch. Row 5 is unreachable.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:9-16 (Review table as a whole)",
+      "claim": "The table is not total: it has no default/else row, so a verdict outside the recognised vocabulary has no defined terminal.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "mystery",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "An unrecognised verdict fails closed at a documented default row: block, naming the verdict as unclassified, and stop.",
+      "actual": "There is no default row. Row 6 is guarded on 'there is no review', not on 'nothing else matched', so it is not a catch-all. As written, the unclassified verdict is swallowed by the over-broad row 1 (it 'does not find a code defect') and becomes a repair plus a reviewer dispatch plus a write, with no stop; if row 1's guard is corrected to the positive polarity, the same state instead falls off the end of the table with no match and no terminal. Either way an unclassified state has no defined termination.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:20",
+      "claim": "The claim that no later component reads the review record is directly contradicted by row 5 and by line 22, both of which branch on whether the record exists.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "pass",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "The record's readers are stated, since row 5 ('its result has not been recorded') and line 22 ('after a recorded pass') both require reading the record to evaluate their guards.",
+      "actual": "Line 20 asserts 'no later component reads it'. A maintainer who trusts that sentence has no reason to keep the record queryable or even durable, at which point the guards on line 15 and line 22 cannot be evaluated and the flow can neither re-enter correctly nor terminate. The artifact contradicts itself about whether artifact.reviewLogPresent is observable.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:20 vs :11, :15, :16",
+      "claim": "Ownership of the review-record write is contradictory: line 20 assigns it to the implementation flow while three table rows assign it to the review flow.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "pass",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "Exactly one component is named as the writer of the review record, and the table's WRITE effects are attributed to it.",
+      "actual": "Line 20 says 'the implementation flow writes the record', but rows 1, 5, and 6 all instruct the review flow to 'write the review result'. Under line 20 the review flow's WRITE effects are not its own to perform, so either the record is written twice or, if the review flow defers to the implementation flow, row 5's write never happens and artifact.reviewLogPresent stays 'no' across re-entries, looping forever.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:5 vs :3",
+      "claim": "A read-only session with a failed completion signal deadlocks: the only prescribed next action is a write, which read-only forbids, and no alternative is given.",
+      "state": {
+        "signal.pass": "no",
+        "review.lastVerdict": "NONE",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "yes"
+      },
+      "expected": "The read-only rule states what happens when the sole forward path is a forbidden effect, e.g. present the completion gate as blocked-in-read-only and stop, rather than re-entering.",
+      "actual": "Line 3 requires writing the completion evidence record before the flow can proceed; line 5 forbids writing and says the plan 'is blocked before it is shown'. The blocked plan is never displayed, no terminal is defined, and re-entering the flow reproduces the identical state, so the session has no exit and no user-visible reason.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:5 and :11",
+      "claim": "'Repair' is a mutating effect used by row 1 but is not named by the read-only prohibition, and its position in row 1's effect order is ambiguous.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "yes"
+      },
+      "expected": "The read-only rule enumerates every mutating effect it blocks (including repair), and each row lists its effects in a single unambiguous order.",
+      "actual": "Line 5 blocks only 'write or dispatch'. Row 1's 'after repair' is a source mutation that is neither a write of a record nor a dispatch, so a literal reader may perform the repair in a read-only session and only then discover the plan is blocked. The phrase 'after repair' also leaves it undecided whether repair is an effect this row performs or a precondition it assumes, so the ordered effect plan for the row cannot be derived.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    {
+      "id": "q1",
+      "answer": "Next stage is the completion gate on line 3, not the review table: because signal.pass is 'no', the review table is not consulted at all. Ordered effect plan: (1) RUN the completion check; (2) WRITE its completion evidence record; (3) RE-ENTER the flow from the top, which re-evaluates signal.pass. Since session.readOnly is 'no', the WRITE in step 2 is permitted and the read-only guard on line 5 does not fire. Two gaps in the artifact affect this answer: it never says what happens if the completion check fails again, so step 3 can re-enter unboundedly with no stop condition or attempt limit; and the write on line 3 is of the completion evidence record, which is a distinct artifact from the review record described on lines 18-20, though the artifact never states that distinction."
+    },
+    {
+      "id": "q2",
+      "answer": "No row applies. Evaluating the table top-to-bottom with first-match: row 1 fails because the latest review DOES find a code defect and row 1's guard is the negation ('does not find a code defect'); row 2 fails because review.ordinal is 1, below the 'third or later' threshold; row 3 fails because review.lastTarget is 'code', not a card contract; row 4 fails because the verdict is 'finding', not unverified; row 5 fails because the review does not pass; row 6 fails because a review exists. The table therefore falls through with no match, and the only post-table prose (line 22) is guarded on a recorded pass, which is false here, so no effects are defined for this state at all. This is the defect: the state is the canonical first code finding, and the intended behavior is plainly the ordinary repair path (REPAIR the code defect, DISPATCH a clean reviewer, WRITE the review result), which row 1 would provide if its guard were the positive 'if the latest review finds a code defect'. As written, the most common state in the whole flow is undefined."
+    },
+    {
+      "id": "q3",
+      "answer": "As the artifact is literally written, the broken-record boundary wins: row 1 does not match (this review DOES find a code defect, and row 1's guard is negated), so evaluation reaches row 2, whose guard is satisfied by review.ordinal 3 with review.disposition NONE. Effects: ASK the human, then STOP. But this outcome is accidental rather than designed. The boundary wins only because row 1's negated guard has removed the ordinary repair path from the table entirely, so there is nothing above row 2 left to compete with. If row 1's guard is corrected to the positive polarity, row 1 matches this same state first and the boundary is shadowed permanently: every code finding, however many times it recurs, would be repaired and re-dispatched and the human would never be asked. The row order is therefore unsafe independent of the guard bug, and the broken-record boundary (current row 2) must be ordered above the ordinary repair path for the boundary to remain reachable once row 1 is fixed."
+    },
+    {
+      "id": "q4",
+      "answer": "It does not terminate; the artifact defines no terminal for an unclassified verdict. There is no default or else row: row 6 is guarded on 'there is no review', not on 'nothing above matched', so it is not a catch-all, and 'mystery' is outside the verdict vocabulary the table recognises ('finds a code defect', 'finds a card-contract defect', 'unverified', 'passes'). As written, the state is swallowed by the over-broad row 1, because a mystery verdict 'does not find a code defect': the flow performs a repair with nothing identified to repair, dispatches a clean reviewer, and writes a review result, with no STOP, silently laundering an unclassified verdict into a routine repair cycle. Under the evidently intended positive polarity for row 1 the same state instead falls off the bottom of the table with no match and, since line 22 requires a recorded pass, still reaches no terminal. Correct behavior would be a final default row that fails closed: BLOCK, naming the verdict as unrecognised, and STOP. Row 4's block is the nearest thing present, but its guard says 'unverified', which a maintainer cannot assume covers an arbitrary unknown verdict."
+    },
+    {
+      "id": "q5",
+      "answer": "No. Line 5 states that in a read-only session the skill must not write or dispatch, and that a plan requiring either action is blocked before it is shown, so neither a DISPATCH nor a WRITE effect may be presented. In this state (signal.pass yes, no review recorded) the matching row demands exactly those two effects: as written, row 1 matches because 'no review' trivially 'does not find a code defect' and yields dispatch-after-repair plus write; under the intended polarity, row 6 matches and yields dispatch plus write. Either way the plan is blocked before presentation and the answer is unchanged. Two gaps remain: the artifact never says what the skill presents instead of the blocked plan (there is no read-only terminal, no reason string, and no STOP), so the session has no defined observable outcome; and the 'repair' step in row 1 is a mutating action that line 5's prohibition does not name, leaving it undecided whether repair is also barred in read-only mode."
+    }
+  ],
+  "notes": "Reviewed as a first-time maintainer with no access to sibling forms, the oracle, prior reviews, or history. Findings are ordered most-severe first and all are mechanically reproducible: the artifact states an explicit evaluation rule on line 9 ('read the following rows from top to bottom and use the first matching row'), so every finding follows deterministically from evaluating the guards in that order against the given state. Single most likely root cause: the guard polarity of row 1 (line 11). It reads 'if the latest review does NOT find a code defect', which is simultaneously too narrow and too broad. Too narrow: it excludes the one state the row's effects clearly serve (a code finding needing repair and re-review), leaving that state matched by no row. Too broad: as the first row of a first-match table, its negation subsumes the guards of rows 3, 4, 5, and 6 and also the post-table terminal on line 22, rendering all five unreachable. Correcting it to 'if the latest review finds a code defect' repairs findings 1-5 in one edit but exposes a second, independent ordering defect: the corrected row 1 would then shadow row 2, so the broken-record boundary must be moved above the ordinary repair path. Two further defects survive any fix to row 1 and are not derived from it: the table has no default row, so an unrecognised verdict has no terminal (finding 6); and line 20 makes two assertions about the review record ('no later component reads it', 'the implementation flow writes the record') that contradict the guards and effects of rows 1, 5, 6 and line 22 (findings 7 and 8). Findings 9 and 10 concern the read-only rule on line 5, whose effect vocabulary ('write or dispatch') does not cover the 'repair' effect row 1 introduces, and which leaves a read-only session with a failed completion signal deadlocked with no visible reason. I found no defect in rows 2, 3, or 4 considered in isolation; their guards and effects are individually well-formed and each names an unambiguous terminal. Absence of evidence has not been treated as success anywhere: where the artifact simply does not say what happens (unbounded re-entry on line 3, the content of a blocked read-only plan, the ordering of 'after repair'), I recorded it as an undefined-behavior gap rather than assuming a sensible default."
+}

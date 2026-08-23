@@ -1,0 +1,23 @@
+{
+  "schema": "skill-rails/g0.5-experiment/1",
+  "status": "prepared",
+  "corpus": "stateful-review",
+  "forms": {
+    "a": "a-prose/mutated.md",
+    "b": "b-v5-mutated/"
+  },
+  "clean_controls": {
+    "a": "a-prose/clean.md",
+    "b": "b-v5-clean/"
+  },
+  "reviewers": {
+    "per_form_per_provider": 2,
+    "providers": ["codex", "claude"],
+    "fresh_context_required": true,
+    "brief": "review-brief.md"
+  },
+  "questions": "state-questions.json",
+  "oracle": "oracle.json",
+  "thresholds": "../g0/thresholds.json",
+  "result_policy": "The empirical result remains unproven until all eight fresh review runs and the forbidden-effect probe are recorded. Deterministic lint results are reported separately and cannot substitute for reviewer agreement."
+}

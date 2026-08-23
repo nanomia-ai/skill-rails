@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:nanomia:skill-contract:trace-event:1",
+  "type": "object",
+  "required": ["schema", "event_id", "run_id", "sequence", "at", "type", "authority", "decision_id", "spec_fingerprint", "snapshot_fingerprint", "data"],
+  "properties": {
+    "schema": { "const": "urn:nanomia:skill-contract:trace-event:1" },
+    "event_id": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "at": { "type": "string", "format": "date-time" },
+    "type": { "enum": ["spec_loaded", "snapshot_started", "observation_collected", "observation_unknown", "snapshot_stable", "snapshot_stale", "guard_evaluated", "guard_matched", "decision_emitted", "guide_rendered", "stage_entered", "effect_planned", "effect_claimed", "effect_observed", "artifact_verified", "receipt_recorded", "proof_recorded", "stage_verified", "stage_exited", "review_required"] },
+    "authority": { "enum": ["runtime_observed", "harness_observed", "artifact_verified", "agent_claimed", "human_confirmed"] },
+    "decision_id": { "type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$" },
+    "spec_fingerprint": { "type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$" },
+    "snapshot_fingerprint": { "type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$" },
+    "data": { "type": "object" }
+  },
+  "additionalProperties": false
+}

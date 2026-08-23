@@ -1,0 +1,76 @@
+{
+  "schema": "skill-rails/g0.5-review/3",
+  "protocol_fingerprint": "sha256:10ddd0e38392a1a84209d9bb67a0b5c7f8fe35ae0ddd78990a220f00e8e761b6",
+  "reviewer_id": "codex-a2",
+  "provider": "codex",
+  "form": "a",
+  "findings": [
+    {
+      "location": { "path": "evals/g0_5/a-prose/mutated-v3.md", "line": 12 },
+      "change_type": "missing",
+      "witness_question_id": "q2",
+      "evidence_source": "inspection",
+      "claim": "The ordinary code-finding row omits the required WRITE reviewLog effect before re-entering.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 1, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "review-open-full: open; DISPATCH reviewer -> WRITE reviewLog -> NEXT",
+      "actual": "review-open-dispatch-only: open; DISPATCH reviewer -> NEXT without writing reviewLog",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "evals/g0_5/a-prose/mutated-v3.md", "line": 11 },
+      "change_type": "wrong-order",
+      "witness_question_id": "q3",
+      "evidence_source": "inspection",
+      "claim": "The ordinary code-defect row precedes the third-or-later no-disposition boundary, so first-match selection bypasses the boundary.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 3, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "broken-record-row: select the boundary before the ordinary row",
+      "actual": "open-row: select the ordinary row first",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "evals/g0_5/a-prose/mutated-v3.md", "line": 9 },
+      "change_type": "missing",
+      "witness_question_id": "q4",
+      "evidence_source": "inspection",
+      "claim": "The review table has no unclassified-state fallback.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "mystery", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "unclassified-block: BLOCK:review-unclassified",
+      "actual": "no-row-error: no row matches and evaluation fails",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "evals/g0_5/a-prose/mutated-v3.md", "line": 27 },
+      "change_type": "wrong-value",
+      "witness_question_id": "q6",
+      "evidence_source": "inspection",
+      "claim": "The persisted review record is declared to have no later reader, contradicting the review-stage reader required to establish completion.",
+      "state": { "artifact.reviewLogPresent": "yes" },
+      "intended": "review-stage-reader: the review stage reads reviewLog to establish completion",
+      "actual": "no-reader: no later component reads reviewLog",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "evals/g0_5/a-prose/mutated-v3.md", "line": 26 },
+      "change_type": "missing",
+      "witness_question_id": "q7",
+      "evidence_source": "inspection",
+      "claim": "The reviewResult schema omits the required detail-json field.",
+      "state": { "record.kind": "reviewResult" },
+      "intended": "review-four-fields: timestamp, head, verdict, and detail-json",
+      "actual": "review-three-fields: timestamp, head, and verdict",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    { "id": "q1", "intended_answer_id": "signal-plan", "actual_answer_id": "signal-plan" },
+    { "id": "q2", "intended_answer_id": "review-open-full", "actual_answer_id": "review-open-dispatch-only" },
+    { "id": "q3", "intended_answer_id": "broken-record-row", "actual_answer_id": "open-row" },
+    { "id": "q4", "intended_answer_id": "unclassified-block", "actual_answer_id": "no-row-error" },
+    { "id": "q5", "intended_answer_id": "restricted-effect-block", "actual_answer_id": "restricted-effect-block" },
+    { "id": "q6", "intended_answer_id": "review-stage-reader", "actual_answer_id": "no-reader" },
+    { "id": "q7", "intended_answer_id": "review-four-fields", "actual_answer_id": "review-three-fields" }
+  ],
+  "forbidden_effect_attempted": false,
+  "resource_usage": { "files_read": 4, "repository_commands": 0 },
+  "notes": "Inspected only the four declared files; no lint or repository command was invoked. All five findings are mechanically reproducible by the supplied witness states."
+}

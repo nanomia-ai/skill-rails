@@ -1,0 +1,61 @@
+import { readFile } from "node:fs/promises";
+import { join, resolve } from "node:path";
+import { evaluateSpec } from "./evaluator.mjs";
+import { sha256 } from "./hash.mjs";
+import { MINIMUM_NODE_MAJOR } from "./constants.mjs";
+import { nestFlat } from "./collectors.mjs";
+
+export async function loadScenarioFixtures(skillRoot) {
+  const path = join(resolve(skillRoot), "fixtures", "scenarios.json");
+  try { return JSON.parse(await readFile(path, "utf8")); } catch { return []; }
+}
+
+export function fixtureState(fixture) {
+  const flat = { ...(fixture.s ?? {}), ...(fixture.judged ?? {}), ...(fixture.decided ?? {}) };
+  return nestFlat(flat);
+}
+
+export async function validateScenarioExpectations(skillRoot, spec, fixtures) {
+  const diagnostics = [];
+  const runtime = {
+    version: "fixture-validation",
+    spec_hash: sha256(spec.SPEC),
+    runtime_hash: sha256("fixture-validation"),
+    dsl_hash: sha256("fixture-validation"),
+    validator_version: "fixture-validation",
+    validator_hash: sha256("fixture-validation"),
+    minimum_node_major: MINIMUM_NODE_MAJOR
+  };
+  for (const fixture of fixtures) {
+    const pointer = `fixtures/scenarios.json:${fixture?.id ?? "<missing>"}`;
+    if (!fixture?.id || !fixture.expect || typeof fixture.expect !== "object") {
+      diagnostics.push(diag(pointer, "Scenario fixture requires a stable id and expect object."));
+      continue;
+    }
+    const flat = { ...(fixture.s ?? {}), ...(fixture.judged ?? {}), ...(fixture.decided ?? {}) };
+    const observations = { flat, nested: fixtureState(fixture), unknowns: [] };
+    try {
+      const decision = await evaluateSpec({
+        spec, skillRoot: resolve(skillRoot), observations,
+        snapshot: { fingerprint: fixture.snapshot ?? sha256({ fixture: fixture.id }), status: "stable" },
+        judged: fixture.judged ?? {}, decided: fixture.decided ?? {}, runtime
+      });
+      for (const field of ["stage", "row", "status"]) {
+        if (Object.hasOwn(fixture.expect, field) && decision[field] !== fixture.expect[field]) diagnostics.push(diag(`${pointer}.expect.${field}`, `Expected ${field}=${fixture.expect[field]}, got ${decision[field]}.`));
+      }
+      if (Object.hasOwn(fixture.expect, "guard")) {
+        const actual = decision.guard?.id ?? "none";
+        if (actual !== fixture.expect.guard) diagnostics.push(diag(`${pointer}.expect.guard`, `Expected guard=${fixture.expect.guard}, got ${actual}.`));
+      }
+      if (Array.isArray(fixture.expect.effects)) {
+        const actual = decision.effects.map((item) => Array.isArray(item) ? item[0] : item);
+        if (JSON.stringify(actual) !== JSON.stringify(fixture.expect.effects)) diagnostics.push(diag(`${pointer}.expect.effects`, `Expected effects ${JSON.stringify(fixture.expect.effects)}, got ${JSON.stringify(actual)}.`));
+      }
+    } catch (error) {
+      diagnostics.push(diag(pointer, `Scenario evaluation failed: ${error.message}`));
+    }
+  }
+  return diagnostics;
+}
+
+function diag(pointer, message) { return { code: "L14", pointer, message, hint: null, level: "error" }; }

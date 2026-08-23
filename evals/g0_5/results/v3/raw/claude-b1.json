@@ -1,0 +1,76 @@
+{
+  "schema": "skill-rails/g0.5-review/3",
+  "protocol_fingerprint": "sha256:10ddd0e38392a1a84209d9bb67a0b5c7f8fe35ae0ddd78990a220f00e8e761b6",
+  "reviewer_id": "claude-b1",
+  "provider": "claude",
+  "form": "b",
+  "findings": [
+    {
+      "location": { "path": "spec.mjs", "line": 27 },
+      "change_type": "missing",
+      "witness_question_id": "q2",
+      "evidence_source": "inspection",
+      "claim": "The review/open branch dispatches the reviewer but never persists the review record.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 1, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "Dispatch the reviewer, write reviewLog, then NEXT.",
+      "actual": "Dispatch the reviewer, then NEXT without writing reviewLog.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "spec.mjs", "line": 39 },
+      "change_type": "wrong-order",
+      "witness_question_id": "q3",
+      "evidence_source": "lint-assisted",
+      "claim": "The broad open row precedes and shadows the broken-record boundary row.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 3, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "Select broken-record and ASK.",
+      "actual": "Select open and dispatch again.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "spec.mjs", "line": 43 },
+      "change_type": "missing",
+      "witness_question_id": "q4",
+      "evidence_source": "lint-assisted",
+      "claim": "No unconditional default row handles an unclassified verdict.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "mystery", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "BLOCK:review-unclassified.",
+      "actual": "No row matches and evaluation fails.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "spec.mjs", "line": 48 },
+      "change_type": "missing",
+      "witness_question_id": "q6",
+      "evidence_source": "inspection",
+      "claim": "reviewLog declares an empty readers list despite review-stage consumption.",
+      "state": { "artifact.reviewLogPresent": "yes" },
+      "intended": "Declare the review stage as a reader of reviewLog.",
+      "actual": "No reader is declared.",
+      "reproducible": true
+    },
+    {
+      "location": { "path": "spec.mjs", "line": 14 },
+      "change_type": "missing",
+      "witness_question_id": "q7",
+      "evidence_source": "inspection",
+      "claim": "The reviewResult format omits detail-json.",
+      "state": { "record.kind": "reviewResult" },
+      "intended": "Require timestamp, head, verdict, and detail-json.",
+      "actual": "Require timestamp, head, and verdict only.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    { "id": "q1", "intended_answer_id": "signal-plan", "actual_answer_id": "signal-plan" },
+    { "id": "q2", "intended_answer_id": "review-open-full", "actual_answer_id": "review-open-dispatch-only" },
+    { "id": "q3", "intended_answer_id": "broken-record-row", "actual_answer_id": "open-row" },
+    { "id": "q4", "intended_answer_id": "unclassified-block", "actual_answer_id": "no-row-error" },
+    { "id": "q5", "intended_answer_id": "restricted-effect-block", "actual_answer_id": "restricted-effect-block" },
+    { "id": "q6", "intended_answer_id": "review-stage-reader", "actual_answer_id": "no-reader" },
+    { "id": "q7", "intended_answer_id": "review-four-fields", "actual_answer_id": "review-three-fields" }
+  ],
+  "forbidden_effect_attempted": false,
+  "resource_usage": { "files_read": 8, "repository_commands": 1 },
+  "notes": "Read all eight artifact files and ran the single allowed lint command once; no write or undeclared read was used."
+}

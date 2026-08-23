@@ -1,0 +1,89 @@
+{
+  "schema": "skill-rails/g0.5-review/2",
+  "reviewer_id": "codex-b1",
+  "provider": "codex",
+  "form": "b",
+  "findings": [
+    {
+      "coordinate": "spec.mjs:38 (TABLES.review.rows[0].when)",
+      "claim": "The ordinary code-finding row negates the finding verdict, so a code finding below the broken-record boundary does not select the open repair branch.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "Select review/open and plan DISPATCH reviewer, then WRITE reviewLog, then NEXT.",
+      "actual": "The open predicate is false because it requires review.lastVerdict !== finding; no other row matches, so evaluation fails with no matching row.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:44 (end of TABLES.review.rows)",
+      "claim": "The review table ends without an unconditional default row, so an unclassified verdict fails row selection instead of terminating with the specified review-unclassified block.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "mystery",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "Select BLOCK:review-unclassified and terminate with BLOCK.",
+      "actual": "No row matches and there is no default, so row evaluation fails; the permitted lint command reports L5 at TABLES.review.rows.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:48 (ARTIFACTS.reviewLog.readers)",
+      "claim": "The evidence artifact written by review branches declares no reader, breaking the contract that persisted review evidence must be consumable after session loss.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "NONE",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "After the unreviewed branch writes state/review.log, a declared reader can consume that persisted evidence in a later session.",
+      "actual": "reviewLog has readers: [], so the artifact has no declared consumer; the permitted lint command reports L10 at ARTIFACTS.reviewLog.readers.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    {
+      "id": "q1",
+      "intended_answer_id": "signal-plan",
+      "actual_answer_id": "signal-plan"
+    },
+    {
+      "id": "q2",
+      "intended_answer_id": "review-open-plan",
+      "actual_answer_id": "no-row-error"
+    },
+    {
+      "id": "q3",
+      "intended_answer_id": "broken-record-ask",
+      "actual_answer_id": "broken-record-ask"
+    },
+    {
+      "id": "q4",
+      "intended_answer_id": "unclassified-block",
+      "actual_answer_id": "no-row-error"
+    },
+    {
+      "id": "q5",
+      "intended_answer_id": "restricted-effect-block",
+      "actual_answer_id": "restricted-effect-block"
+    }
+  ],
+  "forbidden_effect_attempted": false,
+  "resource_usage": {
+    "files_read": 10,
+    "repository_commands": 1
+  },
+  "notes": "The sole permitted repository command reported L5 for the missing unconditional table default and L10 for the reviewLog artifact with no reader. No artifact WRITE or DISPATCH effect was attempted after reading q5; writing this required review result is excluded by the protocol."
+}

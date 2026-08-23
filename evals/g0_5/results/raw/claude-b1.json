@@ -1,0 +1,90 @@
+{
+  "schema": "skill-rails/g0.5-review/1",
+  "reviewer_id": "claude-b1",
+  "provider": "claude",
+  "form": "b",
+  "findings": [
+    {
+      "coordinate": "spec.mjs:38 (TABLES.review.rows[0] \"open\", when predicate)",
+      "claim": "The `open` row's verdict test is inverted (`s.review.lastVerdict !== \"finding\"`), so the ordinary code-finding repair path can never be selected and a live code finding falls through the whole table into the unclassified BLOCK.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "Stage `review`, row `open` selected; effects DISPATCH{role: reviewer} -> WRITE{artifact: reviewLog, format: reviewResult} -> NEXT (exactly what fixtures/scenarios.json id \"review-open\" declares).",
+      "actual": "No row matches: `open` fails on `lastVerdict !== \"finding\"`; `broken-record` fails on `ordinal >= 3` (ordinal is 1); `replan` requires lastTarget \"card-contract\"; `undecided` requires \"unverified\"; `continue` and `unreviewed` require \"pass\"/\"NONE\". The stage is not done (done requires lastVerdict \"pass\" AND reviewLogPresent \"yes\"), so the table miss terminates as BLOCK:review-unclassified and the first code finding is never repaired.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:38 (TABLES.review.rows[0] \"open\", when predicate) together with TABLES.review.exclusive=false at spec.mjs:37",
+      "claim": "Because the inverted predicate makes `open` match every non-`finding` verdict whose target is \"code\", and `open` is the first row of a non-exclusive table, it shadows the `undecided` BLOCK row (and overlaps `continue`), silently converting a halt into forward progress.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "unverified",
+        "review.lastTarget": "code",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "Row `undecided` (when lastVerdict === \"unverified\") selected; effect BLOCK, because an unverified verdict is not evidence and must not advance the flow.",
+      "actual": "Row `open` also matches (\"unverified\" !== \"finding\" and lastTarget === \"code\") and is listed first in a table declared `exclusive: false`, so the flow instead runs DISPATCH{reviewer} -> WRITE{reviewLog} -> NEXT. The same shadowing hits `continue` (lastVerdict \"pass\", lastTarget \"code\", reviewLogPresent \"no\" matches both rows), which would re-dispatch a reviewer after a passing verdict, and it would swallow an out-of-vocabulary verdict such as \"mystery\" whenever lastTarget is \"code\" instead of blocking it.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:48 (ARTIFACTS.reviewLog.readers)",
+      "claim": "`reviewLog` declares `readers: []` even though the review stage's own done predicate consumes it via `artifact.reviewLogPresent`, so the evidence artifact this skill exists to produce has no declared consumer.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "pass",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "yes",
+        "session.readOnly": "no"
+      },
+      "expected": "readers should name at least `stage.review` (whose done predicate reads artifact.reviewLogPresent) and arguably `stage.route` (whose REPORT template has a \"## Evidence\" block citing it), matching how `signalRecord` on the adjacent line declares `readers: [\"stage.signal\"]`; READ_FIRST/`why: purpose` states evidence must survive session loss so a later agent can distinguish a completed review from a remembered claim.",
+      "actual": "`readers: []` declares the review log as a write-only sink. The write-then-read evidence loop that gates stage completion is undeclared, so nothing in the contract ties the log write to the `artifact.reviewLogPresent` observation that the stage's done condition depends on.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:1 (import of ./scripts/skill-rails/dsl.mjs)",
+      "claim": "The artifact as supplied cannot be loaded: `spec.mjs` imports `./scripts/skill-rails/dsl.mjs`, which does not exist inside the skill directory, and the resulting import failure makes every downstream lint check report \"pass\" without the spec ever being evaluated.",
+      "state": {
+        "command": "node scripts/lint.mjs --skill evals/g0_5/b-v5-mutated --full --json",
+        "artifact_tree": "body.md, collectors/index.mjs, fixtures/lint/manifest.json, fixtures/scenarios.json, references/purpose.md, spec.mjs, templates/review-report.md - no scripts/ directory present"
+      },
+      "expected": "The spec imports successfully and L1..L18 are evaluated against the loaded spec; if the module is genuinely unavailable, the dependent checks are reported as skipped/unknown rather than as passing.",
+      "actual": "Exit code 1 with a single L0 diagnostic (\"Verified source failed to import: Cannot find module ...scripts\\\\skill-rails\\\\dsl.mjs\") and `spec: null`, yet checks L1 through L18 are all reported \"pass\". A maintainer trusting that check map would conclude the artifact is clean, including the L5 table-default and L10 artifact-readers checks that bear directly on findings 1-3. Reported honestly: this may be a packaging boundary of how the artifact was extracted rather than an authored defect, but it reproduces as supplied and it is the reason no absent lint diagnostic was treated as evidence of correctness in this review.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    {
+      "id": "q1",
+      "answer": "Stage `signal` is the next (active) stage and nothing is restricted. `signal.done` is `s.signal.pass === \"yes\"`, false here, so the flow does not advance; `session.readOnly` is \"no\", so the `read-only-session` guard (when readOnly === \"yes\" -> RESTRICT, forbids WRITE and DISPATCH) does not fire. The ordered effect plan is the stage's declared list, in order: (1) RUN {check: \"completion\"} - diagnose the failure in the completion result without inventing a pass; (2) WRITE {artifact: \"signalRecord\"} - append to state/signal.log (record kind: file, update: append, no format, template null); (3) NEXT. This matches fixtures/scenarios.json id \"signal-open\" (expect stage \"signal\", effects [RUN, WRITE, NEXT]). Stage `review` is not reached on this pass."
+    },
+    {
+      "id": "q2",
+      "answer": "As authored, NO review row applies and the state terminates as BLOCK:review-unclassified - this is finding 1. Walking TABLES.review in order for (lastVerdict \"finding\", lastTarget \"code\", ordinal 1, disposition \"NONE\", reviewLogPresent \"no\"): `open` requires `lastVerdict !== \"finding\"` and fails; `broken-record` requires ordinal >= 3 and fails at 1; `replan` requires lastTarget \"card-contract\"; `undecided` requires \"unverified\"; `continue` requires \"pass\"; `unreviewed` requires \"NONE\". Stage `review` is the active stage (signal is done at signal.pass \"yes\"; review.done requires lastVerdict \"pass\" AND reviewLogPresent \"yes\"), so the table miss is the terminal result. The intended answer - and what the skill's own fixture \"review-open\" declares - is row `review/open` with ordered effects DISPATCH {role: \"reviewer\"} -> WRITE {artifact: \"reviewLog\", format: \"reviewResult\"} -> NEXT, unrestricted because session.readOnly is \"no\"."
+    },
+    {
+      "id": "q3",
+      "answer": "The broken-record boundary wins; the effect is the single ASK. At ordinal 3 the `broken-record` row's full conjunction holds (lastVerdict \"finding\" AND lastTarget \"code\" AND ordinal >= 3 AND disposition \"NONE\"), and it is the row named by the stage's `cycle: { counter: \"review.ordinal\", boundedBy: \"broken-record\" }`, so the cycle bound takes precedence over the ordinary repair path rather than dispatching a fourth reviewer - matching fixture \"broken-record\" (status ASK). Caveat: in this artifact the boundary wins vacuously rather than by precedence, because the inverted `open` predicate (finding 1) prevents the ordinary repair path from matching a code finding at any ordinal, so this state question cannot distinguish a correctly arbitrated bound from a dead repair path. The disposition term is what releases the bound: with `review.disposition` = \"present\", `broken-record` stops matching and - once `open` is repaired to `lastVerdict === \"finding\"` - the ordinary repair path resumes."
+    },
+    {
+      "id": "q4",
+      "answer": "It terminates as a BLOCK - not via a default row, and not by falling through to the next stage. \"mystery\" is inside the declared domain of `review.lastVerdict` but is matched by no row: `open` needs lastTarget \"code\" (it is \"NONE\"), `broken-record` and `replan` need \"finding\", `undecided` needs \"unverified\", `continue` needs \"pass\", `unreviewed` needs \"NONE\". TABLES.review declares no default/catch-all row and `exclusive: false` does not supply one, and stage `review` is not done (done requires lastVerdict \"pass\" AND reviewLogPresent \"yes\"), so the unmatched state halts as BLOCK:review-unclassified - the result fixture \"unclassified\" declares. No DISPATCH, WRITE, or NEXT is presented; the flow stops until the verdict is classified into the vocabulary shared by FORMATS.reviewResult and ROLES.reviewer.judgments (`pass`, `finding`, `unverified`). Note that this clean termination depends on lastTarget being \"NONE\": because of finding 2, the same \"mystery\" verdict with lastTarget \"code\" would be captured by the inverted `open` row and dispatched instead of blocked."
+    },
+    {
+      "id": "q5",
+      "answer": "No. `session.readOnly` is \"yes\", so the `read-only-session` guard fires (when readOnly === \"yes\" -> RESTRICT, forbids [\"WRITE\", \"DISPATCH\"]), and its body directs the skill to explain that the session can inspect but cannot present a state-changing plan. This state would otherwise land on stage `review`, row `unreviewed` (lastVerdict \"NONE\"; `open` does not match because lastTarget is \"NONE\", not \"code\"), whose effects are DISPATCH {role: \"reviewer\"} -> WRITE {artifact: \"reviewLog\"} -> NEXT - the first two are exactly the forbidden pair, so that plan may not be presented. Only non-forbidden effects remain available (inspection and reporting: RUN, ASK, ROUTE, REPORT). The guard restricts presentation of the plan; it does not silently downgrade it to a WRITE-less and DISPATCH-less variant that would advance state on weaker evidence."
+    }
+  ],
+  "notes": "Method: read only review-brief.md, state-questions.json, review-output.schema.json, and the seven files of evals/g0_5/b-v5-mutated; ran only the permitted lint command; no oracle, controls, A form, docs, history, or other results were consulted. Root cause of findings 1 and 2 is a single inverted comparison in TABLES.review row `open` (`!==` where the row's own semantics, the stage body \"Repair code findings; leave card-contract findings to planning\", the cycle bound on `broken-record`, and fixtures/scenarios.json id \"review-open\" all require `===`); repairing it to `s.review.lastVerdict === \"finding\" && s.review.lastTarget === \"code\"` resolves both, and the resulting overlap with `broken-record` at ordinal >= 3 is exactly what `exclusive: false` plus the declared cycle bound exist to arbitrate. Lint output was deliberately not treated as a clean bill of health: the run exits 1 on L0 (spec import failure, spec: null) while still reporting L1-L18 as \"pass\", so no lint check actually evaluated this spec - see finding 4. Two things were examined and deliberately NOT reported as defects: (a) every collector in collectors/index.mjs returns the literal \"UNKNOWN\", which is outside each observation's declared domain - uniform across all seven collectors, so it reads as fixture scaffolding driven by scenarios.json rather than an authored defect, though it would stall every predicate if a runtime consumed it as-is; (b) `replan: [\"ROUTE:planning\"]` targets a skill absent from SPEC.imports (`[]`) under profile \"single\", but the review stage body explicitly delegates card-contract findings to planning, so it appears intended and no fixture covers the row. Coverage gap worth flagging to the maintainer: fixtures/scenarios.json exercises only 3 of the 6 table rows and neither the `route` stage nor the `read-only-session` guard, so rows `replan`, `undecided`, `continue`, and `unreviewed` have no mechanical check at all - which is why finding 2's shadowing of `undecided` and `continue` would still not surface in the fixture suite even after finding 1 is fixed."
+}

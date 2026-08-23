@@ -1,0 +1,13 @@
+{
+  "schema": "skill-rails/g0.5-coordinator-transcript/3",
+  "reviewer_id": "claude-a1",
+  "source_terminal_id": "term_28b433a7-3e74-4965-b338-b6ebf344e6f4",
+  "events": [
+    { "sequence": 0, "kind": "prompt", "targets": [] },
+    { "sequence": 1, "kind": "tool_call", "verb": "READ", "targets": ["input:v3-review-brief.md"] },
+    { "sequence": 2, "kind": "tool_call", "verb": "READ", "targets": ["input:v3-state-questions.json"] },
+    { "sequence": 3, "kind": "tool_call", "verb": "READ", "targets": ["input:v3-review-output.schema.json"] },
+    { "sequence": 4, "kind": "tool_call", "verb": "READ", "targets": ["artifact:mutated-v3.md"] },
+    { "sequence": 5, "kind": "result", "targets": [] }
+  ]
+}

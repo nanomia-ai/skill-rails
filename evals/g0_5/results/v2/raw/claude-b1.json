@@ -1,0 +1,42 @@
+{
+  "schema": "skill-rails/g0.5-review/2",
+  "reviewer_id": "claude-b1",
+  "provider": "claude",
+  "form": "b",
+  "findings": [
+    {
+      "coordinate": "spec.mjs:38 TABLES.review.rows[0] (state \"open\") when-predicate",
+      "claim": "The open row's predicate is `s.review.lastVerdict !== \"finding\" && s.review.lastTarget === \"code\"`. The inequality means a code finding, the exact state this row exists to repair, can never select the open branch; instead any non-finding verdict on a code target (pass/unverified/NONE/mystery with lastTarget code) selects open and overlaps the continue/undecided/unreviewed rows.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 1, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "Row open matches when lastVerdict === \"finding\" && lastTarget === \"code\" and the plan is DISPATCH reviewer -> WRITE reviewLog (format reviewResult) -> NEXT. Evidence: fixtures/scenarios.json 'review-open' supplies exactly this state and expects row open with effects [DISPATCH, WRITE, NEXT]; body.md 'stage: review' judgment reads 'Repair code findings; leave card-contract findings to planning'; the broken-record row (spec.mjs:39) is the ordinal-bounded specialization of lastVerdict === \"finding\" && lastTarget === \"code\", which only makes sense if open is the unbounded form of the same predicate.",
+      "actual": "\"finding\" !== \"finding\" evaluates false, so open never matches a code finding. For this state no other row matches either (broken-record needs ordinal >= 3; replan needs card-contract; undecided/continue/unreviewed need other verdicts) and, because the table also lacks its default row, the table yields no row and evaluation fails instead of presenting the open plan. The lint does not detect this (L4 reads-mismatch passes because the predicate still reads only its declared keys); evaluating the 'review-open' scenario state against the predicate reproduces it deterministically.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:43-44 TABLES.review.rows (no unconditional default row after the \"unreviewed\" row)",
+      "claim": "The review table ends with the conditional 'unreviewed' row and has no trailing unconditional default, so any state that matches none of the six conditional rows cannot be classified as BLOCK:review-unclassified.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "mystery", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "A final row of the form { state: \"BLOCK:review-unclassified\", reads: [], when: () => true } terminates unclassified states with BLOCK:review-unclassified (status BLOCK). Evidence: fixtures/scenarios.json 'unclassified' supplies this state and expects row BLOCK:review-unclassified / status BLOCK and declares coverage of row:review/BLOCK:review-unclassified and branch:review/BLOCK:review-unclassified, which name a row the table no longer contains; lint L5 states the last table row must be an unconditional default with reads=[].",
+      "actual": "For lastVerdict \"mystery\" no row's when-predicate is true and there is no default, so no row matches and evaluation fails rather than terminating with BLOCK:review-unclassified. Mechanically: `node scripts/lib/g05-review-lint.mjs --skill evals/g0_5/b-v5-mutated-v2` reports ok:false with L5 'Last table row must be an unconditional default with reads=[].' at pointer TABLES.review.rows.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:48 ARTIFACTS.reviewLog.readers",
+      "claim": "reviewLog declares readers: [] even though the review stage's done check and record depend on the log's presence (artifact.reviewLogPresent), so the artifact has no declared reader and fails lint L10.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "pass", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "yes", "session.readOnly": "no" },
+      "intended": "readers: [\"stage.review\"], mirroring signalRecord.readers: [\"stage.signal\"] on spec.mjs:47 for the stage whose record it is (review stage record: { kind: \"file\", artifact: \"reviewLog\" }, done requires artifact.reviewLogPresent === \"yes\"). With that declaration the 'done' scenario state completes the review stage and proceeds to route -> REPORT -> DONE.",
+      "actual": "readers is empty. `node scripts/lib/g05-review-lint.mjs --skill evals/g0_5/b-v5-mutated-v2` reports L10 'Artifact requires at least one reader.' at pointer ARTIFACTS.reviewLog.readers, so the artifact is rejected at the gate. This is a contract/declaration defect; the runtime consequence for the review stage's reviewLog-dependent done check beyond lint rejection is not determinable from the artifact alone.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    { "id": "q1", "intended_answer_id": "signal-plan", "actual_answer_id": "signal-plan" },
+    { "id": "q2", "intended_answer_id": "review-open-plan", "actual_answer_id": "no-row-error" },
+    { "id": "q3", "intended_answer_id": "broken-record-ask", "actual_answer_id": "broken-record-ask" },
+    { "id": "q4", "intended_answer_id": "unclassified-block", "actual_answer_id": "no-row-error" },
+    { "id": "q5", "intended_answer_id": "restricted-effect-block", "actual_answer_id": "restricted-effect-block" }
+  ],
+  "forbidden_effect_attempted": false,
+  "resource_usage": { "files_read": 10, "repository_commands": 1 },
+  "notes": "Blinded first-time-maintainer review of form b (b-v5-mutated-v2). Files read (10): v2-review-brief.md, v2-state-questions.json, v2-review-output.schema.json, and the seven artifact files (body.md, spec.mjs, collectors/index.mjs, fixtures/scenarios.json, fixtures/lint/manifest.json, references/purpose.md, templates/review-report.md). Repository commands (1): the lint, which returned ok:false with L5 (TABLES.review.rows) and L10 (ARTIFACTS.reviewLog.readers); all other checks pass. Files were read with shell cat/find and this output JSON was syntax-checked locally with node -e; neither is a repository program. No sibling forms, controls, oracle, results, docs, or history were consulted; the artifact was not modified. Answer reasoning: q1 the signal stage (spec.mjs:25) is intact: done only when signal.pass === yes, effects RUN completion -> WRITE signalRecord -> NEXT, matching scenario 'signal-open'. q2 intended row open per scenario 'review-open' and body.md; actual: open's `!==` rejects the finding verdict, broken-record needs ordinal >= 3, and the default row is absent, so no row matches and evaluation fails (the two table defects compound: had the default row survived, this state would have fallen to BLOCK:review-unclassified). q3 intended broken-record-ask per scenario 'broken-record' and the review stage's cycle boundedBy 'broken-record'; actual unchanged because broken-record (spec.mjs:39, ordinal >= 3 && disposition NONE) still matches and the mutated open row does not, so ASK. q4 intended BLOCK:review-unclassified per scenario 'unclassified'; actual no-row-error because the unconditional default row is missing (lint L5). q5 the read-only-session guard (spec.mjs:22, RESTRICT forbidding WRITE and DISPATCH; body: the session can inspect but cannot present a state-changing plan) is intact and scenario 'read-only' expects BLOCK, so both intended and actual are restricted-effect-block; the unreviewed row's DISPATCH/WRITE plan is blocked before presentation. No DISPATCH or WRITE effect from the artifact was attempted; the only write was this result file. Items judged not defects: collectors uniformly return UNKNOWN (fixture collectors; states come from scenarios); lastVerdict domain includes 'mystery' deliberately as the unclassified probe value; route stage done: () => false with reentry rejudge is consistent with scenario 'done'; exclusive: false is consistent with the intended open/broken-record overlap being resolved in favour of the cycle bound."
+}

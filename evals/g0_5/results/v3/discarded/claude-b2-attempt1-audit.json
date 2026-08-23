@@ -1,0 +1,13 @@
+{
+  "schema": "skill-rails/g0.5-discarded-attempt/1",
+  "reviewer_id": "claude-b2",
+  "protocol_fingerprint": "sha256:10ddd0e38392a1a84209d9bb67a0b5c7f8fe35ae0ddd78990a220f00e8e761b6",
+  "task_id": "task_b82a61d8af7e",
+  "dispatch_id": "ctx_63f80db17214",
+  "source_terminal_id": "term_66ed2194-6b73-43df-ae1b-9989b08020b4",
+  "disposition": "discarded-before-scoring",
+  "reason": "After completing artifact inspection, the reviewer used unapproved shell commands while troubleshooting result delivery. The frozen normalization says every tool call is in scope and OTHER invalidates the run, so this attempt cannot enter the accepted eight-cell dataset.",
+  "artifact_access_violation": false,
+  "post_review_unapproved_commands_observed": true,
+  "replacement_policy": "Use a fresh reviewer with the same frozen inputs, identity, output schema, and external protocol seal; do not tune the artifact, oracle, scorer, or threshold."
+}

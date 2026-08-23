@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-rails/g0.5-review/1",
+  "type": "object",
+  "required": ["schema", "reviewer_id", "provider", "form", "findings", "answers", "notes"],
+  "properties": {
+    "schema": { "const": "skill-rails/g0.5-review/1" },
+    "reviewer_id": { "type": "string" },
+    "provider": { "enum": ["codex", "claude"] },
+    "form": { "enum": ["a", "b"] },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["coordinate", "claim", "state", "expected", "actual", "reproducible"],
+        "properties": {
+          "coordinate": { "type": "string" },
+          "claim": { "type": "string" },
+          "state": {},
+          "expected": { "type": "string" },
+          "actual": { "type": "string" },
+          "reproducible": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "answers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "answer"],
+        "properties": {
+          "id": { "enum": ["q1", "q2", "q3", "q4", "q5"] },
+          "answer": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

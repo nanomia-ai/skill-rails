@@ -1,0 +1,127 @@
+{
+  "schema": "skill-rails/g0.5-review/1",
+  "reviewer_id": "claude-a2",
+  "provider": "claude",
+  "form": "a",
+  "findings": [
+    {
+      "coordinate": "mutated.md line 11 (Review table row 1)",
+      "claim": "Row 1's condition is stated negatively (\"does not find a code defect\"), which makes the first row a catch-all that matches every non-code-defect state and therefore shadows rows 3, 4, 5, 6 and the terminal rule on line 22.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "pass",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "yes",
+        "session.readOnly": "no"
+      },
+      "expected": "A recorded pass reaches the terminal rule on line 22: report completion and stop, with no further effects.",
+      "actual": "Line 9 says to use the first matching row, and a passing review \"does not find a code defect\", so row 1 matches first: repair, dispatch a clean reviewer, and write the review result. The dispatched clean reviewer produces another pass, which matches row 1 again. Line 22 is never reached and the flow does not terminate.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "mutated.md lines 11-16 (Review table, all rows)",
+      "claim": "No row covers the ordinary repair path: a code defect at ordinal 1 or 2 matches no row at all, and the table declares no default.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "The first code finding routes to the ordinary repair path: repair the defect, dispatch a clean reviewer, and write the review result.",
+      "actual": "Row 1 is false (the review does find a code defect), row 2 is false (ordinal is 1, not 3+), row 3 is false (target is code, not card-contract), row 4 is false (the verdict is classified), row 5 is false (it is a finding, not a pass), row 6 is false (a review exists). Every row fails and the artifact specifies no fallback, so behavior is undefined for the single most common review outcome.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "mutated.md line 14 (row 4), shadowed by line 11 (row 1)",
+      "claim": "The unverified/unclassified block on row 4 is unreachable, so an unclassified verdict silently acquires repair and dispatch effects instead of terminating as a block.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "mystery",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "An unverified/unclassified verdict blocks with its reason (row 4) and stops; no repair, dispatch, or write occurs on state the flow cannot classify.",
+      "actual": "A \"mystery\" verdict does not find a code defect, so row 1 matches before row 4 is evaluated: the flow repairs, dispatches a clean reviewer, and writes a review result for a verdict it never classified. The safety block is dead code.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "mutated.md line 20 (Review record)",
+      "claim": "Line 20's two claims about the record - that the implementation flow writes it and that no later component reads it - are both contradicted by the review table and by the terminal rule on line 22.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "pass",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "The record section describes the same reader/writer set the flow actually uses, so a maintainer can trust it when deciding whether the record may be dropped or restructured.",
+      "actual": "Rows 1, 5 and 6 all make the review flow write the review result, contradicting \"the implementation flow writes the record\". Row 5 branches on whether the result \"has not been recorded\" and line 22 branches on \"a recorded pass\", so the record is read by a later component, contradicting \"no later component reads it\". A maintainer trusting line 20 would treat the record as write-only and could delete or stop populating it, breaking rows 5 and 22.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "mutated.md line 20 vs line 12 (row 2)",
+      "claim": "The record schema (timestamp, 40-character head, verdict) carries neither the finding ordinal nor the human disposition, so row 2's condition is not evaluable from persisted state and its outcome is never persisted.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 3,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "The persisted record supplies every field the table branches on, so \"third or later code finding\" and \"has no human disposition\" are decidable across re-entries and the human's answer is recorded once.",
+      "actual": "The record holds only timestamp, head and verdict. Nothing in the artifact defines where review.ordinal is counted or where review.disposition is stored after row 2 asks the human, and no row writes a disposition. On every re-entry the state is still ordinal 3+ with disposition NONE, so row 2 asks the human again indefinitely and the answer is lost.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "mutated.md line 11 (row 1) vs line 16 (row 6)",
+      "claim": "On the fresh-start path (no review yet) row 1's condition is undefined - vacuously true if read literally - so row 1 and row 6 both plausibly apply and select different effects.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "NONE",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "With no review present, exactly one row applies (row 6): dispatch a clean reviewer and write the review result, with no repair.",
+      "actual": "The artifact never says whether \"the latest review does not find a code defect\" is false or vacuously true when there is no latest review. Under the literal reading row 1 matches first and performs a repair on code against which no defect was ever reported; under the other reading row 6 matches. Two defensible readings of the same text produce different effect plans on the most common entry state, and the artifact supplies no tiebreak.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    {
+      "id": "q1",
+      "answer": "Next stage is the completion check, not review. Line 3 makes a passing completion signal a precondition for review, so with signal.pass=no the review table on lines 9-16 is not consulted at all. Ordered effect plan, per line 3: (1) RUN the completion check; (2) WRITE its evidence record; (3) re-enter the review flow, which re-evaluates line 3 first. The session is not read-only, so the WRITE in step 2 is permitted and line 5 does not block the plan. Two gaps worth flagging: the artifact bounds nothing about repeated failure - if the completion check fails again the same three steps repeat with no attempt limit and no escape row - and step 2's \"evidence record\" is a different artifact from the \"review record\" of line 20, but the artifact never says so explicitly."
+    },
+    {
+      "id": "q2",
+      "answer": "As written, NO row applies and no effects are defined. Evaluating lines 11-16 top to bottom against this state: row 1 is FALSE because the latest review DOES find a code defect and row 1 is written negatively (\"does not find a code defect\"); row 2 is FALSE because review.ordinal is 1, not third-or-later; row 3 is FALSE because review.lastTarget is code, not card-contract; row 4 is FALSE because the verdict is a classified \"finding\", not unverified; row 5 is FALSE because the review does not pass; row 6 is FALSE because a review exists. The table declares no default row and no fallthrough, so the flow has no defined behavior for a first code finding. The ordinary repair path that this state should hit - repair the defect, dispatch a clean reviewer, write the review result - exists nowhere in the table; row 1 holds its slot but with inverted polarity, so it both fails to catch this state and wrongly catches the non-code-defect states that rows 3-6 and line 22 own. This is the artifact's central defect, and it leaves the most common review outcome unhandled."
+    },
+    {
+      "id": "q3",
+      "answer": "The broken-record boundary wins: row 2 (line 12) matches - this is the third code finding with review.disposition=NONE - and the effect is ASK the human, then STOP. Rows 3-6 are never reached. But the boundary wins only by accident, not by structure. Row 1 sits ABOVE row 2 and misses this state solely because its condition is negated; if row 1 held the ordinary repair path it is supposed to hold (\"if the latest review finds a code defect, repair and dispatch a clean reviewer\") in its current position, it would match at ordinal 3 and shadow the broken-record boundary entirely, so escalation would never fire and the flow would loop on repair. The boundary needs to be ordered above the ordinary repair row explicitly, not left to depend on that row being broken. A second problem makes this state unstable even when row 2 does win: the review record (line 20) stores only timestamp, head and verdict, so neither review.ordinal nor the human's disposition is persisted, and no row writes a disposition after the human answers. Every re-entry therefore re-derives ordinal 3+ with disposition NONE and asks the human again."
+    },
+    {
+      "id": "q4",
+      "answer": "It does not terminate. The intended terminator is row 4 (line 14) - \"if the latest review is unverified, block with its reason\" - which would stop the flow with a block and no side effects. But row 1 (line 11) is evaluated first, and a \"mystery\" verdict does not find a code defect, so row 1 matches: the flow repairs, dispatches a clean reviewer, and writes a review result for a verdict it could not classify. Row 4 is unreachable for this state, so the unclassified case is converted from a terminal block into a side-effecting dispatch. If the dispatched reviewer returns another unclassified verdict the cycle repeats, and if it returns a pass the state matches row 1 again (finding 1), so there is no path to a stop. Two secondary gaps: the artifact never defines whether \"unverified\" is the same class as a \"mystery\" verdict, and row 4 says to block \"with its reason\" while the record on line 20 carries no reason field, so even a reachable row 4 has nothing to report."
+    },
+    {
+      "id": "q5",
+      "answer": "No. Line 5 is unconditional: in a read-only session the skill must not write or dispatch, and a plan that requires either action is blocked before it is shown. Every row that can match this state requires both forbidden effects - row 6 (no review) is DISPATCH a clean reviewer plus WRITE the review result, and row 1 under the literal vacuous-truth reading is repair plus DISPATCH plus WRITE - so the selected plan is blocked before presentation and the only thing the skill may present is the block itself. It may not present DISPATCH or WRITE effects, not even as a preview or a proposed plan, because line 5 gates on presentation rather than execution. Two gaps a maintainer should note: the artifact offers no read-only-safe alternative row, so a read-only session with no review has no productive path at all and the block is its terminal state; and line 5 enumerates only \"write\" and \"dispatch\" while the rows also introduce \"repair\" (row 1) and \"route to planning\" (row 3), whose effect classes are never declared, leaving the read-only block decision undecidable for those rows."
+    }
+  ],
+  "notes": "Six findings, all traced by evaluating the table on lines 9-16 top-to-bottom against concrete states. Five of the six trace to one root cause: row 1 (line 11) states its condition negatively. That single inversion produces three distinct failure modes rather than one - it shadows rows 3, 4, 5, 6 and the line-22 terminal (findings 1, 3, 6), it leaves code findings at ordinal 1-2 matching no row at all (finding 2), and it makes the broken-record boundary's precedence at q3 accidental rather than structural. Findings 4 and 5 are independent of that inversion and live in the Review record section: line 20's claims about who writes and who reads the record are both false against the surrounding rows, and the record's three fields cannot supply the ordinal and disposition that row 2 branches on. Reachability caveat: findings 1, 3 and 6 all depend on the first-match rule stated on line 9; if that rule were best-match or all-match instead, their severity changes but the ambiguity in finding 6 remains. Line 22's precedence relative to the table is also never stated - it sits outside the table with no ordering rule, so even with row 1 repaired a maintainer cannot tell whether a recorded pass consults the table first. I did not treat the absence of a stated defect as evidence of correctness; where the text is silent (ordinal counting, disposition persistence, effect class of repair and route-to-planning, no-review semantics of row 1) I recorded the silence as the defect."
+}

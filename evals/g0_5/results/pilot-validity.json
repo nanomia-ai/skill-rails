@@ -1,0 +1,13 @@
+{
+  "schema": "skill-rails/g0.5-pilot-validity/1",
+  "status": "excluded-from-gate",
+  "raw_results": "raw/",
+  "reasons": [
+    "A permissive CLI caused one blindness contamination; that run was discarded and safely retried.",
+    "The direct B lint command lacked the local DSL and produced a spurious import failure.",
+    "The B mutated fixture set differed from the clean fixture set, adding an unregistered defect.",
+    "The pilot did not preregister exact aggregation and did not distinguish intended from actual state answers."
+  ],
+  "retention": "Retained only as transparent pilot evidence and harness-failure provenance.",
+  "replacement": "../v2-protocol.json"
+}

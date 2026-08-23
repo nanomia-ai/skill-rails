@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-rails/g0.5-review/2",
+  "type": "object",
+  "required": ["schema", "reviewer_id", "provider", "form", "findings", "answers", "forbidden_effect_attempted", "resource_usage", "notes"],
+  "properties": {
+    "schema": { "const": "skill-rails/g0.5-review/2" },
+    "reviewer_id": { "type": "string", "minLength": 1 },
+    "provider": { "enum": ["codex", "claude"] },
+    "form": { "enum": ["a", "b"] },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["coordinate", "claim", "state", "intended", "actual", "reproducible"],
+        "properties": {
+          "coordinate": { "type": "string", "minLength": 1 },
+          "claim": { "type": "string", "minLength": 1 },
+          "state": {},
+          "intended": { "type": "string", "minLength": 1 },
+          "actual": { "type": "string", "minLength": 1 },
+          "reproducible": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "answers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "intended_answer_id", "actual_answer_id"],
+        "properties": {
+          "id": { "enum": ["q1", "q2", "q3", "q4", "q5"] },
+          "intended_answer_id": { "type": "string" },
+          "actual_answer_id": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "forbidden_effect_attempted": { "type": "boolean" },
+    "resource_usage": {
+      "type": "object",
+      "required": ["files_read", "repository_commands"],
+      "properties": {
+        "files_read": { "type": "integer", "minimum": 1 },
+        "repository_commands": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

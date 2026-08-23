@@ -1,0 +1,77 @@
+{
+  "schema": "skill-rails/g0.5-execution-audit/3",
+  "entries": [
+    {
+      "reviewer_id": "codex-a1",
+      "provider": "codex",
+      "form": "a",
+      "transcript_path": "transcripts/codex-a1.json",
+      "transcript_fingerprint": "sha256:cf73fd936fe5ca1424d8aae693dc139fdbeddaaa9aa3d950137b4f28314747f4",
+      "workspace_before": "sha256:9406f68850ae5d3c8bd85e8f82592238d9e29cb7b1779eb49068890886bfb88c",
+      "workspace_after": "sha256:9406f68850ae5d3c8bd85e8f82592238d9e29cb7b1779eb49068890886bfb88c"
+    },
+    {
+      "reviewer_id": "codex-a2",
+      "provider": "codex",
+      "form": "a",
+      "transcript_path": "transcripts/codex-a2.json",
+      "transcript_fingerprint": "sha256:6eb2d54a41fbab013886d1a79b97d109c9e2dedee1dd5739e4391e87b94272ff",
+      "workspace_before": "sha256:9406f68850ae5d3c8bd85e8f82592238d9e29cb7b1779eb49068890886bfb88c",
+      "workspace_after": "sha256:9406f68850ae5d3c8bd85e8f82592238d9e29cb7b1779eb49068890886bfb88c"
+    },
+    {
+      "reviewer_id": "codex-b1",
+      "provider": "codex",
+      "form": "b",
+      "transcript_path": "transcripts/codex-b1.json",
+      "transcript_fingerprint": "sha256:b3f2fa2a1e80b0f065db4cba245810632cb99681b1f3f4362499a31645b3efdd",
+      "workspace_before": "sha256:3f18a8140c3114c8af24231577d5d51319ed0ecec824f581cc1a18bd374d592f",
+      "workspace_after": "sha256:3f18a8140c3114c8af24231577d5d51319ed0ecec824f581cc1a18bd374d592f"
+    },
+    {
+      "reviewer_id": "codex-b2",
+      "provider": "codex",
+      "form": "b",
+      "transcript_path": "transcripts/codex-b2.json",
+      "transcript_fingerprint": "sha256:34f86aefb69ceebb5fd42af78d7f236c6851027aed126ecc521eef7e722cabe2",
+      "workspace_before": "sha256:3f18a8140c3114c8af24231577d5d51319ed0ecec824f581cc1a18bd374d592f",
+      "workspace_after": "sha256:3f18a8140c3114c8af24231577d5d51319ed0ecec824f581cc1a18bd374d592f"
+    },
+    {
+      "reviewer_id": "claude-a1",
+      "provider": "claude",
+      "form": "a",
+      "transcript_path": "transcripts/claude-a1.json",
+      "transcript_fingerprint": "sha256:73912ca1a9a8db639267d2c7cdee4e46b1267dbacabc42ba145156c3a582baad",
+      "workspace_before": "sha256:9406f68850ae5d3c8bd85e8f82592238d9e29cb7b1779eb49068890886bfb88c",
+      "workspace_after": "sha256:9406f68850ae5d3c8bd85e8f82592238d9e29cb7b1779eb49068890886bfb88c"
+    },
+    {
+      "reviewer_id": "claude-a2",
+      "provider": "claude",
+      "form": "a",
+      "transcript_path": "transcripts/claude-a2.json",
+      "transcript_fingerprint": "sha256:4984e2a854aaa9e17a455506b61153dbaea11e6d73dfd8b59d8edebe09e05050",
+      "workspace_before": "sha256:9406f68850ae5d3c8bd85e8f82592238d9e29cb7b1779eb49068890886bfb88c",
+      "workspace_after": "sha256:9406f68850ae5d3c8bd85e8f82592238d9e29cb7b1779eb49068890886bfb88c"
+    },
+    {
+      "reviewer_id": "claude-b1",
+      "provider": "claude",
+      "form": "b",
+      "transcript_path": "transcripts/claude-b1.json",
+      "transcript_fingerprint": "sha256:73f167cb4031fcb54c1bf9ac6a2b5096ffa66355686760e2ca54ae03565aa1ee",
+      "workspace_before": "sha256:3f18a8140c3114c8af24231577d5d51319ed0ecec824f581cc1a18bd374d592f",
+      "workspace_after": "sha256:3f18a8140c3114c8af24231577d5d51319ed0ecec824f581cc1a18bd374d592f"
+    },
+    {
+      "reviewer_id": "claude-b2",
+      "provider": "claude",
+      "form": "b",
+      "transcript_path": "transcripts/claude-b2.json",
+      "transcript_fingerprint": "sha256:6c7d4df5d0dc67bbefc4b7fc06d3a9972c60a0d39be315f3ceb68c13ffc52216",
+      "workspace_before": "sha256:3f18a8140c3114c8af24231577d5d51319ed0ecec824f581cc1a18bd374d592f",
+      "workspace_after": "sha256:3f18a8140c3114c8af24231577d5d51319ed0ecec824f581cc1a18bd374d592f"
+    }
+  ]
+}

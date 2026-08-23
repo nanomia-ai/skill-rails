@@ -1,0 +1,85 @@
+{
+  "schema": "skill-rails/g0.5-review/2",
+  "reviewer_id": "codex-b2",
+  "provider": "codex",
+  "form": "b",
+  "findings": [
+    {
+      "coordinate": "spec.mjs:38 (TABLES.review.rows[0].when)",
+      "claim": "The ordinary code-finding row negates the verdict test, so a finding below the broken-record boundary cannot enter the open repair path.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "Select review/open and plan DISPATCH reviewer, WRITE reviewLog, then NEXT, as specified by fixtures/scenarios.json:3.",
+      "actual": "The open predicate is false because finding !== finding is false; broken-record is also false at ordinal 1, and no other row matches, so evaluation fails with no row.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:43 (final entry of TABLES.review.rows)",
+      "claim": "The review table has no unconditional default row, so an unclassified verdict does not terminate with the intended review-unclassified block.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "mystery",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "Select BLOCK:review-unclassified and terminate BLOCK, as specified by fixtures/scenarios.json:9.",
+      "actual": "Every conditional row is false and there is no default, so table evaluation fails with no matching row instead of producing the block.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "spec.mjs:48 (ARTIFACTS.reviewLog.readers)",
+      "claim": "The persisted review log declares no reader, so the evidence written for cross-session review progression has no declared consumer.",
+      "state": {
+        "session": "new",
+        "artifact": "state/review.log",
+        "artifact_present": true
+      },
+      "intended": "A later review-flow consumer reads the persisted review evidence so progression can be reconstructed after session loss, as required by body.md:5 and references/purpose.md:3.",
+      "actual": "reviewLog has readers: [], leaving the written artifact with no declared reader.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    {
+      "id": "q1",
+      "intended_answer_id": "signal-plan",
+      "actual_answer_id": "signal-plan"
+    },
+    {
+      "id": "q2",
+      "intended_answer_id": "review-open-plan",
+      "actual_answer_id": "no-row-error"
+    },
+    {
+      "id": "q3",
+      "intended_answer_id": "broken-record-ask",
+      "actual_answer_id": "broken-record-ask"
+    },
+    {
+      "id": "q4",
+      "intended_answer_id": "unclassified-block",
+      "actual_answer_id": "no-row-error"
+    },
+    {
+      "id": "q5",
+      "intended_answer_id": "restricted-effect-block",
+      "actual_answer_id": "restricted-effect-block"
+    }
+  ],
+  "forbidden_effect_attempted": false,
+  "resource_usage": {
+    "files_read": 10,
+    "repository_commands": 1
+  },
+  "notes": "Blinded review only. The permitted lint command reported L5 at TABLES.review.rows and L10 at ARTIFACTS.reviewLog.readers."
+}

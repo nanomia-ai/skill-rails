@@ -1,0 +1,42 @@
+{
+  "schema": "skill-rails/g0.5-review/2",
+  "reviewer_id": "claude-a1",
+  "provider": "claude",
+  "form": "a",
+  "findings": [
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:11",
+      "claim": "Row 1's condition is inverted. It fires when the latest review does NOT find a code defect, yet its effect (dispatch a clean reviewer after repair, write the review result) is the ordinary repair path that only makes sense after a code finding; 'after repair' presupposes a defect. Consequences under the first-matching-row rule (line 9): an ordinary code finding matches no row at all, while every non-code-finding verdict (pass, card-contract, unverified, unclassified, no review) is captured by row 1 ahead of rows 3-6, which become unreachable. Note the ordering hazard when fixing: if row 1 is simply changed to 'finds a code defect' while staying above row 2, it captures the third-or-later code finding too and the broken-record boundary (row 2) can never fire; the corrected row must sit below row 2 or carry an 'only the first two findings' qualifier.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "finding", "review.lastTarget": "code", "review.ordinal": 1, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "A first code finding with no disposition takes the ordinary repair path: dispatch a clean reviewer after repair, write the review result, continue (review-open-plan).",
+      "actual": "Row 1 does not match (the review does find a code defect); row 2 fails (ordinal 1 is not third or later); rows 3, 4, 5 fail (not card-contract, not unverified, not a pass); row 6 fails (a review exists). No row matches and evaluation fails (no-row-error).",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:9",
+      "claim": "The first-matching-row rule has no fallback for a verdict that no row classifies, and as written the inverted row 1 swallows such a verdict: an unclassified review is routed into the repair/dispatch path instead of terminating in a block.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "mystery", "review.lastTarget": "NONE", "review.ordinal": 0, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "An unclassified review verdict terminates in a block (BLOCK:review-unclassified), consistent with the block the table already uses for a non-actionable (unverified) review in row 4.",
+      "actual": "Row 1 ('does not find a code defect') is true for a 'mystery' verdict with no target, so the flow dispatches a clean reviewer after a repair that never happened and writes the review result (review-open-plan). Even with row 1's polarity corrected, no row would match and evaluation would fail; nothing in the artifact blocks the state.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:20",
+      "claim": "The review-record provenance sentence contradicts the flow it documents. It says the implementation flow writes the record and no later component reads it, but rows 1, 5 and 6 have this review flow write the record, and row 5 ('has not been recorded') plus line 22 ('after a recorded pass') require the re-entered flow to read it.",
+      "state": { "signal.pass": "yes", "review.lastVerdict": "pass", "review.lastTarget": "NONE", "review.ordinal": 1, "review.disposition": "NONE", "artifact.reviewLogPresent": "no", "session.readOnly": "no" },
+      "intended": "The review flow writes the record (row 5 here), re-enters, reads the record to recognise a recorded pass, then reports completion and stops (line 22).",
+      "actual": "The artifact states the implementation flow writes the record and that no later component reads it, which makes row 5's 'not been recorded' test and line 22's 'recorded pass' unevaluable on re-entry; the documented data flow and the table disagree.",
+      "reproducible": false
+    }
+  ],
+  "answers": [
+    { "id": "q1", "intended_answer_id": "signal-plan", "actual_answer_id": "signal-plan" },
+    { "id": "q2", "intended_answer_id": "review-open-plan", "actual_answer_id": "no-row-error" },
+    { "id": "q3", "intended_answer_id": "broken-record-ask", "actual_answer_id": "broken-record-ask" },
+    { "id": "q4", "intended_answer_id": "unclassified-block", "actual_answer_id": "review-open-plan" },
+    { "id": "q5", "intended_answer_id": "restricted-effect-block", "actual_answer_id": "restricted-effect-block" }
+  ],
+  "forbidden_effect_attempted": false,
+  "resource_usage": { "files_read": 4, "repository_commands": 0 },
+  "notes": "Inputs read: v2-review-brief.md, v2-state-questions.json, v2-review-output.schema.json, a-prose/mutated.md. No repository programs (scripts, collectors, lint, git) were run; files were located with a directory listing and read with cat. The artifact was not modified. Walk per question against the artifact as written: q1 line 3 gives run completion, write evidence record, re-enter (intended = actual). q2 the inverted row 1 rejects a code finding and nothing else matches (intended open plan, actual no row). q3 row 2 fires for the third undispositioned code finding, but only because the inverted row 1 fails to match a code finding; under the intended positive condition the current row order would shadow the boundary, so the fix for row 1 must also move it below row 2 or qualify it (latent, masked; not listed as a separate finding because no as-written state reproduces it). q4 actual is reported off the option list: the negated row 1 is true for a mystery verdict with no target, so the artifact routes it to dispatch/write rather than to a block or to a no-match failure; the closest listed ids would be no-row-error only after row 1 is corrected. q5 line 5 blocks the dispatch/write plan before it is shown regardless of whether row 1 or row 6 would have produced it (intended = actual). Line 20's provenance sentence is a statement defect without a mechanical reproduction."
+}

@@ -1,0 +1,16 @@
+{
+  "name": "example-skill",
+  "description": "What the skill does and when it should trigger.",
+  "problem": "The failure this skill prevents.",
+  "use_cases": ["A representative user request"],
+  "near_misses": ["A similar request that should not trigger"],
+  "inputs": ["Input artifact or fact"],
+  "outputs": ["Expected result"],
+  "irreversible_boundaries": [],
+  "state_dependent_behaviors": [],
+  "exact_formats": [],
+  "external_dependencies": [],
+  "completion_evidence": [],
+  "judgment_points": [],
+  "deterministic_helpers": []
+}

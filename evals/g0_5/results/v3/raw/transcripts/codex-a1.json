@@ -1,0 +1,26 @@
+{
+  "schema": "skill-rails/g0.5-coordinator-transcript/3",
+  "reviewer_id": "codex-a1",
+  "source_terminal_id": "term_225bf3c0-804f-4ed3-850b-7b779f1128c0",
+  "events": [
+    { "sequence": 0, "kind": "prompt", "targets": [] },
+    {
+      "sequence": 1,
+      "kind": "tool_call",
+      "verb": "READ",
+      "targets": [
+        "input:v3-review-brief.md",
+        "input:v3-state-questions.json",
+        "input:v3-review-output.schema.json",
+        "artifact:mutated-v3.md"
+      ]
+    },
+    {
+      "sequence": 2,
+      "kind": "tool_call",
+      "verb": "READ",
+      "targets": ["artifact:mutated-v3.md"]
+    },
+    { "sequence": 3, "kind": "result", "targets": [] }
+  ]
+}

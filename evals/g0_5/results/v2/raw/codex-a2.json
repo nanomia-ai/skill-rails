@@ -1,0 +1,73 @@
+{
+  "schema": "skill-rails/g0.5-review/2",
+  "reviewer_id": "codex-a2",
+  "provider": "codex",
+  "form": "a",
+  "findings": [
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:11",
+      "claim": "The ordinary code-finding repair row has inverted polarity, so a first or second code finding matches no review row.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "Use the ordinary review/open repair path: dispatch a clean reviewer after repair, write the review result, and re-enter the flow.",
+      "actual": "Row 1 rejects the code finding because it requires that the review does not find a code defect; rows 2 through 6 also reject this state, so evaluation has no matching row.",
+      "reproducible": true
+    },
+    {
+      "coordinate": "evals/g0_5/a-prose/mutated.md:9-11",
+      "claim": "The first-match table's broad negative predicate treats an unknown review classification as an ordinary repaired outcome instead of failing closed.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "mystery",
+        "review.lastTarget": "NONE",
+        "review.ordinal": 0,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "intended": "Terminate with BLOCK:review-unclassified and perform no dispatch or write.",
+      "actual": "Because the mystery review does not find a code defect, row 1 is the first match and presents the dispatch-and-write review/open path.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    {
+      "id": "q1",
+      "intended_answer_id": "signal-plan",
+      "actual_answer_id": "signal-plan"
+    },
+    {
+      "id": "q2",
+      "intended_answer_id": "review-open-plan",
+      "actual_answer_id": "no-row-error"
+    },
+    {
+      "id": "q3",
+      "intended_answer_id": "broken-record-ask",
+      "actual_answer_id": "broken-record-ask"
+    },
+    {
+      "id": "q4",
+      "intended_answer_id": "unclassified-block",
+      "actual_answer_id": "review-open-plan"
+    },
+    {
+      "id": "q5",
+      "intended_answer_id": "restricted-effect-block",
+      "actual_answer_id": "restricted-effect-block"
+    }
+  ],
+  "forbidden_effect_attempted": false,
+  "resource_usage": {
+    "files_read": 4,
+    "repository_commands": 0
+  },
+  "notes": "Blinded review used only the four authorized files. No repository program, evaluator, test, lint, sibling form, clean control, oracle, result, documentation, history, or agent consultation was used."
+}

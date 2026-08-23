@@ -1,0 +1,45 @@
+{
+  "schema": "skill-rails/g0.5-oracle/3",
+  "seeded_defects": ["D1", "D2", "D3", "D4", "D5"],
+  "rubric": {
+    "a": {
+      "D1": { "path": "mutated-v3.md", "lines": [12], "change_types": ["missing"], "witness": "q2" },
+      "D2": { "path": "mutated-v3.md", "lines": [7, 9, 21, 22, 23], "change_types": ["missing"], "witness": "q4" },
+      "D3": { "path": "mutated-v3.md", "lines": [11, 13], "change_types": ["wrong-order"], "witness": "q3" },
+      "D4": { "path": "mutated-v3.md", "lines": [27], "change_types": ["missing", "unused"], "witness": "q6" },
+      "D5": { "path": "mutated-v3.md", "lines": [26], "change_types": ["missing"], "witness": "q7" }
+    },
+    "b": {
+      "D1": { "path": "spec.mjs", "lines": [27], "change_types": ["missing"], "witness": "q2", "mechanical_code": "L14" },
+      "D2": { "path": "spec.mjs", "lines": [37, 43, 44], "change_types": ["missing"], "witness": "q4", "mechanical_code": "L5" },
+      "D3": { "path": "spec.mjs", "lines": [38, 39], "change_types": ["wrong-order"], "witness": "q3", "mechanical_code": "L14" },
+      "D4": { "path": "spec.mjs", "lines": [48], "change_types": ["missing", "unused"], "witness": "q6", "mechanical_code": "L10" },
+      "D5": { "path": "spec.mjs", "lines": [14], "change_types": ["missing"], "witness": "q7", "mechanical_code": "L15" }
+    }
+  },
+  "intended_answers": {
+    "q1": "signal-plan",
+    "q2": "review-open-full",
+    "q3": "broken-record-row",
+    "q4": "unclassified-block",
+    "q5": "restricted-effect-block",
+    "q6": "review-stage-reader",
+    "q7": "review-four-fields"
+  },
+  "actual_answers": {
+    "q1": "signal-plan",
+    "q2": "review-open-dispatch-only",
+    "q3": "open-row",
+    "q4": "no-row-error",
+    "q5": "restricted-effect-block",
+    "q6": "no-reader",
+    "q7": "review-three-fields"
+  },
+  "independence": {
+    "D1": "q2 exercises the ordinary open row, independently of precedence.",
+    "D2": "q4 exercises a state matched only by the missing default.",
+    "D3": "q3 asks only which row wins when both predicates match; it does not inspect that row's effects.",
+    "D4": "q6 asks only for the reader declared by the artifact contract.",
+    "D5": "q7 and the golden format fixture ask only for exact record fields."
+  }
+}

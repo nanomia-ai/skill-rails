@@ -1,0 +1,47 @@
+{
+  "schema": "skill-rails/g0.5-review/1",
+  "reviewer_id": "codex-b2",
+  "provider": "codex",
+  "form": "b",
+  "findings": [
+    {
+      "coordinate": "evals/g0_5/b-v5-mutated/spec.mjs:38",
+      "claim": "The open review row uses an inverted verdict test, excluding ordinary code findings from their repair path and admitting non-findings instead.",
+      "state": {
+        "signal.pass": "yes",
+        "review.lastVerdict": "finding",
+        "review.lastTarget": "code",
+        "review.ordinal": 1,
+        "review.disposition": "NONE",
+        "artifact.reviewLogPresent": "no",
+        "session.readOnly": "no"
+      },
+      "expected": "The review table selects row open and presents the ordered effects DISPATCH reviewer, WRITE reviewLog in reviewResult format, then NEXT.",
+      "actual": "The open predicate is false, the broken-record predicate is not yet true, and no later row matches, so review terminates through BLOCK:review-unclassified instead of presenting the ordinary repair plan.",
+      "reproducible": true
+    }
+  ],
+  "answers": [
+    {
+      "id": "q1",
+      "answer": "The next stage is signal; its ordered effect plan is RUN the completion check, WRITE the signalRecord artifact, then NEXT."
+    },
+    {
+      "id": "q2",
+      "answer": "No declared review row matches this state: open rejects verdict finding and broken-record requires ordinal at least 3, so the actual result is BLOCK:review-unclassified rather than the fixture's open row with DISPATCH reviewer, WRITE reviewLog, NEXT."
+    },
+    {
+      "id": "q3",
+      "answer": "The broken-record boundary wins: row broken-record matches at ordinal 3 with no disposition, and its only effect/status is ASK."
+    },
+    {
+      "id": "q4",
+      "answer": "The mystery verdict matches no declared row, so the table uses the unclassified termination BLOCK:review-unclassified with status BLOCK."
+    },
+    {
+      "id": "q5",
+      "answer": "No. The read-only-session guard applies RESTRICT and explicitly forbids both DISPATCH and WRITE, so neither effect may be presented."
+    }
+  ],
+  "notes": "Blinded review limited to the supplied B artifact and named review inputs; the finding is mechanically reproducible by evaluating the declared row predicates for the supplied q2/review-open state."
+}

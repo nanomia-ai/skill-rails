@@ -1,0 +1,410 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { appendFile, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { spawnSync } from "node:child_process";
+import Ajv2020 from "ajv/dist/2020.js";
+import { generatePackage } from "../scripts/lib/generator.mjs";
+import { buildP2 } from "../scripts/lib/build-core.mjs";
+import { copyTree, exists, listFiles, readJson, writeJsonAtomic, writeTextAtomic } from "../scripts/lib/io.mjs";
+import { enterSkill, stageSkill } from "../scripts/runtime/api.mjs";
+import { loadBuiltSkill } from "../scripts/runtime/loader.mjs";
+import { alignDecision } from "../scripts/runtime/alignment.mjs";
+import { assertExternalStateDir, readTrace, recordHarnessEvidence } from "../scripts/runtime/trace-core.mjs";
+import { main as runtimeMain } from "../scripts/runtime/cli.mjs";
+import { hashFile } from "../scripts/runtime/hash.mjs";
+import { captureSnapshot } from "../scripts/runtime/snapshot.mjs";
+import { resolveTemplate } from "../scripts/runtime/templates.mjs";
+import { validateFull } from "../scripts/runtime/validator.mjs";
+import { ROOT, makeTestDir, removeTestDir } from "./helpers.mjs";
+
+test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) => {
+  const base = await makeTestDir("profiles");
+  t.after(() => removeTestDir(base));
+  const outputs = {};
+  let p2Build = null;
+  for (const profile of ["p0", "p1", "p2"]) {
+    const intent = await readJson(join(ROOT, "fixtures", "intents", `${profile}.json`));
+    const output = join(base, profile);
+    outputs[profile] = output;
+    const result = await generatePackage({
+      intent, output,
+      finalize: async (stage, selection) => { if (selection.profile === "p2") p2Build = await buildP2(stage, { repeats: 10 }); }
+    });
+    assert.equal(result.profile, profile);
+  }
+  assert.equal(await exists(join(outputs.p0, "spec.mjs")), false);
+  assert.equal(await exists(join(outputs.p0, "scripts")), false);
+  assert.equal(await exists(join(outputs.p1, "spec.mjs")), false);
+  assert.equal(await exists(join(outputs.p1, "scripts", "run.mjs")), true);
+  assert.equal(await exists(join(outputs.p2, "spec.mjs")), true);
+  assert.equal(await exists(join(outputs.p2, "scripts", "skill-rails", "vendor", "acorn.mjs")), true);
+  assert.equal(await exists(join(outputs.p2, ".generated.json")), true);
+  const manifest = await readJson(join(outputs.p2, ".generated.json"));
+  assert.equal(manifest.evidence.mutations.passed, 20);
+  assert.equal(manifest.evidence.mutations.survivors.length, 0);
+  assert.equal(manifest.evidence.fixtures.mismatches, 0);
+  assert.ok(manifest.evidence.fixtures.predicate_evaluations > 0);
+  assert.deepEqual(manifest.evidence.fixtures.predicate_performance, { status: "pass", limit_ms: 50 });
+  assert.ok(p2Build.fixtures.predicate_evaluation_p99_ms < 50);
+  const p0Ledger = await readJson(join(outputs.p0, ".skill-rails", "obligation-ledger.json"));
+  assert.ok(p0Ledger.atoms.length > 2 && p0Ledger.atoms.every((atom) => atom.disposition === "projected"));
+  const p1Ledger = await readJson(join(outputs.p1, ".skill-rails", "obligation-ledger.json"));
+  assert.ok(p1Ledger.atoms.some((atom) => atom.disposition === "review-required" && atom.candidate_class === "format"));
+  const p2Cases = await readJson(join(outputs.p2, ".skill-rails", "eval-cases.json"));
+  assert.ok(p2Cases[0].forbidden_actions.some((item) => item.includes("publishing a release")));
+
+  const p0Eval = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", outputs.p0], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  const p1Eval = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", outputs.p1], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  assert.equal(p0Eval.status, 1);
+  assert.equal(JSON.parse(p0Eval.stdout).release_readiness, "forward-test-required");
+  assert.equal(p1Eval.status, 1);
+  assert.equal(JSON.parse(p1Eval.stdout).release_readiness, "helper-implementation-required");
+  const p1Run = spawnSync(process.execPath, [join(outputs.p1, "scripts", "run.mjs")], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  assert.equal(p1Run.status, 2);
+  assert.match(p1Run.stderr, /SR_P1_SCAFFOLD/);
+
+  const entered = await enterSkill({ skillRoot: outputs.p2 });
+  assert.equal(entered.schema, "skill-rails/enter/1");
+  assert.match(entered.enter_hash, /^sha256:[0-9a-f]{64}$/);
+  const deferred = await stageSkill({ skillRoot: outputs.p2, projectRoot: ROOT, decided: { "authoring.readiness": "ready" } });
+  assert.equal(deferred.decision.status, "BLOCK");
+  assert.equal(deferred.decision.guard.id, "authoring-deferred");
+  const scaffoldSpecPath = join(outputs.p2, "spec.mjs");
+  const scaffoldSpec = await readFile(scaffoldSpecPath, "utf8");
+  await writeTextAtomic(scaffoldSpecPath, scaffoldSpec.replace(/export const DEFERRED = \[[\s\S]*?\];\s*$/, "export const DEFERRED = [];\n"));
+  const premature = await validateFull(outputs.p2);
+  assert.ok(premature.diagnostics.some((item) => item.code === "L16" && /review-required/.test(item.message)));
+  await writeTextAtomic(scaffoldSpecPath, scaffoldSpec);
+  await completeGeneratedP2ForRuntimeTest(outputs.p2);
+  await buildP2(outputs.p2, { repeats: 1 });
+  const unknown = await stageSkill({ skillRoot: outputs.p2, projectRoot: ROOT });
+  assert.deepEqual(unknown.decision.needs.map((item) => item.field), ["authoring.readiness"]);
+  const ready = await stageSkill({ skillRoot: outputs.p2, projectRoot: ROOT, decided: { "authoring.readiness": "ready" } });
+  assert.equal(ready.decision.status, "DONE");
+  assert.equal(ready.decision.stage, "operate");
+  assert.deepEqual(ready.decision.snapshot.unknowns, []);
+  const decisionSchema = await readJson(join(outputs.p2, "schemas", "decision.schema.json"));
+  const validateDecision = new Ajv2020({ strict: true, allErrors: true, validateFormats: false, allowUnionTypes: true }).compile(decisionSchema);
+  for (const decision of [deferred.decision, unknown.decision, ready.decision]) assert.equal(validateDecision(decision), true, JSON.stringify(validateDecision.errors));
+});
+
+test("P2 build fuzzes exact formats across structured values", async (t) => {
+  const base = await makeTestDir("format-fuzz");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  await copyTree(join(ROOT, "evals", "g0_5", "b-v5-clean"), root);
+  const result = await buildP2(root, { repeats: 2 });
+  assert.equal(result.manifest.evidence.formats.passed, 1);
+  assert.equal(result.manifest.evidence.formats.results[0].round_trips, 256);
+  assert.equal(result.manifest.evidence.formats.results[0].crlf_rejected, true);
+});
+
+test("table precedence and format completeness have independent golden witnesses", async (t) => {
+  const base = await makeTestDir("semantic-witnesses");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  await copyTree(join(ROOT, "evals", "g0_5", "b-v5-clean"), root);
+  await buildP2(root, { repeats: 2 });
+  const specPath = join(root, "spec.mjs");
+  const original = await readFile(specPath, "utf8");
+  const broken = original.match(/    \{ state: "broken-record"[^\n]+\n/)?.[0];
+  const open = original.match(/    \{ state: "open"[^\n]+\n/)?.[0];
+  assert.ok(broken && open);
+  await writeFile(specPath, original.replace(broken, "__ROW_SWAP__\n").replace(open, broken).replace("__ROW_SWAP__\n", open), "utf8");
+  let validation = await validateFull(root);
+  assert.ok(validation.diagnostics.some((item) => item.code === "L14" && /Expected row=broken-record, got open/.test(item.message)));
+  await writeFile(specPath, original.replace(', "detail-json": "json"', ""), "utf8");
+  validation = await validateFull(root);
+  assert.ok(validation.diagnostics.some((item) => item.code === "L15" && /Golden values/.test(item.message)));
+});
+
+test("non-ASCII package paths remain read-only during runtime evaluation", async (t) => {
+  const base = await makeTestDir("unicode");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "한글 경로", "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 3 }) });
+  await completeGeneratedP2ForRuntimeTest(root);
+  await buildP2(root, { repeats: 1 });
+  const before = await treeHashes(root);
+  const result = await stageSkill({ skillRoot: root, projectRoot: ROOT, decided: { "authoring.readiness": "ready" } });
+  assert.equal(result.decision.status, "DONE");
+  assert.deepEqual(await treeHashes(root), before);
+});
+
+test("generation rolls back the target when final validation fails", async (t) => {
+  const base = await makeTestDir("rollback");
+  t.after(() => removeTestDir(base));
+  const target = join(base, "failed");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await assert.rejects(generatePackage({ intent, output: target, finalize: async () => { throw new Error("injected-finalize-failure"); } }), /injected-finalize-failure/);
+  assert.equal(await exists(target), false);
+});
+
+test("direct P2 rebuild validates in isolation and leaves generated outputs unchanged on failure", async (t) => {
+  const base = await makeTestDir("rebuild-rollback");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 2 }) });
+  const generated = ["SKILL.md", "agents/openai.yaml", "schemas/decision.schema.json", "scripts/skill-rails/run.mjs", ".generated.json"];
+  const before = Object.fromEntries(await Promise.all(generated.map(async (local) => [local, await hashFile(join(root, ...local.split("/")))])));
+  const intentPath = join(root, ".skill-rails", "intent.json");
+  const changedIntent = JSON.parse(await readFile(intentPath, "utf8"));
+  changedIntent.description = "This text would change generated bootstrap output if a failed build leaked.";
+  await writeFile(intentPath, JSON.stringify(changedIntent, null, 2), "utf8");
+  await appendFile(join(root, "spec.mjs"), "\nprocess.cwd();\n", "utf8");
+  await assert.rejects(buildP2(root, { repeats: 2 }), /L-full failed|L-fast|L0|L1/);
+  const after = Object.fromEntries(await Promise.all(generated.map(async (local) => [local, await hashFile(join(root, ...local.split("/")))])));
+  assert.deepEqual(after, before);
+});
+
+test("repeated P2 builds are byte-stable for every generated output", async (t) => {
+  const base = await makeTestDir("reproducible-build");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 3 }) });
+  const firstManifest = await readJson(join(root, ".generated.json"));
+  const paths = [...Object.keys(firstManifest.generated_files), ".generated.json"].sort();
+  const before = Object.fromEntries(await Promise.all(paths.map(async (local) => [local, await hashFile(join(root, ...local.split("/")))])));
+  await buildP2(root, { repeats: 3 });
+  const after = Object.fromEntries(await Promise.all(paths.map(async (local) => [local, await hashFile(join(root, ...local.split("/")))])));
+  assert.deepEqual(after, before);
+});
+
+test("manifest rejects every generated-surface class and L-fast rejects spec mutation", async (t) => {
+  const base = await makeTestDir("tamper");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 3 }) });
+  const candidates = [
+    "scripts/skill-rails/alignment.mjs", "scripts/skill-rails/api.mjs", "scripts/skill-rails/body.mjs",
+    "scripts/skill-rails/collectors.mjs", "scripts/skill-rails/constants.mjs", "scripts/skill-rails/domains.mjs",
+    "scripts/skill-rails/evaluator.mjs", "scripts/skill-rails/guide.mjs", "scripts/skill-rails/loader.mjs",
+    "scripts/skill-rails/snapshot.mjs", "scripts/skill-rails/run.mjs",
+    "scripts/skill-rails/vendor/ACORN-LICENSE", "schemas/decision.schema.json", "agents/openai.yaml",
+    "fixtures/scenarios.json", ".skill-rails/intent.json"
+  ];
+  const rejected = [];
+  for (const [index, local] of candidates.entries()) {
+    const path = join(root, ...local.split("/"));
+    const original = await readFile(path, "utf8");
+    await writeFile(path, `${original}\n// tamper-${index}\n`, "utf8");
+    try { await loadBuiltSkill(root); }
+    catch (error) { assert.equal(error.code, "SR_MANIFEST_MISMATCH"); rejected.push(local); }
+    finally { await writeFile(path, original, "utf8"); }
+  }
+  assert.deepEqual(rejected, candidates);
+
+  const manifestPath = join(root, ".generated.json");
+  const originalManifest = await readFile(manifestPath, "utf8");
+  const changedManifest = JSON.parse(originalManifest);
+  changedManifest.build_id = "sha256:" + "0".repeat(64);
+  await writeFile(manifestPath, JSON.stringify(changedManifest), "utf8");
+  await assert.rejects(loadBuiltSkill(root), (error) => error.code === "SR_MANIFEST_MISMATCH");
+  await writeFile(manifestPath, originalManifest, "utf8");
+
+  const unsupportedNodeManifest = JSON.parse(originalManifest);
+  unsupportedNodeManifest.minimum_node_major = Number(process.versions.node.split(".")[0]) + 1;
+  await writeFile(manifestPath, JSON.stringify(unsupportedNodeManifest), "utf8");
+  await assert.rejects(loadBuiltSkill(root), (error) => error.code === "SR_NODE_VERSION");
+  await writeFile(manifestPath, originalManifest, "utf8");
+
+  const unsafeManifest = JSON.parse(originalManifest);
+  unsafeManifest.generated_files["../outside.txt"] = "sha256:" + "0".repeat(64);
+  await writeFile(manifestPath, JSON.stringify(unsafeManifest), "utf8");
+  await assert.rejects(buildP2(root, { repeats: 1 }), /unsafe-path/);
+  await writeFile(manifestPath, originalManifest, "utf8");
+
+  const specPath = join(root, "spec.mjs");
+  const spec = await readFile(specPath, "utf8");
+  await writeFile(specPath, `${spec}\nprocess.cwd();\n`, "utf8");
+  await assert.rejects(loadBuiltSkill(root), (error) => error.code === "SR_LFAST_FAILED");
+  await writeFile(specPath, spec, "utf8");
+
+  const generated = join(root, "scripts", "skill-rails", "run.mjs");
+  const originalGenerated = await readFile(generated, "utf8");
+  await appendFile(generated, "// manual edit\n", "utf8");
+  await assert.rejects(buildP2(root, { repeats: 1 }), /edited manually/);
+  await writeFile(generated, originalGenerated, "utf8");
+});
+
+test("trace state stays external and alignment distinguishes observed evidence", async (t) => {
+  const base = await makeTestDir("trace");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const traceDir = join(base, "state", "traces");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 3 }) });
+  await completeGeneratedP2ForRuntimeTest(root);
+  await buildP2(root, { repeats: 1 });
+  await assert.rejects(assertExternalStateDir(root, join(root, ".state")), (error) => error.code === "SR_STATE_INSIDE_SKILL");
+  await assertExternalStateDir(root, traceDir);
+  const inside = join(root, "inside-target"); const outside = join(base, "outside-target");
+  await Promise.all([mkdir(inside, { recursive: true }), mkdir(outside, { recursive: true })]);
+  try {
+    const outsideLink = join(base, "outside-link-to-inside");
+    const insideLink = join(root, "inside-link-to-outside");
+    await symlink(inside, outsideLink, "junction");
+    await symlink(outside, insideLink, "junction");
+    await assert.rejects(assertExternalStateDir(root, outsideLink), (error) => error.code === "SR_STATE_INSIDE_SKILL");
+    await assert.rejects(assertExternalStateDir(root, insideLink), (error) => error.code === "SR_STATE_INSIDE_SKILL");
+    await rm(outsideLink, { recursive: true, force: true });
+    await rm(insideLink, { recursive: true, force: true });
+  } catch (error) {
+    if (!["EPERM", "EACCES", "UNKNOWN"].includes(error.code)) throw error;
+  }
+
+  const staged = await stageSkill({ skillRoot: root, projectRoot: ROOT, decided: { "authoring.readiness": "ready" }, traceDir, runId: "run-1" });
+  const tracePath = join(traceDir, "run-1.jsonl");
+  const decisionPath = join(base, "decision.json");
+  await writeFile(decisionPath, JSON.stringify(staged.decision), "utf8");
+  const quiet = { log() {}, error() {} };
+  assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_claimed", "--unknown-probe", "true"], quiet), 1);
+  assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_observed", "--authority", "harness_observed", "--data", '{"index":0,"verb":"REPORT"}'], quiet), 1);
+  assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_observed", "--data", '{"index":0,"verb":"REPORT"}'], quiet), 1);
+  let events = await readTrace(tracePath);
+  assert.equal(alignDecision(staged.decision, events).aggregate, "unproven");
+  await recordHarnessEvidence({ skillRoot: root, traceDir, runId: "run-1", decision: staged.decision, type: "effect_observed", data: { index: 0, verb: "REPORT", kind: "effect" } });
+  events = await readTrace(tracePath);
+  assert.equal(alignDecision(staged.decision, events).aggregate, "aligned");
+});
+
+test("snapshot changes during collection fail closed as stale", async (t) => {
+  const base = await makeTestDir("stale");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill"); const project = join(base, "project"); const traceDir = join(base, "trace");
+  await mkdir(project, { recursive: true });
+  const watched = join(project, "watched.txt"); await writeFile(watched, "before", "utf8");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 2 }) });
+  await completeGeneratedP2ForRuntimeTest(root);
+  const specPath = join(root, "spec.mjs");
+  const spec = (await readFile(specPath, "utf8")).replace(
+    '"authoring.readiness": { decided: true, domain: ["ready", "needs-design", "complete"] }',
+    '"authoring.readiness": { decided: true, domain: ["ready", "needs-design", "complete"] },\n  "probe.value": { collector: "evidence-release/probe.value", domain: ["yes"] }'
+  );
+  await writeTextAtomic(specPath, spec);
+  await writeTextAtomic(join(root, "collectors", "index.mjs"), 'import { readFile, writeFile } from "node:fs/promises";\nimport { join } from "node:path";\nexport const collectors = { "evidence-release/probe.value": async (ctx) => { await writeFile(join(ctx.projectRoot, "collector.started"), "yes", "utf8"); await new Promise((resolve) => setTimeout(resolve, 80)); return "yes"; } };\nexport const snapshotBasis = async (ctx) => ({ watched: await readFile(join(ctx.projectRoot, "watched.txt"), "utf8") });\n');
+  await buildP2(root, { repeats: 2 });
+  const stagedPromise = stageSkill({ skillRoot: root, projectRoot: project, decided: { "authoring.readiness": "ready" }, traceDir, runId: "stale-run" });
+  const collectorStarted = join(project, "collector.started");
+  for (let attempt = 0; attempt < 100 && !(await exists(collectorStarted)); attempt += 1) await new Promise((resolve) => setTimeout(resolve, 10));
+  assert.equal(await exists(collectorStarted), true);
+  await writeFile(watched, "after-and-longer", "utf8");
+  const staged = await stagedPromise;
+  assert.equal(staged.decision.snapshot.status, "stale");
+  assert.equal(staged.decision.status, "BLOCK");
+  assert.equal(staged.decision.reinvoke, "recompute");
+  assert.ok((await readTrace(join(traceDir, "stale-run.jsonl"))).some((event) => event.type === "snapshot_stale"));
+});
+
+test("non-git snapshot fallback hashes nested same-size content changes", async (t) => {
+  const base = await makeTestDir("filesystem-snapshot");
+  t.after(() => removeTestDir(base));
+  const project = join(base, "project");
+  await mkdir(join(project, "nested"), { recursive: true });
+  await mkdir(join(project, ".git"), { recursive: true });
+  const watched = join(project, "nested", "watched.txt");
+  await writeFile(watched, "AAAA", "utf8");
+  const before = await captureSnapshot(project);
+  assert.equal(before.material.kind, "filesystem");
+  await writeFile(watched, "BBBB", "utf8");
+  const after = await captureSnapshot(project);
+  assert.notEqual(after.fingerprint, before.fingerprint);
+  assert.equal(after.material.entries.find((entry) => entry.path === "nested/watched.txt").size, 4);
+});
+
+test("template and READ_FIRST paths fail closed on traversal and junction escape", async (t) => {
+  const base = await makeTestDir("path-policy");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const outside = join(base, "outside");
+  await Promise.all([mkdir(join(root, "templates"), { recursive: true }), mkdir(outside, { recursive: true })]);
+  await writeFile(join(outside, "secret.md"), "outside\n", "utf8");
+  await assert.rejects(resolveTemplate(root, "escape", { file: "../outside/secret.md" }), (error) => error.code === "L11");
+
+  try {
+    await symlink(outside, join(root, "templates", "linked"), "junction");
+    await assert.rejects(resolveTemplate(root, "escape", { file: "templates/linked/secret.md" }), (error) => error.code === "L11");
+
+    const generated = join(base, "generated");
+    const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+    await generatePackage({ intent, output: generated, finalize: async (stage) => buildP2(stage, { repeats: 2 }) });
+    const externalLink = join(generated, "references", "external");
+    await symlink(outside, externalLink, "junction");
+    const specPath = join(generated, "spec.mjs");
+    const source = (await readFile(specPath, "utf8")).replace('path: "references/purpose.md"', 'path: "references/external/secret.md"');
+    await writeFile(specPath, source, "utf8");
+    await assert.rejects(buildP2(generated, { repeats: 2 }), (error) => error.code === "SR_PACKAGE_SYMLINK");
+  } catch (error) {
+    if (!["EPERM", "EACCES", "UNKNOWN"].includes(error.code)) throw error;
+  }
+});
+
+test("trace records only predicates actually evaluated and orders projection before emission", async (t) => {
+  const base = await makeTestDir("trace-order");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const traceDir = join(base, "traces");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 2 }) });
+  await completeGeneratedP2ForRuntimeTest(root);
+  const specPath = join(root, "spec.mjs");
+  const source = (await readFile(specPath, "utf8"))
+    .replace(
+      '"authoring.readiness": { decided: true, domain: ["ready", "needs-design", "complete"] }',
+      '"authoring.readiness": { decided: true, domain: ["ready", "needs-design", "complete"] },\n  "guard.known": { decided: true, domain: ["yes", "no"] },\n  "guard.missing": { decided: true, domain: ["yes", "no"] }'
+    )
+    .replace("export const GUARDS = [];", 'export const GUARDS = [\n  { id: "known-false", reads: ["guard.known"], when: s => s.guard.known === "yes", then: "BLOCK", body: "guard: known-false" },\n  { id: "missing-input", reads: ["guard.known", "guard.missing"], when: s => s.guard.known === "no" && s.guard.missing === "yes", then: "BLOCK", body: "guard: missing-input" }\n];');
+  await writeFile(specPath, source, "utf8");
+  const bodyPath = join(root, "body.md");
+  const body = await readFile(bodyPath, "utf8");
+  await writeFile(bodyPath, body.replace("## stage: operate", "## guard: known-false\n\nBlock when the known guard is yes.\n\n## guard: missing-input\n\nBlock when the second guard is yes.\n\n## stage: operate"), "utf8");
+  const fixturesPath = join(root, "fixtures", "scenarios.json");
+  const fixtures = JSON.parse(await readFile(fixturesPath, "utf8"));
+  for (const fixture of fixtures) fixture.decided = { ...(fixture.decided ?? {}), "guard.known": "no", "guard.missing": "no" };
+  fixtures.push(
+    { id: "guard-known", s: {}, decided: { "authoring.readiness": "ready", "guard.known": "yes", "guard.missing": "no" }, expect: { guard: "known-false", stage: null, status: "BLOCK" }, cover: ["guard:known-false"] },
+    { id: "guard-missing", s: {}, decided: { "authoring.readiness": "ready", "guard.known": "no", "guard.missing": "yes" }, expect: { guard: "missing-input", stage: null, status: "BLOCK" }, cover: ["guard:missing-input"] }
+  );
+  await writeFile(fixturesPath, JSON.stringify(fixtures, null, 2), "utf8");
+  await buildP2(root, { repeats: 2 });
+  const staged = await stageSkill({
+    skillRoot: root, projectRoot: base, traceDir, runId: "trace-order",
+    decided: { "authoring.readiness": "ready", "guard.known": "no" }
+  });
+  assert.equal(staged.decision.status, "BLOCK");
+  assert.equal(staged.decision.guard.id, "missing-input");
+  const events = (await readTrace(join(traceDir, "trace-order.jsonl"))).filter((event) => event.decision_id === staged.decision.decision_id);
+  assert.deepEqual(events.filter((event) => event.type === "guard_evaluated").map((event) => event.data.guard), ["known-false"]);
+  assert.equal(events.some((event) => event.type === "guard_matched"), false);
+  const types = events.map((event) => event.type);
+  assert.ok(types.indexOf("review_required") < types.indexOf("decision_emitted"));
+  assert.ok(types.indexOf("decision_emitted") < types.indexOf("guide_rendered"));
+});
+
+async function treeHashes(root) {
+  const output = {};
+  for (const path of await listFiles(root, { exclude: [".skill-rails"] })) output[path.slice(root.length + 1).replace(/\\/g, "/")] = await hashFile(path);
+  return output;
+}
+
+async function completeGeneratedP2ForRuntimeTest(root) {
+  const path = join(root, "spec.mjs");
+  const source = await readFile(path, "utf8");
+  const completed = source.replace(/export const DEFERRED = \[[\s\S]*?\];\s*$/, "export const DEFERRED = [];\n");
+  assert.notEqual(completed, source, "generated P2 test scaffold must contain a DEFERRED authoring gate");
+  await writeTextAtomic(path, completed);
+  const ledgerPath = join(root, ".skill-rails", "obligation-ledger.json");
+  const ledger = await readJson(ledgerPath);
+  for (const atom of ledger.atoms) if (atom.disposition === "review-required") {
+    atom.disposition = "projected";
+    atom.targets = ["spec:STAGES/operate"];
+    atom.evidence = ["fixture:ready"];
+  }
+  await writeJsonAtomic(ledgerPath, ledger);
+}

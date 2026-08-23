@@ -1,0 +1,23 @@
+{
+  "schema": "skill-rails/g0.5-coordinator-transcript/3",
+  "reviewer_id": "codex-b2",
+  "source_terminal_id": "term_14f69830-f937-4c0b-9f2d-11747e1ab48d",
+  "events": [
+    { "sequence": 0, "kind": "prompt", "targets": [] },
+    { "sequence": 1, "kind": "tool_call", "verb": "READ", "targets": ["input:v3-review-brief.md"] },
+    { "sequence": 2, "kind": "tool_call", "verb": "READ", "targets": ["artifact:body.md", "artifact:collectors/index.mjs", "artifact:fixtures/formats.json", "artifact:fixtures/lint/manifest.json", "artifact:fixtures/scenarios.json", "artifact:references/purpose.md", "artifact:spec.mjs", "artifact:templates/review-report.md"] },
+    { "sequence": 3, "kind": "tool_call", "verb": "READ", "targets": ["input:v3-review-output.schema.json"] },
+    { "sequence": 4, "kind": "tool_call", "verb": "READ", "targets": ["input:v3-state-questions.json"] },
+    { "sequence": 5, "kind": "tool_call", "verb": "READ", "targets": ["artifact:spec.mjs"] },
+    { "sequence": 6, "kind": "tool_call", "verb": "READ", "targets": ["artifact:body.md"] },
+    { "sequence": 7, "kind": "tool_call", "verb": "READ", "targets": ["artifact:collectors/index.mjs"] },
+    { "sequence": 8, "kind": "tool_call", "verb": "READ", "targets": ["artifact:fixtures/formats.json"] },
+    { "sequence": 9, "kind": "tool_call", "verb": "READ", "targets": ["artifact:references/purpose.md"] },
+    { "sequence": 10, "kind": "tool_call", "verb": "READ", "targets": ["artifact:fixtures/lint/manifest.json"] },
+    { "sequence": 11, "kind": "tool_call", "verb": "READ", "targets": ["artifact:fixtures/scenarios.json"] },
+    { "sequence": 12, "kind": "tool_call", "verb": "READ", "targets": ["artifact:templates/review-report.md"] },
+    { "sequence": 13, "kind": "tool_call", "verb": "RUN", "targets": ["command:node scripts/lib/g05-review-lint.mjs --skill evals/g0_5/b-v5-mutated-v3"] },
+    { "sequence": 14, "kind": "tool_call", "verb": "READ", "targets": ["artifact:spec.mjs"] },
+    { "sequence": 15, "kind": "result", "targets": [] }
+  ]
+}
