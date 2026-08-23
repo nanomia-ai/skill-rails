@@ -621,9 +621,9 @@ node <skill-root>/scripts/migrate.mjs \
   --out <folder>
 ```
 
-원본 project를 수정하지 않는다. 승인된 destination에 복사·생성한다. source의 paragraph, list item, table row를 atomize하고, exact format → observation → stage/guard/effect 순으로 옮긴다. judgment는 body에 남긴다.
+원본 project를 수정하지 않는다. 승인된 destination에 복사·생성한다. Markdown source는 parser-backed semantic atom(frontmatter metadata, heading/context, paragraph, nested list item, table row, code/HTML block, parser-consumed reference definition)으로 보존하고, Markdown 이외 regular source file은 파일 하나당 하나의 `file-text` 또는 `file-opaque` review atom으로 inventory한다. UTF-8 text는 exact raw text와 byte hash를 남기고, opaque file은 내용을 덤프하지 않고 byte hash·byte count와 preserve/map/dispose 명시 지시만 남긴다. exact format → observation → stage/guard/effect 순으로 옮기며 judgment는 body에 남긴다.
 
-Migration atom은 별도 원장에 쓰지 않고 `.skill-rails/obligation-ledger.json`에 원문 span/hash/confidence/rationale와 함께 추가한다. 따라서 P2의 기존 L16 gate가 intent atom과 migration atom을 같은 릴리스 경계에서 검사한다.
+Migration atom은 별도 원장에 쓰지 않고 `.skill-rails/obligation-ledger.json`에 exact source path/span/hash, raw text 또는 opaque instruction, context와 함께 추가한다. 모든 migration atom은 명시적으로 처리할 때까지 `review-required`이므로 P2의 기존 L16 gate가 intent atom과 migration atom을 같은 릴리스 경계에서 검사한다.
 
 다음이면 중단한다.
 
@@ -770,7 +770,7 @@ Script는 사용자 project의 현재 directory가 아니라 active `SKILL.md`�
 ### 17.1 결정적 repository 검증
 
 - `npm run lint`: pass
-- 현재 환경 전체 test: 36/36 pass
+- 현재 환경 전체 test: 38/38 pass
 - Node 20.20.2: 35/35 pass
 - Node 22.23.2: 35/35 pass
 - Node 24.18.0: 35/35 pass
@@ -938,7 +938,7 @@ V5 의미를 바꾸는 새 수정은 반드시 이 표에 다음 네 가지를 �
 - 범용 security boundary
 - 외부 runtime 의존
 
-생성된 P2 runtime에 직접 vendoring하는 제3자 source는 JavaScript AST parsing을 위한 Acorn과 Acorn-walk 배포 파일뿐이며, 원본 license를 그대로 보존한다. Creator repository의 개발·평가 환경은 두 parser package와 G0.5 JSON Schema 검증용 Ajv를 dev dependency로 사용한다. 이를 제외한 제품 logic은 V5와 이 저장소의 설계에 따라 작성했다.
+생성된 P2 runtime에 직접 vendoring하는 제3자 source는 JavaScript AST parsing을 위한 Acorn과 Acorn-walk 배포 파일뿐이며, 원본 license를 그대로 보존한다. Creator repository는 Acorn·Acorn-walk, migration 입력을 구조적으로 나누는 Markdown-it, G0.5 JSON Schema 검증용 Ajv를 dev dependency로 사용한다. Markdown-it은 creator의 migration 경로에서만 실행되며 생성된 skill runtime에는 포함되지 않는다. 이를 제외한 제품 logic은 V5와 이 저장소의 설계에 따라 작성했다.
 
 ---
 

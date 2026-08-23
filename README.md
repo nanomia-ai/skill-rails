@@ -195,7 +195,7 @@ node "<skill-rails>/scripts/eval.mjs" --skill ./my-skill
 
 ## What has been verified
 
-The repository currently passes code linting and all 36 tests. It also distinguishes the expected results in a fixed suite of normal and deliberately broken cases. Compatibility runs passed on Node.js 20, 22, and 24. Fresh project-local sessions created P1 and P2 skills and used the same generated packages through both current installation layouts. P2 also passed required-file and reference checks (L0–L18), tests that deliberately break rules and expect failure, repeatable state scenarios, and comparisons between execution records and required evidence.
+The current environment passes code linting and all 38 tests. It also distinguishes the expected results in a fixed suite of normal and deliberately broken cases. Earlier compatibility runs on Node.js 20, 22, and 24 each passed the then-current 35-test suite. Fresh project-local sessions created P1 and P2 skills and used the same generated packages through both current installation layouts. P2 also passed required-file and reference checks (L0–L18), tests that deliberately break rules and expect failure, repeatable state scenarios, and comparisons between execution records and required evidence.
 
 Those results support the tested Windows project-local path. They do not yet prove global installation, marketplace distribution, Linux/macOS behavior, broad trigger precision, or recovery after real long-session compaction.
 

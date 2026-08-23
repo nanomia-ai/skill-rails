@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
@@ -96,6 +96,150 @@ test("conservative migration records every atom and leaves the source unchanged"
   const releaseAttempt = await validateFull(output);
   assert.equal(releaseAttempt.ok, false);
   assert.ok(releaseAttempt.diagnostics.some((item) => item.code === "L16" && item.pointer.includes("migration-a0001")));
+});
+
+test("migration preserves Markdown semantic units, metadata, and parser-consumed definitions", async (t) => {
+  const base = await makeTestDir("migration-structures");
+  t.after(() => removeTestDir(base));
+  const source = join(ROOT, "fixtures", "migration-structures");
+  const inspection = await inspectProseSkill(source);
+  const atoms = inspection.atoms;
+  const kinds = atoms.map((atom) => atom.source_kind);
+  assert.deepEqual(kinds, [
+    "frontmatter", "heading", "paragraph", "list-item", "list-item", "list-item",
+    "heading", "table-row", "table-row", "table-row", "reference-definition", "fenced-code"
+  ]);
+
+  const [frontmatter, paragraph, outerItem, nestedItem, tableHeader, failedRow, reference, code] = [
+    atoms.find((atom) => atom.source_kind === "frontmatter"),
+    atoms.find((atom) => atom.original_text.startsWith("Run the verification")),
+    atoms.find((atom) => atom.original_text.startsWith("- Block publication")),
+    atoms.find((atom) => atom.original_text.startsWith("  - Check the child")),
+    atoms.find((atom) => atom.original_text === "| State | Action |"),
+    atoms.find((atom) => atom.original_text === "| verification fails | never publish |"),
+    atoms.find((atom) => atom.source_kind === "reference-definition"),
+    atoms.find((atom) => atom.source_kind === "fenced-code")
+  ];
+  assert.match(frontmatter.original_text, /allowed-tools: Read, Write/);
+  assert.match(frontmatter.original_text, /license: MIT/);
+  assert.match(frontmatter.original_text, /compatibility: Codex and Claude Code/);
+  assert.match(frontmatter.original_text, /disable-model-invocation: true/);
+  assert.match(frontmatter.original_text, /user-invocable: false/);
+  assert.match(frontmatter.original_text, /x-future-metadata: preserve exactly/);
+  assert.equal(frontmatter.source_span, "1-10");
+  assert.deepEqual(frontmatter.context, []);
+  assert.equal(paragraph.original_text, "Run the verification command and record its result.\nThe second sentence stays in this paragraph.");
+  assert.equal(outerItem.original_text, "- Block publication when verification fails.\n  Keep this continuation with the item.\n  - Check the child evidence.\n    Keep nested detail with the child.");
+  assert.equal(nestedItem.original_text, "  - Check the child evidence.\n    Keep nested detail with the child.");
+  assert.equal(code.original_text, "```sh\nif verify; then\n  echo \"verified\"\nfi\n```");
+  assert.equal(reference.original_text, "[release-policy]: https://example.test/release-policy");
+  assert.equal(reference.candidate_class, "declaration");
+  assert.deepEqual(reference.context.map((item) => item.text), ["Release gate", "Decision matrix"]);
+  const sourceLines = (await readFile(join(source, "SKILL.md"), "utf8")).split(/\r?\n/);
+  for (const atom of [frontmatter, reference]) {
+    const [start, end] = atom.source_span.split("-").map(Number);
+    assert.equal(sourceLines.slice(start - 1, end).join("\n"), atom.original_text);
+  }
+  assert.deepEqual(paragraph.context.map((item) => item.text), ["Release gate"]);
+  assert.deepEqual(tableHeader.context.map((item) => item.text), ["Release gate", "Decision matrix"]);
+  assert.equal(tableHeader.candidate_class, "table row");
+  assert.equal(failedRow.candidate_class, "table row");
+  for (const atom of atoms) assert.equal(atom.source_hash, sha256(atom.original_text));
+  assert.equal(failedRow.source_span, "27-27");
+
+  const intent = await inferMigrationIntent(source, inspection);
+  const output = join(base, "migrated");
+  await generatePackage({ intent, output, requestedProfile: "p2", finalize: async (stage) => {
+    await writeMigrationLedger(stage, inspection);
+    await buildP2(stage, { repeats: 1 });
+  } });
+  const ledger = await readJson(join(output, ".skill-rails", "obligation-ledger.json"));
+  const migrationAtoms = ledger.atoms.filter((atom) => atom.source.startsWith("migration:"));
+  assert.deepEqual(migrationAtoms.map((atom) => atom.text), atoms.map((atom) => atom.original_text));
+  assert.deepEqual(migrationAtoms.map((atom) => atom.source_kind), kinds);
+  assert.deepEqual(migrationAtoms.map((atom) => atom.context), atoms.map((atom) => atom.context));
+  for (const sourceKind of ["frontmatter", "reference-definition"]) {
+    const sourceAtom = atoms.find((atom) => atom.source_kind === sourceKind);
+    const ledgerAtom = migrationAtoms.find((atom) => atom.source_kind === sourceKind);
+    assert.equal(ledgerAtom.source_hash, sourceAtom.source_hash);
+    assert.equal(ledgerAtom.source, `migration:${sourceAtom.source_path}:${sourceAtom.source_span}`);
+  }
+  assert.ok(migrationAtoms.some((atom) => atom.text === nestedItem.original_text));
+  assert.ok(migrationAtoms.some((atom) => atom.text === failedRow.original_text));
+  assert.ok(migrationAtoms.some((atom) => atom.text === code.original_text));
+});
+
+test("migration inventories non-Markdown files as conservative review atoms", async (t) => {
+  const base = await makeTestDir("migration-nonmarkdown");
+  t.after(() => removeTestDir(base));
+  const source = join(ROOT, "fixtures", "migration-nonmarkdown");
+  const inspection = await inspectProseSkill(source);
+  const expectedFiles = [
+    "SKILL.md", "agents/openai.yaml", "assets/sample.bin", "empty.txt", "references/source-notes.txt", "scripts/run.mjs"
+  ];
+  const relativeFiles = inspection.files.map((file) => file.slice(source.length + 1).replace(/\\/g, "/"));
+  assert.deepEqual(relativeFiles, expectedFiles);
+  const before = new Map(await Promise.all(inspection.files.map(async (file) => [file, sha256(await readFile(file))])));
+  const fileAtoms = inspection.atoms.filter((atom) => atom.source_kind.startsWith("file-"));
+  assert.equal(fileAtoms.length, expectedFiles.length - 1);
+  assert.deepEqual(fileAtoms.map((atom) => atom.source_path), expectedFiles.slice(1));
+  for (const atom of fileAtoms) {
+    assert.equal(atom.source_span, "file");
+    assert.equal(atom.candidate_class, "ambiguous/review-required");
+    assert.equal(atom.disposition, "review-required");
+    assert.equal(atom.target_id, null);
+    assert.equal(atom.fixture_or_review_evidence, null);
+  }
+
+  const yaml = fileAtoms.find((atom) => atom.source_path === "agents/openai.yaml");
+  const script = fileAtoms.find((atom) => atom.source_path === "scripts/run.mjs");
+  const reference = fileAtoms.find((atom) => atom.source_path === "references/source-notes.txt");
+  const empty = fileAtoms.find((atom) => atom.source_path === "empty.txt");
+  const opaque = fileAtoms.find((atom) => atom.source_path === "assets/sample.bin");
+  for (const [atom, path] of [[yaml, "agents/openai.yaml"], [script, "scripts/run.mjs"], [reference, "references/source-notes.txt"], [empty, "empty.txt"]]) {
+    const bytes = await readFile(join(source, path));
+    assert.equal(atom.source_kind, "file-text");
+    assert.equal(atom.original_text, bytes.toString("utf8"));
+    assert.equal(atom.source_hash, sha256(bytes));
+    assert.equal(atom.byte_count, bytes.length);
+  }
+  const opaqueBytes = await readFile(join(source, "assets/sample.bin"));
+  assert.equal(opaque.source_kind, "file-opaque");
+  assert.equal(opaque.source_hash, sha256(opaqueBytes));
+  assert.equal(opaque.byte_count, opaqueBytes.length);
+  assert.match(opaque.original_text, /Opaque file/);
+  assert.notEqual(opaque.original_text, Buffer.from(opaqueBytes).toString("base64"));
+
+  const intent = await inferMigrationIntent(source, inspection);
+  const output = join(base, "migrated");
+  await generatePackage({ intent, output, finalize: async (stage) => {
+    await writeMigrationLedger(stage, inspection);
+    await buildP2(stage, { repeats: 1 });
+  } });
+  const ledger = await readJson(join(output, ".skill-rails", "obligation-ledger.json"));
+  const migrationAtoms = ledger.atoms.filter((atom) => atom.source.startsWith("migration:"));
+  assert.equal(migrationAtoms.length, inspection.atoms.length);
+  assert.deepEqual(ledger.migration.source_files, relativeFiles);
+  assert.ok(migrationAtoms.every((atom) => atom.disposition === "review-required" && atom.targets.length === 0 && atom.evidence.length === 0));
+  for (const atom of fileAtoms) {
+    const ledgerAtom = migrationAtoms.find((item) => item.source_kind === atom.source_kind && item.source.includes(`:${atom.source_path}:`));
+    assert.equal(ledgerAtom.source_hash, atom.source_hash);
+    assert.equal(ledgerAtom.byte_count, atom.byte_count);
+    assert.equal(ledgerAtom.text, atom.original_text);
+  }
+  const after = new Map(await Promise.all(inspection.files.map(async (file) => [file, sha256(await readFile(file))])));
+  assert.deepEqual(after, before);
+
+  const invalidMarkdownRoot = join(base, "invalid-markdown");
+  await mkdir(invalidMarkdownRoot, { recursive: true });
+  await writeFile(join(invalidMarkdownRoot, "SKILL.md"), "---\nname: invalid-markdown\ndescription: Preserve invalid Markdown bytes.\n---\n\n# Valid source\n", "utf8");
+  const invalidBytes = Uint8Array.from([0xff, 0x00, 0xfe]);
+  await writeFile(join(invalidMarkdownRoot, "opaque.md"), invalidBytes);
+  const invalidInspection = await inspectProseSkill(invalidMarkdownRoot);
+  const invalidAtom = invalidInspection.atoms.find((atom) => atom.source_path === "opaque.md");
+  assert.equal(invalidAtom.source_kind, "file-opaque");
+  assert.equal(invalidAtom.source_hash, sha256(invalidBytes));
+  assert.equal(invalidAtom.byte_count, invalidBytes.byteLength);
 });
 
 test("maintenance applies stable-id body changes atomically and reports semantic impact", async (t) => {
