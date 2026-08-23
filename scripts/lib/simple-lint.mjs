@@ -25,11 +25,11 @@ export async function lintSimpleSkill(skillRoot, options = {}) {
   }
 
   if (options.creatorBudgets) {
-    const budgets = { scripts: 6, references: 6, templates: 5 };
+    const budgets = { scripts: 6, references: 7, templates: 5 };
     for (const [directory, maximum] of Object.entries(budgets)) {
       const path = join(root, directory);
       const count = await exists(path) ? (await readdir(path, { withFileTypes: true })).filter((entry) => entry.isFile()).length : 0;
-      if (count > maximum) diagnostics.push(diag("SR_CREATOR_BUDGET", directory, `${directory} has ${count} top-level files; initial budget is ${maximum}.`));
+      if (count > maximum) diagnostics.push(diag("SR_CREATOR_BUDGET", directory, `${directory} has ${count} top-level files; current budget is ${maximum}.`));
     }
   }
   return result(diagnostics);

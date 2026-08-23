@@ -33,7 +33,8 @@ Do not choose P2 merely because the source is long. The generator records the se
 9. Write judgment-only body sections.
 10. Add positive, negative, counterexample, and mutation fixtures.
 11. Generate the thin loader and platform metadata.
-12. Run L-fast, L-structural lint, L-full build, and behavior evaluation.
+12. If the user requested a README, read [readme-authoring.md](readme-authoring.md) and write it from the implemented behavior and available evidence. Do not treat the guide as a fixed section template.
+13. Run L-fast, L-structural lint, L-full build, and behavior evaluation.
 
 The obligation ledger is provenance, not a second behavior source. Keep original intent text immutable inside each atom and point `targets` to the canonical implementation and `evidence` to its check. Supported locators are `file:<relative-path>`, `body:<section-ref>`, `spec:<GROUP>/<stable-id>` (or `spec:TABLES/<table>/<row>`), `fixture:<id>`, and `eval:<id>`. Mark an atom `projected` only after both locators resolve. If an atom is still ambiguous, leave it `review-required` and keep the P2 `DEFERRED` gate.
 

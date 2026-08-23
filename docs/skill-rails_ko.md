@@ -239,7 +239,7 @@ Skill Rails 자체는 P1이다. 사용법은 짧은 `SKILL.md`에 있고, 생성
 ### 8.1 Creator 정본
 
 - `SKILL.md`: 선택과 authoring 진입 절차
-- `references/`: 작업 종류에 따라 읽는 작성·V5·평가·마이그레이션·플랫폼 규칙
+- `references/`: 작업 종류에 따라 읽는 작성·V5·평가·마이그레이션·플랫폼·README 작성 규칙
 - `scripts/lib/`: profile, generator, obligation, migration, maintenance, semantic diff, build
 - `scripts/runtime/`: P2 validator, evaluator, guide, trace, alignment 원본
 - `schemas/`: 공개 Decision과 Trace Event 계약
@@ -770,7 +770,7 @@ Script는 사용자 project의 현재 directory가 아니라 active `SKILL.md`�
 ### 17.1 결정적 repository 검증
 
 - `npm run lint`: pass
-- 전체 test: 35/35 pass
+- 현재 환경 전체 test: 36/36 pass
 - Node 20.20.2: 35/35 pass
 - Node 22.23.2: 35/35 pass
 - Node 24.18.0: 35/35 pass
@@ -1079,17 +1079,18 @@ node <generated-skill>/scripts/skill-rails/run.mjs resume --skill <generated-ski
 1. 이 문서와 root `SKILL.md`를 읽는다.
 2. 요청이 생성, 마이그레이션, 유지보수, 진단, 검증 중 무엇인지 분류한다.
 3. 해당 작업에 필요한 `references/`만 읽는다.
-4. 현재 git 상태를 확인하고 사용자 변경을 보존한다.
-5. 다른 project는 read-only로 취급하고 승인된 destination만 수정한다.
-6. profile을 길이가 아니라 행동 신호로 선택한다.
-7. intent와 obligation을 대화가 아니라 디스크에 기록한다.
-8. generated file을 직접 수정하지 않는다.
-9. 작은 patch를 누적하기 전에 책임 경계의 근본 결함인지 판단한다.
-10. 변경 후 lint, test, eval, fresh representative build를 실행한다.
-11. deterministic claim, model behavior claim, output-quality claim을 분리한다.
-12. 증거가 없으면 `unproven`이라고 쓴다.
-13. V5 변경이면 이 문서의 원장을 먼저 갱신한다.
-14. blocking finding만 root cause로 수정하고 같은 검수자에게 재검증한다.
+4. README 생성·수정 요청이면 `references/readme-authoring.md`를 읽고, 사용자 지시를 우선하면서 문제·구체적인 처리 방식·결과가 처음부터 보이게 작성한다.
+5. 현재 git 상태를 확인하고 사용자 변경을 보존한다.
+6. 다른 project는 read-only로 취급하고 승인된 destination만 수정한다.
+7. profile을 길이가 아니라 행동 신호로 선택한다.
+8. intent와 obligation을 대화가 아니라 디스크에 기록한다.
+9. generated file을 직접 수정하지 않는다.
+10. 작은 patch를 누적하기 전에 책임 경계의 근본 결함인지 판단한다.
+11. 변경 후 lint, test, eval, fresh representative build를 실행한다.
+12. deterministic claim, model behavior claim, output-quality claim을 분리한다.
+13. 증거가 없으면 `unproven`이라고 쓴다.
+14. V5 변경이면 이 문서의 원장을 먼저 갱신한다.
+15. blocking finding만 root cause로 수정하고 같은 검수자에게 재검증한다.
 
 ### 24.1 코드 증가 규칙
 

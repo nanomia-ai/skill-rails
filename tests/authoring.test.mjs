@@ -37,6 +37,22 @@ test("creator self-evaluation works without generated authoring state", () => {
   assert.equal(report.release_readiness, "creator-forward-test-required");
 });
 
+test("README guidance remains conditional and reachable from agent entry points", async () => {
+  const [skill, workflow, agents, claude, guide] = await Promise.all([
+    readFile(join(ROOT, "SKILL.md"), "utf8"),
+    readFile(join(ROOT, "references", "authoring-workflow.md"), "utf8"),
+    readFile(join(ROOT, "AGENTS.md"), "utf8"),
+    readFile(join(ROOT, "CLAUDE.md"), "utf8"),
+    readFile(join(ROOT, "references", "readme-authoring.md"), "utf8")
+  ]);
+  assert.match(skill, /When the user asks to create or revise a skill README/);
+  assert.match(skill, /Do not create a README merely because the guide exists/);
+  for (const entry of [skill, workflow, agents, claude]) assert.match(entry, /readme-authoring\.md/);
+  for (const heading of ["The first-screen contract", "Make mechanization visible", "Preserve user voice and authority", "Authoring and review procedure"]) {
+    assert.match(guide, new RegExp(`## ${heading}`));
+  }
+});
+
 test("creator generation paths use only package-local runtime dependencies", async (t) => {
   const base = await makeTestDir("thin-dependency-boundary");
   t.after(() => removeTestDir(base));
