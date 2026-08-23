@@ -15,7 +15,8 @@
 - branch: `main`
 - 이전 완료 milestone commit: `d9aac0a` (`feat: add progressive guidance for simple skills`)
 - 작업 시작 시 `origin/main`은 `9691f107bc08ac7657bca3bc6160f0d2aa3159eb`였고 local `main`은 한 commit 앞섰음
-- 현재 milestone은 portable universal installation이며 최종 commit·push·원격 release smoke 전 상태
+- portable installation 구현 commit: `9e28cbf` (`feat: make creator installs self-contained`)
+- `d9aac0a`와 `9e28cbf`를 `origin/main`에 push했고 GitHub 원격 release smoke까지 완료
 - 최초 구현 기획과 통합 문서는 Git commit `4929b5b`에서 복구 가능
 
 다른 프로젝트, 특히 `D:/Projects/Private/nanomia/nanomia-skills/devflow/`, 는 이 작업 범위 밖이며 read-only다.
@@ -47,15 +48,16 @@ P0/P1 profile, conditional guidance, P2 `spec.mjs`, V5 runtime, obligation ledge
 
 - `npm run verify`: `vendor:check`, lint, 49/49 tests, frozen eval pass
 - 외부 runtime dependency를 차단한 portable creator command test pass
-- Node 24.18.0 + `skills` 1.5.23의 node_modules-free clone-shaped package 설치 smoke pass
-- Codex, Claude Code, Cursor, OpenCode target 선택으로 installer copy 성공
+- Node 24.18.0 + `skills` 1.5.23의 node_modules-free local clone-shaped package 설치 smoke pass
+- `origin/main`의 GitHub remote package를 다시 clone한 release installation smoke pass
+- Local smoke에서는 Codex, Claude Code, Cursor, OpenCode target 선택, remote smoke에서는 Codex, Claude Code, Cursor target 선택으로 installer copy 성공
 - `.agents`와 `.claude` 설치 tree fingerprint byte-identical
 - 설치된 creator의 migration이 12개 semantic atom과 기존 kind/order를 보존
 - 설치된 creator가 만든 P2 package의 L0–L18 full lint pass
 - 독립 audit가 old-import와 vendored-import migration 결과를 5개 corpus(12/726/331/3/1693 atoms)에서 full JSON 비교해 동일함을 확인
 - local Markdown link와 `git diff --check` pass
 
-현재 설치 smoke는 local clone-shaped source를 사용했다. GitHub 원격 배포본을 다시 내려받는 release smoke는 push 뒤 수행해야 하며 아직 성공 증거로 기록하지 않는다. Cursor·OpenCode의 fresh trigger와 실제 task output도 `unproven`이다.
+GitHub 원격 설치본에서도 vendor parser 존재, `node_modules` 부재, 12개 migration atom kind/order, 생성 P2 L0–L18을 다시 확인했다. Cursor·OpenCode의 fresh trigger와 실제 task output은 여전히 `unproven`이다.
 
 ---
 
@@ -66,19 +68,13 @@ P0/P1 profile, conditional guidance, P2 `spec.mjs`, V5 runtime, obligation ledge
 - Root package payload 증가는 의도적으로 수용한 비차단 packaging limitation
 - Claude plugin 또는 official marketplace 등록은 구현하지 않음
 - 코드 blocking finding 없음
-- 최종 commit, push, 원격 release smoke가 남아 있음
+- 구현·배포·원격 release smoke 완료
 
 ---
 
 ## 5. 다음에 선택할 수 있는 검증
 
-이번 milestone을 닫기 전에 필요한 마지막 단계:
-
-1. commit과 `origin/main` push
-2. 별도 임시 project에서 `npx skills@latest add nanomia-ai/skill-rails` 원격 설치
-3. 원격 설치본에 `node_modules`가 없는 상태로 migration과 L0–L18 재실행
-
-그 뒤의 선택적 범위:
+현재 blocking 후속은 없다. 선택적 범위:
 
 1. Cursor·OpenCode 등 추가 host의 fresh trigger, skill-root 해석, 실제 task output
 2. Node 20에서 manual clone 설치 smoke와 최신 49개 suite 재실행

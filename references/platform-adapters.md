@@ -66,7 +66,7 @@ Current implementation status:
 - Codex project-local discovery plus explicit and implicit invocation: `verified` by clean cold-agent runs. One installed near-miss also did not trigger. Long-session re-entry remains `unproven`.
 - Claude Code project-local discovery, `${CLAUDE_SKILL_DIR}` use, plus explicit and implicit invocation: `verified` by clean cold-agent runs. Installed near-miss behavior and compaction recovery remain `unproven`.
 - Cross-consumption: a Claude-created P1 package ran in Codex and a Codex-created P2 package ran in Claude without translation; copied trees were byte-identical.
-- Universal installer discovery and dependency-free installed migration: verify them in the release installation smoke before claiming them `verified`.
+- Universal installer discovery, copy, and dependency-free installed migration: `verified` structurally on Windows with the GitHub remote package and `skills` 1.5.23. This does not upgrade target-host model behavior.
 - Other installer-supported hosts: placement is structurally available; trigger behavior, skill-root handling, and task output are `unproven`.
 - H1 recovery hook: `unsupported` in the current generated artifact; the Decision/enter-hash fallback remains available.
 - H2 effect interception: `unsupported` and explicitly outside scope.

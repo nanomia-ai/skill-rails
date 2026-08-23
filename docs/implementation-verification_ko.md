@@ -55,7 +55,7 @@ Codex와 Claude Code는 현재 검증된 project-local adapter다. 제품의 영
 - Atom kind가 frontmatter, heading, paragraph, nested list item, GFM row, reference definition, fenced code를 기존 fixture와 같은 순서로 보존
 - 생성된 P2 package의 L0–L18 full lint pass
 
-이 결과는 Windows에서 installer가 root package를 발견·복사하고, 별도 `npm ci` 없이 설치된 creator의 migration과 P2 build가 동작한다는 구조·실행 증거다. 아직 GitHub 원격 배포본을 내려받은 release smoke는 아니며, Cursor·OpenCode에서 fresh AI가 trigger하고 skill root를 해석해 실제 산출물을 만드는 행동 증거도 아니다.
+이 결과는 Windows에서 installer가 root package를 발견·복사하고, 별도 `npm ci` 없이 설치된 creator의 migration과 P2 build가 동작한다는 구조·실행 증거다. Commit `9e28cbf`를 `origin/main`에 배포한 뒤 별도 임시 project에서 `npx skills@1.5.23 add nanomia-ai/skill-rails`도 실행했다. GitHub 원격 source를 clone해 Codex, Claude Code, Cursor target 설치에 성공했고, `.agents`와 `.claude` tree fingerprint가 일치했으며, 설치본의 migration 12 atom kind/order와 생성 P2 L0–L18을 다시 확인했다. Cursor·OpenCode에서 fresh AI가 trigger하고 skill root를 해석해 실제 산출물을 만드는 행동 증거는 아니다.
 
 별도의 Claude Opus xhigh read-only audit는 기존 external-import migration과 vendored-import migration의 전체 `inspectProseSkill()` JSON을 5개 corpus(12/726/331/3/1693 atoms)에서 비교했고 모두 동일했다. Bundle은 upstream `markdown-it` 14.3.0 standalone distribution과 byte-identical이고 runtime `require`/`import`가 없음을 확인했다. Audit가 발견한 Windows `core.autocrlf` checkout byte drift는 `scripts/**/vendor/** -text`로 고정했다. 이 규칙은 creator의 Markdown parser와 기존 P2 Acorn vendor를 함께 보호한다.
 
