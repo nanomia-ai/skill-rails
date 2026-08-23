@@ -1,6 +1,6 @@
 ---
 name: skill-rails
-description: Create, migrate, maintain, diagnose, build, and evaluate Codex and Claude skills with the smallest sufficient P0/P1/P2 structure. Use when a skill must resist long-session drift, convert prose rules into a verified executable spec, preserve migration provenance, generate platform-ready packages, or test trigger and behavior reliability.
+description: Create, migrate, maintain, diagnose, build, and evaluate drift-resistant AI-agent skills with the smallest sufficient P0/P1/P2 structure; current adapters support Codex and Claude Code. Use when a skill must convert growing prose rules into maintainable executable mechanics, preserve migration provenance, generate platform-ready packages, or test trigger and behavior reliability.
 ---
 
 # Skill Rails
