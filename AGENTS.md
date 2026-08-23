@@ -17,7 +17,7 @@ Skill Rails helps an AI create and maintain one standalone skill without keeping
 
 - Understand the whole authoring, generated-package, and using-agent flow before changing one local symptom.
 - Prefer a coherent correction at the owning abstraction over accumulating special cases or parallel sources of truth.
-- Do not silently weaken the V5 contract or reduce a rule that can be mechanized back into prose. A better design is allowed, but record what changed, why it is safer or clearer, and which evidence supports it in `docs/skill-rails_ko.md`.
+- Do not silently weaken the V5 contract or reduce a rule that can be mechanized back into prose. A better design is allowed, but record what changed, why it is safer or clearer, and which evidence supports it in `docs/implementation-verification_ko.md`.
 - Preserve existing user changes and keep all writes inside this repository unless the user explicitly expands the scope.
 - Never hand-edit generated files governed by `.generated.json`; change the canonical source and rebuild.
 - Do not commit, push, publish, or deploy unless the user explicitly requests that action. Keep unrelated milestones in separate commits when the user asks for a checkpoint.
@@ -49,4 +49,8 @@ Before creating or revising a skill README, read [references/readme-authoring.md
 - `references/authoring-workflow.md` — creation and maintenance order
 - `references/v5-contract.md` — P2 behavior contract
 - `references/readme-authoring.md` — README authoring and review protocol
-- `docs/skill-rails_ko.md` — complete product design, operation, and verification record
+- `docs/maintenance-status_ko.md` — current milestone, exact continuation point, and next-session entry; read first when resuming repository work
+- `docs/skill-rails_ko.md` — current product purpose, architecture, and stable design boundaries; read when changing product behavior or owning abstractions
+- `docs/implementation-verification_ko.md` — exact implementation scope, support evidence, unproven boundaries, and V5 change ledger; read for verification claims or V5 changes
+
+Do not read all three project documents by default. Start from the maintenance status, then load the product design or implementation evidence only when the task requires that authority.

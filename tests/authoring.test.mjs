@@ -8,6 +8,7 @@ import { generatePackage } from "../scripts/lib/generator.mjs";
 import { buildP2 } from "../scripts/lib/build-core.mjs";
 import { inspectProseSkill, inferMigrationIntent, writeMigrationLedger } from "../scripts/lib/migration.mjs";
 import { maintainPackage } from "../scripts/lib/maintenance.mjs";
+import { lintSimpleSkill } from "../scripts/lib/simple-lint.mjs";
 import { exists, readJson } from "../scripts/lib/io.mjs";
 import { sha256 } from "../scripts/runtime/hash.mjs";
 import { parseArgs } from "../scripts/lib/args.mjs";
@@ -35,6 +36,11 @@ test("creator self-evaluation works without generated authoring state", () => {
   assert.equal(report.kind, "creator");
   assert.equal(report.profile, "p1");
   assert.equal(report.release_readiness, "creator-forward-test-required");
+});
+
+test("starter intent template does not inject undeclared array requirements", async () => {
+  const intent = await readJson(join(ROOT, "templates", "intent-brief.json"));
+  for (const [field, value] of Object.entries(intent)) if (Array.isArray(value)) assert.deepEqual(value, [], `${field} must start empty`);
 });
 
 test("README guidance remains conditional and reachable from agent entry points", async () => {
@@ -261,4 +267,64 @@ test("maintenance applies stable-id body changes atomically and reports semantic
   assert.equal(report.groups.body[0].id, "stage: operate");
   assert.match(await readFile(join(root, "body.md"), "utf8"), /forward evidence exist/);
   assert.equal(await exists(join(root, ".generated.json")), true);
+});
+
+test("P0 and P1 maintenance regenerates intent projections without replacing authored helpers", async (t) => {
+  const base = await makeTestDir("simple-maintenance");
+  t.after(() => removeTestDir(base));
+
+  const p0 = join(base, "p0");
+  const p0Intent = await readJson(join(ROOT, "fixtures", "intents", "p0.json"));
+  p0Intent.judgment_points = [{ id: "old-topic", when: "The old condition applies.", points: ["Use the old guidance."] }];
+  await generatePackage({ intent: p0Intent, output: p0 });
+  const updatedTopics = [{ id: "new-topic", when: "The new condition applies.", points: ["Use the new guidance."] }];
+  const report = await maintainPackage(p0, {
+    id: "replace-guidance-topic",
+    intent: "Replace one conditional judgment topic.",
+    operations: [{ type: "update-intent", patch: { judgment_points: updatedTopics } }]
+  });
+  assert.equal(report.schema, "skill-rails/simple-maintenance-report/1");
+  assert.deepEqual(report.changed_fields, ["judgment_points"]);
+  assert.equal(await exists(join(p0, "references", "guidance", "old-topic.md")), false);
+  assert.equal(await exists(join(p0, "references", "guidance", "new-topic.md")), true);
+  assert.equal((await lintSimpleSkill(p0)).ok, true);
+  const maintainedLedger = await readJson(join(p0, ".skill-rails", "obligation-ledger.json"));
+  assert.equal(maintainedLedger.intent_hash, sha256(await readJson(join(p0, ".skill-rails", "intent.json"))));
+
+  const p1 = join(base, "p1");
+  const p1Intent = await readJson(join(ROOT, "fixtures", "intents", "p1.json"));
+  await generatePackage({ intent: p1Intent, output: p1 });
+  const helperPath = join(p1, "scripts", "run.mjs");
+  const authoredHelper = "#!/usr/bin/env node\n// authored helper remains byte-identical\nprocess.stdout.write('ready\\n');\n";
+  await writeFile(helperPath, authoredHelper, "utf8");
+  await maintainPackage(p1, {
+    id: "clarify-description",
+    operations: [{ type: "update-intent", patch: { description: `${p1Intent.description} Use only with verified source facts.` } }]
+  });
+  assert.equal(await readFile(helperPath, "utf8"), authoredHelper);
+  assert.equal((await lintSimpleSkill(p1)).ok, true);
+
+  const beforeUnsupported = sha256(await readFile(join(p0, "SKILL.md")));
+  await assert.rejects(maintainPackage(p0, { operations: [{ type: "replace-resource", path: "references/x.md", content: "x" }] }), /SR_SIMPLE_MAINTAIN_OPERATION/);
+  assert.equal(sha256(await readFile(join(p0, "SKILL.md"))), beforeUnsupported);
+
+  const skillPath = join(p0, "SKILL.md");
+  const currentIntent = await readJson(join(p0, ".skill-rails", "intent.json"));
+  await writeFile(skillPath, (await readFile(skillPath, "utf8")).replace(/\n/g, "\r\n"), "utf8");
+  await maintainPackage(p0, { operations: [{ type: "update-intent", patch: { problem: currentIntent.problem } }] });
+  const canonicalSkill = await readFile(skillPath, "utf8");
+  await writeFile(skillPath, `${canonicalSkill}\n## Hand-authored note\n\nPreserve me.\n`, "utf8");
+  await assert.rejects(maintainPackage(p0, {
+    operations: [{ type: "update-intent", patch: { problem: "A clarified canonical problem." } }]
+  }), /SR_SIMPLE_OWNERSHIP.*SKILL\.md/);
+  assert.match(await readFile(skillPath, "utf8"), /Preserve me/);
+  await writeFile(skillPath, canonicalSkill, "utf8");
+
+  const autoP0 = join(base, "auto-p0");
+  await generatePackage({ intent: await readJson(join(ROOT, "fixtures", "intents", "p0.json")), output: autoP0 });
+  const beforeIntent = await readFile(join(autoP0, ".skill-rails", "intent.json"), "utf8");
+  await assert.rejects(maintainPackage(autoP0, {
+    operations: [{ type: "update-intent", patch: { deterministic_helpers: ["a newly required helper"] } }]
+  }), /SR_PROFILE_CHANGE/);
+  assert.equal(await readFile(join(autoP0, ".skill-rails", "intent.json"), "utf8"), beforeIntent);
 });

@@ -5,6 +5,8 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import Ajv2020 from "ajv/dist/2020.js";
 import { generatePackage } from "../scripts/lib/generator.mjs";
+import { lintSimpleSkill } from "../scripts/lib/simple-lint.mjs";
+import { measureSimpleContextSurface } from "../scripts/lib/context-surface.mjs";
 import { buildP2 } from "../scripts/lib/build-core.mjs";
 import { copyTree, exists, listFiles, readJson, writeJsonAtomic, writeTextAtomic } from "../scripts/lib/io.mjs";
 import { enterSkill, stageSkill } from "../scripts/runtime/api.mjs";
@@ -35,9 +37,11 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   }
   assert.equal(await exists(join(outputs.p0, "spec.mjs")), false);
   assert.equal(await exists(join(outputs.p0, "scripts")), false);
+  assert.equal(await exists(join(outputs.p0, "references", "intent.md")), false);
   assert.equal(await exists(join(outputs.p1, "spec.mjs")), false);
   assert.equal(await exists(join(outputs.p1, "scripts", "run.mjs")), true);
   assert.equal(await exists(join(outputs.p2, "spec.mjs")), true);
+  assert.equal(await exists(join(outputs.p2, "references", "guidance-index.md")), false);
   assert.equal(await exists(join(outputs.p2, "scripts", "skill-rails", "vendor", "acorn.mjs")), true);
   assert.equal(await exists(join(outputs.p2, ".generated.json")), true);
   const manifest = await readJson(join(outputs.p2, ".generated.json"));
@@ -87,6 +91,238 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   const decisionSchema = await readJson(join(outputs.p2, "schemas", "decision.schema.json"));
   const validateDecision = new Ajv2020({ strict: true, allErrors: true, validateFormats: false, allowUnionTypes: true }).compile(decisionSchema);
   for (const decision of [deferred.decision, unknown.decision, ready.decision]) assert.equal(validateDecision(decision), true, JSON.stringify(validateDecision.errors));
+});
+
+test("P0 and P1 route only declared conditional judgment topics", async (t) => {
+  const base = await makeTestDir("progressive-guidance");
+  t.after(() => removeTestDir(base));
+  const p0Intent = await readJson(join(ROOT, "fixtures", "intents", "p0.json"));
+  p0Intent.judgment_points = [
+    "Keep the review evidence-aware.",
+    {
+      id: "meaning-risk",
+      when: "A proposed tone change could alter a factual claim.",
+      points: [
+        "Identify the exact claim before proposing new wording.",
+        "Explain why the revised wording preserves the original meaning."
+      ]
+    },
+    {
+      id: "reader-fit",
+      when: "The reader expertise is materially different from the source audience.",
+      points: ["Adjust explanation depth without deleting necessary qualifications."]
+    }
+  ];
+  const p0 = join(base, "p0");
+  await generatePackage({ intent: p0Intent, output: p0 });
+  const skill = await readFile(join(p0, "SKILL.md"), "utf8");
+  const index = await readFile(join(p0, "references", "guidance-index.md"), "utf8");
+  assert.match(skill, /Keep the review evidence-aware/);
+  assert.match(skill, /references\/guidance-index\.md/);
+  assert.doesNotMatch(skill, /Identify the exact claim/);
+  assert.doesNotMatch(skill, /reader expertise is materially different/);
+  assert.match(index, /meaning-risk/);
+  assert.match(index, /reader-fit/);
+  assert.match(await readFile(join(p0, "references", "guidance", "meaning-risk.md"), "utf8"), /revised wording preserves/);
+  assert.equal((await lintSimpleSkill(p0)).ok, true);
+
+  const ledger = await readJson(join(p0, ".skill-rails", "obligation-ledger.json"));
+  assert.equal(ledger.schema, "skill-rails/obligation-ledger/2");
+  assert.ok(ledger.atoms.some((atom) => atom.id === "judgment-topic-meaning-risk-when" && atom.targets.includes("file:references/guidance-index.md")));
+  assert.ok(ledger.atoms.some((atom) => atom.id === "judgment-topic-meaning-risk-point-001" && atom.targets.includes("file:references/guidance/meaning-risk.md")));
+  assert.equal(ledger.atoms.some((atom) => atom.targets?.includes("file:references/intent.md")), false);
+
+  const largeIntent = structuredClone(p0Intent);
+  largeIntent.judgment_points[1].points = ["x".repeat(20000)];
+  const large = join(base, "large-p0");
+  await generatePackage({ intent: largeIntent, output: large });
+  const [smallSurface, largeSurface] = await Promise.all([measureSimpleContextSurface(p0), measureSimpleContextSurface(large)]);
+  assert.equal(largeSurface.entry_bytes, smallSurface.entry_bytes);
+  assert.equal(largeSurface.routing_index_bytes, smallSurface.routing_index_bytes);
+  assert.ok(largeSurface.on_demand_total_bytes > smallSurface.on_demand_total_bytes + 19000);
+  assert.ok(largeSurface.fixed_context_bytes < largeSurface.total_guidance_bytes);
+  const evaluated = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", p0], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  assert.equal(evaluated.status, 1);
+  assert.deepEqual(JSON.parse(evaluated.stdout).context_surface, smallSurface);
+
+  const p1Intent = await readJson(join(ROOT, "fixtures", "intents", "p1.json"));
+  p1Intent.judgment_points = [p0Intent.judgment_points[1]];
+  const p1 = join(base, "p1");
+  await generatePackage({ intent: p1Intent, output: p1 });
+  const p1Skill = await readFile(join(p1, "SKILL.md"), "utf8");
+  assert.match(p1Skill, /SR_P1_SCAFFOLD/);
+  assert.match(p1Skill, /fixed release-note heading/);
+  assert.doesNotMatch(p1Skill, /Identify the exact claim/);
+  assert.equal((await lintSimpleSkill(p1)).ok, true);
+});
+
+test("progressive guidance lint fails closed on routing drift and orphans", async (t) => {
+  const base = await makeTestDir("progressive-guidance-lint");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p0.json"));
+  intent.judgment_points = [{ id: "claim-risk", when: "A revision changes a claim.", points: ["Preserve the claim."] }];
+  await generatePackage({ intent, output: root });
+  const indexPath = join(root, "references", "guidance-index.md");
+  const originalIndex = await readFile(indexPath, "utf8");
+  await writeFile(indexPath, originalIndex.replace("| `claim-risk`", "| `different-id`"), "utf8");
+  let lint = await lintSimpleSkill(root);
+  assert.ok(lint.diagnostics.some((item) => ["SR_GUIDANCE_PATH", "SR_GUIDANCE_INTENT"].includes(item.code)));
+  await writeFile(indexPath, originalIndex, "utf8");
+  await writeFile(join(root, "references", "guidance", "orphan.md"), "# Orphan\n", "utf8");
+  lint = await lintSimpleSkill(root);
+  assert.ok(lint.diagnostics.some((item) => item.code === "SR_GUIDANCE_ORPHAN"));
+  await mkdir(join(root, "references", "guidance", "nested"));
+  await writeFile(join(root, "references", "guidance", "nested", "orphan.md"), "# Nested orphan\n", "utf8");
+  await writeFile(join(root, "references", "guidance", "UPPERCASE.MD"), "# Uppercase orphan\n", "utf8");
+  lint = await lintSimpleSkill(root);
+  assert.ok(lint.diagnostics.some((item) => item.code === "SR_GUIDANCE_ORPHAN" && /nested/.test(item.pointer)));
+  assert.ok(lint.diagnostics.some((item) => item.code === "SR_GUIDANCE_ORPHAN" && /UPPERCASE\.MD/.test(item.pointer)));
+});
+
+test("conditional routing round-trips prose punctuation and rejects invalid UTF-8", async (t) => {
+  const base = await makeTestDir("progressive-guidance-text");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p0.json"));
+  intent.judgment_points = [{
+    id: "path-table-risk",
+    when: "  A \\ path | table cell, C:/example, or 한글 label affects the requested judgment.  ",
+    points: ["Preserve Unicode, a literal | delimiter, and a \\ character exactly."]
+  }];
+  await generatePackage({ intent, output: root });
+  assert.equal((await lintSimpleSkill(root)).ok, true);
+  const index = await readFile(join(root, "references", "guidance-index.md"), "utf8");
+  assert.match(index, /\\\| table cell/);
+  assert.match(index, /C:\/example/);
+  await appendFile(join(root, "references", "guidance", "path-table-risk.md"), Uint8Array.from([0xff]));
+  const invalid = await lintSimpleSkill(root);
+  assert.ok(invalid.diagnostics.some((item) => ["SR_GUIDANCE_LINK", "SR_GUIDANCE_PATH", "SR_LEDGER_LOCATOR"].includes(item.code)));
+});
+
+test("simple lint detects deletion of every canonical intent requirement", async (t) => {
+  const base = await makeTestDir("simple-intent-preservation");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = {
+    name: "intent-preservation-probe",
+    description: "Use this uniquely described probe when every declared intent atom must remain traceable in a simple skill package.",
+    problem: "PROBLEM-UNIQUE must never disappear from the generated instructions.",
+    use_cases: ["USE-CASE-UNIQUE request applies."],
+    near_misses: ["NEAR-MISS-UNIQUE request does not apply."],
+    inputs: ["INPUT-UNIQUE artifact"],
+    outputs: ["OUTPUT-UNIQUE artifact"],
+    irreversible_boundaries: ["BOUNDARY-UNIQUE action"],
+    state_dependent_behaviors: ["STATE-UNIQUE behavior"],
+    exact_formats: ["FORMAT-UNIQUE contract"],
+    external_dependencies: ["DEPENDENCY-UNIQUE service"],
+    completion_evidence: ["EVIDENCE-UNIQUE receipt"],
+    judgment_points: ["JUDGMENT-UNIQUE question"],
+    deterministic_helpers: ["HELPER-UNIQUE transformation"]
+  };
+  await generatePackage({ intent, output: root, requestedProfile: "p0" });
+  const skillPath = join(root, "SKILL.md");
+  const original = await readFile(skillPath, "utf8");
+  const texts = [intent.description, intent.problem, ...Object.values(intent).filter(Array.isArray).flat()];
+  for (const text of texts) {
+    assert.ok(original.includes(text));
+    await writeFile(skillPath, original.replace(text, `REMOVED-${text.length}`), "utf8");
+    const lint = await lintSimpleSkill(root);
+    assert.ok(lint.diagnostics.some((item) => item.code === "SR_LEDGER_TEXT"), `missing SR_LEDGER_TEXT for ${text}`);
+  }
+  await writeFile(skillPath, original, "utf8");
+  assert.equal((await lintSimpleSkill(root)).ok, true);
+});
+
+test("progressive routing rejects symlink and junction escapes", async (t) => {
+  const base = await makeTestDir("progressive-guidance-links");
+  t.after(() => removeTestDir(base));
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p0.json"));
+  intent.judgment_points = [{ id: "claim-risk", when: "A claim changes.", points: ["Preserve the claim."] }];
+  async function generated(name) {
+    const root = join(base, name);
+    await generatePackage({ intent, output: root });
+    return root;
+  }
+  const directoryRoot = await generated("directory-link");
+  const outsideDirectory = join(base, "outside-guidance");
+  await mkdir(outsideDirectory);
+  await writeFile(join(outsideDirectory, "claim-risk.md"), await readFile(join(directoryRoot, "references", "guidance", "claim-risk.md")));
+  await rm(join(directoryRoot, "references", "guidance"), { recursive: true });
+  await symlink(outsideDirectory, join(directoryRoot, "references", "guidance"), "junction");
+  assert.ok((await lintSimpleSkill(directoryRoot)).diagnostics.some((item) => ["SR_GUIDANCE_PATH", "SR_GUIDANCE_LINK"].includes(item.code)));
+
+  try {
+    const indexRoot = await generated("index-link");
+    const outsideIndex = join(base, "outside-index.md");
+    const indexPath = join(indexRoot, "references", "guidance-index.md");
+    await writeFile(outsideIndex, await readFile(indexPath));
+    await rm(indexPath);
+    await symlink(outsideIndex, indexPath, "file");
+    assert.ok((await lintSimpleSkill(indexRoot)).diagnostics.some((item) => item.code === "SR_GUIDANCE_PATH"));
+
+    const topicRoot = await generated("topic-link");
+    const topicPath = join(topicRoot, "references", "guidance", "claim-risk.md");
+    const outsideTopic = join(base, "outside-topic.md");
+    await writeFile(outsideTopic, await readFile(topicPath));
+    await rm(topicPath);
+    await symlink(outsideTopic, topicPath, "file");
+    assert.ok((await lintSimpleSkill(topicRoot)).diagnostics.some((item) => ["SR_GUIDANCE_PATH", "SR_GUIDANCE_LINK", "SR_LEDGER_LOCATOR"].includes(item.code)));
+
+    const targetRoot = await generated("target-link");
+    const targetTopic = join(targetRoot, "references", "guidance", "claim-risk.md");
+    await appendFile(targetTopic, "\n[extra](extra.md)\n", "utf8");
+    const outsideExtra = join(base, "outside-extra.md");
+    await writeFile(outsideExtra, "# Extra\n", "utf8");
+    await symlink(outsideExtra, join(targetRoot, "references", "guidance", "extra.md"), "file");
+    assert.ok((await lintSimpleSkill(targetRoot)).diagnostics.some((item) => ["SR_GUIDANCE_PATH", "SR_SKILL_LINK"].includes(item.code)));
+  } catch (error) {
+    if (["EPERM", "EACCES"].includes(error.code)) t.diagnostic(`file symlink creation unavailable; junction escape was still verified: ${error.code}`);
+    else throw error;
+  }
+});
+
+test("P1 evaluation validates its decision, helper, and authoring obligations", async (t) => {
+  const base = await makeTestDir("p1-evaluation-boundary");
+  t.after(() => removeTestDir(base));
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p1.json"));
+
+  const missing = join(base, "missing-helper");
+  await generatePackage({ intent, output: missing });
+  await rm(join(missing, "scripts", "run.mjs"));
+  assert.ok((await lintSimpleSkill(missing)).diagnostics.some((item) => item.code === "SR_P1_HELPER"));
+  const missingEval = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", missing], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  assert.equal(JSON.parse(missingEval.stdout).release_readiness, "invalid");
+
+  const drift = join(base, "decision-drift");
+  await generatePackage({ intent, output: drift });
+  const decisionPath = join(drift, ".skill-rails", "profile-decision.json");
+  const decision = await readJson(decisionPath);
+  await writeJsonAtomic(decisionPath, { ...decision, profile: "p0" });
+  assert.ok((await lintSimpleSkill(drift)).diagnostics.some((item) => item.code === "SR_PROFILE_DECISION"));
+
+  const complete = join(base, "complete");
+  await generatePackage({ intent, output: complete });
+  const helperPath = join(complete, "scripts", "run.mjs");
+  const scaffold = await readFile(helperPath, "utf8");
+  await writeFile(helperPath, scaffold.replace("// @skill-rails scaffold: replace this body with the approved deterministic helper and tests.\n", ""), "utf8");
+  let evaluated = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", complete], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  assert.equal(JSON.parse(evaluated.stdout).release_readiness, "helper-implementation-required");
+
+  await mkdir(join(complete, "tests"));
+  await writeFile(helperPath, `#!/usr/bin/env node\n// ${intent.exact_formats[0]}\n// ${intent.deterministic_helpers[0]}\nprocess.stdout.write("ready\\n");\n`, "utf8");
+  await writeFile(join(complete, "tests", "helper.test.mjs"), "// golden helper evidence\n", "utf8");
+  const ledgerPath = join(complete, ".skill-rails", "obligation-ledger.json");
+  const ledger = await readJson(ledgerPath);
+  for (const atom of ledger.atoms.filter((item) => item.disposition === "review-required")) {
+    atom.disposition = "projected";
+    atom.targets = ["file:scripts/run.mjs"];
+    atom.evidence = ["file:tests/helper.test.mjs"];
+  }
+  await writeJsonAtomic(ledgerPath, ledger);
+  assert.equal((await lintSimpleSkill(complete)).ok, true);
+  evaluated = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", complete], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  assert.equal(JSON.parse(evaluated.stdout).release_readiness, "forward-test-required");
 });
 
 test("P2 build fuzzes exact formats across structured values", async (t) => {

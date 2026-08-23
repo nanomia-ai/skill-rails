@@ -8,7 +8,7 @@ Skill Rails does not manage a complex skill as one long prompt. It records requi
 | --- | --- | --- |
 | User requirements scatter across long conversations and many paragraphs. | Record each requirement and link it to where it appears and how it can be checked. | Missing requirements and the places to change become visible. |
 | The AI reinterprets even exact, repeatable rules on every use. | Process the same input in code and check the result with tests. | The same rule is applied the same way when the model or session changes. |
-| The AI rereads the whole rulebook for every task. | Return only the currently allowed actions, forbidden actions, and required evidence. | Prompts use less context, and key rules are less likely to disappear in long conversations. |
+| The AI rereads the whole rulebook for every task. | Route P0/P1 to matching judgment topics and calculate the current P2 action. | Prompts can avoid unrelated prose, and key rules are less likely to disappear in long conversations. |
 
 An agent skill usually begins with a `SKILL.md`: a document that tells an AI how to handle a recurring kind of work. That works well while the skill is small. Trouble begins when every missed condition, new exception, and safety rule is added as another paragraph.
 
@@ -54,6 +54,8 @@ The rule is simple: **if a machine can check it reliably, do not leave it as pro
 
 ### 3. During use, give the AI only the instructions it needs now
 
+For a P0 or P1 skill with independently relevant judgment topics, the entry document first opens a small guidance index. Each row says when one topic applies and points to exactly one file. The AI is instructed to read matching topics and leave unrelated prose on disk. Universal boundaries, exact formats, and stop rules remain in the entry instead of being hidden behind optional routing.
+
 Suppose a P2 skill is waiting for fresh test results. The execution script generated with the skill—the runtime—returns `WAIT`, allows tests to run, forbids release, and requires a fresh test result. Planning and completion rules do not need to enter the AI's context at that moment. All rules remain in files, while the using AI receives only what it may do now and what evidence is still missing.
 
 ## A concrete example
@@ -95,8 +97,8 @@ A judgment-only skill with no state changes does not become more accurate when a
 
 | Profile | When to choose it | What gets created | What the using agent does |
 | --- | --- | --- | --- |
-| **P0 — structured judgment** | Interpretation, critique, or advice is the real work, with no transformation that code can repeat exactly. | A requirements file, explicit boundaries, a requirement tracking table, examples of when to invoke or not invoke the skill, and cases a fresh AI can try. | Reads the short guidance and requirements, then applies judgment. |
-| **P1 — executable mechanics** | Some part needs an exact format, input check, or repeatable transformation. | The P0 files plus validation or transformation scripts, templates, rejected-input tests, and expected-result tests. | Handles judgment directly and runs code for work that must repeat exactly. |
+| **P0 — structured judgment** | Interpretation, critique, or advice is the real work, with no transformation that code can repeat exactly. | A requirements file, explicit boundaries, a requirement tracking table, examples of when to invoke or not invoke the skill, and conditional topic files only when the prose has distinct read conditions. | Reads the entry and only matching judgment topics, then applies judgment. |
+| **P1 — executable mechanics** | Some part needs an exact format, input check, or repeatable transformation. | The P0 files plus validation or transformation scripts, templates, rejected-input tests, and expected-result tests. | Loads matching judgment topics and runs code for work that must repeat exactly. |
 | **P2 — executable behavior flow** | Approval, evidence, order, or current state changes what may happen next. | The mechanics needed from P1 plus state inputs, stage conditions, an execution script that calculates the next action, execution records, and evidence checks. | Gives the runtime the current facts and follows the returned allowed actions, forbidden actions, and evidence requirements. |
 
 A profile belongs to one skill, not to an entire plugin or repository. A plugin can contain a small P0 brainstorming skill, a P1 formatter, and a P2 implementation workflow side by side. They remain separate skills; Skill Rails does not chain them together.
@@ -110,7 +112,7 @@ The exact package stays proportional to the skill.
 ```text
 my-skill/
 ├─ SKILL.md                    # discovery and the short entry procedure
-├─ references/                # judgment and knowledge, loaded when needed
+├─ references/                # a small routing index and conditional judgment topics when needed
 ├─ scripts/ templates/ tests/ # added when P1 mechanics are needed
 ├─ spec.mjs                   # P2 conditions and next actions for each state
 ├─ body.md                    # P2 guidance that still requires AI judgment
@@ -127,10 +129,12 @@ A new P1 script keeps a marker that says its real helper is not implemented yet.
 ## Context stays proportional too
 
 ```text
-P0  concise SKILL.md ───────────────────────────────→ agent decides
-P1  concise SKILL.md → validation/transform script → code-checked result
+P0  entry SKILL.md → optional index and matching topic → agent decides
+P1  entry SKILL.md → optional topic + validation/transform script → checked result
 P2  entry SKILL.md → next-action script ───────────→ current-step instructions
 ```
+
+P0/P1 routing appears only when the intent declares a stable topic ID, a concise `when` condition, and the judgment points owned by that topic. Plain judgment remains in `SKILL.md`. The profile does not change because document loading and behavioral mechanization are separate decisions. Lint rejects missing indexes, broken topic links, orphaned topic Markdown, duplicated routed prose in the entry, and obligation-ledger drift.
 
 For P2, all behavior rules live in `spec.mjs`, but the AI does not read that entire file every time it uses the skill. The execution script calculates the current stage and next action, then returns a small JSON result called a Decision. It contains only the current status, allowed and forbidden actions, material to read now, and evidence still required.
 
@@ -195,7 +199,7 @@ node "<skill-rails>/scripts/eval.mjs" --skill ./my-skill
 
 ## What has been verified
 
-The current environment passes code linting and all 38 tests. It also distinguishes the expected results in a fixed suite of normal and deliberately broken cases. Earlier compatibility runs on Node.js 20, 22, and 24 each passed the then-current 35-test suite. Fresh project-local sessions created P1 and P2 skills and used the same generated packages through both current installation layouts. P2 also passed required-file and reference checks (L0–L18), tests that deliberately break rules and expect failure, repeatable state scenarios, and comparisons between execution records and required evidence.
+The current environment passes code linting and all 49 tests. It also distinguishes the expected results in a fixed suite of normal and deliberately broken cases. Earlier compatibility runs on Node.js 20, 22, and 24 each passed the then-current 35-test suite. Fresh project-local sessions created P1 and P2 skills and used the same generated packages through both current installation layouts. P2 also passed required-file and reference checks (L0–L18), tests that deliberately break rules and expect failure, repeatable state scenarios, and comparisons between execution records and required evidence. A separate fresh author/consumer pair read only the one relevant topic from a five-topic P0 package; multi-match, no-match, near-miss, and large-index routing recall remain unverified.
 
 Those results support the tested Windows project-local path. They do not yet prove global installation, marketplace distribution, Linux/macOS behavior, broad trigger precision, or recovery after real long-session compaction.
 
@@ -214,7 +218,8 @@ The P2 execution script calculates the next action and checks whether evidence e
 
 ## Documentation
 
-- [Complete design, operation, and verification reference (Korean)](docs/skill-rails_ko.md)
+- [Product purpose and design boundaries (Korean)](docs/skill-rails_ko.md)
+- [Implementation scope and verification record (Korean)](docs/implementation-verification_ko.md)
 - [Authoring workflow](references/authoring-workflow.md)
 - [Skill README authoring guide](references/readme-authoring.md)
 - [P2 contract](references/v5-contract.md)

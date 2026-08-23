@@ -1,18 +1,21 @@
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { copyTree, createDirectoryAtomic, isInside, readJson, writeJsonAtomic, writeTextAtomic } from "./io.mjs";
+import { copyTree, createDirectoryAtomic, exists, isInside, readJson, writeJsonAtomic, writeTextAtomic } from "./io.mjs";
 import { parseBody } from "../runtime/body.mjs";
 import { sha256 } from "../runtime/hash.mjs";
 import { semanticDiff, snapshotContract } from "./semantic-diff.mjs";
 import { mergeObligationLedger } from "./obligations.mjs";
-import { INTENT_ARRAYS, validateIntent } from "./profiles.mjs";
+import { INTENT_ARRAYS, selectProfile, validateIntent } from "./profiles.mjs";
+import { assertSimpleProjectionOwnership, createEvalCases, writeSimplePackage } from "./generator.mjs";
+import { lintSimpleSkill } from "./simple-lint.mjs";
 
 export async function maintainPackage(skillRoot, change, options = {}) {
   const root = resolve(skillRoot);
+  if (!await exists(join(root, "spec.mjs"))) return maintainSimplePackage(root, change);
   const before = await snapshotContract(root);
   let report;
   await createDirectoryAtomic(root, async (stage) => {
-    await copyTree(root, stage, { filter: (local) => !local.startsWith(".git/") && !local.startsWith("node_modules/") });
+    await copyTree(root, stage, { filter: (local) => ![".git", "node_modules"].includes(local.split("/")[0]) });
     await applyOperations(stage, change.operations ?? []);
     const after = await snapshotContract(stage);
     report = semanticDiff(before, after);
@@ -22,6 +25,47 @@ export async function maintainPackage(skillRoot, change, options = {}) {
     await writeJsonAtomic(join(stage, ".skill-rails", "semantic-diff.json"), report);
     const { buildP2 } = await import("./build-core.mjs");
     await buildP2(stage, { allowGeneratedEdits: Boolean(options.repairGenerated), repeats: options.repeats ?? 200 });
+  }, { replace: true, replaceNonEmpty: true });
+  return report;
+}
+
+export async function maintainSimplePackage(skillRoot, change) {
+  const root = resolve(skillRoot);
+  const validation = await lintSimpleSkill(root);
+  if (!validation.ok) throw new Error(`SR_SIMPLE_INVALID: fix the current simple skill before maintenance:\n${validation.diagnostics.map((item) => `- ${item.code} ${item.pointer}: ${item.message}`).join("\n")}`);
+  const operations = change.operations ?? [];
+  if (!Array.isArray(operations) || operations.length === 0 || operations.some((operation) => operation.type !== "update-intent")) throw new Error("SR_SIMPLE_MAINTAIN_OPERATION: P0/P1 maintenance accepts one or more update-intent operations only.");
+  if (operations.some((operation) => !operation.patch || Object.keys(operation.patch).length === 0)) throw new Error("SR_SIMPLE_MAINTAIN_OPERATION: update-intent requires a non-empty patch.");
+  const [beforeIntent, beforeDecision] = await Promise.all([
+    readJson(join(root, ".skill-rails", "intent.json")),
+    readJson(join(root, ".skill-rails", "profile-decision.json"))
+  ]);
+  await assertSimpleProjectionOwnership(root, beforeIntent, beforeDecision.profile);
+  const changedFields = [...new Set(operations.flatMap((operation) => Object.keys(operation.patch)))].sort();
+  let report;
+  await createDirectoryAtomic(root, async (stage) => {
+    await copyTree(root, stage, { filter: (local) => ![".git", "node_modules"].includes(local.split("/")[0]) });
+    for (const operation of operations) await updateIntent(stage, operation);
+    const [intent, decision] = await Promise.all([
+      readJson(join(stage, ".skill-rails", "intent.json")),
+      readJson(join(stage, ".skill-rails", "profile-decision.json"))
+    ]);
+    const automatic = selectProfile(intent);
+    if (!decision.explicit && automatic.profile !== decision.profile) throw new Error(`SR_PROFILE_CHANGE: updated intent selects ${automatic.profile}, but this package is ${decision.profile}; regenerate so the package shape changes explicitly.`);
+    await writeJsonAtomic(join(stage, ".skill-rails", "profile-decision.json"), { ...decision, signals: automatic.signals });
+    await writeJsonAtomic(join(stage, ".skill-rails", "eval-cases.json"), createEvalCases(intent));
+    await writeSimplePackage(stage, intent, decision.profile, { refresh: true });
+    const afterValidation = await lintSimpleSkill(stage);
+    if (!afterValidation.ok) throw new Error(`SR_SIMPLE_MAINTAIN_INVALID: regenerated simple skill failed lint:\n${afterValidation.diagnostics.map((item) => `- ${item.code} ${item.pointer}: ${item.message}`).join("\n")}`);
+    report = {
+      schema: "skill-rails/simple-maintenance-report/1",
+      change_id: change.id ?? null,
+      intent: change.intent ?? null,
+      profile: decision.profile,
+      changed: sha256(beforeIntent) !== sha256(intent),
+      changed_fields: changedFields,
+      conditional_topics: intent.judgment_points.filter((item) => item && typeof item === "object").length
+    };
   }, { replace: true, replaceNonEmpty: true });
   return report;
 }

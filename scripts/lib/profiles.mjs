@@ -6,13 +6,39 @@ export function validateIntent(intent) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(intent?.name ?? "")) issues.push("name must be kebab-case");
   if (typeof intent?.description !== "string" || intent.description.trim().length < 20) issues.push("description must explain behavior and trigger conditions");
   if (typeof intent?.problem !== "string" || intent.problem.trim().length === 0) issues.push("problem is required");
-  for (const field of INTENT_ARRAYS) {
+  for (const field of INTENT_ARRAYS.filter((item) => item !== "judgment_points")) {
     if (!Array.isArray(intent?.[field])) issues.push(`${field} must be an array`);
     else if (intent[field].some((item) => typeof item !== "string" || item.trim().length === 0)) issues.push(`${field} entries must be non-empty strings`);
   }
+  validateJudgmentPoints(intent?.judgment_points, issues);
   const allowed = new Set(["name", "description", "problem", ...INTENT_ARRAYS]);
   for (const field of Object.keys(intent ?? {})) if (!allowed.has(field)) issues.push(`unknown intent field: ${field}`);
   return issues;
+}
+
+function validateJudgmentPoints(value, issues) {
+  if (!Array.isArray(value)) {
+    issues.push("judgment_points must be an array");
+    return;
+  }
+  const ids = new Set();
+  for (const [index, item] of value.entries()) {
+    if (typeof item === "string") {
+      if (item.trim().length === 0) issues.push(`judgment_points[${index}] must be a non-empty string or guidance topic`);
+      continue;
+    }
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      issues.push(`judgment_points[${index}] must be a non-empty string or guidance topic`);
+      continue;
+    }
+    const keys = Object.keys(item).sort();
+    if (keys.join("\0") !== ["id", "points", "when"].sort().join("\0")) issues.push(`judgment_points[${index}] guidance topic must contain exactly id, when, and points`);
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.id ?? "")) issues.push(`judgment_points[${index}].id must be kebab-case`);
+    else if (ids.has(item.id)) issues.push(`judgment_points guidance topic id is duplicated: ${item.id}`);
+    else ids.add(item.id);
+    if (typeof item.when !== "string" || item.when.trim().length === 0 || /[\r\n]/.test(item.when)) issues.push(`judgment_points[${index}].when must be a non-empty single-line condition`);
+    if (!Array.isArray(item.points) || item.points.length === 0 || item.points.some((point) => typeof point !== "string" || point.trim().length === 0)) issues.push(`judgment_points[${index}].points must contain one or more non-empty strings`);
+  }
 }
 
 export function selectProfile(intent, requested = "auto") {

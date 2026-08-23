@@ -9,6 +9,7 @@ import { parseArgs } from "./lib/args.mjs";
 import { copyTree, isInside, readJson, writeJsonAtomic } from "./lib/io.mjs";
 import { exists } from "./lib/io.mjs";
 import { lintSimpleSkill } from "./lib/simple-lint.mjs";
+import { measureSimpleContextSurface } from "./lib/context-surface.mjs";
 
 const execFileAsync = promisify(execFile);
 
@@ -45,12 +46,22 @@ async function evaluateSimpleSkill(root) {
   if (!validation.ok) return { schema: "skill-rails/eval-report/1", ok: false, target: root, structural: validation, behavior: null, release_readiness: "invalid", claim: "invalid" };
   const profileDecision = await optionalJson(join(root, ".skill-rails", "profile-decision.json"));
   const cases = await optionalJson(join(root, ".skill-rails", "eval-cases.json")) ?? [];
+  const ledger = await optionalJson(join(root, ".skill-rails", "obligation-ledger.json"));
   const profile = profileDecision?.profile ?? (creator ? "p1" : "unknown");
+  const contextSurface = await measureSimpleContextSurface(root);
   let scaffold = false;
   if (!creator && profile === "p1") {
     const helper = await readFile(join(root, "scripts", "run.mjs"), "utf8");
-    scaffold = helper.includes("@skill-rails scaffold");
+    scaffold = helper.includes("@skill-rails scaffold") || helper.includes("SR_P1_SCAFFOLD");
   }
+  const openObligations = Array.isArray(ledger?.atoms) ? ledger.atoms.filter((atom) => atom.disposition === "review-required").length : 0;
+  const releaseReadiness = scaffold
+    ? "helper-implementation-required"
+    : openObligations > 0
+    ? "authoring-obligations-required"
+    : creator
+    ? "creator-forward-test-required"
+    : "forward-test-required";
   return {
     schema: "skill-rails/eval-report/1",
     ok: false,
@@ -58,12 +69,15 @@ async function evaluateSimpleSkill(root) {
     profile,
     kind: creator ? "creator" : "generated-skill",
     structural: { ok: true, level: validation.level },
-    behavior: { status: "unproven", cases: cases.length, scaffold },
-    release_readiness: scaffold ? "helper-implementation-required" : creator ? "creator-forward-test-required" : "forward-test-required",
+    context_surface: contextSurface,
+    behavior: { status: "unproven", cases: cases.length, scaffold, open_obligations: openObligations },
+    release_readiness: releaseReadiness,
     caveat: creator
       ? "Creator structure passed. Profile selection, generated-package quality, platform discovery, and cold-agent use still require forward runs."
       : scaffold
       ? "The generated P1 helper is a fail-closed scaffold. Implement it and add golden tests before forward evaluation."
+      : openObligations > 0
+      ? `${openObligations} authoring obligation(s) remain review-required; structural validity is not semantic completion.`
       : "Structural validity is not behavior evidence. Run the recorded positive and near-miss cases with fresh Codex and Claude sessions."
   };
 }

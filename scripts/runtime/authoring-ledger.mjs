@@ -16,7 +16,7 @@ export async function validateAuthoringLedger(skillRoot, spec, body, fixtures) {
   catch (error) { return [diag(".skill-rails/obligation-ledger.json", `Intent-backed P2 requires a readable obligation ledger: ${error.message}`)]; }
 
   const diagnostics = [];
-  if (ledger.schema !== "skill-rails/obligation-ledger/1") diagnostics.push(diag(".skill-rails/obligation-ledger.json:schema", "Obligation ledger schema is invalid."));
+  if (!["skill-rails/obligation-ledger/1", "skill-rails/obligation-ledger/2"].includes(ledger.schema)) diagnostics.push(diag(".skill-rails/obligation-ledger.json:schema", "Obligation ledger schema is invalid."));
   if (ledger.intent_hash !== sha256(intent)) diagnostics.push(diag(".skill-rails/obligation-ledger.json:intent_hash", "Obligation ledger is stale relative to intent.json."));
   if (!Array.isArray(ledger.atoms)) return [...diagnostics, diag(".skill-rails/obligation-ledger.json:atoms", "Obligation ledger atoms must be an array.")];
   const ids = new Set();

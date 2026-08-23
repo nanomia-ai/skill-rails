@@ -5,6 +5,7 @@
 - Separate targets
 - Clean testing
 - Evidence authority
+- Context surface
 - Release interpretation
 
 ## Separate targets
@@ -24,6 +25,10 @@ Use fresh contexts and provide only the raw skill, task, and input artifact. Hid
 - `human_confirmed`: only when a trusted channel records the human action and scope.
 
 Alignment verdicts are `satisfied`, `violated`, `unproven`, or `not_applicable`. Aggregate results are `aligned`, `partial`, `unproven`, `misaligned`, or `stale`.
+
+## Context surface
+
+For P0/P1, evaluation reports entry bytes, routing-index bytes, their fixed sum, on-demand topic count and bytes, the largest topic, and total stored guidance. These are deterministic byte measurements, not token estimates or behavior evidence. Do not infer that a model matched the right condition or avoided unrelated files from a smaller fixed surface; verify that with a fresh consumer transcript.
 
 ## Release interpretation
 
