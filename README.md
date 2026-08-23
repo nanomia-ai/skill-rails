@@ -96,7 +96,7 @@ The profile only prevents a state machine from being added where it would create
 
 A profile belongs to one skill, not to an entire plugin or repository. A plugin can contain a small P0 brainstorming skill, a P1 formatter, and a P2 implementation workflow side by side. They remain separate skills; Skill Rails does not chain them together.
 
-Skill Rails cannot mechanize a requirement that the authoring agent never records. That is why authoring starts by breaking the request into trackable obligations. Ambiguous items stay visible for review instead of silently lowering the profile.
+Suppose the user says, “Never modify the source files,” but the authoring agent forgets to carry that condition into the intent and obligation ledger. The validator and runtime cannot check a rule that is absent from the design. Skill Rails therefore breaks the request into individual requirements first, then checks where each one was implemented and tested. If a requirement is unclear, it stays open for review instead of being quietly discarded.
 
 ## What gets created
 
