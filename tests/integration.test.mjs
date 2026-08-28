@@ -4,7 +4,7 @@ import { appendFile, mkdir, readFile, rm, symlink, writeFile } from "node:fs/pro
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import Ajv2020 from "ajv/dist/2020.js";
-import { generatePackage } from "../scripts/lib/generator.mjs";
+import { generatePackage, P2_PACKAGE_GITATTRIBUTES } from "../scripts/lib/generator.mjs";
 import { lintSimpleSkill } from "../scripts/lib/simple-lint.mjs";
 import { measureSimpleContextSurface } from "../scripts/lib/context-surface.mjs";
 import { buildP2 } from "../scripts/lib/build-core.mjs";
@@ -44,7 +44,13 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.equal(await exists(join(outputs.p2, "references", "guidance-index.md")), false);
   assert.equal(await exists(join(outputs.p2, "scripts", "skill-rails", "vendor", "acorn.mjs")), true);
   assert.equal(await exists(join(outputs.p2, ".generated.json")), true);
+  assert.equal(await exists(join(outputs.p0, ".gitattributes")), false);
+  assert.equal(await exists(join(outputs.p1, ".gitattributes")), false);
+  assert.equal(await readFile(join(outputs.p2, ".gitattributes"), "utf8"), P2_PACKAGE_GITATTRIBUTES);
+  assert.equal((await readFile(join(outputs.p2, "scripts", "skill-rails", "manifest.mjs"), "utf8")).includes("\r"), false);
+  assert.equal((await readFile(join(outputs.p2, "schemas", "decision.schema.json"), "utf8")).includes("\r"), false);
   const manifest = await readJson(join(outputs.p2, ".generated.json"));
+  assert.match(manifest.generated_files[".gitattributes"], /^sha256:[0-9a-f]{64}$/);
   assert.equal(manifest.evidence.mutations.passed, 20);
   assert.equal(manifest.evidence.mutations.survivors.length, 0);
   assert.equal(manifest.evidence.fixtures.mismatches, 0);
@@ -384,7 +390,7 @@ test("direct P2 rebuild validates in isolation and leaves generated outputs unch
   const root = join(base, "skill");
   const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
   await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 2 }) });
-  const generated = ["SKILL.md", "agents/openai.yaml", "schemas/decision.schema.json", "scripts/skill-rails/run.mjs", ".generated.json"];
+  const generated = [".gitattributes", "SKILL.md", "agents/openai.yaml", "schemas/decision.schema.json", "scripts/skill-rails/run.mjs", ".generated.json"];
   const before = Object.fromEntries(await Promise.all(generated.map(async (local) => [local, await hashFile(join(root, ...local.split("/")))])));
   const intentPath = join(root, ".skill-rails", "intent.json");
   const changedIntent = JSON.parse(await readFile(intentPath, "utf8"));
@@ -410,6 +416,30 @@ test("repeated P2 builds are byte-stable for every generated output", async (t) 
   assert.deepEqual(after, before);
 });
 
+test("P2 package attributes collide safely and transfer ownership only when explicit", async (t) => {
+  const base = await makeTestDir("package-attributes-collision");
+  t.after(() => removeTestDir(base));
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+
+  const noncanonical = join(base, "noncanonical");
+  await generatePackage({ intent, output: noncanonical });
+  await writeFile(join(noncanonical, ".gitattributes"), "*.mjs text\n", "utf8");
+  const noncanonicalBefore = await treeHashes(noncanonical);
+  await assert.rejects(buildP2(noncanonical, { allowGeneratedEdits: true, repeats: 1 }), (error) => error.code === "SR_GENERATED_COLLISION" && /not overwritten or merged/.test(error.message));
+  assert.deepEqual(await treeHashes(noncanonical), noncanonicalBefore);
+
+  const transferable = join(base, "transferable");
+  await generatePackage({ intent, output: transferable });
+  await writeFile(join(transferable, ".gitattributes"), P2_PACKAGE_GITATTRIBUTES, "utf8");
+  const transferableBefore = await treeHashes(transferable);
+  await assert.rejects(buildP2(transferable, { repeats: 1 }), (error) => error.code === "SR_GENERATED_COLLISION" && /--repair-generated/.test(error.message));
+  assert.deepEqual(await treeHashes(transferable), transferableBefore);
+  await buildP2(transferable, { allowGeneratedEdits: true, repeats: 1 });
+  const manifest = await readJson(join(transferable, ".generated.json"));
+  assert.equal(await readFile(join(transferable, ".gitattributes"), "utf8"), P2_PACKAGE_GITATTRIBUTES);
+  assert.match(manifest.generated_files[".gitattributes"], /^sha256:[0-9a-f]{64}$/);
+});
+
 test("manifest rejects every generated-surface class and L-fast rejects spec mutation", async (t) => {
   const base = await makeTestDir("tamper");
   t.after(() => removeTestDir(base));
@@ -417,6 +447,7 @@ test("manifest rejects every generated-surface class and L-fast rejects spec mut
   const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
   await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 3 }) });
   const candidates = [
+    ".gitattributes",
     "scripts/skill-rails/alignment.mjs", "scripts/skill-rails/api.mjs", "scripts/skill-rails/body.mjs",
     "scripts/skill-rails/collectors.mjs", "scripts/skill-rails/constants.mjs", "scripts/skill-rails/domains.mjs",
     "scripts/skill-rails/evaluator.mjs", "scripts/skill-rails/guide.mjs", "scripts/skill-rails/loader.mjs",

@@ -6,6 +6,9 @@ import { fail } from "./diagnostics.mjs";
 
 const VALIDATOR_FILES = new Set(["ast-policy.mjs", "validator.mjs", "scenario-checks.mjs", "format-checks.mjs", "authoring-ledger.mjs", "constants.mjs", "domains.mjs", "diagnostics.mjs"]);
 const AUTHORING_EVIDENCE_FILES = new Set([".skill-rails/intent.json", ".skill-rails/profile-decision.json", ".skill-rails/eval-cases.json", ".skill-rails/obligation-ledger.json"]);
+export const GENERATED_PACKAGE_FILES = Object.freeze([
+  ".gitattributes", "SKILL.md", "agents/openai.yaml", "schemas/decision.schema.json", "schemas/trace-event.schema.json"
+]);
 
 export async function computeFingerprints(skillRoot, runtimeDir = join(resolve(skillRoot), "scripts", "skill-rails")) {
   const root = resolve(skillRoot);
@@ -88,7 +91,7 @@ export async function verifyManifest(skillRoot, options = {}) {
   const fields = ["spec_hash", "dsl_hash", "runtime_hash", "validator_hash", "content_hash", "validator_version", "runtime_version", "minimum_node_major"];
   const mismatches = fields.filter((field) => manifest[field] !== current[field]).map((field) => ({ field, expected: manifest[field], actual: current[field] }));
   const requiredGenerated = new Set([
-    "SKILL.md", "agents/openai.yaml", "schemas/decision.schema.json", "schemas/trace-event.schema.json",
+    ...GENERATED_PACKAGE_FILES,
     ...current.runtime_files.map((path) => `scripts/skill-rails/${path}`)
   ]);
   for (const path of requiredGenerated) if (!Object.hasOwn(manifest.generated_files ?? {}, path)) mismatches.push({ field: `generated_files.${path}`, expected: "recorded", actual: "missing-entry" });

@@ -277,13 +277,14 @@ SKILL.md
 
 다음은 build가 만든다.
 
+- `.gitattributes` (`* -text`와 마지막 newline; P2 package 전체 byte 보존)
 - `SKILL.md`
 - `agents/openai.yaml`
 - `schemas/`
 - `scripts/skill-rails/`
 - `.generated.json`
 
-`.generated.json`에 기록된 파일을 손으로 고치지 않는다. 정본을 수정하고 build한다. build는 임시 staging directory에서 전체를 검증한 뒤 manifest를 마지막에 기록하고 원자적으로 교체한다. 실패한 build가 부분 생성물을 남기지 않는다.
+`.generated.json`에 기록된 파일을 손으로 고치지 않는다. 정본을 수정하고 build한다. Package-root `.gitattributes`도 manifest가 소유하는 생성물이며 Git newline 변환을 끄므로, manifest가 봉인한 실제 byte가 checkout 설정과 무관하게 보존된다. 기존의 비정본 `.gitattributes`는 자동 병합하거나 덮어쓰지 않고 충돌로 멈추며, 기존 package는 명시적 rebuild와 ownership transfer를 거쳐야 한다. Build는 임시 staging directory에서 전체를 검증한 뒤 manifest를 마지막에 기록하고 원자적으로 교체한다. 실패한 build가 부분 생성물을 남기지 않는다.
 
 ---
 

@@ -60,6 +60,8 @@ This contract does not create a second migration ledger or a progressive query l
 12. If the user requested a README, read [readme-authoring.md](readme-authoring.md) and write it from the implemented behavior and available evidence. Do not treat the guide as a fixed section template.
 13. Run L-fast, L-structural lint, L-full build, and behavior evaluation.
 
+Every generated P2 package reserves a package-root `.gitattributes` with exact bytes `* -text\n`. The builder emits its owned runtime and schema text with LF, then records exact raw hashes including `.gitattributes` in `generated_files`; verification never normalizes bytes, and Git checkouts preserve every sealed file instead of applying platform newline conversion. A pre-existing noncanonical file is a collision and is never overwritten or merged; an unowned file with the canonical bytes requires an explicit `--repair-generated` rebuild to transfer ownership. P0 and P1 package shape is unchanged.
+
 Resolve every project-relative path a collector accepts through a canonical realpath containment check before reading or hashing it; a lexical relative-path test accepts a symlink or junction that escapes the project.
 
 The obligation ledger is provenance, not a second behavior source. Keep original intent text immutable inside each atom and point `targets` to the canonical implementation and `evidence` to its check. Supported locators are `file:<relative-path>`, `body:<section-ref>`, `spec:<GROUP>/<stable-id>` (or `spec:TABLES/<table>/<row>`), `fixture:<id>`, and `eval:<id>`. Mark an atom `projected` only after both locators resolve. If an atom is still ambiguous, leave it `review-required` and keep the P2 `DEFERRED` gate.

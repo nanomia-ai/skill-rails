@@ -13,11 +13,11 @@
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 기준 commit: `b277a4c` (`chore: release v0.1.2`)
-- 이 tree에는 아직 commit하지 않은 유지보수 delta가 작업 tree에 landing되어 있다.
-- 구현 delta가 건드린 경로는 다섯 개다: `references/authoring-workflow.md`, `scripts/lib/io.mjs`, `scripts/lib/maintenance.mjs`, `scripts/lib/semantic-diff.mjs`, `tests/authoring.test.mjs`.
-- 작업 tree 전체 현황은 tracked 수정 11개와 untracked 추가 2개다. 위 다섯 경로 외의 tracked 수정은 Windows checkout portability correction인 `.gitattributes`와 `AGENTS.md`, `docs/implementation-verification_ko.md`, `docs/maintenance-status_ko.md`, `docs/skill-rails_ko.md`, `references/evaluation.md`의 문서 갱신이고, untracked 추가는 `fixtures/next-core-single-skill-pilot/` pilot subtree와 `docs/evidence/`다.
-- `scripts/runtime/`, `schemas/`, `references/v5-contract.md`에는 변경이 없다.
+- 기준 commit: `5ea44c2` (typed-artifact 유지보수와 declared-column pilot landing)
+- 현재 HEAD는 그 위 단일 local commit으로 generated P2 package의 raw-byte checkout portability를 닫는다.
+- owning source diff는 `scripts/lib/generator.mjs`, `scripts/lib/build-core.mjs`, `scripts/runtime/manifest.mjs`, `tests/integration.test.mjs`, `references/authoring-workflow.md`다.
+- canonical pilot rebuild와 현재 제품·증거·status 문서가 package-root `.gitattributes`, 새 manifest hash, build ID, 검증 receipt를 반영한다.
+- `scripts/runtime/hash.mjs`, `schemas/`, `references/v5-contract.md`, root `.gitattributes`에는 변경이 없다.
 - 최초 구현 기획과 통합 문서는 Git commit `4929b5b`에서 복구 가능하다.
 
 이 저장소 밖 project는 작업 범위 밖이며 read-only다.
@@ -39,8 +39,9 @@
 - package 순회가 symlink·junction·비정규 entry를 명시적으로 거부한다.
 - declared-column pilot: 검증자가 돌려준 task, snapshot, selection locator, 선택 byte SHA-256, continuation, 기록된 currentness, verdict를 갓 수집한 사실과 대조해야만 pass가 credit된다. 은퇴한 continuation receipt·singleton recorded-JSON·합성 runtime-state fixture는 남기지 않았다.
 - pilot collector가 project root와 선택 경로를 canonical하게 해석한 뒤 containment를 검사하므로, 상위 traversal·symlink·junction 탈출은 hashing 전에 fail-closed된다.
+- generated P2 package는 정확히 `* -text\n`인 package-root `.gitattributes`를 reserved generated artifact로 소유하고 manifest `generated_files`에 봉인한다. 비정본·비정규 entry는 덮어쓰거나 병합하지 않고 `SR_GENERATED_COLLISION`으로 멈추며, manifest가 소유하지 않은 정본 파일은 명시적 `--repair-generated` rebuild에서만 ownership을 이전한다.
 
-P0/P1 profile, conditional guidance, P2 `spec.mjs` 계약, V5 runtime, obligation ledger, 생성 package shape는 바꾸지 않았다. 하나의 authorized writer가 package root를 단독 소유한다는 전제는 이번 원자성의 명시적 경계이며, capture 이후에도 계속 쓰는 out-of-band writer에 대한 보존은 주장하지 않는다.
+P0/P1 profile, conditional guidance, P2 `spec.mjs` 계약, Decision·Trace schema, obligation ledger는 바꾸지 않았다. P2 package shape에는 manifest-bound `.gitattributes` 한 파일만 추가했다. 하나의 authorized writer가 package root를 단독 소유한다는 전제는 그대로이며, capture 이후에도 계속 쓰는 out-of-band writer에 대한 보존은 주장하지 않는다.
 
 ---
 
@@ -52,15 +53,16 @@ P0/P1 profile, conditional guidance, P2 `spec.mjs` 계약, V5 runtime, obligatio
 - pilot package 대상 formal build: mutation 20/20, scenario 10/10, 50회 반복 불일치 0, format round trip 256/256과 CR/LF 거부
 - 저장소 밖 임시 복제본에서 같은 build를 재실행해 in-repo package와 파일 차이 없음
 - 생성 package 내장 lint pass, real-state e2e 2/2 pass
-- manifest 선언 hash 51개(content 15 + generated 36) 확인
-- fresh Windows `npm ci`는 pass했고, 이어서 실행한 full `npm run verify`도 pass했다. 세부 receipt는 vendor pass, lint pass, repository test 52/52 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass다.
+- manifest 선언 hash 52개(content 15 + generated 37), build ID `sha256:c454917379009b55968a785bb49fa46a565d99b1479db746b78777166f519aa9` 확인
+- full `npm run verify`의 세부 receipt는 vendor pass, lint pass, repository test 53/53 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass다.
+- `core.autocrlf=true`와 `false`의 disposable `git clone --no-local`에서 sealed package byte와 build ID가 같고 모든 tracked package path가 `attr/-text`이며 manifest verification이 통과했다. Exact temp root containment를 확인한 뒤 세 clone을 삭제했다.
 - 최초 full verify의 두 실패는 migration semantic-unit test와 G0.5 scorer test였다. 둘 다 행동 결함이 아니라 raw-byte fixture·corpus·scorer helper가 CRLF checkout으로 바뀐 portability defect였고, `.gitattributes`의 다섯 `-text` pattern으로 현재 92개 matched tracked path를 보호한 뒤 닫혔다. 사전에 worktree·index diff가 없음을 확인한 그 경로들만 index LF byte로 복원했으며 protected path에는 수정이 남지 않았다.
 
 유지보수 delta에는 bounded test 두 건이 추가되어 registry·경로·hash·원자성·junction 거부·legacy `replace-spec`·동시 쓰기 감지와 semantic diff effect 인자 변화를 덮는다. 이 test들은 위 fresh repository test 52/52 pass에 포함되어 관찰되었다.
 
 아직 관찰하지 않았고 따라서 `UNPROVEN`인 것:
 
-- commit, push, 설치, 배포
+- push, 설치, 배포
 - 최종 declared-column package에 대한 fresh-agent 행동(trigger 선택, 지시 준수, 출력 품질)
 - 사용할 수 있는 project-local orchestration channel이 없어 관찰하지 못한 Decision. 이는 제품 실패가 아니라 `UNPROVEN`이다.
 - out-of-band writer가 계속 쓰는 상황에서의 package 보존
@@ -74,20 +76,17 @@ P0/P1 profile, conditional guidance, P2 `spec.mjs` 계약, V5 runtime, obligatio
 
 - typed-artifact 유지보수 구현과 bounded test landing 완료
 - declared-column pilot fixture와 그 보고서 정합화 완료
+- P2 package raw-byte checkout portability와 collision-safe ownership transfer 완료
 - AI-facing reference, 제품 설계, 구현·검증 기록 갱신 완료
-- V5 공개 계약과 runtime·schema는 불변
+- V5 Decision 공개 계약과 schema는 불변; runtime manifest의 generated-file 필수 집합만 확장
 - 코드 blocking finding 없음
-- structural/staging readiness는 `LANDING PASS`; commit/push, 설치, 배포, fresh-agent/live 행동은 아직 수행하지 않음
+- local single-commit landing과 structural verification 완료; push, 설치, 배포, fresh-agent/live 행동은 아직 수행하지 않음
 
 ---
 
 ## 5. 다음에 할 일
 
-정확한 다음 단계는 하나다.
-
-1. exact allowlist를 지금 stage하고 commit 직전 status·staged diff·ignored-file 경계를 검증한다. 현재 status는 tracked 수정 11개와 untracked root 2개이며, pilot의 `.skill-rails/eval-cases.json`, `.skill-rails/intent.json`, `.skill-rails/obligation-ledger.json`, `.skill-rails/profile-decision.json` 네 파일은 force-add 대상이고 `.skill-rails/semantic-diff.json`은 ignored 상태로 stage하지 않는다. 이 staging/commit 검증 전에는 commit하지 않는다.
-
-그 뒤에도 commit, push, 설치, 배포는 사용자가 명시적으로 요청한 범위에서만 수행한다. 배포 이후에만 최종 package에 대한 fresh-agent 행동 test를 수행하고, 그 결과를 [냉시작 행동 증거 카드](evidence/proof-03-cold-behavior_ko.md)의 대체물로 기록한다.
+정확한 다음 단계는 사용자가 별도로 승인한 경우에만 push·설치·배포를 수행하는 것이다. 배포 이후에만 최종 package에 대한 fresh-agent 행동 test를 수행하고, 그 결과를 [냉시작 행동 증거 카드](evidence/proof-03-cold-behavior_ko.md)의 대체물로 기록한다.
 
 선택적 범위는 그대로 남는다: 추가 host의 fresh trigger와 실제 task output, Node 20 설치 smoke, Linux/macOS 경계, P0/P1 conditional guidance의 multi-match·no-match·near-miss, 실제 대형 기존 skill migration.
 

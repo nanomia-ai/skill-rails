@@ -4,8 +4,8 @@ import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { copyTree, exists, listFiles, readJson, replaceDirectoryAtomic, writeTextAtomic } from "./io.mjs";
-import { writeGeneratedSkillBootstrap } from "./generator.mjs";
-import { createManifest, detectGeneratedEdits, writeManifest } from "../runtime/manifest.mjs";
+import { assertP2PackageGitAttributes, writeGeneratedSkillBootstrap } from "./generator.mjs";
+import { createManifest, detectGeneratedEdits, GENERATED_PACKAGE_FILES, readManifest, writeManifest } from "../runtime/manifest.mjs";
 import { hashFile, sha256 } from "../runtime/hash.mjs";
 import { loadAuthoringSkill, simulateSkill } from "../runtime/api.mjs";
 import { runMutationSuite } from "./mutation-suite.mjs";
@@ -18,7 +18,13 @@ const GENERATED_RUNTIME = join("scripts", "skill-rails");
 export async function buildP2(skillRoot, options = {}) {
   const root = resolve(skillRoot);
   if (!(await exists(join(root, "spec.mjs")))) throw new Error(`P2 build requires spec.mjs: ${root}`);
-  if (await exists(join(root, ".generated.json")) && !options.allowGeneratedEdits) {
+  const hasManifest = await exists(join(root, ".generated.json"));
+  const manifest = hasManifest ? await readManifest(root) : null;
+  await assertP2PackageGitAttributes(root, {
+    manifestOwned: Boolean(manifest?.generated_files?.[".gitattributes"]),
+    allowOwnershipTransfer: Boolean(options.allowGeneratedEdits)
+  });
+  if (hasManifest && !options.allowGeneratedEdits) {
     const edits = await detectGeneratedEdits(root);
     if (edits.length > 0) throw new Error(`Generated files were edited manually:\n${edits.map((item) => `- ${item.path}: ${item.status}`).join("\n")}\nChange canonical sources or pass --repair-generated explicitly.`);
   }
@@ -52,7 +58,7 @@ async function buildP2InPlace(root, options = {}) {
   const formatEvidence = await runFormatSuite(root);
 
   const generatedFiles = [
-    "SKILL.md", "agents/openai.yaml", "schemas/decision.schema.json", "schemas/trace-event.schema.json",
+    ...GENERATED_PACKAGE_FILES,
     ...((await listFiles(join(root, GENERATED_RUNTIME))).map((path) => relative(root, path).replace(/\\/g, "/")))
   ];
   const { predicate_evaluation_p99_ms: _observedP99, ...stableFixtureEvidence } = fixtureEvidence;
@@ -70,10 +76,6 @@ async function buildP2InPlace(root, options = {}) {
   return { root, manifest, validation: isolated, fixtures: fixtureEvidence };
 }
 
-const GENERATED_FILE_PATHS = Object.freeze([
-  "SKILL.md", "agents/openai.yaml", "schemas/decision.schema.json", "schemas/trace-event.schema.json"
-]);
-
 async function installGeneratedOutputs(sourceRoot, targetRoot) {
   const backup = join(dirname(targetRoot), `.${basename(targetRoot)}.generated-backup-${randomUUID()}`);
   const runtimeLocal = "scripts/skill-rails";
@@ -82,7 +84,7 @@ async function installGeneratedOutputs(sourceRoot, targetRoot) {
   const existed = new Set();
   let installStarted = false;
   try {
-    for (const local of [...GENERATED_FILE_PATHS, manifestLocal]) {
+    for (const local of [...GENERATED_PACKAGE_FILES, manifestLocal]) {
       const target = join(targetRoot, ...local.split("/"));
       if (await exists(target)) {
         const backupPath = join(backup, ...local.split("/"));
@@ -98,7 +100,7 @@ async function installGeneratedOutputs(sourceRoot, targetRoot) {
     }
 
     installStarted = true;
-    for (const local of GENERATED_FILE_PATHS) {
+    for (const local of GENERATED_PACKAGE_FILES) {
       await writeTextAtomic(join(targetRoot, ...local.split("/")), await readFile(join(sourceRoot, ...local.split("/")), "utf8"));
     }
     await replaceDirectoryAtomic(runtimeTarget, async (stage) => copyTree(join(sourceRoot, ...runtimeLocal.split("/")), stage));
@@ -107,7 +109,7 @@ async function installGeneratedOutputs(sourceRoot, targetRoot) {
     await writeTextAtomic(join(targetRoot, manifestLocal), await readFile(join(sourceRoot, manifestLocal), "utf8"));
   } catch (error) {
     if (installStarted) {
-      for (const local of GENERATED_FILE_PATHS) await restoreFile(local);
+      for (const local of GENERATED_PACKAGE_FILES) await restoreFile(local);
       if (existed.has(runtimeLocal)) await replaceDirectoryAtomic(join(targetRoot, ...runtimeLocal.split("/")), async (stage) => copyTree(join(backup, ...runtimeLocal.split("/")), stage));
       else await rm(join(targetRoot, ...runtimeLocal.split("/")), { recursive: true, force: true });
       await restoreFile(manifestLocal);
@@ -168,6 +170,7 @@ export async function materializeRuntime(skillRoot) {
   const target = join(root, GENERATED_RUNTIME);
   await replaceDirectoryAtomic(target, async (stage) => {
     await copyTree(SOURCE_RUNTIME, stage, { filter: (local) => !["cli.mjs"].includes(local) });
+    for (const path of await listFiles(stage)) await writeTextAtomic(path, canonicalGeneratedText(await readFile(path, "utf8")));
     await writeTextAtomic(join(stage, "cli.mjs"), await generatedCliSource());
     for (const name of ["run", "lint", "trace", "align"]) {
       await writeTextAtomic(join(stage, `${name}.mjs`), `#!/usr/bin/env node\n// @generated by Skill Rails\nimport { main } from "./cli.mjs";\nprocess.exitCode = await main(process.argv.slice(2));\n`);
@@ -177,13 +180,17 @@ export async function materializeRuntime(skillRoot) {
 }
 
 async function generatedCliSource() {
-  return readFile(join(SOURCE_RUNTIME, "cli.mjs"), "utf8");
+  return canonicalGeneratedText(await readFile(join(SOURCE_RUNTIME, "cli.mjs"), "utf8"));
 }
 
 async function copyPublicSchemas(root) {
   await mkdir(join(root, "schemas"), { recursive: true });
-  for (const name of ["decision.schema.json", "trace-event.schema.json"]) await copyFile(join(AUTHORING_ROOT, "schemas", name), join(root, "schemas", name));
+  for (const name of ["decision.schema.json", "trace-event.schema.json"]) {
+    await writeTextAtomic(join(root, "schemas", name), canonicalGeneratedText(await readFile(join(AUTHORING_ROOT, "schemas", name), "utf8")));
+  }
 }
+
+function canonicalGeneratedText(source) { return String(source).replace(/\r\n?/g, "\n"); }
 
 async function isolatedLint(root) {
   const lintPath = join(AUTHORING_ROOT, "scripts", "lint.mjs");

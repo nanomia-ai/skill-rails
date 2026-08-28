@@ -173,9 +173,9 @@ Fresh project-local Claude Code는 P1 `verified-note`를 만들었다.
 
 ### 6.1 이번 delta의 정확한 범위
 
-기준 commit은 `b277a4c`이고, 아래 내용은 아직 commit하지 않은 작업 tree 상태다. 구현 delta가 건드린 경로는 `references/authoring-workflow.md`, `scripts/lib/io.mjs`, `scripts/lib/maintenance.mjs`, `scripts/lib/semantic-diff.mjs`, `tests/authoring.test.mjs` 다섯 개이고, untracked pilot subtree는 `fixtures/next-core-single-skill-pilot/`다.
+현재 기준 commit은 `5ea44c2`이고, 그 위 단일 commit이 generated P2 package의 raw-byte checkout portability를 닫는다. Owning source diff는 `scripts/lib/generator.mjs`, `scripts/lib/build-core.mjs`, `scripts/runtime/manifest.mjs`, `tests/integration.test.mjs`, `references/authoring-workflow.md`다. Canonical rebuild가 pilot package-root `.gitattributes`, embedded runtime·schema, `.generated.json`을 갱신했고, 이 문서와 제품 정본·유지보수 status·pilot report가 현재 evidence와 package shape를 반영한다.
 
-작업 tree 전체는 이보다 넓다. 현재 status는 tracked 수정 11개와 untracked 추가 2개다. 다섯 구현 경로 밖의 tracked 수정은 portability correction인 `.gitattributes`와 `AGENTS.md`, `docs/implementation-verification_ko.md`, `docs/maintenance-status_ko.md`, `docs/skill-rails_ko.md`, `references/evaluation.md`의 문서 갱신이고, untracked 추가는 `docs/evidence/`와 `fixtures/next-core-single-skill-pilot/`다. 이 문서 갱신은 diff에 포함되며, 아래 수치와 test 서술은 다섯 개 구현 경로에만 해당한다. `scripts/runtime/`, `schemas/`, `references/v5-contract.md`에는 변경이 없다.
+이 변경은 `scripts/runtime/hash.mjs`, P0/P1 generator, Decision·Trace schema, `references/v5-contract.md`, root repository `.gitattributes`를 건드리지 않는다. Pilot의 `.skill-rails/semantic-diff.json`은 계속 ignored이며 staged·committed 경로가 아니다.
 
 fresh Windows verify가 드러낸 결함은 행동 구현이 아니라 checkout portability였다. `.gitattributes`에 `fixtures/migration-structures/SKILL.md -text`, `evals/g0_5/** -text`, `evals/g0/thresholds.json -text`, `scripts/lib/g05-score-v3.mjs -text`, `scripts/lib/g05-review-lint.mjs -text`를 추가해 raw-byte 입력을 보호했다. 현재 92개 matched tracked path는 보정 전에 worktree와 index 양쪽에서 사용자·coordinator diff가 없음을 확인한 뒤 각 index blob의 LF byte로만 복원했으며, 보정 후 matched path에는 수정이 남지 않았다.
 
@@ -246,35 +246,37 @@ semantic diff는 `artifact_receipts`(kind, path, before_hash, after_hash, source
 | formal build (`--repeats 50`) | mutation 20/20, scenario 10/10, 50회 반복 불일치 0, predicate 성능 한도 내, format round trip 256/256 및 CR/LF 거부 |
 | 재현 build | 저장소 밖 임시 복제본에서 재build 후 in-repo package와 파일 차이 없음 |
 | 내장 lint / real-state e2e | pass / 2/2 pass |
-| manifest 선언 hash | content 15 + generated 36 = 51 |
-| package 규모 | skill 54 파일, pilot root 5 파일 |
+| manifest 선언 hash | content 15 + generated 37 = 52 |
+| package 규모 | skill 55 파일, pilot root 5 파일 |
 
 수치는 pilot 보고서가 각 receipt의 재현 명령과 함께 소유한다. 은퇴한 설계(continuation receipt, singleton recorded-JSON 상관, 합성 runtime-state fixture)는 mechanism과 함께 제거했고, 그 흔적은 pilot 보고서의 부록 한 줄로만 남는다.
 
-### 6.7 V5 호환과 공개 계약
+### 6.7 P2 package byte 소유권과 V5 호환
 
-이번 delta는 V5 의미를 바꾸지 않는다. 근거는 다음과 같다.
+Fresh `core.autocrlf=true` clone은 repository verify 52/52를 통과했지만, 기존 pilot package manifest는 checkout newline 변환 뒤 14개 mismatch를 냈고 real-state e2e는 0/2였다. Hash를 정규화하면 raw-byte sealing을 약화하므로 채택하지 않았다. 대신 P2 build가 정확히 `* -text\n`인 package-root `.gitattributes`를 생성하고 manifest `generated_files`에 봉인한다. 기존 비정본 파일은 자동 병합·덮어쓰지 않고 `SR_GENERATED_COLLISION`으로 멈추며, manifest가 소유하지 않은 정본 파일도 명시적 `--repair-generated` rebuild 전에는 ownership을 가져오지 않는다. P0/P1 package shape와 root corpus용 다섯 `-text` pattern은 그대로다.
 
-- `scripts/runtime/`, `schemas/`, `references/v5-contract.md`에 변경이 없다.
-- pilot package가 내장한 runtime 파일은 `scripts/runtime/`의 해당 파일과 byte-identical이고, schema도 동일하다. 생성 package는 진입점 네 개만 추가한다.
+이번 delta는 V5 Decision 의미를 바꾸지 않는다. 근거는 다음과 같다.
+
+- `scripts/runtime/manifest.mjs`는 생성 파일의 필수 집합에 `.gitattributes`를 추가했지만 hashing, Decision 계산, schema에는 normalization이나 새 의미를 추가하지 않았다. `schemas/`와 `references/v5-contract.md`는 변경하지 않았다.
+- pilot package가 내장한 runtime과 schema는 canonical build input에서 생성되며, 생성 package는 진입점 네 개와 package byte 보존용 `.gitattributes`만 추가한다.
 - pilot은 기존 stage `reentry` 값과 기존 표·format 문법만 사용하며 새 runtime mode, 새 declaration, 새 alignment 기대 종류를 추가하지 않는다.
 - `replace-artifact`는 authoring/유지보수 도구 표면이고 생성 package의 실행 계약이 아니다.
 
-따라서 7절 변경 원장에는 새 행을 추가하지 않는다.
+따라서 7절 Decision 변경 원장에는 새 행을 추가하지 않는다.
 
 ### 6.8 landing 판정과 남은 release 미상
 
-- fresh Windows `npm ci`와 full `npm run verify`는 모두 pass했다. full receipt는 vendor pass, lint pass, repository test 52/52 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass다.
+- full `npm run verify`는 pass했다. Receipt는 vendor pass, lint pass, repository test 53/53 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass다. 새 test는 exact `.gitattributes` P2-only 생성, manifest sealing, noncanonical collision 무변경, canonical unowned file의 명시적 ownership transfer, rebuild rollback·반복 byte 안정성·tamper 거부를 덮는다.
 - 최초 실패 두 건은 migration semantic-unit test와 G0.5 scorer test였고, `.gitattributes`의 `fixtures/migration-structures/SKILL.md -text`, `evals/g0_5/** -text`, `evals/g0/thresholds.json -text`, `scripts/lib/g05-score-v3.mjs -text`, `scripts/lib/g05-review-lint.mjs -text`로 raw-byte checkout을 보호해 닫았다.
-- structural/staging readiness 판정은 `LANDING PASS`다. 현재 status는 tracked 수정 11개와 untracked root 2개이고, pilot의 `.skill-rails/eval-cases.json`, `.skill-rails/intent.json`, `.skill-rails/obligation-ledger.json`, `.skill-rails/profile-decision.json` 네 파일은 force-add 대상이며 `.skill-rails/semantic-diff.json`은 ignored 상태로 stage하지 않는다.
-- commit, push, 설치, 배포를 수행하지 않았다.
+- pilot root/embedded L0–L18, manifest closure 15 + 37 = 52, real-state e2e 2/2가 pass했다. `core.autocrlf=true`와 `false`의 disposable `git clone --no-local`은 같은 sealed raw byte와 build ID를 보존하고 모든 tracked pilot package path에 `attr/-text`를 보고하며 manifest verification을 통과했다.
+- structural/staging readiness와 단일 local commit landing은 pass했다. `.skill-rails/semantic-diff.json`은 ignored 상태로 stage·commit하지 않았고, push·설치·배포는 수행하지 않았다.
 - 최종 declared-column package에 대한 fresh-agent 행동은 `UNPROVEN`이다. 선행 후보 bytes에서 관찰된 냉시작 행동의 credit 범위는 [냉시작 행동 증거 카드](evidence/proof-03-cold-behavior_ko.md)가 소유한다.
 - 사용할 수 있는 project-local orchestration channel이 없어 Decision을 관찰하지 못한 경로는 `UNPROVEN`이며 제품 실패가 아니다.
 - 검증자의 정직성은 runtime 밖에 있다. package는 돌려받은 열을 상관시킬 뿐 검증자가 실제로 그 항목을 검사했음을 증명하지 못한다.
 - 공개 lane은 agent 주장과 artifact 경로·byte 검증까지만 기록하고 harness가 신뢰하는 effect 관찰은 없다. 따라서 공개 lane의 effect 실행 credit은 partial 또는 `unproven`을 넘지 않는다.
 - out-of-band writer가 계속 쓰는 상황에서의 package 보존은 검증 경계 밖이다.
 
-즉시 다음 단계는 하나다. exact allowlist를 지금 stage하고 commit 직전 status·staged diff·ignored-file 경계를 검증한다. 이 staging/commit 검증 전에는 commit하지 않는다.
+local single-commit landing 뒤 남은 단계는 별도 승인된 push·설치·배포와 fresh-agent/live 행동 검증뿐이다. 이 영수증은 그 범위를 수행했다고 주장하지 않는다.
 
 ---
 
