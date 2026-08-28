@@ -30,12 +30,14 @@ test("real-state public evidence binds the exact selection and snapshot while re
   assert.equal(waitLane.initial.decision.stage, "channel");
   assert.equal(waitLane.initial.decision.status, "WAIT");
   assert.deepEqual(waitLane.initial.decision.effects, ["WAIT"]);
+  assert.deepEqual(waitLane.initial.decision.stage_artifacts.map(({ id }) => id), ["channelStatus"]);
 
   for (const lane of [publicLane, controlLane, selectionReuseLane, snapshotReuseLane, staleLane]) {
     assert.equal(lane.acquire.decision.stage, "acquire");
     assert.equal(lane.acquire.decision.status, "NEXT");
     assert.deepEqual(lane.acquire.decision.effects.map(effect => Array.isArray(effect) ? effect[0] : effect), ["RUN", "DISPATCH", "WRITE", "NEXT"]);
-    assert.equal(lane.acquire.decision.effects[0][1].input, "state/verifier-channel.json");
+    assert.equal(lane.acquire.decision.effects[0][1].artifact, "channelInput");
+    assert.deepEqual(lane.acquire.decision.stage_artifacts.map(({ id }) => id), ["channelInput", "selectionState", "targetState", "taskState", "verifierResult"]);
     assert.equal(lane.dispatch.executable, lane.usedChannel.argv[0]);
     assert.equal(lane.dispatch.windowsHide, true);
     assert.ok(Array.isArray(lane.dispatch.argv));
@@ -60,6 +62,7 @@ test("real-state public evidence binds the exact selection and snapshot while re
 
   assert.equal(publicLane.final.decision.stage, "evidence");
   assert.equal(publicLane.final.decision.row, "matching-pass");
+  assert.deepEqual(publicLane.final.decision.stage_artifacts.map(({ id }) => id), ["selectionState", "targetState", "taskState", "verifierResult"]);
   assert.equal(publicLane.final.decision.status, "DONE");
   const publicFacts = factMap(publicLane.final.decision);
   assert.equal(publicFacts["selection.locator"], publicLane.state.selectionLocator);

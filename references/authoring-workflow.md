@@ -3,6 +3,7 @@
 ## Contents
 
 - Intent brief
+- Authoring judgment
 - Fresh-consumer closure
 - Profile selection
 - Creation order
@@ -15,6 +16,18 @@ Start from `templates/intent-brief.json`; its keys are the input contract and it
 
 Keep a judgment point as a string when every invocation needs it. When a large P0 or P1 skill has a prose topic that applies only under a distinct condition, record it as `{ "id": "stable-kebab-id", "when": "one-line condition", "points": ["preserved requirement", "another requirement"] }`. The profile does not change: conditional prose routing is orthogonal to P0/P1 mechanics. Do not mechanically split prose by length. Use a topic only when its condition is meaningful, its points form one coherent subject, and the always-loaded entry still contains universal boundaries, state-dependent obligations, exact formats, and stop rules.
 
+## Authoring judgment
+
+Use this section to choose and review an authoring design; it does not override the user's explicit intent or the selected profile and runtime contracts.
+
+Start with the first useful result a user of the target skill must produce, then work backward. Mechanize rules that are repeatable and can be checked reliably; keep interpretation, tradeoffs, and value judgment in concise prose with enough context to prevent misunderstanding. Do not optimize for brevity itself. When the manual needed to understand or operate a mechanism grows larger or harder to use than the prose it replaces, reconsider the boundary and whether the mechanism is earning its cost.
+
+For a high-cost decision, compare an independent alternative and the simplest workable alternative before extending the current design. Treat existing implementations, history, tests, and failures as evidence, not answer keys. Keep each behavior or fact owned by one canonical source; other surfaces should route to or project from that owner instead of becoming parallel truths.
+
+Watch for nonconvergence: exceptions, explanations, and tests keep growing while no new evidence shows the first user result getting closer. Stop patching that layer and return to its parent premise, the user outcome, and the owning boundary; if the premise no longer holds, replace the approach. Do not turn one agent failure under constrained reasoning or an unsuitable role, or a structural pass without observed behavior, into universal machinery.
+
+After the design has logically converged, verify it with a high-information representative flow that exercises the coupled risks, then with a fresh agent using only the declared consumption set. Record what each check actually observed, and mark every remaining uncertainty `unproven`.
+
 ## Fresh-consumer closure
 
 Author each generated skill, and each durable output intended for later AI consumption, for a session that has not seen the authoring or producing conversation. Do not rely on prior-session memory, undocumented project history, or an earlier agent's unrecorded inference.
@@ -25,6 +38,8 @@ Judge sufficiency over the smallest declared consumption set, not over each file
 - For a durable task output intended for later AI consumption, the consumption set is the output plus only the durable dependencies that the output identifies precisely.
 
 The consumption set defines only what must suffice for correct interpretation; it neither defines nor restricts the files, tools, or evidence used to perform the domain work.
+
+For P2, complete `templates/authoring-card.md` with a named consumption set for each consumer. Declare every static project artifact that a selected stage or stopping guard requires once in `ARTIFACTS`, name that stage or guard in `readers`, and keep exact grammar in its structured format/template or selected guidance. The runtime projects those declared paths as the current Decision's `stage_artifacts`; non-file observations do not need placeholder artifacts. The authoring card and collector source are outside the generated skill's consumer consumption set: neither counts as consumer disclosure.
 
 Together, that consumption set must provide the information the new AI needs to interpret and use the skill or output correctly. Depending on the skill or output, that may include its purpose, skill-defined internal terms, input identity and scope, constraints, evidence or uncertainty, current result or status, and next action. Define a skill-defined internal term at or before its first use on the mandatory reading path, or route through a mandatory definition before that use. Put shared context on a mandatory path and local context in the selected topic, body, template, or output. Do not compensate for missing context by duplicating all background in every file, adding unrelated material to the consumption set, or telling the AI to scan unrelated files.
 
@@ -48,7 +63,7 @@ This contract does not create a second migration ledger or a progressive query l
 
 1. Write the intent brief and evaluation cases.
 2. Atomize obligations and record their source and consequence.
-3. For P2, copy `templates/authoring-card.md` into the work package, complete its observations, judgment inputs, owners, artifacts, and terminals, then project approved decisions into the canonical spec and obligation ledger. The card is an authoring aid, not a second behavior source.
+3. For P2, copy `templates/authoring-card.md` into the work package, complete its observations, judgment inputs, owners, artifacts, terminals, and named consumer consumption sets, then project approved decisions into the canonical spec and obligation ledger. Put each static consumer artifact path in `ARTIFACTS`, bind it to its selected stage or stopping guard with `readers`, and place any required grammar on a mandatory structured or selected guidance surface. The card is an authoring aid, not a behavior source or consumer guidance.
 4. Design ASK, WAIT, ROUTE, BLOCK, and DONE terminals first.
 5. Define observations and domains.
 6. Define guards and bypass evidence.

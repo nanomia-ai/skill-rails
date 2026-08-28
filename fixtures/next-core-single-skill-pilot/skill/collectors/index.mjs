@@ -2,14 +2,14 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { canonicalPath, isInside } from "../scripts/skill-rails/path-policy.mjs";
-import { FORMATS } from "../spec.mjs";
+import { ARTIFACTS, FORMATS } from "../spec.mjs";
 
 const FILES = Object.freeze({
-  task: join("state", "task.txt"),
-  target: join("state", "target.json"),
-  channel: join("state", "verifier-channel.txt"),
-  result: join("state", "verifier-result.log"),
-  selection: join("state", "selection.json")
+  task: ARTIFACTS.taskState.path,
+  target: ARTIFACTS.targetState.path,
+  channel: ARTIFACTS.channelStatus.path,
+  result: ARTIFACTS.verifierResult.path,
+  selection: ARTIFACTS.selectionState.path
 });
 
 const decoder = new TextDecoder("utf-8", { fatal: true });

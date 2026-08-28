@@ -47,6 +47,12 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.equal(await exists(join(outputs.p0, ".gitattributes")), false);
   assert.equal(await exists(join(outputs.p1, ".gitattributes")), false);
   assert.equal(await readFile(join(outputs.p2, ".gitattributes"), "utf8"), P2_PACKAGE_GITATTRIBUTES);
+  const p2Skill = await readFile(join(outputs.p2, "SKILL.md"), "utf8");
+  assert.match(p2Skill, /Decision body, `stage_artifacts`, and ordered effects/);
+  assert.match(p2Skill, /do not infer replacement paths from collector or authoring files/);
+  assert.doesNotMatch(p2Skill, /BLOCK: consumer guidance missing/);
+  assert.match(p2Skill, /bound to the exact Decision/);
+  assert.match(p2Skill, /do not automatically carry to the new Decision/);
   assert.equal((await readFile(join(outputs.p2, "scripts", "skill-rails", "manifest.mjs"), "utf8")).includes("\r"), false);
   assert.equal((await readFile(join(outputs.p2, "schemas", "decision.schema.json"), "utf8")).includes("\r"), false);
   const manifest = await readJson(join(outputs.p2, ".generated.json"));
@@ -97,6 +103,18 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   const decisionSchema = await readJson(join(outputs.p2, "schemas", "decision.schema.json"));
   const validateDecision = new Ajv2020({ strict: true, allErrors: true, validateFormats: false, allowUnionTypes: true }).compile(decisionSchema);
   for (const decision of [deferred.decision, unknown.decision, ready.decision]) assert.equal(validateDecision(decision), true, JSON.stringify(validateDecision.errors));
+});
+
+test("pilot stage-artifact fixtures fail when one stage reader association is removed", async (t) => {
+  const base = await makeTestDir("stage-artifact-reader");
+  t.after(() => removeTestDir(base));
+  const skill = join(base, "skill");
+  await copyTree(join(ROOT, "fixtures", "next-core-single-skill-pilot", "skill"), skill);
+  const specPath = join(skill, "spec.mjs");
+  const source = await readFile(specPath, "utf8");
+  await writeTextAtomic(specPath, source.replace('readers: ["stage.acquire", "stage.evidence"], update: "replace"', 'readers: ["stage.evidence"], update: "replace"'));
+  const validation = await validateFull(skill);
+  assert.ok(validation.diagnostics.some((item) => item.code === "L14" && /stage artifacts/.test(item.message)), JSON.stringify(validation.diagnostics));
 });
 
 test("P0 and P1 route only declared conditional judgment topics", async (t) => {

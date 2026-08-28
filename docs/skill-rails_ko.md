@@ -307,7 +307,7 @@ Runtime은 AI 대신 일을 수행하는 agent runtime이 아니다. 목적은 *
 1. `spec.mjs`를 import하기 전에 허용 AST와 source 구조를 검사한다.
 2. collector·judged·decided 입력을 하나의 snapshot에 묶는다.
 3. guard, stage, table row, ordered effects를 결정적으로 계산한다.
-4. 현재 Decision과 compact guide를 만든다.
+4. 선택된 stage와 멈춘 guard가 읽는 정적 artifact를 `ARTIFACTS.readers`에서 투영해 현재 Decision과 compact guide를 만든다.
 5. 필요한 body section과 template만 전달한다.
 6. runtime 관찰, agent claim, artifact evidence를 서로 다른 권위로 trace에 기록한다.
 7. 요구된 proof와 실제 evidence를 비교해 alignment를 계산한다.
@@ -364,11 +364,11 @@ Trace와 lock은 skill root 밖에서 호출자가 `--trace-dir`로 명시한 st
 
 ### 11.1 Decision
 
-Decision은 현재 run의 작고 versioned한 계약이다. Snapshot, guard와 restrict, 현재 stage와 row, ordered effects, 필요한 format·template·body, proof와 reinvoke 조건을 같은 계산 결과로 묶는다. V5의 공개 위치는 삭제하지 않고 typed grouping으로 보존하며 replay와 evidence 경계에 필요한 fingerprint와 assurance를 추가한다. 정확한 위치 대응은 [구현·검증 기록](implementation-verification_ko.md)의 V5 원장이 소유한다.
+Decision은 현재 run의 작고 versioned한 계약이다. Snapshot, guard와 restrict, 현재 stage와 row, ordered effects, 선택된 stage/guard의 정적 `stage_artifacts`, 필요한 format·template·body, proof와 reinvoke 조건을 같은 계산 결과로 묶는다. `ARTIFACTS`가 path·writer·template의 단일 정본이고 `readers`가 `stage.<id>` 또는 `guard.<id>` 소비를 선언하므로, runtime은 현재 분기에 필요한 artifact만 투영한다. V5의 공개 위치는 삭제하지 않고 typed grouping으로 보존하며 replay와 evidence 경계에 필요한 fingerprint와 assurance를 추가한다. 정확한 위치 대응은 [구현·검증 기록](implementation-verification_ko.md)의 V5 원장이 소유한다.
 
 ### 11.2 Compact guide
 
-Guide는 Decision의 model-facing projection이다. 모델이 JSON 내부를 다시 해석하거나 전체 body를 열지 않도록 현재 사실·중지 이유·ordered effects·proof·body section을 짧게 보여준다. JSON과 guide는 같은 계산 결과에서 생성되며 golden test로 동등성을 확인한다.
+Guide는 Decision의 model-facing projection이다. 모델이 JSON 내부를 다시 해석하거나 전체 body를 열지 않도록 현재 사실·중지 이유·`stage_artifacts`·ordered effects·proof·body section을 짧게 보여준다. JSON과 guide는 같은 계산 결과에서 생성되며 golden test로 동등성을 확인한다.
 
 ### 11.3 Trace Event
 
@@ -439,7 +439,7 @@ Target과 evidence가 모두 실제로 resolve될 때만 `projected`로 바꾼�
 
 1. intent와 evaluation cases
 2. obligation ledger
-3. P2는 `templates/authoring-card.md`를 작업 package에 복사해 observation, judgment, owner, artifact, terminal을 채운 뒤 승인된 결정을 spec과 ledger에 투영
+3. P2는 `templates/authoring-card.md`를 작업 package에 복사해 observation, judgment, owner, artifact, terminal을 채운 뒤 승인된 결정을 spec과 ledger에 투영. File artifact는 `ARTIFACTS` 한 곳에서 path·writer·template을 소유하고 `readers`에 실제 `stage.<id>`/`guard.<id>` 소비자를 선언하며, collector와 e2e host도 이 registry를 재사용한다. 비-file observation에는 의미 없는 null artifact를 만들지 않는다.
 4. terminal 설계
 5. observation과 domain
 6. guard와 bypass evidence

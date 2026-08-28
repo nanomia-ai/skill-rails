@@ -51,6 +51,10 @@ export async function validateScenarioExpectations(skillRoot, spec, fixtures) {
         const actual = decision.effects.map((item) => Array.isArray(item) ? item[0] : item);
         if (JSON.stringify(actual) !== JSON.stringify(fixture.expect.effects)) diagnostics.push(diag(`${pointer}.expect.effects`, `Expected effects ${JSON.stringify(fixture.expect.effects)}, got ${JSON.stringify(actual)}.`));
       }
+      if (Array.isArray(fixture.expect.stage_artifacts)) {
+        const actual = decision.stage_artifacts.map(({ id, path }) => ({ id, path }));
+        if (JSON.stringify(actual) !== JSON.stringify(fixture.expect.stage_artifacts)) diagnostics.push(diag(`${pointer}.expect.stage_artifacts`, `Expected stage artifacts ${JSON.stringify(fixture.expect.stage_artifacts)}, got ${JSON.stringify(actual)}.`));
+      }
     } catch (error) {
       diagnostics.push(diag(pointer, `Scenario evaluation failed: ${error.message}`));
     }

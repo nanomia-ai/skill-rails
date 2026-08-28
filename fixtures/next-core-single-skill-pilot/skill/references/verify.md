@@ -22,7 +22,7 @@ The evidence stage's reentry: rejudge means agent reentry: after recording a res
 
 ## Decision use
 
-Follow the current Decision's ordered effects exactly. The runtime projects them but does not acquire a channel, dispatch a verifier, or write the result. A host or agent claim is not trusted observation merely because it follows the plan.
+Follow the current Decision's `stage_artifacts` and ordered effects exactly. `stage_artifacts` is the complete static project-path set declared for this selected stage; resolve each path from `<project>`. The runtime projects them but does not acquire a channel, dispatch a verifier, or write the result. A host or agent claim is not trusted observation merely because it follows the plan.
 
 - Resolve Decision paths from <project>; if any required path is unavailable or escapes the project after canonical path resolution, stop UNPROVEN.
 - For RUN acquire-channel, read its declared input and accept exactly one nonempty argv array or approver string.
@@ -32,7 +32,7 @@ Follow the current Decision's ordered effects exactly. The runtime projects them
 
 For every current Decision proof_required descriptor, pass its reference unchanged as record --data.reference, and pass the file named by its path as --artifact under the same --project. For the pilot result proof, the exact mapping is:
 
-    node <skill-root>/scripts/skill-rails/run.mjs record --decision <stage-result.json> --type artifact_verified --data {reference:verifierResult} --artifact <project>/state/verifier-result.log --project <project> --json
+    node <skill-root>/scripts/skill-rails/run.mjs record --decision <stage-result.json> --type artifact_verified --data {reference:verifierResult} --artifact <project>/<proof.path> --project <project> --json
 
 ## Evidence interpretation
 

@@ -30,6 +30,8 @@ All predicates declare `reads`. The validator derives state reads from the AST a
 
 UNKNOWN is not false. Only fields listed in `acceptsUnknown` may receive it inside a predicate. `judged` and `decided` values are bound to a snapshot. A guard bypass must use collector-observed durable evidence, never a model-supplied judgment or decision alone.
 
+`ARTIFACTS` owns static project-relative consumer paths. Its `writer` is the skill id, a declared role, or a named `external.*`/`project.*` actor; its `readers` may name stages, guards, roles, or external/project consumers. The current Decision projects entries read by its selected stage or stopping guard as `stage_artifacts`. Non-file observations do not declare null or placeholder artifacts.
+
 ## Evaluation rules
 
 Evaluate guards in array order. ASK, BLOCK, and ROUTE stop; RESTRICT accumulates forbidden effect verbs and continues. Evaluate stages in order and select the first whose `done` is not true. A stage owns either a `record` or `reentry`. Every effect plan ends in exactly one of NEXT, ASK, WAIT, ROUTE, BLOCK, or DONE.

@@ -14,7 +14,7 @@ import { resolveTemplate } from "./templates.mjs";
 import { appendTraceEvent, assertExternalStateDir, readTrace, recordEvidence } from "./trace-core.mjs";
 import { acquireTraceRunLease } from "./trace-store.mjs";
 import { alignDecision } from "./alignment.mjs";
-import { KERNEL_VERSION, RUNTIME_VERSION, VALIDATOR_VERSION } from "./constants.mjs";
+import { DECISION_SCHEMA, KERNEL_VERSION, RUNTIME_VERSION, VALIDATOR_VERSION } from "./constants.mjs";
 import { sha256, stableStringify } from "./hash.mjs";
 import { fail } from "./diagnostics.mjs";
 import { validateDomainValue } from "./domains.mjs";
@@ -225,10 +225,10 @@ async function inferRuntimeDir(skillRoot) {
 
 function staleDecision(loaded, snapshot, observations, judged, decided) {
   const value = {
-    schema: "urn:nanomia:skill-contract:decision:1", decision_id: null, skill: loaded.spec.SPEC.id,
+    schema: DECISION_SCHEMA, decision_id: null, skill: loaded.spec.SPEC.id,
     spec: { id: loaded.spec.SPEC.id, version: "5", fingerprint: loaded.runtime.spec_hash },
     runtime: { version: loaded.runtime.version, hash: loaded.runtime.runtime_hash, dsl_hash: loaded.runtime.dsl_hash, validator_version: loaded.runtime.validator_version, validator_hash: loaded.runtime.validator_hash, minimum_node_major: loaded.runtime.minimum_node_major },
-    snapshot: { fingerprint: snapshot.fingerprint, status: "stale", unknowns: observations.unknowns }, status: "BLOCK", guard: { id: "snapshot-stale", then: "BLOCK", reason: "observation-changed" }, bypassed: [], restrict: [], stage: null, row: null, facts: [], judged, decided, record: null, reads: [], effects: [], format: null, template: null, template_text: null, body: null, needs: [], proof_required: [], reinvoke: "recompute", assurance: "checked"
+    snapshot: { fingerprint: snapshot.fingerprint, status: "stale", unknowns: observations.unknowns }, status: "BLOCK", guard: { id: "snapshot-stale", then: "BLOCK", reason: "observation-changed" }, bypassed: [], restrict: [], stage: null, row: null, facts: [], judged, decided, record: null, reads: [], effects: [], format: null, template: null, template_text: null, body: null, stage_artifacts: [], needs: [], proof_required: [], reinvoke: "recompute", assurance: "checked"
   };
   value.decision_id = sha256({ ...value, decision_id: undefined });
   return value;
@@ -237,10 +237,10 @@ function staleDecision(loaded, snapshot, observations, judged, decided) {
 function deferredDecision(loaded) {
   const fingerprint = sha256({ spec: loaded.runtime.spec_hash, deferred: loaded.spec.DEFERRED.map((item) => item.id) });
   const value = {
-    schema: "urn:nanomia:skill-contract:decision:1", decision_id: null, skill: loaded.spec.SPEC.id,
+    schema: DECISION_SCHEMA, decision_id: null, skill: loaded.spec.SPEC.id,
     spec: { id: loaded.spec.SPEC.id, version: "5", fingerprint: loaded.runtime.spec_hash },
     runtime: { version: loaded.runtime.version, hash: loaded.runtime.runtime_hash, dsl_hash: loaded.runtime.dsl_hash, validator_version: loaded.runtime.validator_version, validator_hash: loaded.runtime.validator_hash, minimum_node_major: loaded.runtime.minimum_node_major },
-    snapshot: { fingerprint, status: "stable", unknowns: [] }, status: "BLOCK", guard: { id: "authoring-deferred", then: "BLOCK", reason: "unresolved-deferred" }, bypassed: [], restrict: [], stage: null, row: null, facts: [], judged: {}, decided: {}, record: null, reads: [], effects: [], format: null, template: null, template_text: null, body: null, needs: [], proof_required: [], reinvoke: "after-authoring", assurance: "checked"
+    snapshot: { fingerprint, status: "stable", unknowns: [] }, status: "BLOCK", guard: { id: "authoring-deferred", then: "BLOCK", reason: "unresolved-deferred" }, bypassed: [], restrict: [], stage: null, row: null, facts: [], judged: {}, decided: {}, record: null, reads: [], effects: [], format: null, template: null, template_text: null, body: null, stage_artifacts: [], needs: [], proof_required: [], reinvoke: "after-authoring", assurance: "checked"
   };
   value.decision_id = sha256({ ...value, decision_id: undefined });
   return value;

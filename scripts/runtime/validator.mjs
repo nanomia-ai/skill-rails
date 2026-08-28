@@ -168,7 +168,7 @@ export async function validateFull(skillRoot, options = {}) {
     check("L10", isPortableRelativePath(artifact.path), `ARTIFACTS.${id}.path`, "Artifact path must be portable and project-relative.");
     check("L10", Array.isArray(artifact.readers) && artifact.readers.length > 0, `ARTIFACTS.${id}.readers`, "Artifact requires at least one reader.");
     check("L10", typeof artifact.writer === "string" && artifact.writer.length > 0, `ARTIFACTS.${id}.writer`, "Artifact requires a writer id.");
-    check("L10", artifact.writer === spec.SPEC.id || Boolean(spec.ROLES?.[artifact.writer]), `ARTIFACTS.${id}.writer`, "Artifact writer must be this skill or a declared role.");
+    check("L10", validArtifactWriter(artifact.writer, spec), `ARTIFACTS.${id}.writer`, "Artifact writer must be this skill, a declared role, or a named external/project actor.");
     for (const reader of artifact.readers ?? []) check("L10", validReader(reader, spec), `ARTIFACTS.${id}.readers`, `Unknown artifact reader: ${reader}`);
     if (artifact.template) check("L10", Boolean(spec.TEMPLATES?.[artifact.template]), `ARTIFACTS.${id}.template`, "Artifact template reference does not exist.");
   }
@@ -327,9 +327,15 @@ function nestField(field, value) {
 
 function validReader(reader, spec) {
   if (typeof reader !== "string") return false;
+  if (reader.startsWith("guard.")) return (spec.GUARDS ?? []).some((guard) => guard.id === reader.slice(6));
   if (reader.startsWith("stage.")) return (spec.STAGES ?? []).some((stage) => stage.id === reader.slice(6));
   if (reader.startsWith("role.")) return Boolean(spec.ROLES?.[reader.slice(5)]);
   return /^(?:external|project)\.[a-z0-9.-]+$/.test(reader);
+}
+
+function validArtifactWriter(writer, spec) {
+  if (typeof writer !== "string") return false;
+  return writer === spec.SPEC.id || Boolean(spec.ROLES?.[writer]) || /^(?:external|project)\.[a-z0-9.-]+$/.test(writer);
 }
 
 function resolveOwner(ownership, path) {

@@ -31,7 +31,7 @@ export const GUARDS = [
 export const STAGES = [
   { id: "work", reads: ["intent.token"], done: s => s.intent.token !== "work", record: { kind: "message", message: "work-guidance" }, effects: [["REPORT", { template: "laneReport", reference: "references/work.md", token: "work" }], "DONE"], body: "stage: work" },
   { id: "channel", reads: ["intent.token", "verifier.channel"], done: s => s.intent.token !== "verify" || s.verifier.channel === "available", record: { kind: "message", message: "verifier-channel" }, effects: ["WAIT"], body: "stage: channel" },
-  { id: "acquire", reads: ["intent.token", "result.verdict"], done: s => s.intent.token !== "verify" || s.result.verdict !== "NONE", record: { kind: "file", artifact: "verifierResult" }, effects: [["RUN", { action: "acquire-channel", channel: "verifier", input: "state/verifier-channel.json" }], ["DISPATCH", { action: "dispatch-verifier", role: "verifier" }], ["WRITE", { action: "record-result", artifact: "verifierResult", format: "verifierResult" }], "NEXT"], body: "stage: acquire" },
+  { id: "acquire", reads: ["intent.token", "result.verdict"], done: s => s.intent.token !== "verify" || s.result.verdict !== "NONE", record: { kind: "file", artifact: "verifierResult" }, effects: [["RUN", { action: "acquire-channel", channel: "verifier", artifact: "channelInput" }], ["DISPATCH", { action: "dispatch-verifier", role: "verifier" }], ["WRITE", { action: "record-result", artifact: "verifierResult", format: "verifierResult" }], "NEXT"], body: "stage: acquire" },
   { id: "evidence", reads: ["intent.token"], done: s => s.intent.token !== "verify", reentry: "rejudge", table: "evidence", branches: {
     "stale-proof": ["BLOCK"],
     "mismatched-proof": ["BLOCK"],
@@ -50,6 +50,11 @@ export const TABLES = {
   ] }
 };
 export const ARTIFACTS = {
+  channelInput: { path: "state/verifier-channel.json", writer: "project.consumer", readers: ["stage.acquire"], update: "replace", template: null },
+  channelStatus: { path: "state/verifier-channel.txt", writer: "project.consumer", readers: ["stage.channel"], update: "replace", template: null },
+  selectionState: { path: "state/selection.json", writer: "project.consumer", readers: ["stage.acquire", "stage.evidence"], update: "replace", template: null },
+  taskState: { path: "state/task.txt", writer: "project.consumer", readers: ["stage.acquire", "stage.evidence"], update: "replace", template: null },
+  targetState: { path: "state/target.json", writer: "project.consumer", readers: ["stage.acquire", "stage.evidence"], update: "replace", template: null },
   verifierResult: { path: "state/verifier-result.log", writer: "evidence-credit", readers: ["stage.acquire", "stage.evidence"], update: "append", template: null }
 };
 export const ROLES = {

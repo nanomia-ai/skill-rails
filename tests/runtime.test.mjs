@@ -7,7 +7,9 @@ import { loadBody } from "../scripts/runtime/body.mjs";
 import { line } from "../scripts/runtime/dsl.mjs";
 import { validateDomainValue } from "../scripts/runtime/domains.mjs";
 import { alignDecision } from "../scripts/runtime/alignment.mjs";
+import { alignRun } from "../scripts/runtime/api.mjs";
 import { evaluateSpec } from "../scripts/runtime/evaluator.mjs";
+import { renderGuide } from "../scripts/runtime/guide.mjs";
 import { sha256 } from "../scripts/runtime/hash.mjs";
 import { main as runtimeMain } from "../scripts/runtime/cli.mjs";
 import { ROOT } from "./helpers.mjs";
@@ -95,6 +97,77 @@ test("exclusive tables use their default only when no non-default row matches", 
   assert.equal((await evaluateSpec({ ...base, observations: observations("miss") })).row, "fallback");
 });
 
+test("selected stages and stopping guards project only their declared static artifacts", async () => {
+  const spec = {
+    SPEC: { id: "artifact-projection", version: "5" },
+    OBSERVATIONS: { "choice.value": { decided: true, domain: ["stage", "guard"] } },
+    GUARDS: [{ id: "stop", reads: ["choice.value"], when: s => s.choice.value === "guard", then: "BLOCK" }],
+    STAGES: [{ id: "operate", reads: ["choice.value"], done: () => false, effects: ["DONE"] }],
+    TABLES: {}, FORMATS: {}, TEMPLATES: {},
+    ARTIFACTS: {
+      guardInput: { path: "state/guard.json", writer: "external.approver", readers: ["guard.stop"], update: "replace", template: null },
+      stageInput: { path: "state/stage.json", writer: "project.consumer", readers: ["stage.operate"], update: "replace", template: null }
+    }
+  };
+  const base = {
+    spec, skillRoot: ROOT,
+    snapshot: { fingerprint: "sha256:" + "a".repeat(64), status: "stable" },
+    runtime: { spec_hash: "sha256:" + "b".repeat(64), runtime_hash: "sha256:" + "c".repeat(64), dsl_hash: "sha256:" + "d".repeat(64), validator_hash: "sha256:" + "e".repeat(64), minimum_node_major: 20 }
+  };
+  const observations = (value) => ({ flat: { "choice.value": value }, nested: { choice: { value } }, unknowns: [] });
+  const stage = await evaluateSpec({ ...base, observations: observations("stage"), decided: { "choice.value": "stage" } });
+  assert.deepEqual(stage.stage_artifacts, [{ id: "stageInput", path: "state/stage.json", writer: "project.consumer", template: null }]);
+  assert.match(renderGuide(stage), /stage artifacts: \[{"id":"stageInput","path":"state\/stage.json","template":null,"writer":"project.consumer"}\]/);
+  const guard = await evaluateSpec({ ...base, observations: observations("guard"), decided: { "choice.value": "guard" } });
+  assert.deepEqual(guard.stage_artifacts, [{ id: "guardInput", path: "state/guard.json", writer: "external.approver", template: null }]);
+});
+
+test("a skipped judgment NEXT branch cannot leak state into the next selected stage", async () => {
+  const firstRecord = { kind: "message", message: "first-stage" };
+  const secondRecord = { kind: "artifact", artifact: "secondResult" };
+  const secondEffects = [["RUN", { channel: "second-stage" }], ["WRITE", { artifact: "secondResult" }], "NEXT"];
+  const spec = {
+    SPEC: { id: "stage-coherence", version: "5" },
+    OBSERVATIONS: { "route.mode": { decided: true, domain: ["skip"] } },
+    GUARDS: [],
+    STAGES: [
+      { id: "first", reads: ["route.mode"], needs: ["route.mode"], done: () => false, branches: { skip: ["NEXT"] }, record: firstRecord, body: "stage: acquire" },
+      { id: "second", reads: [], done: () => false, effects: secondEffects, record: secondRecord, body: "stage: evidence" }
+    ],
+    TABLES: {}, FORMATS: {}, TEMPLATES: {},
+    ARTIFACTS: {
+      firstInput: { path: "state/first.json", writer: "project.consumer", readers: ["stage.first"], update: "replace", template: null },
+      secondInput: { path: "state/second.json", writer: "project.consumer", readers: ["stage.second"], update: "replace", template: null },
+      secondResult: { path: "state/second-result.json", writer: "stage-coherence", readers: ["stage.second"], update: "replace", template: null }
+    }
+  };
+  const decision = await evaluateSpec({
+    spec,
+    skillRoot: join(ROOT, "fixtures", "next-core-single-skill-pilot", "skill"),
+    observations: { flat: { "route.mode": "skip" }, nested: { route: { mode: "skip" } }, unknowns: [] },
+    snapshot: { fingerprint: "sha256:" + "a".repeat(64), status: "stable" },
+    decided: { "route.mode": "skip" },
+    runtime: { spec_hash: "sha256:" + "b".repeat(64), runtime_hash: "sha256:" + "c".repeat(64), dsl_hash: "sha256:" + "d".repeat(64), validator_hash: "sha256:" + "e".repeat(64), minimum_node_major: 20 }
+  });
+
+  assert.equal(decision.stage, "second");
+  assert.equal(decision.row, null);
+  assert.deepEqual(decision.effects, secondEffects);
+  assert.deepEqual(decision.record, secondRecord);
+  assert.equal(decision.body.ref, "stage-coherence#stage: evidence");
+  assert.match(decision.body.markdown, /^## stage: evidence/m);
+  assert.deepEqual(decision.proof_required, [
+    { kind: "artifact", reference: "secondResult", path: "state/second-result.json" },
+    { kind: "effect", index: 0, verb: "RUN" },
+    { kind: "effect", index: 1, verb: "WRITE" }
+  ]);
+  assert.equal(decision.reinvoke, "after-effects");
+  assert.deepEqual(decision.stage_artifacts, [
+    { id: "secondInput", path: "state/second.json", writer: "project.consumer", template: null },
+    { id: "secondResult", path: "state/second-result.json", writer: "stage-coherence", template: null }
+  ]);
+});
+
 test("runtime CLI rejects ambiguous booleans and command-inappropriate options before I/O", async () => {
   const errors = [];
   const io = { log() {}, error(value) { errors.push(String(value)); } };
@@ -123,12 +196,87 @@ test("alignment never upgrades missing or agent-only evidence", () => {
     decision_id: null, spec: { fingerprint: "sha256:" + "b".repeat(64) }, snapshot: { fingerprint: "sha256:" + "c".repeat(64) },
     effects: [["RUN", { check: "test" }]], proof_required: [{ kind: "effect", index: 0 }]
   });
-  assert.equal(alignDecision(decision, []).aggregate, "unproven");
-  const claimed = [traceEvent({ event_id: "claim", sequence: 0, decision_id: decision.decision_id, type: "effect_claimed", authority: "agent_claimed", decision, data: { index: 0, verb: "RUN" } })];
-  assert.equal(alignDecision(decision, claimed).aggregate, "unproven");
   const emitted = decisionEvent(decision);
+  assert.equal(alignDecision(decision, [emitted]).aggregate, "unproven");
+  const claimed = traceEvent({ event_id: "claim", sequence: 1, decision_id: decision.decision_id, type: "effect_claimed", authority: "agent_claimed", decision, data: { index: 0, verb: "RUN" } });
+  assert.equal(alignDecision(decision, [emitted, claimed]).aggregate, "unproven");
   const observed = [traceEvent({ event_id: "seen", sequence: 1, decision_id: decision.decision_id, type: "effect_observed", authority: "harness_observed", decision, data: { index: 0, verb: "RUN", kind: "effect" } })];
   assert.equal(alignDecision(decision, [emitted, ...observed]).aggregate, "aligned");
+});
+
+test("alignment API and CLI reject tampered Decisions before deriving expectations", async (t) => {
+  const base = await makeTestDir("alignment-tamper");
+  t.after(() => removeTestDir(base));
+  const skillRoot = join(base, "skill");
+  const traceDir = join(base, "trace");
+  await Promise.all([mkdir(skillRoot), mkdir(traceDir)]);
+  const decision = sealDecision({
+    schema: "urn:nanomia:skill-contract:decision:2",
+    decision_id: null,
+    spec: { fingerprint: "sha256:" + "b".repeat(64) },
+    snapshot: { fingerprint: "sha256:" + "c".repeat(64) },
+    restrict: [],
+    effects: [["RUN", { check: "test" }]],
+    proof_required: [{ kind: "effect", index: 0, verb: "RUN" }],
+    stage_artifacts: [{ id: "input", path: "state/input.json", writer: "project.consumer", template: null }]
+  });
+  const tracePath = join(traceDir, "alignment-run.jsonl");
+  await writeFile(tracePath, `${JSON.stringify(decisionEvent(decision))}\n`, "utf8");
+  const decisionPath = join(base, "decision.json");
+  const cases = [
+    ["effects", (value) => { value.effects = []; }],
+    ["proof_required", (value) => { value.proof_required = []; }],
+    ["restrict", (value) => { value.restrict = ["WRITE"]; }],
+    ["stage_artifacts", (value) => { value.stage_artifacts = []; }],
+    ["decision_id", (value) => { value.decision_id = "sha256:" + "d".repeat(64); }]
+  ];
+
+  for (const [field, mutate] of cases) {
+    const tampered = structuredClone(decision);
+    mutate(tampered);
+    await writeFile(decisionPath, JSON.stringify(tampered), "utf8");
+    const apiReport = await alignRun({ decision: tampered, tracePath });
+    assert.equal(apiReport.aggregate, "misaligned", `API accepted tampered ${field}`);
+    assert.deepEqual(apiReport.expectations, [], `API derived expectations for tampered ${field}`);
+    assert.ok(apiReport.issues.some((item) => item.code === "decision-self-seal"), `API missed ${field} self-seal`);
+
+    const output = [];
+    const errors = [];
+    const exitCode = await runtimeMain([
+      "align", "--skill", skillRoot, "--runtime-dir", join(ROOT, "scripts", "runtime"),
+      "--decision", decisionPath, "--trace", tracePath
+    ], { log(value) { output.push(String(value)); }, error(value) { errors.push(String(value)); } });
+    assert.equal(exitCode, 2, `CLI accepted tampered ${field}: ${errors.join("\n")}`);
+    const cliReport = JSON.parse(output.at(-1));
+    assert.equal(cliReport.aggregate, "misaligned");
+    assert.deepEqual(cliReport.expectations, []);
+    assert.ok(cliReport.issues.some((item) => item.code === "decision-self-seal"));
+  }
+
+  const mismatchedEmission = decisionEvent(decision);
+  mismatchedEmission.data.decision = { ...decision, stage_artifacts: [] };
+  const mismatchReport = alignDecision(decision, [mismatchedEmission]);
+  assert.equal(mismatchReport.aggregate, "misaligned");
+  assert.deepEqual(mismatchReport.expectations, []);
+  assert.ok(mismatchReport.issues.some((item) => item.code === "decision-emission-mismatch"));
+
+  const recordErrors = [];
+  const tampered = structuredClone(decision);
+  tampered.effects = [];
+  await writeFile(decisionPath, JSON.stringify(tampered), "utf8");
+  assert.equal(await runtimeMain([
+    "record", "--skill", skillRoot, "--runtime-dir", join(ROOT, "scripts", "runtime"),
+    "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "alignment-run",
+    "--type", "effect_claimed", "--data", '{"index":0,"verb":"RUN"}'
+  ], { log() {}, error(value) { recordErrors.push(String(value)); } }), 1);
+  assert.match(recordErrors.at(-1), /SR_EVIDENCE_DECISION/);
+
+  await writeFile(decisionPath, JSON.stringify(decision), "utf8");
+  assert.equal(await runtimeMain([
+    "record", "--skill", skillRoot, "--runtime-dir", join(ROOT, "scripts", "runtime"),
+    "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "alignment-run",
+    "--type", "effect_claimed", "--data", '{"index":0,"verb":"RUN"}'
+  ], { log() {}, error(value) { recordErrors.push(String(value)); } }), 0, recordErrors.join("\n"));
 });
 
 test("alignment scopes evidence to one decision and rejects forbidden or out-of-order effects", () => {
@@ -143,7 +291,7 @@ test("alignment scopes evidence to one decision and rejects forbidden or out-of-
   const event = (id, decisionId, sequence, index, verb, extra = {}) => createTraceEvent({ event_id: id, run_id: "alignment-run", at: "2026-08-23T00:00:00.000Z", sequence, decision_id: decisionId, type: "effect_observed", authority: "harness_observed", spec_fingerprint: fingerprint, snapshot_fingerprint: extra.snapshot_fingerprint ?? snapshot, data: { index, verb, kind: "effect" } });
 
   const otherDecision = [event("other", "sha256:" + "d".repeat(64), 0, 0, "RUN")];
-  assert.equal(alignDecision(decision, otherDecision).aggregate, "unproven");
+  assert.equal(alignDecision(decision, otherDecision).aggregate, "misaligned");
 
   const emitted = decisionEvent(decision);
   const ordered = [emitted, event("run", decision.decision_id, 1, 0, "RUN"), event("write", decision.decision_id, 2, 1, "WRITE")];
@@ -154,7 +302,7 @@ test("alignment scopes evidence to one decision and rejects forbidden or out-of-
   assert.ok(duplicate.issues.some((item) => item.code === "duplicate-effect"));
 
   const blocked = sealDecision({ ...decision, decision_id: null, effects: [], proof_required: [], restrict: ["WRITE"] });
-  const forbidden = [event("forbidden", blocked.decision_id, 0, 0, "WRITE")];
+  const forbidden = [decisionEvent(blocked), event("forbidden", blocked.decision_id, 1, 0, "WRITE")];
   const report = alignDecision(blocked, forbidden);
   assert.equal(report.aggregate, "misaligned");
   assert.deepEqual(report.issues.map((item) => item.code).sort(), ["restricted-effect", "unplanned-effect"]);
@@ -174,7 +322,7 @@ test("alignment scopes evidence to one decision and rejects forbidden or out-of-
   assert.ok(partial.issues.some((item) => item.code === "claimed-unplanned-effect"));
 
   const unrelatedStale = [event("old", "sha256:" + "f".repeat(64), 0, 0, "RUN", { snapshot_fingerprint: "sha256:" + "0".repeat(64) })];
-  assert.equal(alignDecision(decision, unrelatedStale).aggregate, "unproven");
+  assert.equal(alignDecision(decision, unrelatedStale).aggregate, "misaligned");
 });
 
 test("trace store serializes concurrent writers and rejects duplicate run emissions", async (t) => {

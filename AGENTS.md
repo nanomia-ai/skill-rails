@@ -54,5 +54,6 @@ Before creating or revising a skill README, read [references/readme-authoring.md
 - `docs/maintenance-status_ko.md` — current milestone, exact continuation point, and next-session entry; read first when resuming repository work
 - `docs/skill-rails_ko.md` — current product purpose, architecture, and stable design boundaries; read when changing product behavior or owning abstractions
 - `docs/implementation-verification_ko.md` — exact implementation scope, support evidence, unproven boundaries, and V5 change ledger; read for verification claims or V5 changes
+- `docs/authoring-lessons_ko.md` — detailed experience for high-cost core choices, nonconvergence recovery, and successor comprehension
 
-Do not read all three project documents by default. Start from the maintenance status, then load the product design or implementation evidence only when the task requires that authority.
+Do not read all project documents by default. Start from the maintenance status, then load the product design, implementation evidence, or authoring lessons only when the task requires that authority.

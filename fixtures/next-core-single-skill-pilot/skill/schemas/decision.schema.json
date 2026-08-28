@@ -1,10 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:nanomia:skill-contract:decision:1",
+  "$id": "urn:nanomia:skill-contract:decision:2",
   "type": "object",
-  "required": ["schema", "decision_id", "skill", "spec", "runtime", "snapshot", "status", "bypassed", "restrict", "facts", "judged", "decided", "reads", "effects", "needs", "proof_required", "reinvoke", "assurance"],
+  "required": ["schema", "decision_id", "skill", "spec", "runtime", "snapshot", "status", "bypassed", "restrict", "facts", "judged", "decided", "reads", "effects", "stage_artifacts", "needs", "proof_required", "reinvoke", "assurance"],
   "properties": {
-    "schema": { "const": "urn:nanomia:skill-contract:decision:1" },
+    "schema": { "const": "urn:nanomia:skill-contract:decision:2" },
     "decision_id": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "skill": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
     "spec": {
@@ -73,6 +73,20 @@
       "properties": { "ref": { "type": "string" }, "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }, "markdown": { "type": "string" } },
       "required": ["ref", "hash", "markdown"],
       "additionalProperties": false
+    },
+    "stage_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "path", "writer", "template"],
+        "properties": {
+          "id": { "type": "string" },
+          "path": { "type": "string" },
+          "writer": { "type": "string" },
+          "template": { "type": ["string", "null"] }
+        },
+        "additionalProperties": false
+      }
     },
     "needs": {
       "type": "array",

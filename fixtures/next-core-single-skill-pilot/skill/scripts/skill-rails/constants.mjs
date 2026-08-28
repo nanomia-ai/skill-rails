@@ -49,11 +49,11 @@ export const TRACE_TYPES = Object.freeze([
   "review_required"
 ]);
 
-export const DECISION_SCHEMA = "urn:nanomia:skill-contract:decision:1";
+export const DECISION_SCHEMA = "urn:nanomia:skill-contract:decision:2";
 export const TRACE_SCHEMA = "urn:nanomia:skill-contract:trace-event:1";
 export const MINIMUM_NODE_MAJOR = 20;
-export const VALIDATOR_VERSION = "0.2.0";
-export const RUNTIME_VERSION = "0.1.0";
+export const VALIDATOR_VERSION = "0.3.0";
+export const RUNTIME_VERSION = "0.2.0";
 export const KERNEL_VERSION = "6";
 
 export const PLACEHOLDER_KINDS = Object.freeze(["line", "block", "list", "generated"]);

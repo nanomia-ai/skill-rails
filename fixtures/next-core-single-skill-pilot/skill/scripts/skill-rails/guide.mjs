@@ -13,6 +13,7 @@ export function renderGuide(decision, options = {}) {
     `needs / reads / record / reentry: ${decision.needs.length ? stableStringify(decision.needs) : "none"} | ${list(decision.reads)} | ${decision.record ? stableStringify(decision.record) : "none"} | ${decision.reinvoke ?? "none"}`,
     `ordered effects: ${renderEffects(decision.effects)}`,
     `proof required: ${decision.proof_required.length ? stableStringify(decision.proof_required) : "none"}`,
+    `stage artifacts: ${decision.stage_artifacts.length ? stableStringify(decision.stage_artifacts) : "none"}`,
     `format / template: ${decision.format?.example ?? "none"} | ${decision.template ?? "none"}`
   ];
   if (decision.template_text) lines.push(`template content:\n${decision.template_text.trimEnd()}\n---`);

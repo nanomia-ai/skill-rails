@@ -43,10 +43,13 @@ export async function evaluateSpec({ spec, skillRoot, observations, snapshot, ju
   }
 
   let selectedStage = null;
-  let row = null;
-  let plan = null;
-  let pendingNeeds = [];
+  let selectedRow = null;
+  let selectedPlan = null;
+  let selectedNeeds = [];
   for (const stage of spec.STAGES ?? []) {
+    let row = null;
+    let plan = null;
+    let pendingNeeds = [];
     const checked = checkReads(spec, stage, observations.flat, facts, stage.needs ?? []);
     if (!checked.ok) {
       return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "BLOCK", guard: stoppingGuard, stage: stage.id, row: null, effects: [], bodyRef: stage.body, needs: checked.needs, language, record: stage.record ?? { reentry: stage.reentry } }));
@@ -78,21 +81,24 @@ export async function evaluateSpec({ spec, skillRoot, observations, snapshot, ju
       if (!row) fail("L5", `Table ${stage.table} produced no row.`);
       plan = stage.branches[row];
     } else if (!plan) plan = stage.effects;
+    selectedRow = row;
+    selectedPlan = plan;
+    selectedNeeds = pendingNeeds;
     break;
   }
 
   if (!selectedStage) return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "DONE", guard: stoppingGuard, stage: null, row: null, effects: [], bodyRef: null, needs: [], language }));
-  if (!Array.isArray(plan)) fail("L6", `No effect plan for stage ${selectedStage.id}${row ? ` row ${row}` : ""}.`);
+  if (!Array.isArray(selectedPlan)) fail("L6", `No effect plan for stage ${selectedStage.id}${selectedRow ? ` row ${selectedRow}` : ""}.`);
 
-  if (row?.startsWith("BLOCK:")) return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "BLOCK", guard: stoppingGuard, stage: selectedStage.id, row, effects: [], bodyRef: selectedStage.body, needs: [], language, record: selectedStage.record ?? { reentry: selectedStage.reentry } }));
+  if (selectedRow?.startsWith("BLOCK:")) return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "BLOCK", guard: stoppingGuard, stage: selectedStage.id, row: selectedRow, effects: [], bodyRef: selectedStage.body, needs: [], language, record: selectedStage.record ?? { reentry: selectedStage.reentry } }));
 
-  const verbs = plan.filter(Array.isArray).map((effect) => effect[0]);
+  const verbs = selectedPlan.filter(Array.isArray).map((effect) => effect[0]);
   const conflict = verbs.find((verb) => restrictions.has(verb));
-  if (conflict) return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "BLOCK", guard: { id: restrictions.get(conflict), then: "RESTRICT", reason: `restricted-effect ${conflict}` }, stage: selectedStage.id, row, effects: [], bodyRef: selectedStage.body, needs: [], language, record: selectedStage.record ?? { reentry: selectedStage.reentry } }));
+  if (conflict) return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "BLOCK", guard: { id: restrictions.get(conflict), then: "RESTRICT", reason: `restricted-effect ${conflict}` }, stage: selectedStage.id, row: selectedRow, effects: [], bodyRef: selectedStage.body, needs: [], language, record: selectedStage.record ?? { reentry: selectedStage.reentry } }));
 
-  const terminal = plan.at(-1);
+  const terminal = selectedPlan.at(-1);
   const status = terminalStatus(terminal);
-  return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status, guard: stoppingGuard, stage: selectedStage.id, row, effects: plan, bodyRef: selectedStage.body, needs: pendingNeeds, language, record: selectedStage.record ?? { reentry: selectedStage.reentry } }));
+  return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status, guard: stoppingGuard, stage: selectedStage.id, row: selectedRow, effects: selectedPlan, bodyRef: selectedStage.body, needs: selectedNeeds, language, record: selectedStage.record ?? { reentry: selectedStage.reentry } }));
 }
 
 async function decisionParts(context) {
@@ -131,11 +137,22 @@ async function decisionParts(context) {
     template: projection.template,
     template_text: projection.templateText,
     body: bodySection ? { ref: `${spec.SPEC.id}#${bodySection.ref}`, hash: bodySection.hash, markdown: bodySection.markdown } : null,
+    stage_artifacts: projectStageArtifacts(spec, stage, guard),
     needs,
     proof_required: proofRequired,
     reinvoke: effects.at?.(-1) === "NEXT" ? "after-effects" : null,
     assurance: "checked"
   };
+}
+
+function projectStageArtifacts(spec, stage, guard) {
+  const activeReaders = new Set();
+  if (stage) activeReaders.add(`stage.${stage}`);
+  if (guard?.id && (spec.GUARDS ?? []).some((item) => item.id === guard.id)) activeReaders.add(`guard.${guard.id}`);
+  return Object.entries(spec.ARTIFACTS ?? {})
+    .filter(([, artifact]) => (artifact.readers ?? []).some((reader) => activeReaders.has(reader)))
+    .sort(([left], [right]) => left.localeCompare(right, "en"))
+    .map(([id, artifact]) => ({ id, path: artifact.path, writer: artifact.writer, template: artifact.template ?? null }));
 }
 
 function finalize(decision) {

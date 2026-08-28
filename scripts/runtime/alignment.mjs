@@ -1,16 +1,28 @@
-import { sha256 } from "./hash.mjs";
+import { sha256, stableStringify } from "./hash.mjs";
 import { traceIntegrityIssues } from "./trace-store.mjs";
 
 const STRONG = new Set(["runtime_observed", "harness_observed", "artifact_verified"]);
 
 export function alignDecision(decision, events) {
+  if (sha256({ ...decision, decision_id: undefined }) !== decision.decision_id) {
+    return report(decision, "misaligned", [], [{ code: "decision-self-seal", critical: true }]);
+  }
   const integrity = traceIntegrityIssues(events);
   if (integrity.length > 0) return report(decision, "misaligned", [], integrity.map((item) => ({ ...item, critical: true })));
   const scoped = [...events].sort((a, b) => a.sequence - b.sequence).filter((event) => event.decision_id === decision.decision_id);
+  const emissions = scoped.filter((event) => event.type === "decision_emitted" && event.authority === "runtime_observed");
+  const exactEmission = emissions.find((event) => stableStringify(event.data?.decision) === stableStringify(decision));
+  if (!exactEmission) {
+    return report(decision, "misaligned", [], [{
+      code: emissions.length > 0 ? "decision-emission-mismatch" : "decision-emission-missing",
+      critical: true,
+      evidence: emissions.map((event) => event.event_id)
+    }]);
+  }
   if (scoped.some((event) => event.spec_fingerprint && event.spec_fingerprint !== decision.spec.fingerprint) || scoped.some((event) => event.snapshot_fingerprint && event.snapshot_fingerprint !== decision.snapshot.fingerprint)) {
     return report(decision, "stale", [], [{ code: "fingerprint-mismatch" }]);
   }
-  const emission = judgeExpectation({ id: "decision:emitted", kind: "decision" }, scoped);
+  const emission = { id: "decision:emitted", kind: "decision", verdict: "satisfied", critical: false, evidence: [exactEmission.event_id], reason: null };
   const expectations = [];
   for (const [index, effect] of decision.effects.entries()) {
     if (!Array.isArray(effect)) continue;
@@ -65,16 +77,6 @@ function unexpectedEffects(decision, events) {
 }
 
 function judgeExpectation(expectation, events) {
-  if (expectation.kind === "decision") {
-    const evidence = events.filter((event) => event.type === "decision_emitted");
-    const exact = evidence.find((event) => {
-      const emitted = event.data?.decision;
-      if (event.authority !== "runtime_observed" || !emitted || emitted.decision_id !== event.decision_id) return false;
-      return sha256({ ...emitted, decision_id: undefined }) === emitted.decision_id;
-    });
-    if (exact) return { ...expectation, verdict: "satisfied", critical: false, evidence: [exact.event_id], reason: null };
-    return { ...expectation, verdict: evidence.length ? "violated" : "unproven", critical: evidence.length > 0, evidence: evidence.map((event) => event.event_id), reason: evidence.length ? "invalid-decision-emission" : "missing-decision-emission" };
-  }
   if (expectation.kind === "effect") {
     const evidence = events.filter((event) => ["effect_observed", "effect_claimed"].includes(event.type) && event.data?.index === expectation.index && event.data?.verb === expectation.verb);
     const strong = evidence.find((event) => STRONG.has(event.authority));

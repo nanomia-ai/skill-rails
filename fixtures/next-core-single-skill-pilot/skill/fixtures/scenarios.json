@@ -3,28 +3,28 @@
     "id": "work-route",
     "s": { "verifier.channel": "unavailable", "task.identity": "task-17", "task.snapshot": "snapshot-a", "selection.locator": "items/7", "selection.hash": "hash-a", "continuation.identity": "continuation-a", "result.verdict": "NONE", "result.task": "NONE", "result.snapshot": "NONE", "result.selection": "NONE", "result.selectionHash": "NONE", "result.continuation": "NONE", "result.currentness": "NONE" },
     "decided": { "intent.token": "work" },
-    "expect": { "stage": "work", "status": "DONE", "effects": ["REPORT", "DONE"] },
+    "expect": { "stage": "work", "status": "DONE", "effects": ["REPORT", "DONE"], "stage_artifacts": [] },
     "cover": ["guard:work-prose-isolation", "stage:work"]
   },
   {
     "id": "verifier-unavailable",
     "s": { "verifier.channel": "unavailable", "task.identity": "task-17", "task.snapshot": "snapshot-a", "selection.locator": "items/7", "selection.hash": "hash-a", "continuation.identity": "continuation-a", "result.verdict": "NONE", "result.task": "NONE", "result.snapshot": "NONE", "result.selection": "NONE", "result.selectionHash": "NONE", "result.continuation": "NONE", "result.currentness": "NONE" },
     "decided": { "intent.token": "verify" },
-    "expect": { "stage": "channel", "status": "WAIT", "effects": ["WAIT"] },
+    "expect": { "stage": "channel", "status": "WAIT", "effects": ["WAIT"], "stage_artifacts": [{ "id": "channelStatus", "path": "state/verifier-channel.txt" }] },
     "cover": ["stage:channel"]
   },
   {
     "id": "available-result-missing",
     "s": { "verifier.channel": "available", "task.identity": "task-17", "task.snapshot": "snapshot-a", "selection.locator": "items/7", "selection.hash": "hash-a", "continuation.identity": "continuation-a", "result.verdict": "NONE", "result.task": "NONE", "result.snapshot": "NONE", "result.selection": "NONE", "result.selectionHash": "NONE", "result.continuation": "NONE", "result.currentness": "NONE" },
     "decided": { "intent.token": "verify" },
-    "expect": { "stage": "acquire", "status": "NEXT", "effects": ["RUN", "DISPATCH", "WRITE", "NEXT"] },
+    "expect": { "stage": "acquire", "status": "NEXT", "effects": ["RUN", "DISPATCH", "WRITE", "NEXT"], "stage_artifacts": [{ "id": "channelInput", "path": "state/verifier-channel.json" }, { "id": "selectionState", "path": "state/selection.json" }, { "id": "targetState", "path": "state/target.json" }, { "id": "taskState", "path": "state/task.txt" }, { "id": "verifierResult", "path": "state/verifier-result.log" }] },
     "cover": ["stage:acquire"]
   },
   {
     "id": "matching-pass",
     "s": { "verifier.channel": "available", "task.identity": "task-17", "task.snapshot": "snapshot-a", "selection.locator": "items/7", "selection.hash": "hash-a", "continuation.identity": "continuation-a", "result.verdict": "pass", "result.task": "task-17", "result.snapshot": "snapshot-a", "result.selection": "items/7", "result.selectionHash": "hash-a", "result.continuation": "continuation-a", "result.currentness": "current" },
     "decided": { "intent.token": "verify" },
-    "expect": { "stage": "evidence", "row": "matching-pass", "status": "DONE", "effects": ["REPORT", "DONE"] },
+    "expect": { "stage": "evidence", "row": "matching-pass", "status": "DONE", "effects": ["REPORT", "DONE"], "stage_artifacts": [{ "id": "selectionState", "path": "state/selection.json" }, { "id": "targetState", "path": "state/target.json" }, { "id": "taskState", "path": "state/task.txt" }, { "id": "verifierResult", "path": "state/verifier-result.log" }] },
     "cover": ["stage:evidence", "row:evidence/matching-pass", "branch:evidence/matching-pass"]
   },
   {

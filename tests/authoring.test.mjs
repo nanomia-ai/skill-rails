@@ -60,6 +60,20 @@ test("README guidance remains conditional and reachable from agent entry points"
   }
 });
 
+test("P2 authoring aid requires consumer consumption-set disclosure", async () => {
+  const [card, workflow] = await Promise.all([
+    readFile(join(ROOT, "templates", "authoring-card.md"), "utf8"),
+    readFile(join(ROOT, "references", "authoring-workflow.md"), "utf8")
+  ]);
+  assert.match(card, /Consumer consumption sets:/);
+  assert.match(card, /one canonical `ARTIFACTS` entry/);
+  assert.match(card, /Non-file observations need no placeholder artifact/);
+  assert.match(card, /not consumer disclosure surfaces/);
+  assert.match(workflow, /named consumption set for each consumer/);
+  assert.match(workflow, /current Decision's `stage_artifacts`/);
+  assert.match(workflow, /neither counts as consumer disclosure/);
+});
+
 test("portable creator commands use only package-local runtime dependencies", async (t) => {
   const base = await makeTestDir("thin-dependency-boundary");
   t.after(() => removeTestDir(base));

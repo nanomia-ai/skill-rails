@@ -10,9 +10,9 @@ Resolve `<skill-root>` to this SKILL.md directory. In Claude Code use `${CLAUDE_
 
 1. Run `node "<skill-root>/scripts/skill-rails/run.mjs" enter --skill "<skill-root>"` unless this context has already processed the returned enter hash.
 2. Run `node "<skill-root>/scripts/skill-rails/run.mjs" stage --skill "<skill-root>" --project "<project>" --trace-dir "<trace-dir>" --json` and save the complete JSON stage result. Supply only requested `--judged field=value` or `--decided field=value` values.
-3. Stop on a diagnostic, stale snapshot, BLOCK, ASK, or WAIT. Otherwise follow only the current Decision body and ordered effects.
+3. Stop on a diagnostic, stale snapshot, BLOCK, ASK, or WAIT. Otherwise follow only the current Decision body, `stage_artifacts`, and ordered effects. Resolve every `stage_artifacts[].path` from `<project>`; do not infer replacement paths from collector or authoring files.
 4. Attach claims with `record --decision <stage-result.json> --type <effect_claimed|proof_recorded|receipt_recorded> --data <json>`. For a declared file proof, use `--type artifact_verified --artifact <path> --project "<project>"`. The stage-result file supplies its run id and trace path.
-5. Run `align --decision <stage-result.json>`. Missing or agent-only evidence remains unproven; never upgrade it to success.
-6. If `reinvoke` is set, invoke stage again with the same `--run-id` after effects.
+5. Run `align --decision <stage-result.json>`. Record and alignment evidence is bound to the exact Decision in that file. Missing or agent-only evidence remains unproven; never upgrade it to success.
+6. If `reinvoke` is set, invoke stage again with the same `--run-id` after effects and save the new stage result. Evidence and alignment for the earlier Decision do not automatically carry to the new Decision.
 
 The runtime decides and verifies; it never performs domain effects. Never edit generated files listed in `.generated.json` directly.

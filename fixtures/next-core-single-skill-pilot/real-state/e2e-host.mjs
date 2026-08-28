@@ -3,7 +3,7 @@ import { execFile } from "node:child_process";
 import { appendFile, mkdir, open, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { FORMATS } from "../skill/spec.mjs";
+import { ARTIFACTS, FORMATS } from "../skill/spec.mjs";
 import { readTrace, recordHarnessEvidence } from "../skill/scripts/skill-rails/trace-core.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -12,6 +12,10 @@ const skillRoot = join(pilotRoot, "skill");
 const runPath = join(skillRoot, "scripts", "skill-rails", "run.mjs");
 const verifierPath = join(here, "verifier.mjs");
 const resultTimestamp = "2026-08-28T00:00:00Z";
+
+function declaredArtifactPath(projectRoot, artifactId) {
+  return join(projectRoot, ARTIFACTS[artifactId].path);
+}
 
 function sha256(bytes) {
   return `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
@@ -94,11 +98,11 @@ async function createProject(projectRoot, { currentness = "current", channel = "
       process.execPath,
       verifierPath,
       "--project", projectRoot,
-      "--target", join(stateDir, "target.json"),
+      "--target", declaredArtifactPath(projectRoot, "targetState"),
       "--task", task,
       "--snapshot", snapshot,
       "--continuation", continuation,
-      "--selection", join(stateDir, "selection.json"),
+      "--selection", declaredArtifactPath(projectRoot, "selectionState"),
       "--currentness", currentness
     ]
   };
@@ -107,22 +111,22 @@ async function createProject(projectRoot, { currentness = "current", channel = "
   await mkdir(targetDir, { recursive: true });
   await writeUtf8Atomic(artifactPath, artifact);
   await writeUtf8Atomic(alternateArtifactPath, alternateArtifact);
-  await writeUtf8Atomic(join(stateDir, "task.txt"), task);
-  await writeUtf8Atomic(join(stateDir, "target.json"), target);
-  await writeUtf8Atomic(join(stateDir, "verifier-channel.txt"), channel);
-  await writeUtf8Atomic(join(stateDir, "verifier-channel.json"), JSON.stringify(channelInput));
-  await writeUtf8Atomic(join(stateDir, "selection.json"), selection);
+  await writeUtf8Atomic(declaredArtifactPath(projectRoot, "taskState"), task);
+  await writeUtf8Atomic(declaredArtifactPath(projectRoot, "targetState"), target);
+  await writeUtf8Atomic(declaredArtifactPath(projectRoot, "channelStatus"), channel);
+  await writeUtf8Atomic(declaredArtifactPath(projectRoot, "channelInput"), JSON.stringify(channelInput));
+  await writeUtf8Atomic(declaredArtifactPath(projectRoot, "selectionState"), selection);
 
   return {
     task, snapshot, continuation, artifactPath, alternateArtifactPath,
     selectionLocator, alternateSelectionLocator, alternateSnapshot, alternateTarget, alternateSelection,
     stateDir,
-    resultPath: join(stateDir, "verifier-result.log"),
-    channelPath: join(stateDir, "verifier-channel.txt"),
-    channelInputPath: join(stateDir, "verifier-channel.json"),
+    resultPath: declaredArtifactPath(projectRoot, "verifierResult"),
+    channelPath: declaredArtifactPath(projectRoot, "channelStatus"),
+    channelInputPath: declaredArtifactPath(projectRoot, "channelInput"),
     channelInput,
-    targetPath: join(stateDir, "target.json"),
-    selectionPath: join(stateDir, "selection.json"),
+    targetPath: declaredArtifactPath(projectRoot, "targetState"),
+    selectionPath: declaredArtifactPath(projectRoot, "selectionState"),
     initialRaw: { task, target, channel, selection, result: null }
   };
 }
