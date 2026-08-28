@@ -2,7 +2,7 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-08-23 KST
+최종 갱신: 2026-08-29 KST
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품 계약은 [제품·설계 정본](skill-rails_ko.md), 정확한 수치·지원 주장·V5 변경 근거는 [구현·검증 기록](implementation-verification_ko.md)이 소유한다.
 
@@ -13,75 +13,83 @@
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 이전 완료 milestone commit: `d9aac0a` (`feat: add progressive guidance for simple skills`)
-- 작업 시작 시 `origin/main`은 `9691f107bc08ac7657bca3bc6160f0d2aa3159eb`였고 local `main`은 한 commit 앞섰음
-- portable installation 구현 commit: `9e28cbf` (`feat: make creator installs self-contained`)
-- `d9aac0a`와 `9e28cbf`를 `origin/main`에 push했고 GitHub 원격 release smoke까지 완료
-- 최초 구현 기획과 통합 문서는 Git commit `4929b5b`에서 복구 가능
+- 기준 commit: `b277a4c` (`chore: release v0.1.2`)
+- 이 tree에는 아직 commit하지 않은 유지보수 delta가 작업 tree에 landing되어 있다.
+- 구현 delta가 건드린 경로는 다섯 개다: `references/authoring-workflow.md`, `scripts/lib/io.mjs`, `scripts/lib/maintenance.mjs`, `scripts/lib/semantic-diff.mjs`, `tests/authoring.test.mjs`.
+- 작업 tree 전체 현황은 tracked 수정 11개와 untracked 추가 2개다. 위 다섯 경로 외의 tracked 수정은 Windows checkout portability correction인 `.gitattributes`와 `AGENTS.md`, `docs/implementation-verification_ko.md`, `docs/maintenance-status_ko.md`, `docs/skill-rails_ko.md`, `references/evaluation.md`의 문서 갱신이고, untracked 추가는 `fixtures/next-core-single-skill-pilot/` pilot subtree와 `docs/evidence/`다.
+- `scripts/runtime/`, `schemas/`, `references/v5-contract.md`에는 변경이 없다.
+- 최초 구현 기획과 통합 문서는 Git commit `4929b5b`에서 복구 가능하다.
 
-다른 프로젝트, 특히 `D:/Projects/Private/nanomia/nanomia-skills/devflow/`, 는 이 작업 범위 밖이며 read-only다.
+이 저장소 밖 project는 작업 범위 밖이며 read-only다.
 
 ---
 
 ## 2. 마지막 완료 milestone
 
-목적은 Node.js가 있는 환경에서 Skill Rails의 기능을 줄이지 않고 한 번의 file-based installer 명령으로 여러 host에 같은 portable creator를 설치할 수 있게 하는 것이다.
+목적은 P2 package의 whole-file 유지보수를 임의 소스 덮어쓰기로 넓히지 않으면서, 등록된 typed artifact에 한해 hash로 잠긴 원자적 교체를 제공하는 것이다. 같은 milestone에서 declared-column evidence-credit pilot을 fixture로 확정했다.
 
 완료된 구현:
 
-- `markdown-it` 공식 standalone bundle을 creator package 안에 vendoring하고 bundle에 포함된 dependency notice를 함께 보존
-- 고정 sync script와 `vendor:check`가 vendor byte를 소유하며 수동 편집을 거부
-- migration이 package-local parser를 사용하되 기존 stock reference rule과 semantic atom 계약을 유지
-- portable creator test가 외부 runtime import를 차단한 상태에서 `init`, `migrate`, `maintain`, `lint`, `build`, `eval --skill`을 실행
-- `npx skills@latest add nanomia-ai/skill-rails`를 기본 설치 경로로 문서화하고 Node runtime과 installer의 version requirement를 분리
-- 다른 file-based host의 구조적 설치 가능성과 Codex·Claude의 fresh 행동 evidence를 분리
-- marketplace plugin, hook, platform별 행동 body를 추가하지 않음
-- Windows checkout이 vendor byte를 바꾸지 않도록 `scripts/**/vendor/** -text`를 Git 계약으로 고정
+- `replace-artifact` operation과 닫힌 registry: `spec`은 `spec.mjs`, `collector`는 `collectors/index.mjs`, `reference`는 `references/` 아래 기존 파일만 대상이며 셋 다 P2 전용이다.
+- 적용 전 preflight가 미등록 kind, kind–path 불일치, profile 불일치, 형식 불량·stale `expected_hash`, 비-string content, generated 경로, 존재하지 않는 target, 한 transaction 안의 동일 physical file 중복, 비-portable 또는 비-canonical 경로 철자, symlink/junction 경로, 비정규 entry를 거부한다.
+- `replace-spec`는 `spec` kind로 정규화되어 기존 의미와 stale-hash 거부 문구를 유지한다.
+- install 경계: 원본 fingerprint 계산 → stage 복사 후 동일성 확인 → operation 적용 → 전체 package build → build가 canonical artifact를 바꾸지 않았는지 확인 → install 직전 root fingerprint 재확인 → 원본을 captured backup으로 rename 후 시작 fingerprint와 대조 → 그 다음에만 stage 설치.
+- 실패 시 captured backup을 삭제하지 않고 target/stage/captured_backup/installed/recovery 상태를 오류 메시지에 남긴다.
+- semantic diff가 `artifact_receipts`, `source_changes`, `any_changed`를 추가하고 기존 `spec_hash`·`changed`·`groups` 의미를 유지한다.
+- package 순회가 symlink·junction·비정규 entry를 명시적으로 거부한다.
+- declared-column pilot: 검증자가 돌려준 task, snapshot, selection locator, 선택 byte SHA-256, continuation, 기록된 currentness, verdict를 갓 수집한 사실과 대조해야만 pass가 credit된다. 은퇴한 continuation receipt·singleton recorded-JSON·합성 runtime-state fixture는 남기지 않았다.
+- pilot collector가 project root와 선택 경로를 canonical하게 해석한 뒤 containment를 검사하므로, 상위 traversal·symlink·junction 탈출은 hashing 전에 fail-closed된다.
 
-P0/P1 profile, conditional guidance, P2 `spec.mjs`, V5 runtime, obligation ledger, generated-package shape는 변경하지 않았다. Root `SKILL.md` package boundary 때문에 installer가 tests와 설계 기록까지 함께 복사하는 186-file payload는 알려진 비차단 비용이다. 이 파일들은 자동 prompt loading 경로가 아니며, 이를 줄이기 위한 nested distribution layout은 별도 repository migration으로 남긴다.
-
-설계 경계는 Claude Opus xhigh read-only audit로 먼저 검토했고, 구현 뒤 fresh Opus xhigh diff audit를 수행했다. 최종 audit는 Windows line-ending 문제 한 건을 blocking으로 찾아냈으며 `.gitattributes`로 보정했다. 그 외 기존 행동 의미, V5, P0/P1, license notice, 문서 주장에는 blocking finding이 없었다.
+P0/P1 profile, conditional guidance, P2 `spec.mjs` 계약, V5 runtime, obligation ledger, 생성 package shape는 바꾸지 않았다. 하나의 authorized writer가 package root를 단독 소유한다는 전제는 이번 원자성의 명시적 경계이며, capture 이후에도 계속 쓰는 out-of-band writer에 대한 보존은 주장하지 않는다.
 
 ---
 
 ## 3. 마지막 검증
 
-- `npm run verify`: `vendor:check`, lint, 49/49 tests, frozen eval pass
-- 외부 runtime dependency를 차단한 portable creator command test pass
-- Node 24.18.0 + `skills` 1.5.23의 node_modules-free local clone-shaped package 설치 smoke pass
-- `origin/main`의 GitHub remote package를 다시 clone한 release installation smoke pass
-- Local smoke에서는 Codex, Claude Code, Cursor, OpenCode target 선택, remote smoke에서는 Codex, Claude Code, Cursor target 선택으로 installer copy 성공
-- `.agents`와 `.claude` 설치 tree fingerprint byte-identical
-- 설치된 creator의 migration이 12개 semantic atom과 기존 kind/order를 보존
-- 설치된 creator가 만든 P2 package의 L0–L18 full lint pass
-- 독립 audit가 old-import와 vendored-import migration 결과를 5개 corpus(12/726/331/3/1693 atoms)에서 full JSON 비교해 동일함을 확인
-- local Markdown link와 `git diff --check` pass
+이번 delta에 대해 실제로 관찰한 것:
 
-GitHub 원격 설치본에서도 vendor parser 존재, `node_modules` 부재, 12개 migration atom kind/order, 생성 P2 L0–L18을 다시 확인했다. Cursor·OpenCode의 fresh trigger와 실제 task output은 여전히 `unproven`이다.
+- pilot package 대상 root full lint L0–L18 pass, 진단 없음
+- pilot package 대상 formal build: mutation 20/20, scenario 10/10, 50회 반복 불일치 0, format round trip 256/256과 CR/LF 거부
+- 저장소 밖 임시 복제본에서 같은 build를 재실행해 in-repo package와 파일 차이 없음
+- 생성 package 내장 lint pass, real-state e2e 2/2 pass
+- manifest 선언 hash 51개(content 15 + generated 36) 확인
+- fresh Windows `npm ci`는 pass했고, 이어서 실행한 full `npm run verify`도 pass했다. 세부 receipt는 vendor pass, lint pass, repository test 52/52 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass다.
+- 최초 full verify의 두 실패는 migration semantic-unit test와 G0.5 scorer test였다. 둘 다 행동 결함이 아니라 raw-byte fixture·corpus·scorer helper가 CRLF checkout으로 바뀐 portability defect였고, `.gitattributes`의 다섯 `-text` pattern으로 현재 92개 matched tracked path를 보호한 뒤 닫혔다. 사전에 worktree·index diff가 없음을 확인한 그 경로들만 index LF byte로 복원했으며 protected path에는 수정이 남지 않았다.
+
+유지보수 delta에는 bounded test 두 건이 추가되어 registry·경로·hash·원자성·junction 거부·legacy `replace-spec`·동시 쓰기 감지와 semantic diff effect 인자 변화를 덮는다. 이 test들은 위 fresh repository test 52/52 pass에 포함되어 관찰되었다.
+
+아직 관찰하지 않았고 따라서 `UNPROVEN`인 것:
+
+- commit, push, 설치, 배포
+- 최종 declared-column package에 대한 fresh-agent 행동(trigger 선택, 지시 준수, 출력 품질)
+- 사용할 수 있는 project-local orchestration channel이 없어 관찰하지 못한 Decision. 이는 제품 실패가 아니라 `UNPROVEN`이다.
+- out-of-band writer가 계속 쓰는 상황에서의 package 보존
+- POSIX symlink 분기(이번 실행은 Windows junction 분기만 관찰)
+
+이전 release에서 관찰한 수치를 현재 tree의 결과로 인용하지 않는다. 정확한 receipt와 그 재현 명령은 [구현·검증 기록](implementation-verification_ko.md)이 소유한다.
 
 ---
 
 ## 4. 이번 maintenance 종료 상태
 
-- Portable dependency 구현과 회귀검증 완료
-- README 영문·한글, adapter reference, 제품 설계, 구현·검증 기록 정합화 완료
-- Root package payload 증가는 의도적으로 수용한 비차단 packaging limitation
-- Claude plugin 또는 official marketplace 등록은 구현하지 않음
+- typed-artifact 유지보수 구현과 bounded test landing 완료
+- declared-column pilot fixture와 그 보고서 정합화 완료
+- AI-facing reference, 제품 설계, 구현·검증 기록 갱신 완료
+- V5 공개 계약과 runtime·schema는 불변
 - 코드 blocking finding 없음
-- 구현·배포·원격 release smoke 완료
+- structural/staging readiness는 `LANDING PASS`; commit/push, 설치, 배포, fresh-agent/live 행동은 아직 수행하지 않음
 
 ---
 
-## 5. 다음에 선택할 수 있는 검증
+## 5. 다음에 할 일
 
-현재 blocking 후속은 없다. 선택적 범위:
+정확한 다음 단계는 하나다.
 
-1. Cursor·OpenCode 등 추가 host의 fresh trigger, skill-root 해석, 실제 task output
-2. Node 20에서 manual clone 설치 smoke와 최신 49개 suite 재실행
-3. Linux/macOS installer와 filesystem 경계
-4. 186-file root payload가 실제 배포 문제일 때만 nested distribution layout 설계
-5. P0/P1 conditional guidance의 multi-match, no-match, near-miss와 장기 compaction
-6. 실제 대형 기존 skill migration
+1. exact allowlist를 지금 stage하고 commit 직전 status·staged diff·ignored-file 경계를 검증한다. 현재 status는 tracked 수정 11개와 untracked root 2개이며, pilot의 `.skill-rails/eval-cases.json`, `.skill-rails/intent.json`, `.skill-rails/obligation-ledger.json`, `.skill-rails/profile-decision.json` 네 파일은 force-add 대상이고 `.skill-rails/semantic-diff.json`은 ignored 상태로 stage하지 않는다. 이 staging/commit 검증 전에는 commit하지 않는다.
+
+그 뒤에도 commit, push, 설치, 배포는 사용자가 명시적으로 요청한 범위에서만 수행한다. 배포 이후에만 최종 package에 대한 fresh-agent 행동 test를 수행하고, 그 결과를 [냉시작 행동 증거 카드](evidence/proof-03-cold-behavior_ko.md)의 대체물로 기록한다.
+
+선택적 범위는 그대로 남는다: 추가 host의 fresh trigger와 실제 task output, Node 20 설치 smoke, Linux/macOS 경계, P0/P1 conditional guidance의 multi-match·no-match·near-miss, 실제 대형 기존 skill migration.
 
 증거가 필요하지 않은 항목을 관성적으로 실행하지 않는다. 구조적 설치와 fresh AI 행동을 같은 지원 주장으로 합치지 않는다.
 

@@ -35,6 +35,13 @@ A valid template, a declared artifact reader, or a successful producing run does
 - `agent_claimed`: model self-report; insufficient for critical proof.
 - `human_confirmed`: only when a trusted channel records the human action and scope.
 
+Grade what an event actually proves, not that it exists:
+
+- `runtime_observed` about the runtime's own repeatability is a structural check; it must not move an aggregate from `unproven` to `partial`.
+- `artifact_verified` proves a declared artifact's canonical path and bytes at that fingerprint, not that the effect behind it happened.
+- An `effect_claimed` event recorded by the model carries `agent_claimed` authority; that is weak evidence and leaves the expectation `unproven` with reason `agent-claim-only`.
+- Authority decides effect credit, not event type: the effect expectation matches events of type `effect_observed` or `effect_claimed` for that index and verb, and is satisfied by the first one whose authority is strong. A trusted adapter recording `effect_claimed` at strong authority therefore counts, while `effect_observed` at weak authority does not.
+
 Alignment verdicts are `satisfied`, `violated`, `unproven`, or `not_applicable`. Aggregate results are `aligned`, `partial`, `unproven`, `misaligned`, or `stale`.
 
 ## Context surface

@@ -1,16 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir, readFile, symlink, unlink, writeFile } from "node:fs/promises";
+import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
 import { generatePackage } from "../scripts/lib/generator.mjs";
 import { buildP2 } from "../scripts/lib/build-core.mjs";
 import { inspectProseSkill, inferMigrationIntent, writeMigrationLedger } from "../scripts/lib/migration.mjs";
 import { maintainPackage } from "../scripts/lib/maintenance.mjs";
+import { semanticDiff, snapshotContract } from "../scripts/lib/semantic-diff.mjs";
 import { lintSimpleSkill } from "../scripts/lib/simple-lint.mjs";
-import { exists, readJson } from "../scripts/lib/io.mjs";
-import { sha256 } from "../scripts/runtime/hash.mjs";
+import { createDirectoryAtomic, exists, listFiles, readJson } from "../scripts/lib/io.mjs";
+import { hashFile, sha256 } from "../scripts/runtime/hash.mjs";
 import { parseArgs } from "../scripts/lib/args.mjs";
 import { validateFull } from "../scripts/runtime/validator.mjs";
 import { ROOT, makeTestDir, removeTestDir } from "./helpers.mjs";
@@ -275,6 +276,192 @@ test("maintenance applies stable-id body changes atomically and reports semantic
   assert.equal(await exists(join(root, ".generated.json")), true);
 });
 
+test("P2 typed-artifact maintenance preflights closed canonical paths and preserves legacy replace-spec", async (t) => {
+  const base = await makeTestDir("typed-artifact-maintenance");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 1 }) });
+
+  const paths = {
+    spec: join(root, "spec.mjs"),
+    collector: join(root, "collectors", "index.mjs"),
+    reference: join(root, "references", "purpose.md")
+  };
+  const before = Object.fromEntries(await Promise.all(Object.entries(paths).map(async ([kind, path]) => [kind, await readFile(path, "utf8")])));
+  const after = {
+    spec: `${before.spec}\n// replace-artifact spec receipt\n`,
+    collector: `${before.collector}\n// replace-artifact collector receipt\n`,
+    reference: `${before.reference}\nTyped-artifact context receipt.\n`
+  };
+  const publicChange = {
+    id: "typed-artifact-happy-path",
+    operations: [
+      { type: "replace-artifact", kind: "spec", path: "spec.mjs", profile: "p2", expected_hash: sha256(before.spec), content: after.spec },
+      { type: "replace-artifact", kind: "collector", path: "collectors/index.mjs", profile: "p2", expected_hash: sha256(before.collector), content: after.collector },
+      { type: "replace-artifact", kind: "reference", path: "references/purpose.md", profile: "p2", expected_hash: sha256(before.reference), content: after.reference }
+    ]
+  };
+  const publicChangePath = join(base, "typed-artifact-change.json");
+  await writeFile(publicChangePath, JSON.stringify(publicChange), "utf8");
+  const publicRun = spawnSync(process.execPath, [join(ROOT, "scripts", "maintain.mjs"), "--skill", root, "--change", publicChangePath, "--repeats", "1", "--json"], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  assert.equal(publicRun.status, 0, publicRun.stderr);
+  const report = JSON.parse(publicRun.stdout).report;
+  assert.deepEqual(report.artifact_receipts.map(({ kind, path }) => ({ kind, path })), [
+    { kind: "spec", path: "spec.mjs" },
+    { kind: "collector", path: "collectors/index.mjs" },
+    { kind: "reference", path: "references/purpose.md" }
+  ]);
+  assert.equal(report.artifact_receipts.every((item) => item.before_hash !== item.after_hash), true);
+  assert.deepEqual(report.source_changes, { behavior_source: true, observation_source: true, context: true });
+  assert.equal(report.any_changed, true);
+  for (const [kind, path] of Object.entries(paths)) assert.equal(await readFile(path, "utf8"), after[kind]);
+
+  const current = Object.fromEntries(await Promise.all(Object.entries(paths).map(async ([kind, path]) => [kind, await readFile(path, "utf8")])));
+  const generatedPath = join(root, "scripts", "skill-rails", "run.mjs");
+  const rejected = [
+    { pattern: /unsupported kind/, operation: { type: "replace-artifact", kind: "template", path: "templates/result.md", profile: "p2", expected_hash: await hashFile(join(root, "templates", "result.md")), content: "unchanged" } },
+    { pattern: /not registered for kind spec/, operation: { type: "replace-artifact", kind: "spec", path: "collectors/index.mjs", profile: "p2", expected_hash: sha256(current.collector), content: current.collector } },
+    { pattern: /requires profile p2/, operation: { type: "replace-artifact", kind: "spec", path: "spec.mjs", profile: "p1", expected_hash: sha256(current.spec), content: current.spec } },
+    { pattern: /current expected_hash/, operation: { type: "replace-artifact", kind: "spec", path: "spec.mjs", profile: "p2", expected_hash: `sha256:${"0".repeat(64)}`, content: current.spec } },
+    { pattern: /refuses generated path/, operation: { type: "replace-artifact", kind: "reference", path: "scripts/skill-rails/run.mjs", profile: "p2", expected_hash: await hashFile(generatedPath), content: await readFile(generatedPath, "utf8") } },
+    { pattern: /requires an existing target/, operation: { type: "replace-artifact", kind: "reference", path: "references/missing.md", profile: "p2", expected_hash: `sha256:${"0".repeat(64)}`, content: "missing" } }
+  ];
+  for (const { pattern, operation } of rejected) {
+    const fingerprint = await treeFingerprint(root);
+    await assert.rejects(maintainPackage(root, { operations: [operation] }, { repeats: 1 }), pattern);
+    assert.equal(await treeFingerprint(root), fingerprint);
+  }
+
+  await t.test("captured backups, canonical aliases, and unsupported reparse entries fail recoverably", async (t) => {
+    await assert.rejects(maintainPackage(root, { operations: [{
+      type: "replace-artifact", kind: "reference", path: "references/./purpose.md", profile: "p2",
+      expected_hash: sha256(current.reference), content: current.reference
+    }] }, { repeats: 1 }), /canonical portable spelling/);
+    await assert.rejects(maintainPackage(root, { operations: [{
+      type: "replace-artifact", kind: "reference", path: "references\\purpose.md", profile: "p2",
+      expected_hash: sha256(current.reference), content: current.reference
+    }] }, { repeats: 1 }), /portable package-relative path/);
+    await assert.rejects(maintainPackage(root, { operations: [{
+      type: "replace-artifact", kind: "reference", path: "references/../references/purpose.md", profile: "p2",
+      expected_hash: sha256(current.reference), content: current.reference
+    }] }, { repeats: 1 }), /canonical portable spelling/);
+    if (process.platform === "win32") await assert.rejects(maintainPackage(root, { operations: [
+      { type: "replace-artifact", kind: "reference", path: "references/purpose.md", profile: "p2", expected_hash: sha256(current.reference), content: current.reference },
+      { type: "replace-artifact", kind: "reference", path: "references/PURPOSE.md", profile: "p2", expected_hash: sha256(current.reference), content: current.reference }
+    ] }, { repeats: 1 }), /canonical physical spelling|physical file only once/);
+
+    const atomicRoot = join(base, "captured-backup-obstruction");
+    await mkdir(atomicRoot, { recursive: true });
+    await writeFile(join(atomicRoot, "original.txt"), "original\n", "utf8");
+    let capturedBackup;
+    let installFailure;
+    await assert.rejects(createDirectoryAtomic(atomicRoot, async (stage) => {
+      await writeFile(join(stage, "candidate.txt"), "candidate\n", "utf8");
+    }, {
+      replace: true,
+      replaceNonEmpty: true,
+      verifyBackup: async ({ target, backup }) => {
+        capturedBackup = backup;
+        await writeFile(join(backup, "concurrent.txt"), "captured concurrent bytes\n", "utf8");
+        await mkdir(target, { recursive: false });
+        await writeFile(join(target, "foreign.txt"), "foreign owner\n", "utf8");
+        throw new Error("captured backup fingerprint mismatch witness");
+      }
+    }), (error) => {
+      installFailure = error;
+      return /captured backup fingerprint mismatch witness/.test(error.message);
+    });
+    assert.equal(await readFile(join(atomicRoot, "foreign.txt"), "utf8"), "foreign owner\n");
+    assert.equal(await readFile(join(capturedBackup, "original.txt"), "utf8"), "original\n");
+    assert.equal(await readFile(join(capturedBackup, "concurrent.txt"), "utf8"), "captured concurrent bytes\n");
+    assert.equal(installFailure.message.includes(`captured_backup=preserved at ${capturedBackup}`), true);
+    assert.equal(installFailure.message.includes(`target=present at ${atomicRoot}`), true);
+
+    const linkPath = join(root, "references", "purpose-link.md");
+    let linkCreated = false;
+    try {
+      await symlink("purpose.md", linkPath, "file");
+      linkCreated = true;
+    } catch (error) {
+      if (!["EACCES", "EPERM", "ENOSYS"].includes(error?.code)) throw error;
+      if (process.platform === "win32") {
+        const junctionTarget = join(base, "junction-target");
+        await mkdir(junctionTarget, { recursive: true });
+        try {
+          await symlink(junctionTarget, linkPath, "junction");
+          linkCreated = true;
+        } catch (junctionError) {
+          if (!["EACCES", "EPERM", "ENOSYS"].includes(junctionError?.code)) throw junctionError;
+          t.diagnostic(`reparse-entry assertion skipped: file=${error.code}, junction=${junctionError.code}`);
+        }
+      } else t.diagnostic(`reparse-entry assertion skipped: ${error.code}`);
+    }
+    if (linkCreated) {
+      try {
+        const beforeUnsupported = await readFile(paths.reference, "utf8");
+        await assert.rejects(maintainPackage(root, { operations: [{
+          type: "replace-artifact", kind: "reference", path: "references/purpose.md", profile: "p2",
+          expected_hash: sha256(beforeUnsupported), content: beforeUnsupported
+        }] }, { repeats: 1 }), /Unsupported package entry references\/purpose-link\.md: symbolic link or junction/);
+        assert.equal(await readFile(paths.reference, "utf8"), beforeUnsupported);
+      } finally {
+        await unlink(linkPath);
+      }
+    }
+  });
+
+  const beforeLaterFailure = await treeFingerprint(root);
+  await assert.rejects(maintainPackage(root, { operations: [
+    { type: "replace-artifact", kind: "reference", path: "references/purpose.md", profile: "p2", expected_hash: sha256(current.reference), content: `${current.reference}\nnot-installed\n` },
+    { type: "replace-artifact", kind: "collector", path: "collectors/index.mjs", profile: "p2", expected_hash: `sha256:${"0".repeat(64)}`, content: current.collector }
+  ] }, { repeats: 1 }), /current expected_hash/);
+  assert.equal(await treeFingerprint(root), beforeLaterFailure);
+
+  const legacySource = `${current.spec}\n// legacy replace-spec compatibility\n`;
+  const legacy = await maintainPackage(root, { operations: [{ type: "replace-spec", expected_hash: sha256(current.spec), source: legacySource }] }, { repeats: 1 });
+  assert.equal(await readFile(paths.spec, "utf8"), legacySource);
+  assert.deepEqual(legacy.artifact_receipts.map(({ kind, path }) => ({ kind, path })), [{ kind: "spec", path: "spec.mjs" }]);
+  await assert.rejects(maintainPackage(root, { operations: [{ type: "replace-spec", expected_hash: `sha256:${"0".repeat(64)}`, source: legacySource }] }, { repeats: 1 }), /replace-spec requires the current expected_hash/);
+
+  const referenceBeforeConflict = await readFile(paths.reference, "utf8");
+  await assert.rejects(maintainPackage(root, {
+    operations: [{ type: "replace-artifact", kind: "reference", path: "references/purpose.md", profile: "p2", expected_hash: sha256(referenceBeforeConflict), content: `${referenceBeforeConflict}\ntransaction candidate\n` }]
+  }, {
+    repeats: 1,
+    beforeInstall: async () => writeFile(join(root, "concurrent-owner.txt"), "preserve concurrent owner\n", "utf8")
+  }), /changed while maintenance was running/);
+  assert.equal(await readFile(paths.reference, "utf8"), referenceBeforeConflict);
+  assert.equal(await readFile(join(root, "concurrent-owner.txt"), "utf8"), "preserve concurrent owner\n");
+});
+
+test("semantic diff reports direct and branch effect argument changes without changing legacy verb summaries", async (t) => {
+  const base = await makeTestDir("semantic-effect-plans");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root });
+  const specPath = join(root, "spec.mjs");
+  const generated = await readFile(specPath, "utf8");
+  const baseline = generated
+    .replace("export const STAGES = [\n", "export const STAGES = [\n  { id: \"prepare\", reads: [], done: s => true, record: { kind: \"receipt\", message: \"prepare\" }, effects: [[\"RUN\", { action: \"prepare\", mode: \"one\" }], \"NEXT\"], body: \"stage: operate\" },\n")
+    .replace('{ template: "result" }', '{ template: "result", channel: "one" }');
+  await writeFile(specPath, baseline, "utf8");
+  const before = await snapshotContract(root);
+  await writeFile(specPath, baseline.replace('mode: "one"', 'mode: "two"').replace('channel: "one"', 'channel: "two"'), "utf8");
+  const after = await snapshotContract(root);
+  const report = semanticDiff(before, after);
+  assert.deepEqual(report.groups.stages.map((item) => item.id).sort(), ["operate", "prepare"]);
+  const prepare = report.groups.stages.find((item) => item.id === "prepare");
+  const operate = report.groups.stages.find((item) => item.id === "operate");
+  assert.deepEqual(prepare.before.effects, ["RUN", "NEXT"]);
+  assert.deepEqual(prepare.after.effects, ["RUN", "NEXT"]);
+  assert.equal(prepare.before.effect_plans.default[0][1].mode, "one");
+  assert.equal(prepare.after.effect_plans.default[0][1].mode, "two");
+  assert.equal(operate.before.effect_plans.branches.ready[0][1].channel, "one");
+  assert.equal(operate.after.effect_plans.branches.ready[0][1].channel, "two");
+});
+
 test("P0 and P1 maintenance regenerates intent projections without replacing authored helpers", async (t) => {
   const base = await makeTestDir("simple-maintenance");
   t.after(() => removeTestDir(base));
@@ -334,3 +521,8 @@ test("P0 and P1 maintenance regenerates intent projections without replacing aut
   }), /SR_PROFILE_CHANGE/);
   assert.equal(await readFile(join(autoP0, ".skill-rails", "intent.json"), "utf8"), beforeIntent);
 });
+
+async function treeFingerprint(root) {
+  const files = await listFiles(root);
+  return sha256(await Promise.all(files.map(async (path) => `${relative(root, path).replace(/\\/g, "/")}:${await hashFile(path)}`)));
+}

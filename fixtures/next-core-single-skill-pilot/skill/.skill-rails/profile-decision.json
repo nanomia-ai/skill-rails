@@ -1,0 +1,23 @@
+{
+  "schema": "skill-rails/profile-decision/1",
+  "profile": "p2",
+  "explicit": true,
+  "signals": [
+    {
+      "kind": "state-dependent-behavior",
+      "profile": "p2",
+      "count": 2
+    },
+    {
+      "kind": "irreversible-boundary",
+      "profile": "p2",
+      "count": 1
+    },
+    {
+      "kind": "exact-format",
+      "profile": "p2",
+      "count": 1
+    }
+  ],
+  "warning": "This is a structurally valid design scaffold, not evidence that user-specific semantics are complete."
+}

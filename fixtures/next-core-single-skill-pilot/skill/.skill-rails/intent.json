@@ -1,0 +1,39 @@
+{
+  "name": "evidence-credit",
+  "description": "Use for work or verify: supply the selected intent as --decided intent.token=<work|verify>; first read references/canon.md, then work -> references/work.md or verify -> references/verify.md; run the verifier Decision only for verify evidence.",
+  "problem": "A long-running agent can confuse a verifier claim with current proof, or let an unavailable verifier block unrelated prose work.",
+  "use_cases": [
+    "Handle a work or verify intent through one discoverable skill while preserving current evidence boundaries."
+  ],
+  "near_misses": [
+    "Explain the evidence policy without routing or executing the work or verify intent."
+  ],
+  "inputs": [
+    "The intent token (work or verify) plus raw task, channel, selected locator and bytes, continuation, and recorded-result facts."
+  ],
+  "outputs": [
+    "One Decision-selected stage reference, shared canon, and a proof-bounded Decision or alignment result."
+  ],
+  "irreversible_boundaries": [
+    "The runtime calculates Decisions and receipts but never dispatches a verifier, writes a result, or performs another domain effect."
+  ],
+  "state_dependent_behaviors": [
+    "Work routes independently; verify waits when the channel is unavailable and requests acquisition, dispatch, and result recording when a channel exists but the result is missing.",
+    "A recorded result is credited only when current and bound to the current task, snapshot, selected locator and computed byte hash, and continuation; selection or snapshot reuse is mismatched evidence."
+  ],
+  "exact_formats": [
+    "A one-line verifier result binds task, snapshot, selected locator and hash, continuation, verdict, and recorded currentness JSON."
+  ],
+  "external_dependencies": [
+    "An optional verifier channel and its raw result facts, supplied by the host rather than operated by the runtime."
+  ],
+  "completion_evidence": [
+    "Current Decision facts plus artifact-verified path and byte-hash binding, package fixtures, lint, build, and evaluation; cold model behavior remains unproven until a separate forward run."
+  ],
+  "judgment_points": [
+    "Apply only the selected rich stage guidance and preserve the canon's evidence language without restating its rules."
+  ],
+  "deterministic_helpers": [
+    "The fact-only collector computes SHA-256 from the bytes named by the current selection locator and rejects disagreement with the declared selection digest."
+  ]
+}

@@ -1,0 +1,25 @@
+[
+  {
+    "id": "positive-1",
+    "task": "Handle a work or verify intent through one discoverable skill while preserving current evidence boundaries.",
+    "should_trigger": true,
+    "expected_obligations": [
+      "One Decision-selected stage reference, shared canon, and a proof-bounded Decision or alignment result.",
+      "Confirm dependency: An optional verifier channel and its raw result facts, supplied by the host rather than operated by the runtime."
+    ],
+    "forbidden_actions": [
+      "Perform without explicit authority: The runtime calculates Decisions and receipts but never dispatches a verifier, writes a result, or performs another domain effect."
+    ],
+    "acceptance": [
+      "Current runtime receipt binding plus package fixtures, lint, build, and evaluation; cold model behavior remains unproven until a separate forward run."
+    ]
+  },
+  {
+    "id": "near-miss-1",
+    "task": "Explain the evidence policy without routing or executing the work or verify intent.",
+    "should_trigger": false,
+    "expected_obligations": [],
+    "forbidden_actions": [],
+    "acceptance": []
+  }
+]

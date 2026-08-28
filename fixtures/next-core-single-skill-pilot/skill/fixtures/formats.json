@@ -1,0 +1,17 @@
+[
+  {
+    "id": "verifier-result-golden",
+    "format": "verifierResult",
+    "context": { "timestamp": "2026-08-28T00:00:00Z" },
+    "values": {
+      "task": "task-17",
+      "snapshot": "snapshot-a",
+      "selection": "items/7",
+      "selection-hash": "hash-a",
+      "continuation": "continuation-a",
+      "verdict": "pass",
+      "recorded-json": { "currentness": "current", "detail": "ok" }
+    },
+    "expect": "2026-08-28T00:00:00Z verifier result: task: task-17; snapshot: snapshot-a; selection: items/7; selection-hash: hash-a; continuation: continuation-a; verdict: pass; recorded-json: {\"currentness\":\"current\",\"detail\":\"ok\"}"
+  }
+]

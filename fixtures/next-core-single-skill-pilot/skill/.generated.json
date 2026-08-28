@@ -1,0 +1,326 @@
+{
+  "schema": "skill-rails/build-manifest/1",
+  "skill_id": "evidence-credit",
+  "profile": "p2",
+  "built_at": null,
+  "build_id": "sha256:6787fdaec1c06ec68478b60d0b0882d7d3e4ddf9a9f2f1d96f677e614c51d5ad",
+  "spec_hash": "sha256:b26335b9ee195969461bace75d06d5f5e2622e884e7d2693c51e8e0f5f9ec044",
+  "dsl_hash": "sha256:1f2d5fe84900d724646128dd1815188cfa1411288e3bc02e39ec8215bd9ebd1e",
+  "runtime_hash": "sha256:701c40ff726ef69ce39c05998b8545e861f141e36d94fc2f56f74493393d16da",
+  "validator_hash": "sha256:d4a60212b7dc6f43b5811cb5b50029c495d5d36f48e4dca9010c1408bd5ae68b",
+  "content_hash": "sha256:550fdd6b77e708b3ea1cfee823bcc814336c00f4eb5d1743259949ffa4babbc4",
+  "content": {
+    "SKILL.md": "sha256:1225e8b12a1eb9d5caffda38464a5713506c90f8f1ec07427e7a7c70d755dd33",
+    "body.md": "sha256:972021f0e44678054194092d86854af7af829d06941f4281dce625fa54b6d18c",
+    "collectors/index.mjs": "sha256:29df8fefd6e3b3a57cbd9358e90af4344a334771a6b195e93dba2a626704a8e6",
+    "fixtures/formats.json": "sha256:a636fb33dbb9b86378d26297ad2549065973753b7788913a6eff1a72d6d1fd1e",
+    "fixtures/lint/manifest.json": "sha256:7e63b4b60f9d85b72a2fb1e7040a3a28cffe59246ceedf69f0aee2290d826eed",
+    "fixtures/scenarios.json": "sha256:6f873eb65d1e08ce57bed16f646ce0049ea32064bd612388e6e00a59bc8b4b55",
+    "references/canon.md": "sha256:9fd39b26d231cf84eb40a01652beacfa359908cf36fda6092a8e593db7d5cc17",
+    "references/purpose.md": "sha256:08aeafb1f5f4782429ac2c82530f1ad0c74077f868d7492114c963f6c01afb45",
+    "references/verify.md": "sha256:11dea7aa55322850c416ced0ab6866e0c542d019e823fa91a341353334feae72",
+    "references/work.md": "sha256:426f6e15e87dac5e0a57c281fb6e21c7239385b5af014a550959828a316c55a0",
+    "templates/lane-report.md": "sha256:c0c219e6b61798154e50d5551e582b05dcb5cd02a1213c23a1f0ddca3290e362",
+    ".skill-rails/intent.json": "sha256:9bc59f90642296b9125d0bd1f16ed583b3690a65c017cdf656d77c377f02c710",
+    ".skill-rails/profile-decision.json": "sha256:1c07cb17224d063efee0c24a680c35391e0e668efe1d6e652f56479a0a7fbe6c",
+    ".skill-rails/eval-cases.json": "sha256:1899b518919b5c449d6cb1cae7531e653a512cebefbf13a11b5e602c0f5bff05",
+    ".skill-rails/obligation-ledger.json": "sha256:014adbe204e6237a402d7549a6677adcef73a185d5971e2c02fd8bf011e9ac12"
+  },
+  "runtime_files": [
+    "align.mjs",
+    "alignment.mjs",
+    "api.mjs",
+    "ast-policy.mjs",
+    "authoring-ledger.mjs",
+    "body.mjs",
+    "cli.mjs",
+    "collectors.mjs",
+    "constants.mjs",
+    "diagnostics.mjs",
+    "domains.mjs",
+    "dsl.mjs",
+    "evaluator.mjs",
+    "format-checks.mjs",
+    "guide.mjs",
+    "hash.mjs",
+    "lint.mjs",
+    "loader.mjs",
+    "manifest.mjs",
+    "path-policy.mjs",
+    "run.mjs",
+    "scenario-checks.mjs",
+    "snapshot.mjs",
+    "templates.mjs",
+    "trace-core.mjs",
+    "trace-store.mjs",
+    "trace.mjs",
+    "validator.mjs",
+    "vendor/ACORN-LICENSE",
+    "vendor/ACORN-WALK-LICENSE",
+    "vendor/acorn-walk.mjs",
+    "vendor/acorn.mjs"
+  ],
+  "validator_version": "0.2.0",
+  "runtime_version": "0.1.0",
+  "minimum_node_major": 20,
+  "generated_files": {
+    "SKILL.md": "sha256:1225e8b12a1eb9d5caffda38464a5713506c90f8f1ec07427e7a7c70d755dd33",
+    "agents/openai.yaml": "sha256:eb07cc911e0edcb739004a01f3cf216987fc59bd19ee1a3c5dc6314ff4dc4bf8",
+    "schemas/decision.schema.json": "sha256:e084281bdd3276f7e2b520a847f82d8c90ea54c454bbd91226661000687f1ad9",
+    "schemas/trace-event.schema.json": "sha256:c60958d78a70e96a384318e96007436a86c7758cc64f25f93574bb6b4055780a",
+    "scripts/skill-rails/align.mjs": "sha256:71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a",
+    "scripts/skill-rails/alignment.mjs": "sha256:11b1855b0a3d3bf669f172ded4a7fb1f238ae4fdc739a6fbd7751c1bf79d42dd",
+    "scripts/skill-rails/api.mjs": "sha256:3d8e39f19e57f51116112ab2585ffc6cf17b6db46af0c1dc793ad004c8363c06",
+    "scripts/skill-rails/ast-policy.mjs": "sha256:59e7beb8c77635deb3c2341867200d3751dec8f5bd900e86b41ab50263ef6fd1",
+    "scripts/skill-rails/authoring-ledger.mjs": "sha256:1925b636c8bab3fa078000ab119bfe43a08a4f34caf77625620803e499f1a485",
+    "scripts/skill-rails/body.mjs": "sha256:93a32725fa4d2ca842eef9956652afb3d6235171f82687924ad29085a4c5e711",
+    "scripts/skill-rails/cli.mjs": "sha256:b48d3fcf084b6ca7796fface327240a77d402c81b212c9ddd8ace019735f6c06",
+    "scripts/skill-rails/collectors.mjs": "sha256:857140c75441cb4b2e2ed0c8d28043a5a6f8d3b6cbbd909134459c722fe8c015",
+    "scripts/skill-rails/constants.mjs": "sha256:1ad5c2fa7219df67cd9f5843b973b2e84857aae19fcfceac5ed5025a504ad959",
+    "scripts/skill-rails/diagnostics.mjs": "sha256:58c9697baf93fca844162e1a049a8c989bf91b9261aee9f18298fafea5b71bfc",
+    "scripts/skill-rails/domains.mjs": "sha256:d41b5f0ca72822cde32dbe727cd3c4ee56593a79068c4fe8556e5da8305ee87f",
+    "scripts/skill-rails/dsl.mjs": "sha256:1f2d5fe84900d724646128dd1815188cfa1411288e3bc02e39ec8215bd9ebd1e",
+    "scripts/skill-rails/evaluator.mjs": "sha256:692e0c4c89a4e9b14b7e2ebb6406661780750847fdfcfa885cf72d39425c344c",
+    "scripts/skill-rails/format-checks.mjs": "sha256:52471f03fca756333090a797b47dc589c58a90b9c1d3edf0c0572de182a156d7",
+    "scripts/skill-rails/guide.mjs": "sha256:38b626915658b6afb968e8c8273f937fc3e7c952da504382384ffa5bc1376ec5",
+    "scripts/skill-rails/hash.mjs": "sha256:ef718a04dc797fd53903feeb9ee51a7379b8c1f8f259f63adc7eb6a2ae77fb9e",
+    "scripts/skill-rails/lint.mjs": "sha256:71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a",
+    "scripts/skill-rails/loader.mjs": "sha256:c0c636c4b24cee7b89d915ff3299de2903ae48bb886c5a469275011fa89ff3e3",
+    "scripts/skill-rails/manifest.mjs": "sha256:f0d9a8ccf3380e41ff90ad351abdda0535460b499663f6a7de5fba4181d8dbae",
+    "scripts/skill-rails/path-policy.mjs": "sha256:00dfea4e91679d734295723390f5537faa5687adae0d3c4cf8f698489d7049a0",
+    "scripts/skill-rails/run.mjs": "sha256:71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a",
+    "scripts/skill-rails/scenario-checks.mjs": "sha256:89a94190e4774444a8bc4b349833cc2eac8a0915971845ada341cbbde3314c9f",
+    "scripts/skill-rails/snapshot.mjs": "sha256:190e7b0ef7479d4ce53fad91141b862d7152450b9fd6c4caaae0e70e6b1f58b9",
+    "scripts/skill-rails/templates.mjs": "sha256:3fc6ed3465b1a3160d3c9ec17596c20d26099896bdca9a0c36b98766b8fb9a0b",
+    "scripts/skill-rails/trace-core.mjs": "sha256:5e8a141e1d2f980a5d3bfc6ab987dedd9acfc011487b8610686e951db2c469f6",
+    "scripts/skill-rails/trace-store.mjs": "sha256:88730c6fe2f7cd276ae8447b01e6fc5181123d8d0b036262eb3e7286b9c3e575",
+    "scripts/skill-rails/trace.mjs": "sha256:71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a",
+    "scripts/skill-rails/validator.mjs": "sha256:5b4f3d72c4a5ad8c5c5dc2621869ecb8ef15b962b61d387a243a8947b9e73399",
+    "scripts/skill-rails/vendor/ACORN-LICENSE": "sha256:76a876cf886ff9be2a8b5e2e86514fed06223c8c9f0c1e9ee9606e93841e00b7",
+    "scripts/skill-rails/vendor/ACORN-WALK-LICENSE": "sha256:c2d8184ea9becd063aa40be243e8c6ec2c4f72828fdfe4b0752664ef73e96ed3",
+    "scripts/skill-rails/vendor/acorn-walk.mjs": "sha256:24bc7ea73dcc319360090f4849746b7493bf234f951ea99ae0b89105981b1b42",
+    "scripts/skill-rails/vendor/acorn.mjs": "sha256:953573b8fdab71599749ea5f2b33d3e760c2116178f9423ee7458dbe39d59453"
+  },
+  "evidence": {
+    "lint": "L-full:pass",
+    "mutations": {
+      "passed": 20,
+      "total": 20,
+      "survivors": [],
+      "results": [
+        {
+          "id": "negative-L0",
+          "expected_code": "L0",
+          "operation": "extra-export",
+          "killed": true,
+          "observed_codes": [
+            "L0"
+          ]
+        },
+        {
+          "id": "negative-L1",
+          "expected_code": "L1",
+          "operation": "ambient-authority",
+          "killed": true,
+          "observed_codes": [
+            "L1"
+          ]
+        },
+        {
+          "id": "negative-L2",
+          "expected_code": "L2",
+          "operation": "observation-source",
+          "killed": true,
+          "observed_codes": [
+            "L2",
+            "L3"
+          ]
+        },
+        {
+          "id": "negative-L3",
+          "expected_code": "L3",
+          "operation": "invalid-domain",
+          "killed": true,
+          "observed_codes": [
+            "L3",
+            "L4"
+          ]
+        },
+        {
+          "id": "negative-L4",
+          "expected_code": "L4",
+          "operation": "reads-mismatch",
+          "killed": true,
+          "observed_codes": [
+            "L4"
+          ]
+        },
+        {
+          "id": "negative-L5",
+          "expected_code": "L5",
+          "operation": "table-default",
+          "killed": true,
+          "observed_codes": [
+            "L5"
+          ]
+        },
+        {
+          "id": "negative-L6",
+          "expected_code": "L6",
+          "operation": "stage-contract",
+          "killed": true,
+          "observed_codes": [
+            "L6"
+          ]
+        },
+        {
+          "id": "negative-L7",
+          "expected_code": "L7",
+          "operation": "body-section",
+          "killed": true,
+          "observed_codes": [
+            "L14",
+            "L16",
+            "L7"
+          ]
+        },
+        {
+          "id": "negative-L8",
+          "expected_code": "L8",
+          "operation": "body-duplicate-procedure",
+          "killed": true,
+          "observed_codes": [
+            "L8"
+          ]
+        },
+        {
+          "id": "negative-L9",
+          "expected_code": "L9",
+          "operation": "stage-signature",
+          "killed": true,
+          "observed_codes": [
+            "L9"
+          ]
+        },
+        {
+          "id": "negative-L10",
+          "expected_code": "L10",
+          "operation": "artifact-readers",
+          "killed": true,
+          "observed_codes": [
+            "L10"
+          ]
+        },
+        {
+          "id": "negative-L11",
+          "expected_code": "L11",
+          "operation": "template-placeholder",
+          "killed": true,
+          "observed_codes": [
+            "L11"
+          ]
+        },
+        {
+          "id": "negative-L12",
+          "expected_code": "L12",
+          "operation": "role-state-effect",
+          "killed": true,
+          "observed_codes": [
+            "L12"
+          ]
+        },
+        {
+          "id": "negative-L13",
+          "expected_code": "L13",
+          "operation": "language-parity",
+          "killed": true,
+          "observed_codes": [
+            "L13"
+          ]
+        },
+        {
+          "id": "negative-L14",
+          "expected_code": "L14",
+          "operation": "fixture-coverage",
+          "killed": true,
+          "observed_codes": [
+            "L14"
+          ]
+        },
+        {
+          "id": "negative-L15",
+          "expected_code": "L15",
+          "operation": "format-domain",
+          "killed": true,
+          "observed_codes": [
+            "L15"
+          ]
+        },
+        {
+          "id": "negative-L16",
+          "expected_code": "L16",
+          "operation": "deferred-shape",
+          "killed": true,
+          "observed_codes": [
+            "L16"
+          ]
+        },
+        {
+          "id": "negative-L17",
+          "expected_code": "L17",
+          "operation": "mutation-manifest",
+          "killed": true,
+          "observed_codes": [
+            "L17"
+          ]
+        },
+        {
+          "id": "negative-L18",
+          "expected_code": "L18",
+          "operation": "unsafe-bypass",
+          "killed": true,
+          "observed_codes": [
+            "L14",
+            "L18"
+          ]
+        },
+        {
+          "id": "negative-L15-format-golden",
+          "expected_code": "L15",
+          "operation": "format-golden",
+          "killed": true,
+          "observed_codes": [
+            "L15"
+          ]
+        }
+      ]
+    },
+    "fixtures": {
+      "passed": 10,
+      "total": 10,
+      "deterministic_repeats": 50,
+      "mismatches": 0,
+      "predicate_evaluations": 100,
+      "predicate_evaluation_limit_ms": 50,
+      "predicate_performance": {
+        "status": "pass",
+        "limit_ms": 50
+      }
+    },
+    "formats": {
+      "passed": 1,
+      "total": 1,
+      "results": [
+        {
+          "id": "verifierResult",
+          "round_trips": 256,
+          "crlf_rejected": true
+        }
+      ]
+    },
+    "isolated_import": true,
+    "build_timestamp": null
+  },
+  "origin": null,
+  "manual_edit_policy": "canonical-source-only"
+}

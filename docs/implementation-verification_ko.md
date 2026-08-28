@@ -2,7 +2,7 @@
 
 문서 상태: 현재 구현과 evidence의 기록 정본
 
-기준일: 2026-08-23 KST
+기준일: 2026-08-29 KST
 
 이 문서는 정확한 구현 범위, 지원 수준, V5 변경 근거, 실행 증거와 미검증 경계를 소유한다. 제품의 안정적인 목적과 설계 경계는 [제품·설계 정본](skill-rails_ko.md), 다음 세션의 작업 시작점은 [유지보수 상태](maintenance-status_ko.md)를 따른다.
 
@@ -12,17 +12,21 @@
 
 ## 1. 현재 결정적 검증
 
-- `npm run vendor:check`: pass
-- `npm run lint`: pass
-- 현재 환경 전체 test: 49/49 pass
-- 현재 환경 `npm run eval`: pass
-- Node 20.20.2: 당시 35/35 pass
-- Node 22.23.2: 당시 35/35 pass
-- Node 24.18.0: 당시 35/35 pass
-- fresh P2 L0–L18: pass
+현재 작업 tree에는 commit되지 않은 유지보수 delta와 pilot fixture가 landing되어 있다. 이 tree에서 fresh Windows `npm ci`와 이어진 full `npm run verify`가 모두 pass했으므로 structural/staging readiness는 `LANDING PASS`다. full verify의 정확한 receipt는 vendor pass, lint pass, repository test 52/52 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass다.
+
+최초 full verify에서 실패한 두 항목은 migration semantic-unit test와 G0.5 scorer test였다. 둘 다 제품 행동 결함이 아니라 raw-byte 입력이 checkout에서 CRLF로 바뀐 portability defect였고, 다섯 pattern의 raw-byte checkout protection으로 닫혔다.
+
+`b277a4c` (`chore: release v0.1.2`) 기준선에서 마지막으로 관찰한 값은 다음과 같다. 이 값들을 현재 tree의 결과로 인용하지 않는다.
+
+- `npm run vendor:check`: 당시 pass
+- `npm run lint`: 당시 pass
+- 당시 환경 전체 test: 49/49 pass
+- 당시 환경 `npm run eval`: pass
+- Node 20.20.2 / 22.23.2 / 24.18.0: 각각 당시 35/35 pass
+- fresh P2 L0–L18: 당시 pass
 - Windows path, non-ASCII, read-only package, external state, symlink/junction boundary, snapshot stale, trace authority, build transaction을 integration test로 확인
 
-Node 20·22·24 결과를 현재 49개 suite의 결과로 확대하지 않는다. 최신 49개 suite는 현재 Node 환경에서만 재실행했다.
+Node 20·22·24 결과를 그때의 49개 suite 결과로 확대하지 않는다. 이번 delta에 대해 실제로 관찰한 bounded test와 pilot receipt는 6절이 소유하며, 현재 tree의 fresh full-verify 수치는 위 receipt로 별도 기록한다.
 
 ---
 
@@ -165,9 +169,118 @@ Fresh project-local Claude Code는 P1 `verified-note`를 만들었다.
 
 ---
 
-## 6. V5 보존 및 변경 원장
+## 6. Typed-artifact 유지보수 delta와 declared-column pilot 증거
 
-### 6.0 V5 Decision 위치 보존
+### 6.1 이번 delta의 정확한 범위
+
+기준 commit은 `b277a4c`이고, 아래 내용은 아직 commit하지 않은 작업 tree 상태다. 구현 delta가 건드린 경로는 `references/authoring-workflow.md`, `scripts/lib/io.mjs`, `scripts/lib/maintenance.mjs`, `scripts/lib/semantic-diff.mjs`, `tests/authoring.test.mjs` 다섯 개이고, untracked pilot subtree는 `fixtures/next-core-single-skill-pilot/`다.
+
+작업 tree 전체는 이보다 넓다. 현재 status는 tracked 수정 11개와 untracked 추가 2개다. 다섯 구현 경로 밖의 tracked 수정은 portability correction인 `.gitattributes`와 `AGENTS.md`, `docs/implementation-verification_ko.md`, `docs/maintenance-status_ko.md`, `docs/skill-rails_ko.md`, `references/evaluation.md`의 문서 갱신이고, untracked 추가는 `docs/evidence/`와 `fixtures/next-core-single-skill-pilot/`다. 이 문서 갱신은 diff에 포함되며, 아래 수치와 test 서술은 다섯 개 구현 경로에만 해당한다. `scripts/runtime/`, `schemas/`, `references/v5-contract.md`에는 변경이 없다.
+
+fresh Windows verify가 드러낸 결함은 행동 구현이 아니라 checkout portability였다. `.gitattributes`에 `fixtures/migration-structures/SKILL.md -text`, `evals/g0_5/** -text`, `evals/g0/thresholds.json -text`, `scripts/lib/g05-score-v3.mjs -text`, `scripts/lib/g05-review-lint.mjs -text`를 추가해 raw-byte 입력을 보호했다. 현재 92개 matched tracked path는 보정 전에 worktree와 index 양쪽에서 사용자·coordinator diff가 없음을 확인한 뒤 각 index blob의 LF byte로만 복원했으며, 보정 후 matched path에는 수정이 남지 않았다.
+
+### 6.2 등록된 replace-artifact 경계
+
+`replace-artifact`는 P2 package의 whole-file 교체를 임의 소스 덮어쓰기로 넓히지 않고 닫힌 registry로 제한한다.
+
+| kind | 허용 경로 | semantic diff source |
+| --- | --- | --- |
+| `spec` | `spec.mjs` | `behavior_source` |
+| `collector` | `collectors/index.mjs` | `observation_source` |
+| `reference` | `references/` 아래의 기존 파일 | `context` |
+
+operation과 package profile이 모두 `p2`여야 한다. 적용 전 preflight가 다음을 거부한다.
+
+- 미등록 kind, kind에 등록되지 않은 경로
+- 형식이 `sha256:<64 hex>`가 아니거나 현재 파일과 다른 `expected_hash`
+- string이 아닌 `content`
+- `.generated.json`과 그 `generated_files`에 등록된 생성 경로
+- 존재하지 않는 target, 정규 파일이 아닌 target
+- 한 transaction 안에서 같은 physical file을 두 번 지정하는 경우
+- 백슬래시, 절대 경로, 빈 segment, `.`/`..` segment를 포함하는 비-portable 경로
+- target의 canonical physical 철자와 다른 표기(Windows 대소문자 alias 포함)
+- 경로 상의 symlink 또는 junction
+
+`replace-spec`는 `spec` kind로 정규화되어 기존 의미와 stale-hash 거부 문구를 그대로 유지한다. body-section, intent-patch, template, resource-creation operation의 의미는 바뀌지 않았다.
+
+### 6.3 원자적 install과 하나의 authorized writer 경계
+
+유지보수는 원본 fingerprint를 먼저 계산하고, stage 복사 직후 stage fingerprint가 같은지 확인하며, operation 적용과 전체 package build를 거친 뒤 build가 canonical artifact를 바꾸지 않았는지 다시 확인한다. install 직전에 root fingerprint를 재확인하고, 원본을 captured backup으로 rename한 다음 그 backup을 시작 fingerprint와 대조한 뒤에야 stage를 설치한다. 실패하면 captured backup을 삭제하지 않고, target·stage·captured_backup 경로와 `installed`, 복구 장애 사유를 오류 메시지에 남긴다.
+
+이 원자성은 **package root를 단독 소유한 하나의 authorized writer**를 전제한다. capture 이후에도 계속 쓰는 out-of-band process를 잠그지 않으며 그 process의 쓰기 보존도 보장하지 않는다. 외부 동시성은 검증된 경계 밖이고, host ownership 증거가 없으면 `UNPROVEN`이지 성공이 아니다. 외부 process에 대한 cross-platform lock은 host 권한이며 AI-facing tool을 실질적으로 복잡하게 만들기 때문에 채택하지 않았다.
+
+semantic diff는 `artifact_receipts`(kind, path, before_hash, after_hash, source), `source_changes`(behavior_source / observation_source / context), `any_changed`를 추가했고 기존 `spec_hash`, `changed`, `groups` 의미는 유지한다.
+
+### 6.4 junction·symlink 폐쇄
+
+- 유지보수 preflight가 경로 상의 symlink·junction target을 적용 전에 거부한다.
+- package 복사와 파일 나열이 symlink·junction·비정규 directory entry를 명시적 오류로 거부한다.
+- pilot collector는 project root와 선택 경로를 canonical하게 해석한 뒤 containment를 검사하므로, 상위 traversal·symlink·junction 탈출이 hashing 전에 fail-closed된다.
+
+이번 실행은 Windows junction 분기만 관찰했다. 같은 test가 비-Windows host에서 POSIX directory symlink 분기를 선택하지만 그 분기는 이번 실행의 증거가 아니다.
+
+### 6.5 이번 delta의 정확한 bounded test
+
+`tests/authoring.test.mjs`에 두 개의 test가 추가되었다. 아래는 각 test가 무엇을 단정하는지에 대한 기록이며, 두 test를 포함한 이 tree의 repository test는 fresh full verify에서 52/52 pass했다.
+
+1. `P2 typed-artifact maintenance preflights closed canonical paths and preserves legacy replace-spec`
+   - spec·collector·reference 세 kind의 정상 교체가 순서대로 receipt를 남기고 `source_changes`의 세 항목이 모두 참이 된다.
+   - 거부 사례(미등록 kind, cross-kind 경로, profile 불일치, stale hash, 생성 경로, 없는 target)마다 tree fingerprint가 그대로임을 확인한다.
+   - 비-canonical 경로 철자, Windows 대소문자 alias 중복, symlink/junction entry를 거부한다. link를 만들 수 없는 환경에서는 해당 단정이 진단과 함께 생략된다.
+   - captured backup 장애를 인위적으로 만들어 backup이 보존되고 오류가 정확한 backup 경로를 보고하며 점유된 target이 덮이지 않음을 확인한다.
+   - transaction의 두 번째 operation이 실패하면 아무것도 설치되지 않는다.
+   - legacy `replace-spec`가 여전히 적용되고 stale hash를 여전히 거부한다.
+   - 실행 중 root에 동시 쓰기가 일어나면 설치가 중단되고 그 파일이 보존된다.
+2. `semantic diff reports direct and branch effect argument changes without changing legacy verb summaries`
+   - stage의 default effect plan과 branch effect plan의 인자 변화가 보고되고, 기존 verb 요약(`["RUN", "NEXT"]`)은 그대로 유지된다.
+
+### 6.6 declared-column pilot 증거
+
+`fixtures/next-core-single-skill-pilot/`은 검증자 주장이 기억이나 자기보고로 현재 proof가 되는 것을 막는 P2 pilot이다. pass는 검증자가 돌려준 열이 갓 수집한 사실과 모두 일치할 때만 credit된다: `task`, `snapshot`, selection locator, 선택 byte SHA-256, `continuation`, 기록된 currentness(`current`), verdict(`pass`). 재관찰은 runtime 기능이 아니라 agent 재진입(`reentry: rejudge`)이고, `DECLARATIONS`에는 `complexityBudget`만 있다.
+
+독립 재실행으로 확인한 receipt:
+
+| 항목 | 결과 |
+| --- | --- |
+| root full lint | L0–L18 pass, 진단 0 |
+| formal build (`--repeats 50`) | mutation 20/20, scenario 10/10, 50회 반복 불일치 0, predicate 성능 한도 내, format round trip 256/256 및 CR/LF 거부 |
+| 재현 build | 저장소 밖 임시 복제본에서 재build 후 in-repo package와 파일 차이 없음 |
+| 내장 lint / real-state e2e | pass / 2/2 pass |
+| manifest 선언 hash | content 15 + generated 36 = 51 |
+| package 규모 | skill 54 파일, pilot root 5 파일 |
+
+수치는 pilot 보고서가 각 receipt의 재현 명령과 함께 소유한다. 은퇴한 설계(continuation receipt, singleton recorded-JSON 상관, 합성 runtime-state fixture)는 mechanism과 함께 제거했고, 그 흔적은 pilot 보고서의 부록 한 줄로만 남는다.
+
+### 6.7 V5 호환과 공개 계약
+
+이번 delta는 V5 의미를 바꾸지 않는다. 근거는 다음과 같다.
+
+- `scripts/runtime/`, `schemas/`, `references/v5-contract.md`에 변경이 없다.
+- pilot package가 내장한 runtime 파일은 `scripts/runtime/`의 해당 파일과 byte-identical이고, schema도 동일하다. 생성 package는 진입점 네 개만 추가한다.
+- pilot은 기존 stage `reentry` 값과 기존 표·format 문법만 사용하며 새 runtime mode, 새 declaration, 새 alignment 기대 종류를 추가하지 않는다.
+- `replace-artifact`는 authoring/유지보수 도구 표면이고 생성 package의 실행 계약이 아니다.
+
+따라서 7절 변경 원장에는 새 행을 추가하지 않는다.
+
+### 6.8 landing 판정과 남은 release 미상
+
+- fresh Windows `npm ci`와 full `npm run verify`는 모두 pass했다. full receipt는 vendor pass, lint pass, repository test 52/52 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass다.
+- 최초 실패 두 건은 migration semantic-unit test와 G0.5 scorer test였고, `.gitattributes`의 `fixtures/migration-structures/SKILL.md -text`, `evals/g0_5/** -text`, `evals/g0/thresholds.json -text`, `scripts/lib/g05-score-v3.mjs -text`, `scripts/lib/g05-review-lint.mjs -text`로 raw-byte checkout을 보호해 닫았다.
+- structural/staging readiness 판정은 `LANDING PASS`다. 현재 status는 tracked 수정 11개와 untracked root 2개이고, pilot의 `.skill-rails/eval-cases.json`, `.skill-rails/intent.json`, `.skill-rails/obligation-ledger.json`, `.skill-rails/profile-decision.json` 네 파일은 force-add 대상이며 `.skill-rails/semantic-diff.json`은 ignored 상태로 stage하지 않는다.
+- commit, push, 설치, 배포를 수행하지 않았다.
+- 최종 declared-column package에 대한 fresh-agent 행동은 `UNPROVEN`이다. 선행 후보 bytes에서 관찰된 냉시작 행동의 credit 범위는 [냉시작 행동 증거 카드](evidence/proof-03-cold-behavior_ko.md)가 소유한다.
+- 사용할 수 있는 project-local orchestration channel이 없어 Decision을 관찰하지 못한 경로는 `UNPROVEN`이며 제품 실패가 아니다.
+- 검증자의 정직성은 runtime 밖에 있다. package는 돌려받은 열을 상관시킬 뿐 검증자가 실제로 그 항목을 검사했음을 증명하지 못한다.
+- 공개 lane은 agent 주장과 artifact 경로·byte 검증까지만 기록하고 harness가 신뢰하는 effect 관찰은 없다. 따라서 공개 lane의 effect 실행 credit은 partial 또는 `unproven`을 넘지 않는다.
+- out-of-band writer가 계속 쓰는 상황에서의 package 보존은 검증 경계 밖이다.
+
+즉시 다음 단계는 하나다. exact allowlist를 지금 stage하고 commit 직전 status·staged diff·ignored-file 경계를 검증한다. 이 staging/commit 검증 전에는 commit하지 않는다.
+
+---
+
+## 7. V5 보존 및 변경 원장
+
+### 7.0 V5 Decision 위치 보존
 
 V5의 18개 공개 위치는 현재 typed Decision에서 다음과 같이 보존한다.
 
@@ -194,7 +307,7 @@ V5의 18개 공개 위치는 현재 typed Decision에서 다음과 같이 보존
 
 `schema`, `decision_id`, `spec`, `runtime`, `status`, `reads`, `needs`, `proof_required`, `reinvoke`, `assurance`은 replay와 evidence 경계를 위한 명시적 확장이다.
 
-### 6.1 그대로 보존한 핵심
+### 7.1 그대로 보존한 핵심
 
 - `spec.mjs` 행동 정본과 정확한 14개 closed exports
 - pure spec과 collector 분리
@@ -213,7 +326,7 @@ V5의 18개 공개 위치는 현재 typed Decision에서 다음과 같이 보존
 - 제품 가설을 먼저 반증하는 G0.5
 - effect interception은 미래 또는 별도 범위
 
-### 6.2 명시적으로 변경·확장한 항목
+### 7.2 명시적으로 변경·확장한 항목
 
 | V5 기준 | 현재 구현 | 이유와 보존 방식 |
 | --- | --- | --- |
@@ -231,7 +344,7 @@ V5의 18개 공개 위치는 현재 typed Decision에서 다음과 같이 보존
 | 복잡 skill 중심 | P0/P1/P2 최소 충분 profile | V5를 축소하지 않고 단순 skill 과설계를 방지 |
 | P0/P1 판단 산문이 한 `SKILL.md`에 집중 | profile과 독립적인 conditional guidance index + stable topic files | 큰 판단형 skill을 P2로 올리지 않고 필요한 산문만 읽게 하며 보편 경계·정확 형식·stop rule은 entry에 유지 |
 
-### 6.3 의도적으로 제외한 capability
+### 7.3 의도적으로 제외한 capability
 
 Cross-skill import/composition은 현재 구현하지 않는다. Parser와 runtime은 `SPEC.profile="single"`, 빈 imports, 자기 skill의 body reference만 허용한다. 여러 skill의 activation, handoff, 상태 전달을 추가하면 줄이려던 drift surface가 다시 늘어나기 때문이다. 향후 필요해도 현재 single profile을 몰래 넓히지 말고 별도 profile과 독립 검증으로 설계한다.
 
@@ -242,7 +355,7 @@ V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 3. 기존 의미를 어떻게 보존하거나 의도적으로 대체하는가
 4. 동등성 또는 rollback을 어떤 test로 확인하는가
 
-### 6.4 L0–L18 구현 대응
+### 7.4 L0–L18 구현 대응
 
 | Level | 차단하는 결함 |
 | --- | --- |
@@ -268,7 +381,7 @@ V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 
 ---
 
-## 7. 현재 구현 완료 범위
+## 8. 현재 구현 완료 범위
 
 - Creator thin skill과 조건부 authoring references
 - P0/P1/P2 profile selection
@@ -276,6 +389,7 @@ V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 - intent/ledger scaffold와 P2 authoring-card template
 - conservative migration과 비-Markdown inventory
 - stable-ID maintenance와 semantic diff
+- 등록된 typed `replace-artifact` 유지보수와 원자적 install receipt
 - P2 V5 validator L0–L18
 - positive-list AST와 two-level validation
 - deterministic evaluator와 compact guide
@@ -293,10 +407,11 @@ V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 - 상대 플랫폼에서 explicit/implicit 사용
 - P2 fail-closed decision과 `unproven` evidence boundary
 - 한 개의 P0 single-match 흐름에서 필요한 judgment topic만 읽는 소비 행동
+- declared-column binding으로 검증자 pass를 정확한 selection·snapshot에만 credit하는 P2 pilot
 
 ---
 
-## 8. 일반화하면 안 되는 주장
+## 9. 일반화하면 안 되는 주장
 
 - 30k+ token 또는 실제 compaction 뒤 critical omission 0
 - 여러 모델 버전에 대한 통계적 trigger precision
@@ -309,6 +424,10 @@ V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 - 많은 conditional topic을 가진 실제 대형 P0/P1의 장기 context 절감과 routing recall
 - symlink/non-regular migration source의 inventory
 - invalid UTF-8 Markdown 내용의 의미 복구
-- 최신 49개 suite의 Node 20/22/24 재실행
+- 최신 suite의 Node 20/22/24 재실행
+- out-of-band writer가 capture 이후에도 쓰는 상황에서의 package 보존
+- 최종 declared-column package에 대한 fresh-agent trigger·준수·출력 품질
+- 비-Windows host의 POSIX symlink 분기
+- 이번 delta의 commit·push·설치·배포
 
 이 항목들은 숨은 미완성 code marker가 아니라 별도 empirical scope다. 지원을 주장하려면 해당 범위를 직접 실행한 fresh evidence를 추가한다.

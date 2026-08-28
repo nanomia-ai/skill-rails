@@ -1,0 +1,257 @@
+{
+  "schema": "skill-rails/obligation-ledger/2",
+  "intent_hash": "sha256:210cb54ce4fe7aad2a3de3b908968a1df39098411124d693406e150276c425a6",
+  "profile": "p2",
+  "atoms": [
+    {
+      "id": "description-001",
+      "source": "intent.description",
+      "text": "Use for work or verify: supply the selected intent as --decided intent.token=<work|verify>; first read references/canon.md, then work -> references/work.md or verify -> references/verify.md; run the verifier Decision only for verify evidence.",
+      "candidate_class": "trigger",
+      "consequence": "low",
+      "disposition": "projected",
+      "targets": [
+        "file:SKILL.md",
+        "file:agents/openai.yaml"
+      ],
+      "evidence": [
+        "file:agents/openai.yaml"
+      ]
+    },
+    {
+      "id": "problem-001",
+      "source": "intent.problem",
+      "text": "A long-running agent can confuse a verifier claim with current proof, or let an unavailable verifier block unrelated prose work.",
+      "candidate_class": "judgment/body",
+      "consequence": "low",
+      "disposition": "projected",
+      "targets": [
+        "body:why: purpose",
+        "file:references/purpose.md"
+      ],
+      "evidence": [
+        "body:why: purpose"
+      ]
+    },
+    {
+      "id": "use-cases-001",
+      "source": "intent.use_cases[0]",
+      "text": "Handle a work or verify intent through one discoverable skill while preserving current evidence boundaries.",
+      "candidate_class": "example",
+      "consequence": "low",
+      "disposition": "projected",
+      "targets": [
+        "spec:STAGES/work",
+        "spec:STAGES/channel",
+        "file:references/work.md",
+        "file:references/verify.md"
+      ],
+      "evidence": [
+        "fixture:work-route",
+        "fixture:matching-pass",
+        "eval:positive-1"
+      ]
+    },
+    {
+      "id": "near-misses-001",
+      "source": "intent.near_misses[0]",
+      "text": "Explain the evidence policy without routing or executing the work or verify intent.",
+      "candidate_class": "guard",
+      "consequence": "medium",
+      "disposition": "projected",
+      "targets": [
+        "file:SKILL.md"
+      ],
+      "evidence": [
+        "eval:near-miss-1"
+      ]
+    },
+    {
+      "id": "inputs-001",
+      "source": "intent.inputs[0]",
+      "text": "The intent token (work or verify) plus raw task, channel, selected locator and bytes, continuation, and recorded-result facts.",
+      "candidate_class": "observation",
+      "consequence": "medium",
+      "disposition": "projected",
+      "targets": [
+        "spec:OBSERVATIONS/intent.token",
+        "spec:OBSERVATIONS/verifier.channel",
+        "spec:OBSERVATIONS/task.identity",
+        "spec:OBSERVATIONS/selection.locator",
+        "spec:OBSERVATIONS/selection.hash",
+        "spec:OBSERVATIONS/continuation.identity",
+        "spec:OBSERVATIONS/result.selection",
+        "spec:OBSERVATIONS/result.selectionHash"
+      ],
+      "evidence": [
+        "fixture:available-result-missing",
+        "fixture:matching-pass",
+        "fixture:mismatched-proof"
+      ]
+    },
+    {
+      "id": "outputs-001",
+      "source": "intent.outputs[0]",
+      "text": "One Decision-selected stage reference, shared canon, and a proof-bounded Decision or alignment result.",
+      "candidate_class": "artifact",
+      "consequence": "medium",
+      "disposition": "projected",
+      "targets": [
+        "spec:TEMPLATES/laneReport",
+        "file:references/canon.md",
+        "body:stage: work",
+        "body:stage: evidence"
+      ],
+      "evidence": [
+        "fixture:work-route",
+        "fixture:matching-pass",
+        "fixture:matching-finding"
+      ]
+    },
+    {
+      "id": "irreversible-boundaries-001",
+      "source": "intent.irreversible_boundaries[0]",
+      "text": "The runtime calculates Decisions and receipts but never dispatches a verifier, writes a result, or performs another domain effect.",
+      "candidate_class": "guard",
+      "consequence": "high",
+      "disposition": "projected",
+      "targets": [
+        "spec:GUARDS/work-prose-isolation",
+        "spec:STAGES/acquire",
+        "file:references/verify.md"
+      ],
+      "evidence": [
+        "fixture:work-route",
+        "fixture:available-result-missing"
+      ]
+    },
+    {
+      "id": "state-dependent-behaviors-001",
+      "source": "intent.state_dependent_behaviors[0]",
+      "text": "Work routes independently; verify waits when the channel is unavailable and requests acquisition, dispatch, and result recording when a channel exists but the result is missing.",
+      "candidate_class": "stage",
+      "consequence": "high",
+      "disposition": "projected",
+      "targets": [
+        "spec:STAGES/work",
+        "spec:STAGES/channel",
+        "spec:STAGES/acquire"
+      ],
+      "evidence": [
+        "fixture:work-route",
+        "fixture:verifier-unavailable",
+        "fixture:available-result-missing"
+      ]
+    },
+    {
+      "id": "state-dependent-behaviors-002",
+      "source": "intent.state_dependent_behaviors[1]",
+      "text": "A recorded result is credited only when current and bound to the current task, snapshot, selected locator and computed byte hash, and continuation; selection or snapshot reuse is mismatched evidence.",
+      "candidate_class": "stage",
+      "consequence": "high",
+      "disposition": "projected",
+      "targets": [
+        "spec:TABLES/evidence/stale-proof",
+        "spec:TABLES/evidence/mismatched-proof",
+        "spec:TABLES/evidence/matching-finding",
+        "spec:TABLES/evidence/matching-pass",
+        "spec:TABLES/evidence/BLOCK:evidence-unclassified"
+      ],
+      "evidence": [
+        "fixture:matching-pass",
+        "fixture:matching-finding",
+        "fixture:stale-proof",
+        "fixture:mismatched-proof",
+        "fixture:reused-against-other-selection",
+        "fixture:reused-against-other-snapshot",
+        "fixture:evidence-unclassified"
+      ]
+    },
+    {
+      "id": "exact-formats-001",
+      "source": "intent.exact_formats[0]",
+      "text": "A one-line verifier result binds task, snapshot, selected locator and hash, continuation, verdict, and recorded currentness JSON.",
+      "candidate_class": "format",
+      "consequence": "medium",
+      "disposition": "projected",
+      "targets": [
+        "spec:FORMATS/verifierResult",
+        "spec:ARTIFACTS/verifierResult"
+      ],
+      "evidence": [
+        "file:fixtures/formats.json"
+      ]
+    },
+    {
+      "id": "external-dependencies-001",
+      "source": "intent.external_dependencies[0]",
+      "text": "An optional verifier channel and its raw result facts, supplied by the host rather than operated by the runtime.",
+      "candidate_class": "collector",
+      "consequence": "medium",
+      "disposition": "projected",
+      "targets": [
+        "spec:OBSERVATIONS/verifier.channel",
+        "file:collectors/index.mjs"
+      ],
+      "evidence": [
+        "fixture:verifier-unavailable",
+        "fixture:available-result-missing"
+      ]
+    },
+    {
+      "id": "completion-evidence-001",
+      "source": "intent.completion_evidence[0]",
+      "text": "Current Decision facts plus artifact-verified path and byte-hash binding, package fixtures, lint, build, and evaluation; cold model behavior remains unproven until a separate forward run.",
+      "candidate_class": "stage/done/evidence",
+      "consequence": "high",
+      "disposition": "projected",
+      "targets": [
+        "spec:STAGES/evidence",
+        "file:fixtures/scenarios.json"
+      ],
+      "evidence": [
+        "fixture:matching-pass",
+        "fixture:matching-finding",
+        "fixture:stale-proof",
+        "fixture:mismatched-proof",
+        "fixture:reused-against-other-selection",
+        "fixture:reused-against-other-snapshot"
+      ]
+    },
+    {
+      "id": "judgment-points-001",
+      "source": "intent.judgment_points[0]",
+      "text": "Apply only the selected rich stage guidance and preserve the canon's evidence language without restating its rules.",
+      "candidate_class": "judgment/body",
+      "consequence": "low",
+      "disposition": "projected",
+      "targets": [
+        "body:stage: work",
+        "body:stage: channel",
+        "body:stage: acquire",
+        "body:stage: evidence",
+        "file:references/work.md",
+        "file:references/verify.md"
+      ],
+      "evidence": [
+        "fixture:work-route",
+        "fixture:matching-pass"
+      ]
+    },
+    {
+      "id": "deterministic-helpers-001",
+      "source": "intent.deterministic_helpers[0]",
+      "text": "The fact-only collector computes SHA-256 from the bytes named by the current selection locator and rejects disagreement with the declared selection digest.",
+      "candidate_class": "declaration",
+      "consequence": "medium",
+      "disposition": "projected",
+      "targets": [
+        "file:collectors/index.mjs"
+      ],
+      "evidence": [
+        "fixture:reused-against-other-selection",
+        "fixture:matching-pass"
+      ]
+    }
+  ]
+}

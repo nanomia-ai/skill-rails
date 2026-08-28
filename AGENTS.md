@@ -11,6 +11,8 @@ Skill Rails helps an AI create and maintain one standalone skill without keeping
 - Choose P0, P1, or P2 per skill, never for an entire plugin or repository. Use the smallest profile that still mechanizes the real repeatable behavior.
 - For P2, keep `spec.mjs` as the only behavior source. The runtime calculates the current Decision; it does not perform the domain work or enforce host tool permissions.
 - Missing evidence is `unproven`, not success. Structural validity is not proof of fresh-agent behavior.
+- When one skill outgrows the profile it selected, decompose or rescope that skill instead of growing the core grammar to carry it.
+- Effect credit on the public lane cannot exceed the authority actually observed for that effect.
 - The core authoring model is platform-independent. Codex and Claude Code are the adapters currently implemented and tested, not the permanent product boundary.
 
 ## Change discipline

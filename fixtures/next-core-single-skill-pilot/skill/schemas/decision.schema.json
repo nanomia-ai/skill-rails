@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:nanomia:skill-contract:decision:1",
+  "type": "object",
+  "required": ["schema", "decision_id", "skill", "spec", "runtime", "snapshot", "status", "bypassed", "restrict", "facts", "judged", "decided", "reads", "effects", "needs", "proof_required", "reinvoke", "assurance"],
+  "properties": {
+    "schema": { "const": "urn:nanomia:skill-contract:decision:1" },
+    "decision_id": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "skill": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "spec": {
+      "type": "object",
+      "required": ["id", "version", "fingerprint"],
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "const": "5" },
+        "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["version", "hash", "dsl_hash", "validator_version", "validator_hash", "minimum_node_major"],
+      "properties": {
+        "version": { "type": "string" },
+        "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "dsl_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "validator_version": { "type": "string" },
+        "validator_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "minimum_node_major": { "type": "integer", "minimum": 20 }
+      },
+      "additionalProperties": false
+    },
+    "snapshot": {
+      "type": "object",
+      "required": ["fingerprint", "status", "unknowns"],
+      "properties": {
+        "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "status": { "enum": ["stable", "stale"] },
+        "unknowns": { "type": "array", "items": { "type": "object" } }
+      },
+      "additionalProperties": false
+    },
+    "status": { "enum": ["ASK", "WAIT", "ROUTE", "BLOCK", "DONE", "NEXT"] },
+    "guard": { "type": ["object", "null"] },
+    "bypassed": { "type": "array", "items": { "type": "object", "required": ["guard", "by"], "properties": { "guard": { "type": "string" }, "by": { "type": "string" } }, "additionalProperties": false } },
+    "restrict": { "type": "array", "items": { "type": "string" } },
+    "stage": { "type": ["string", "null"] },
+    "row": { "type": ["string", "null"] },
+    "facts": { "type": "array", "items": { "type": "object", "required": ["field", "value"], "properties": { "field": { "type": "string" }, "value": {} }, "additionalProperties": false } },
+    "judged": { "type": "object" },
+    "decided": { "type": "object" },
+    "record": { "type": ["object", "null"] },
+    "reads": { "type": "array", "items": { "type": "string" } },
+    "effects": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "string", "pattern": "^(?:NEXT|ASK|WAIT|BLOCK|DONE|ROUTE:[a-z0-9-]+)$" },
+          { "type": "array", "prefixItems": [{ "enum": ["READ", "RUN", "WRITE", "COMMIT", "DISPATCH", "REPORT"] }, { "type": "object" }], "minItems": 2, "maxItems": 2 }
+        ]
+      }
+    },
+    "format": {
+      "type": ["object", "null"],
+      "properties": { "id": { "type": "string" }, "example": { "type": ["string", "null"] } },
+      "required": ["id", "example"],
+      "additionalProperties": false
+    },
+    "template": { "type": ["string", "null"] },
+    "template_text": { "type": ["string", "null"] },
+    "body": {
+      "type": ["object", "null"],
+      "properties": { "ref": { "type": "string" }, "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }, "markdown": { "type": "string" } },
+      "required": ["ref", "hash", "markdown"],
+      "additionalProperties": false
+    },
+    "needs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["field", "domain", "source", "body_ref"],
+        "properties": { "field": { "type": "string" }, "domain": {}, "source": { "enum": ["judged", "decided", "observed"] }, "body_ref": { "type": ["string", "null"] } },
+        "additionalProperties": false
+      }
+    },
+    "proof_required": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "object", "required": ["kind", "reference"], "properties": { "kind": { "type": "string", "not": { "const": "effect" } }, "reference": {}, "path": { "type": "string" } }, "additionalProperties": false },
+          { "type": "object", "required": ["kind", "index", "verb"], "properties": { "kind": { "const": "effect" }, "index": { "type": "integer", "minimum": 0 }, "verb": { "enum": ["READ", "RUN", "WRITE", "COMMIT", "DISPATCH", "REPORT"] } }, "additionalProperties": false }
+        ]
+      }
+    },
+    "reinvoke": { "type": ["string", "null"] },
+    "assurance": { "enum": ["checked", "enforced"] }
+  },
+  "additionalProperties": false
+}

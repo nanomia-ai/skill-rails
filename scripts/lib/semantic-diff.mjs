@@ -28,19 +28,45 @@ export async function snapshotContract(skillRoot) {
   };
 }
 
-export function semanticDiff(before, after) {
+export function semanticDiff(before, after, options = {}) {
   const groups = {};
   for (const key of ["observations", "guards", "stages", "tables", "formats", "templates", "template_content", "body", "references", "ownership", "artifacts", "roles", "declarations", "deferred"]) groups[key] = diffIndex(before[key], after[key]);
-  return { schema: "skill-rails/semantic-diff/1", spec_hash: { before: before.spec_hash, after: after.spec_hash }, changed: before.spec_hash !== after.spec_hash, groups };
+  const artifactReceipts = options.artifactReceipts ?? [];
+  const changedArtifacts = artifactReceipts.filter((item) => item.before_hash !== item.after_hash);
+  const sourceChanges = {
+    behavior_source: before.spec_hash !== after.spec_hash || changedArtifacts.some((item) => item.source === "behavior_source"),
+    observation_source: changedArtifacts.some((item) => item.source === "observation_source"),
+    context: changedArtifacts.some((item) => item.source === "context") || ["body", "templates", "template_content", "references"].some((key) => groups[key].length > 0)
+  };
+  return {
+    schema: "skill-rails/semantic-diff/1",
+    spec_hash: { before: before.spec_hash, after: after.spec_hash },
+    changed: before.spec_hash !== after.spec_hash,
+    any_changed: Object.values(sourceChanges).some(Boolean) || Object.values(groups).some((changes) => changes.length > 0),
+    source_changes: sourceChanges,
+    artifact_receipts: artifactReceipts,
+    groups
+  };
 }
 
 function index(items = [], project) { return Object.fromEntries(items.map((item, index) => [item.id ?? `index-${index}`, project(item)])); }
 function objectIndex(value = {}, project) { return Object.fromEntries(Object.entries(value).map(([id, item]) => [id, project(item)])); }
 function summarizeGuard(value) { return { reads: value.reads, then: value.then, forbids: value.forbids ?? [], body: value.body, unless: value.unless?.id ?? null }; }
-function summarizeStage(value) { return { reads: value.reads, needs: value.needs ?? [], table: value.table ?? null, branches: Object.keys(value.branches ?? {}), effects: effects(value.effects), body: value.body, record: value.record ?? null, reentry: value.reentry ?? null }; }
+function summarizeStage(value) { return { reads: value.reads, needs: value.needs ?? [], table: value.table ?? null, branches: Object.keys(value.branches ?? {}), effects: effects(value.effects), effect_plans: effectPlans(value), body: value.body, record: value.record ?? null, reentry: value.reentry ?? null }; }
 function summarizeTable(value) { return { exclusive: value.exclusive, rows: (value.rows ?? []).map((row) => ({ state: row.state, reads: row.reads })) }; }
 function summarizeFormat(value) { return { kind: value.kind, head: value.head, fields: value.fields }; }
 function effects(plan) { return (plan ?? []).map((item) => Array.isArray(item) ? item[0] : item); }
+function effectPlans(stage) {
+  return {
+    default: Array.isArray(stage.effects) ? canonicalValue(stage.effects) : null,
+    branches: Object.fromEntries(Object.entries(stage.branches ?? {}).sort(([a], [b]) => a.localeCompare(b)).map(([id, plan]) => [id, canonicalValue(plan)]))
+  };
+}
+function canonicalValue(value) {
+  if (Array.isArray(value)) return value.map(canonicalValue);
+  if (value && typeof value === "object") return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonicalValue(value[key])]));
+  return value;
+}
 function diffIndex(before = {}, after = {}) {
   const ids = [...new Set([...Object.keys(before), ...Object.keys(after)])].sort();
   return ids.flatMap((id) => {

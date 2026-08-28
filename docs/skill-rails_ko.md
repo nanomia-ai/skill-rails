@@ -489,7 +489,7 @@ node <skill-root>/scripts/maintain.mjs \
   --change <change.json>
 ```
 
-Intent-backed P0/P1은 `update-intent` operation만 허용한다. 현재 intent에서 생성되는 `SKILL.md`, adapter, guidance index, topic과 실제 파일이 다르면 덮어쓰지 않고 중단한다. Auto-profiled package에서 갱신된 intent가 다른 profile을 선택하면 명시적 재생성을 요구하고, explicit profile 결정은 그대로 고정해 감사 가능하게 남긴다. 정상 유지보수는 intent, ledger, projection, eval case를 원자적으로 갱신하고 별도 소유 helper와 파일은 보존한다. P2는 문장 위치가 아니라 stable ID를 주소로 사용하며, 변경 전후 predicate, stage, row, body, template, owner, fixture, generated artifact의 line diff와 semantic impact report를 함께 본다.
+Intent-backed P0/P1은 `update-intent` operation만 허용한다. 현재 intent에서 생성되는 `SKILL.md`, adapter, guidance index, topic과 실제 파일이 다르면 덮어쓰지 않고 중단한다. Auto-profiled package에서 갱신된 intent가 다른 profile을 선택하면 명시적 재생성을 요구하고, explicit profile 결정은 그대로 고정해 감사 가능하게 남긴다. 정상 유지보수는 intent, ledger, projection, eval case를 원자적으로 갱신하고 별도 소유 helper와 파일은 보존한다. P2는 문장 위치가 아니라 stable ID를 주소로 사용하며, 변경 전후 predicate, stage, row, body, template, owner, fixture, generated artifact의 line diff와 semantic impact report를 함께 본다. whole-file 교체는 등록된 typed artifact(`spec.mjs`, `collectors/index.mjs`, `references/` 아래 기존 파일)에만 현재 hash를 요구하며 허용하고, 원자적 install은 package root를 단독 소유한 하나의 authorized writer를 전제한다. 외부 process의 동시 쓰기에 대한 잠금이나 보존은 제공하지 않으며, 그 경계는 성공이 아니라 `UNPROVEN`이다.
 
 ### 13.7 완료 경계
 
