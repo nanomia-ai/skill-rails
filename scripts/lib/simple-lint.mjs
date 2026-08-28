@@ -110,11 +110,12 @@ async function validateSimpleAtom(root, atom, evalCases, diagnostics, skillSourc
   const pointer = `.skill-rails/obligation-ledger.json:${atom?.id ?? "<missing>"}`;
   const source = String(atom?.source ?? "");
   const text = String(atom?.text ?? "").trim();
+  const universalIntent = isUniversalSimpleIntentSource(source);
   if (!new Set(["projected", "review-required", "obsolete", "duplicate"]).has(atom?.disposition)) {
     diagnostics.push(diag("SR_LEDGER_DISPOSITION", pointer, "Obligation atom has an unknown disposition."));
     return;
   }
-  if (source.startsWith("intent.") && source !== "intent.description" && !/^intent\.judgment_points\[\d+\]\.(?:when|points\[\d+\])$/.test(source) && text && !skillSource.includes(text)) {
+  if (universalIntent && text && !skillSource.includes(text)) {
     diagnostics.push(diag("SR_LEDGER_TEXT", pointer, "Universal simple-skill intent must remain visible in the always-loaded SKILL.md."));
   }
   if (atom.disposition === "review-required") return;
@@ -129,7 +130,13 @@ async function validateSimpleAtom(root, atom, evalCases, diagnostics, skillSourc
     if (!resolved.exists) diagnostics.push(diag("SR_LEDGER_LOCATOR", pointer, `Obligation locator does not resolve: ${locator}`));
     if (atom.targets.includes(locator) && resolved.content !== null) targetContents.push(resolved);
   }
-  if (source.startsWith("intent.") && text && targetContents.length > 0 && !targetContents.some((target) => targetPreservesAtom(target, atom))) diagnostics.push(diag("SR_LEDGER_TEXT", pointer, "No owning target preserves the obligation text."));
+  if (!universalIntent && source.startsWith("intent.") && text && targetContents.length > 0 && !targetContents.some((target) => targetPreservesAtom(target, atom))) diagnostics.push(diag("SR_LEDGER_TEXT", pointer, "No owning target preserves the obligation text."));
+}
+
+function isUniversalSimpleIntentSource(source) {
+  return source.startsWith("intent.")
+    && source !== "intent.description"
+    && !/^intent\.judgment_points\[\d+\]\.(?:when|points\[\d+\])$/.test(source);
 }
 
 async function resolveSimpleLocator(root, locator, evalCases) {

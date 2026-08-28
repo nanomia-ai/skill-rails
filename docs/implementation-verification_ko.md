@@ -12,9 +12,11 @@
 
 ## 1. 현재 결정적 검증
 
-배포 기준선은 commit `0b70194`이며 작업 시작 시 `HEAD`, `origin/main`, `origin/HEAD`가 모두 그 commit을 가리켰다. `0b70194`에서 fresh Windows `npm ci`와 full `npm run verify`가 pass했고, 정확한 receipt는 vendor pass, lint pass, repository test 53/53 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass다. Push·배포 뒤 Sol/Fable/Luna fresh-consumer 실행도 수행했으며 그 제한된 행동 evidence는 4.3절과 6.8절이 소유한다.
+현재 배포 기준선은 commit `f8f42042c774a0276fd5d6f40013e6758039d8fc` (`feat: close P2 consumer path binding`)이며 작업 시작 시 `HEAD`, `origin/main`, `origin/HEAD`가 모두 그 commit을 가리켰고 worktree는 clean이었다. 이 기준선은 `ARTIFACTS.readers → Decision.stage_artifacts → guide`, exact-Decision alignment admission, judgment-only `NEXT` stage-state 격리를 포함한다. 그 기준선의 repository receipt는 vendor pass, lint pass, repository test 58/58 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass다.
 
-현재 worktree에는 그 배포본에서 반복 관찰된 P2 consumer path discoverability gap의 local correction과 final-diff audit의 두 blocking runtime correction이 있다. `ARTIFACTS.readers`에서 선택된 stage와 실제로 멈춘 guard의 정적 소비 의존성을 계산해 Decision schema 2의 `stage_artifacts`와 guide로 투영한다. Alignment는 supplied Decision의 self-seal과 같은 ID의 runtime-observed emission에 대한 stable structural equality를 expectation 계산 전에 검사하고, evaluator는 judgment-only `NEXT`로 건너뛴 stage의 row·plan·dependent iteration state를 다음 stage로 넘기지 않는다. Targeted runtime/authoring/integration test 48/48, canonical pilot L0–L18, formal build 20/20 mutations·10/10 scenarios·50회 불일치 0, manifest 52개 closure, real-state e2e 2/2가 pass했다. Canonical build 뒤 이 변경에 대해 정확히 한 번 실행한 full `npm run verify`도 vendor pass, lint pass, repository test 58/58 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass였다.
+현재 worktree에는 두 final-gate correction이 있다. P2 build fixture coverage는 evaluator의 내부 execution observer가 실제로 낸 guard·stage·judgment-branch·table-row event만 project하며, `coverageFor`는 더 이상 predicate를 재실행하거나 fixture fact에서 branch를 추론하지 않는다. 따라서 `skip:["NEXT"]` branch와 다음 stage를 같은 fixture가 정직하게 claim할 수 있지만, `done === true`로 건너뛴 branch의 거짓 claim은 계속 거부되고 L14의 모든 stage/branch 요구도 그대로다. 이 observer는 final Decision에 포함되지 않으므로 Decision schema, serialized bytes, hash, stage, row, effects가 바뀌지 않는다. P0/P1 simple lint는 universal intent의 `SKILL.md` 가시성, description frontmatter, routed topic text, locator resolution, `review-required` 기본값과 eval gate를 유지하면서, 그 universal atom의 canonical implementation target 파일에 원문 문장까지 중복할 의무만 제거했다.
+
+Targeted runtime/integration test는 35/35 pass했다. Canonical pilot은 L0–L18 pass 뒤 정본에서 rebuild되어 mutation 20/20, scenario 10/10, 50회 불일치 0, format 256/256, build ID `sha256:b0bfffa83c9c4510f46a89936be40c41c4e874ab15eb7bcd7684096e73f082a3`, manifest content 15 + generated 37 = 52, embedded lint pass, real-state e2e 2/2를 기록했다. 논리 수렴 뒤 정확히 한 번 실행한 full `npm run verify`도 vendor pass, lint pass, repository test 59/59 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass였다.
 
 최초 full verify에서 실패한 두 항목은 migration semantic-unit test와 G0.5 scorer test였다. 둘 다 제품 행동 결함이 아니라 raw-byte 입력이 checkout에서 CRLF로 바뀐 portability defect였고, 다섯 pattern의 raw-byte checkout protection으로 닫혔다.
 
@@ -277,18 +279,26 @@ Fresh `core.autocrlf=true` clone은 repository verify 52/52를 통과했지만, 
 
 현재 consumer-closure correction은 별도 V5 Decision 확장이므로 7절 Decision 변경 원장에 새 행을 추가한다.
 
-### 6.8 배포 후 fresh-consumer 판정과 현재 correction
+### 6.8 `f8f4204` 기준선의 fresh-consumer 판정
 
 - `0b70194`의 full `npm run verify` receipt는 vendor pass, lint pass, repository test 53/53 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass다. Exact `.gitattributes` P2-only 생성, manifest sealing, collision 무변경, ownership transfer, rollback·반복 byte 안정성·tamper 거부가 포함된다.
 - `0b70194`는 `origin/main`에 push·배포되었고 그 bytes를 대상으로 Sol/Fable/Luna fresh-consumer 실행을 마쳤다. 세 실행은 package trigger와 종료 가능성을 관찰했지만 path discovery workaround가 필요했으므로 composition은 `PARTIAL`이다.
 - Sol은 `.selection-proof` path를 coordinator에게 물었고, Fable과 Luna는 완료를 위해 generated package source를 검사했다. Authoring card나 collector에만 있는 정보는 declared consumer consumption set의 일부가 아니므로 이 workaround를 consumer closure 성공으로 credit하지 않는다.
 - Fable의 reinvocation 차이는 exact-Decision evidence scope로 설명되지만 final-diff audit는 alignment admission 자체의 별도 결함도 재현했다. 이전 구현은 same `decision_id`만으로 event를 scope하고 supplied Decision과 emitted Decision의 exact equality를 확인하지 않아 obligations를 지운 문서를 `aligned`로 올릴 수 있었다. 현재 `alignDecision`은 supplied Decision self-seal과 같은 ID의 runtime-observed `decision_emitted` document에 대한 stable structural equality를 expectation 계산 전에 요구한다. 실패는 empty expectations와 critical `misaligned` issue로 닫히며, 정확히 bind된 Decision에서 behavior evidence만 빠진 경우는 계속 `unproven`이다.
-- 현재 correction은 `ARTIFACTS.readers`를 선택된 stage/guard의 정적 소비 연결로 사용하고 required `Decision.stage_artifacts`와 guide에만 project한다. 별도 path registry, `OBSERVATIONS.artifact`, null escape, semantic path scanner, cross-skill composition은 추가하지 않는다.
+- `f8f4204` correction은 `ARTIFACTS.readers`를 선택된 stage/guard의 정적 소비 연결로 사용하고 required `Decision.stage_artifacts`와 guide에만 project한다. 별도 path registry, `OBSERVATIONS.artifact`, null escape, semantic path scanner, cross-skill composition은 추가하지 않는다.
 - 구조적 falsification은 네 층이다. Synthetic runtime test가 선택되지 않은 stage artifact를 숨기고 active guard artifact만 더하는 exact projection을 확인한다. Pilot integration test는 static consumer dependency 한 개의 `stage.acquire` reader를 제거하면 scenario의 exact `stage_artifacts` expectation이 L14로 실패함을 확인한다. Alignment regression은 `effects`, `proof_required`, `restrict`, `stage_artifacts`, `decision_id`를 각각 변조해 public API와 CLI가 expectations를 만들기 전에 모두 `misaligned`로 닫힘을 확인하고, record의 exact-match 거부와 정상 문서 수락도 함께 보존한다. Stage-coherence regression은 judgment `NEXT` skip 뒤 선택된 stage의 stage·row·effects·record/body·proof·reinvoke·`stage_artifacts`가 모두 같은 두 번째 stage에서 나옴을 확인한다.
-- 현재 correction의 targeted receipt는 runtime/authoring/integration 48/48 pass다. Canonical pilot root lint는 L0–L18 pass이고 rebuild는 mutation 20/20, scenario 10/10, 50회 불일치 0, format 256/256, manifest 15 + 37 = 52, real-state e2e 2/2이며 build ID는 `sha256:125adab7ef7a6e172272ada9dc247a8fdd9470c7d99fa649aa13f5b828a5bb11`이다.
+- `f8f4204` correction의 targeted receipt는 runtime/authoring/integration 48/48 pass다. 당시 canonical pilot root lint는 L0–L18 pass이고 rebuild는 mutation 20/20, scenario 10/10, 50회 불일치 0, format 256/256, manifest 15 + 37 = 52, real-state e2e 2/2이며 build ID는 `sha256:125adab7ef7a6e172272ada9dc247a8fdd9470c7d99fa649aa13f5b828a5bb11`이었다.
 - Decision schema는 `skill-rails/decision/1`에서 `/2`로 올라갔고 validator/runtime version은 각각 0.3.0/0.2.0이다. 기존 P2 generated package는 새 필드를 얻으려면 canonical rebuild가 필요하며, P0/P1 package와 Trace schema에는 migration이 없다.
-- Canonical build 뒤 이 변경에 대해 정확히 한 번 실행한 full `npm run verify`는 vendor pass, lint pass, repository test 58/58 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass였다. Correction의 commit·push·설치·배포와 corrected bytes의 fresh-consumer 행동은 아직 `UNPROVEN`이다. 여러 static input, non-file observation, stopping guard, skipped judgment stage, dynamic target, Decision tamper와 reinvocation을 한 fresh consumer에서 연결하는 audit 제안 stress scenario도 설계만 존재하고 실행하지 않았다.
+- Canonical build 뒤 이 변경에 대해 정확히 한 번 실행한 full `npm run verify`는 vendor pass, lint pass, repository test 58/58 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass였다. Commit과 `origin/main` 반영은 현재 기준선에서 확인되지만, source inspection 없이 corrected Decision/guide만으로 닫히는 fresh-consumer path discovery는 아직 `UNPROVEN`이다. 여러 static input, non-file observation, stopping guard, skipped judgment stage, dynamic target, Decision tamper와 reinvocation을 한 fresh consumer에서 연결하는 audit 제안 stress scenario도 설계만 존재하고 실행하지 않았다.
 - 검증자 정직성, public lane의 harness-trusted effect 관찰, 비-Windows POSIX symlink, long-session/compaction, out-of-band writer 보존도 여전히 `UNPROVEN`이다.
+
+### 6.9 final-gate coverage와 simple-lint correction
+
+설치된 `f8f4204` byte의 두 독립 audit가 서로 다른 authoring gate 모순을 재현했다. P2에서는 L14가 judgment `skip:["NEXT"]` branch fixture를 요구하지만 build가 final Decision만으로 coverage를 재계산해 정직한 claim을 거부했다. P1에서는 universal intent가 이미 `SKILL.md`에 보존되어도 canonical helper target 파일에 같은 영어 문장을 다시 넣어야만 `projected`가 되어, 공개 workflow의 “target은 구현, evidence는 그 check”와 충돌했다.
+
+P2 correction은 `evaluateSpec`의 optional internal observer와 `simulateSkill` 전달 경로를 사용한다. Evaluator가 predicate를 실제로 평가한 흐름에서만 `guard_matched`, `stage_entered`, `branch_selected`, `table_row_selected`를 내고 build-core는 그 event를 기존 coverage token으로 project한다. `coverageFor`의 guard predicate replay와 final-Decision stage/row projection은 제거했다. Valid skipped-NEXT package build pass, missing skip claim의 정확한 L14 fail, `done === true` fixture의 false skip claim 거부, observer 유무에 따른 Decision JSON/hash 완전 동일을 test가 고정한다. Canonical pilot embedded runtime은 정본에서 rebuild했으며 공개 Decision·Trace schema와 runtime/validator version은 바꾸지 않았다.
+
+P0/P1 correction은 Rule V가 이미 소유하는 universal intent atom에만 per-target exact-sentence conjunct를 제거한다. `SKILL.md` 원문 가시성, `intent.description`의 frontmatter equality, routed topic `when`/point의 index·topic text, `file:`/`eval:` locator resolution, generator의 `review-required` 기본값, eval의 `authoring-obligations-required` gate는 그대로다. P1 helper target에 원문을 복제하지 않은 정상 discharge, `SKILL.md` 원문 삭제·topic text 삭제·description mismatch·unresolvable locator 실패, open obligation eval 실패를 targeted test가 확인했다. 이 실행은 deterministic authoring/build evidence일 뿐 fresh author 또는 consumer 행동 evidence가 아니다.
 
 ---
 
@@ -361,6 +371,7 @@ V5의 18개 공개 위치는 현재 typed Decision에서 다음과 같이 보존
 | 선택된 stage/guard의 project artifact path가 Decision에 없음 | `ARTIFACTS.readers`에서 required `Decision.stage_artifacts`와 guide를 계산 | 기존 ARTIFACTS를 path·writer·template의 단일 정본으로 유지하면서 소비 AI가 collector/source inspection 없이 현재 정적 의존성을 찾게 함; non-file observation과 stage 선택 전 동적 입력에는 artifact/null을 강제하지 않음 |
 | alignment가 same `decision_id`로 scope하지만 supplied document와 emission의 exact equality를 검사하지 않음 | `alignDecision`이 supplied self-seal과 runtime-observed emission structural equality를 expectation보다 먼저 검사 | exact-Decision이라는 기존 evidence 의미를 실제 admission invariant로 복구하고 다섯 변조 field의 API/CLI regression과 record exact-match regression으로 rollback을 막음 |
 | judgment-only `NEXT` skip이 다음 stage에 prior row·plan state를 남길 수 있음 | row·plan·pending needs를 stage iteration-local로 만들고 선택된 bundle만 loop 밖으로 승격 | 선언 stage 순서와 ordered-effect 의미를 보존하며 stage·row·effects·record/body·proof·reinvoke·`stage_artifacts` full-coherence regression으로 확인 |
+| L14가 요구하는 skipped judgment branch를 final Decision만으로는 build evidence에 투영할 수 없음 | evaluator-observed internal execution event를 build fixture coverage token으로 투영 | L14를 약화하지 않고 `skip:["NEXT"]`와 다음 stage를 함께 증명하며, predicate replay·fact inference·Decision field 추가를 피함; valid/missing/false-claim/purity regression으로 rollback을 막음 |
 
 ### 7.3 의도적으로 제외한 capability
 
@@ -404,6 +415,7 @@ V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 - Creator thin skill과 조건부 authoring references
 - P0/P1/P2 profile selection
 - P0/P1 conditional judgment topic의 점진 읽기와 context-surface 계측
+- P0/P1 universal intent의 always-loaded visibility와 canonical implementation/evidence locator를 분리한 simple-lint provenance
 - intent/ledger scaffold와 P2 authoring-card template
 - conservative migration과 비-Markdown inventory
 - stable-ID maintenance와 semantic diff
@@ -411,6 +423,7 @@ V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 - P2 V5 validator L0–L18
 - positive-list AST와 two-level validation
 - deterministic evaluator와 compact guide
+- evaluator-observed execution event에서 fixture coverage를 계산하는 L14 build evidence path
 - `ARTIFACTS.readers`에서 선택된 stage/guard의 정적 `stage_artifacts`를 투영하는 Decision schema 2
 - supplied Decision self-seal과 runtime-emitted structural equality를 expectation보다 먼저 검사하는 exact-Decision alignment
 - Decision/Trace schemas, authority, alignment, resume
@@ -452,5 +465,6 @@ V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 - skipped judgment stage, stopping guard, 여러 static input, dynamic target, tampered Decision과 reinvocation을 한 corrected-byte fresh run에서 함께 관찰하는 chained coherence
 - consumer-closure correction의 commit·push·설치·배포
 - public lane의 harness-trusted effect observation과 verifier truthfulness
+- final-gate correction byte를 사용한 fresh P1 author closure와 fresh P2 skipped-NEXT consumer behavior
 
 이 항목들은 숨은 미완성 code marker가 아니라 별도 empirical scope다. 지원을 주장하려면 해당 범위를 직접 실행한 fresh evidence를 추가한다.

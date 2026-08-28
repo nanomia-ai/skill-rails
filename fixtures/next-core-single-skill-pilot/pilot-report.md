@@ -69,7 +69,7 @@ Receipt: exit 0; L0 through L18 pass with no diagnostics.
 
     node scripts/build.mjs --skill fixtures/next-core-single-skill-pilot/skill --repeats 50 --json
 
-Receipt: exit 0; 20/20 mutations killed, 10/10 scenarios passed for 50 deterministic repeats with no mismatch, predicate performance passed the 50 ms limit, and 256/256 format round trips passed with CRLF rejected. The canonical build identifier is <code>sha256:125adab7ef7a6e172272ada9dc247a8fdd9470c7d99fa649aa13f5b828a5bb11</code>, with <code>built_at: null</code>.
+Receipt: exit 0; 20/20 mutations killed, 10/10 scenarios passed for 50 deterministic repeats with no mismatch, predicate performance passed the 50 ms limit, and 256/256 format round trips passed with CRLF rejected. The canonical build identifier is <code>sha256:b0bfffa83c9c4510f46a89936be40c41c4e874ab15eb7bcd7684096e73f082a3</code>, with <code>built_at: null</code>.
 
 ### Embedded lint and focused real-state e2e
 
@@ -90,23 +90,23 @@ Disposable <code>git clone --no-local</code> checkouts with <code>core.autocrlf=
 
 ### Current correction boundary
 
-The deployed baseline is <code>0b70194</code>. The current uncommitted correction makes <code>ARTIFACTS.readers</code> the stage/guard dependency link, adds required <code>Decision.stage_artifacts</code> plus its guide projection, broadens writer actors to <code>external.*</code>/<code>project.*</code>, binds alignment to the exact supplied/runtime-emitted Decision, isolates skipped-judgment stage iteration state, and updates authoring sources, the canonical pilot, generated runtime/schema, and proportional tests. It does not add observation-to-artifact fields or null placeholders: non-file observations stay ordinary observations, while static file dependencies are declared once in <code>ARTIFACTS</code>. The ignored semantic-diff file is absent from the current package and is not a tracked correction artifact.
+The deployed Git baseline is <code>f8f4204</code>, which contains the <code>ARTIFACTS.readers</code> stage/guard dependency link, required <code>Decision.stage_artifacts</code> plus its guide projection, exact supplied/runtime-emitted Decision binding, and skipped-judgment stage-state isolation. The current uncommitted final-gate correction adds only an internal evaluator observer for build fixture coverage: skipped <code>NEXT</code> branches can be credited from actual execution without adding fields to the final Decision or weakening L14. The canonical rebuild updates the embedded evaluator/API and manifest; Decision and Trace schemas, runtime/validator versions, pilot spec, fixtures, and domain behavior are unchanged.
 
 ### Current repository verification
 
     npm run verify
 
-Receipt: the full <code>npm run verify</code> passed. Vendor and lint passed; repository tests passed 58/58, including exact-Decision API/CLI tamper rejection, skipped-judgment stage coherence, selected stage/guard projection, a pilot falsification that removes one required stage reader and observes L14 failure, package-attribute collision, and explicit ownership-transfer coverage; the eval clean control was valid; the fixture probe reported 10 total cases and 3 divergences; seeded defects were detected 5/5; all 8 required runs were present; and the empirical gate passed.
+Receipt: the full <code>npm run verify</code> passed. Vendor and lint passed; repository tests passed 59/59, including evaluator-observed skipped-NEXT coverage, false-claim rejection, exact-Decision purity, simple-lint helper-target discharge, exact-Decision API/CLI tamper rejection, selected stage/guard projection, package-attribute collision, and explicit ownership-transfer coverage; the eval clean control was valid; the fixture probe reported 10 total cases and 3 divergences; seeded defects were detected 5/5; all 8 required runs were present; and the empirical gate passed.
 
 ### Landing readiness
 
-Receipt: deployed baseline <code>0b70194</code> is complete. The consumer-closure correction is local and uncommitted; its push, installation, deployment, and corrected-byte fresh-consumer behavior remain outside this receipt.
+Receipt: Git baseline <code>f8f4204</code> is complete. The final-gate correction is local and uncommitted; its push, installation, deployment, and corrected-byte fresh-author or fresh-consumer behavior remain outside this receipt.
 
 ### Size facts
 
     node -e "const fs=require('fs'),p='fixtures/next-core-single-skill-pilot/skill/'; const b=f=>fs.readFileSync(p+f); const m=f=>({bytes:b(f).length,lines:(b(f).toString('utf8').match(/\n/g)||[]).length}); const files=[]; const walk=d=>{for(const e of fs.readdirSync(d,{withFileTypes:true})){const x=d+'/'+e.name;e.isDirectory()?walk(x):files.push(x)}}; walk(p.slice(0,-1)); console.log(JSON.stringify({spec:m('spec.mjs'),collector:m('collectors/index.mjs'),skill:m('SKILL.md'),verify_read_set:b('SKILL.md').length+b('references/canon.md').length+b('references/verify.md').length,work_read_set:b('SKILL.md').length+b('references/canon.md').length+b('references/work.md').length,package_bytes:files.reduce((n,f)=>n+fs.readFileSync(f).length,0),package_files:files.length},null,2));"
 
-Measured on 2026-08-29: <code>spec.mjs</code> is 7,224 bytes and 67 lines; the collector is 5,999 bytes and 121 lines; <code>SKILL.md</code> is 2,168 bytes and 18 lines; the verify read set is 8,417 bytes; the work read set is 5,972 bytes; and the 54-file skill package is 492,895 bytes.
+Measured on 2026-08-29: <code>spec.mjs</code> is 7,224 bytes and 67 lines; the collector is 5,999 bytes and 121 lines; <code>SKILL.md</code> is 2,168 bytes and 18 lines; the verify read set is 8,417 bytes; the work read set is 5,972 bytes; and the 54-file skill package is 493,656 bytes.
 
 ## 7. What remains UNPROVEN
 
@@ -119,7 +119,7 @@ Measured on 2026-08-29: <code>spec.mjs</code> is 7,224 bytes and 67 lines; the c
 
 ## 8. Immediate next step
 
-Review the verified local correction, then—only with separate authorization—land and deploy it and repeat a fresh-consumer path-discovery run using only the current Decision/guide and selected body/template.
+Review the verified local final-gate correction, then—only with separate authorization—land and deploy it and run isolated fresh-author and fresh-consumer checks against those corrected bytes.
 
 ## Appendix A. Retired designs
 

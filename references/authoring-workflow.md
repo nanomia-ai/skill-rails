@@ -79,7 +79,7 @@ Every generated P2 package reserves a package-root `.gitattributes` with exact b
 
 Resolve every project-relative path a collector accepts through a canonical realpath containment check before reading or hashing it; a lexical relative-path test accepts a symlink or junction that escapes the project.
 
-The obligation ledger is provenance, not a second behavior source. Keep original intent text immutable inside each atom and point `targets` to the canonical implementation and `evidence` to its check. Supported locators are `file:<relative-path>`, `body:<section-ref>`, `spec:<GROUP>/<stable-id>` (or `spec:TABLES/<table>/<row>`), `fixture:<id>`, and `eval:<id>`. Mark an atom `projected` only after both locators resolve. If an atom is still ambiguous, leave it `review-required` and keep the P2 `DEFERRED` gate.
+The obligation ledger is provenance, not a second behavior source. Keep original intent text immutable inside each atom; for P0/P1, universal intent remains visible in the always-loaded `SKILL.md`, while `targets` name the canonical implementing `file:` and `evidence` names its resolving `file:` or `eval:` check (frontmatter description and routed topic text remain checked on their own guidance surfaces). P2 additionally resolves `body:`, `spec:`, and `fixture:` locators. Mark an atom `projected` only after its target and evidence resolve; otherwise leave it `review-required` and keep the P2 `DEFERRED` gate.
 
 ## Maintenance
 

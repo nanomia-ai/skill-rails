@@ -112,7 +112,7 @@ async function stageSkillOnce({ skillRoot, projectRoot, judged = {}, decided = {
   return { decision, guide, runId: effectiveRunId, tracePath };
 }
 
-export async function simulateSkill({ skillRoot, fixture, runtimeDir = null, language = "en", fullValidation = false, predicateTimings = null }) {
+export async function simulateSkill({ skillRoot, fixture, runtimeDir = null, language = "en", fullValidation = false, predicateTimings = null, evaluationObserver = null }) {
   const root = resolve(skillRoot);
   const loaded = await loadAuthoringSkill(root, runtimeDir ?? await inferRuntimeDir(root));
   if (fullValidation) {
@@ -128,7 +128,7 @@ export async function simulateSkill({ skillRoot, fixture, runtimeDir = null, lan
   }
   observations.nested = nestFlat(observations.flat);
   observations.unknowns = observations.unknowns.filter(({ field }) => !Object.hasOwn(judged, field) && !Object.hasOwn(decided, field));
-  const decision = await evaluateSpec({ spec: loaded.spec, skillRoot: root, observations, snapshot, judged, decided, runtime: loaded.runtime, language, predicateTimings });
+  const decision = await evaluateSpec({ spec: loaded.spec, skillRoot: root, observations, snapshot, judged, decided, runtime: loaded.runtime, language, predicateTimings, evaluationObserver });
   return { decision, guide: renderGuide(decision) };
 }
 

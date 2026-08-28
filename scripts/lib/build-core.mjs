@@ -9,7 +9,6 @@ import { createManifest, detectGeneratedEdits, GENERATED_PACKAGE_FILES, readMani
 import { hashFile, sha256 } from "../runtime/hash.mjs";
 import { loadAuthoringSkill, simulateSkill } from "../runtime/api.mjs";
 import { runMutationSuite } from "./mutation-suite.mjs";
-import { nestFlat } from "../runtime/collectors.mjs";
 
 const AUTHORING_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const SOURCE_RUNTIME = join(AUTHORING_ROOT, "scripts", "runtime");
@@ -204,12 +203,12 @@ async function isolatedLint(root) {
 
 export async function runFixtureSuite(root, options = {}) {
   const fixtures = await readJson(join(root, "fixtures", "scenarios.json"));
-  const loaded = await loadAuthoringSkill(root, join(root, GENERATED_RUNTIME));
   const results = [];
   for (const fixture of fixtures) {
-    const output = await simulateSkill({ skillRoot: root, fixture, runtimeDir: join(root, GENERATED_RUNTIME) });
+    const executionEvents = [];
+    const output = await simulateSkill({ skillRoot: root, fixture, runtimeDir: join(root, GENERATED_RUNTIME), evaluationObserver: (event) => executionEvents.push(event) });
     assertFixture(fixture, output.decision);
-    const actualCoverage = coverageFor(loaded.spec, fixture, output.decision);
+    const actualCoverage = coverageFor(executionEvents);
     for (const claim of fixture.cover ?? []) if (!actualCoverage.has(claim)) throw new Error(`Fixture ${fixture.id} claims coverage it did not execute: ${claim}. actual=${[...actualCoverage].join(",")}`);
     results.push({ id: fixture.id, decision_id: output.decision.decision_id });
   }
@@ -268,23 +267,20 @@ function assertFixture(fixture, decision) {
   }
 }
 
-function coverageFor(spec, fixture, decision) {
+function coverageFor(executionEvents) {
   const coverage = new Set();
-  const state = nestFlat({ ...(fixture.s ?? {}), ...(fixture.judged ?? {}), ...(fixture.decided ?? {}) });
-  for (const guard of spec.GUARDS ?? []) {
-    let matched = false; let bypassed = false;
-    try { matched = guard.when(state) === true; bypassed = matched && guard.unless?.when(state) === true; } catch { /* invalid fixtures fail elsewhere */ }
-    if (matched) coverage.add(`guard:${guard.id}`);
-    if (bypassed) coverage.add(`unless:${guard.id}/${guard.unless.id}`);
-    if (matched && !bypassed && guard.then !== "RESTRICT") break;
-  }
-  if (decision.stage) coverage.add(`stage:${decision.stage}`);
-  if (decision.stage && decision.row) {
-    const stage = (spec.STAGES ?? []).find((item) => item.id === decision.stage);
-    if (stage?.table) {
-      coverage.add(`row:${stage.table}/${decision.row}`);
-      coverage.add(`branch:${stage.table}/${decision.row}`);
-    } else coverage.add(`branch:${stage.id}/${decision.row}`);
+  for (const event of executionEvents) {
+    if (event.type === "guard_matched") {
+      coverage.add(`guard:${event.data.guard}`);
+      if (event.data.bypassed_by) coverage.add(`unless:${event.data.guard}/${event.data.bypassed_by}`);
+    } else if (event.type === "stage_entered") {
+      coverage.add(`stage:${event.data.stage}`);
+    } else if (event.type === "branch_selected") {
+      coverage.add(`branch:${event.data.stage}/${event.data.row}`);
+    } else if (event.type === "table_row_selected") {
+      coverage.add(`row:${event.data.table}/${event.data.row}`);
+      coverage.add(`branch:${event.data.table}/${event.data.row}`);
+    }
   }
   return coverage;
 }

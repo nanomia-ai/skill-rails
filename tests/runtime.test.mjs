@@ -141,15 +141,26 @@ test("a skipped judgment NEXT branch cannot leak state into the next selected st
       secondResult: { path: "state/second-result.json", writer: "stage-coherence", readers: ["stage.second"], update: "replace", template: null }
     }
   };
-  const decision = await evaluateSpec({
+  const input = {
     spec,
     skillRoot: join(ROOT, "fixtures", "next-core-single-skill-pilot", "skill"),
     observations: { flat: { "route.mode": "skip" }, nested: { route: { mode: "skip" } }, unknowns: [] },
     snapshot: { fingerprint: "sha256:" + "a".repeat(64), status: "stable" },
     decided: { "route.mode": "skip" },
     runtime: { spec_hash: "sha256:" + "b".repeat(64), runtime_hash: "sha256:" + "c".repeat(64), dsl_hash: "sha256:" + "d".repeat(64), validator_hash: "sha256:" + "e".repeat(64), minimum_node_major: 20 }
-  });
+  };
+  const decision = await evaluateSpec(input);
+  const executionEvents = [];
+  const observedDecision = await evaluateSpec({ ...input, evaluationObserver: (event) => executionEvents.push(event) });
 
+  assert.deepEqual(observedDecision, decision);
+  assert.equal(JSON.stringify(observedDecision), JSON.stringify(decision));
+  assert.equal(observedDecision.decision_id, decision.decision_id);
+  assert.deepEqual(executionEvents, [
+    { type: "stage_entered", data: { stage: "first" } },
+    { type: "branch_selected", data: { stage: "first", row: "skip" } },
+    { type: "stage_entered", data: { stage: "second" } }
+  ]);
   assert.equal(decision.stage, "second");
   assert.equal(decision.row, null);
   assert.deepEqual(decision.effects, secondEffects);
@@ -166,6 +177,7 @@ test("a skipped judgment NEXT branch cannot leak state into the next selected st
     { id: "secondInput", path: "state/second.json", writer: "project.consumer", template: null },
     { id: "secondResult", path: "state/second-result.json", writer: "stage-coherence", template: null }
   ]);
+  assert.equal(Object.hasOwn(decision, "execution_events"), false);
 });
 
 test("runtime CLI rejects ambiguous booleans and command-inappropriate options before I/O", async () => {

@@ -7,7 +7,7 @@ import { loadBody, resolveBodySection } from "./body.mjs";
 import { resolveTemplate } from "./templates.mjs";
 import { fail } from "./diagnostics.mjs";
 
-export async function evaluateSpec({ spec, skillRoot, observations, snapshot, judged = {}, decided = {}, runtime, language = "en", predicateTimings = null, guardTrace = null }) {
+export async function evaluateSpec({ spec, skillRoot, observations, snapshot, judged = {}, decided = {}, runtime, language = "en", predicateTimings = null, guardTrace = null, evaluationObserver = null }) {
   const facts = new Map();
   const bypassed = [];
   const restrictions = new Map();
@@ -17,22 +17,30 @@ export async function evaluateSpec({ spec, skillRoot, observations, snapshot, ju
   for (const guard of spec.GUARDS ?? []) {
     const checked = checkReads(spec, guard, observations.flat, facts);
     if (!checked.ok) return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "BLOCK", guard: { id: guard.id, then: "BLOCK", reason: checked.reason }, stage: null, row: null, effects: [], bodyRef: guard.body, needs: checked.needs, language }));
-    guardTrace?.push({ type: "guard_evaluated", data: { guard: guard.id } });
+    const evaluatedEvent = { type: "guard_evaluated", data: { guard: guard.id } };
+    guardTrace?.push(evaluatedEvent);
+    evaluationObserver?.(evaluatedEvent);
     let matched = callPredicate(guard.when, s, `GUARDS.${guard.id}.when`, predicateTimings);
     if (!matched) continue;
     if (guard.unless) {
       const unlessReads = checkReads(spec, guard.unless, observations.flat, facts);
       if (!unlessReads.ok) {
-        guardTrace?.push({ type: "guard_matched", data: { guard: guard.id, pending_unless: guard.unless.id } });
+        const matchedEvent = { type: "guard_matched", data: { guard: guard.id, pending_unless: guard.unless.id } };
+        guardTrace?.push(matchedEvent);
+        evaluationObserver?.(matchedEvent);
         return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "BLOCK", guard: { id: guard.id, then: "BLOCK", reason: unlessReads.reason }, stage: null, row: null, effects: [], bodyRef: guard.body, needs: unlessReads.needs, language }));
       }
       if (callPredicate(guard.unless.when, s, `GUARDS.${guard.id}.unless.when`, predicateTimings)) {
         bypassed.push({ guard: guard.id, by: guard.unless.id });
-        guardTrace?.push({ type: "guard_matched", data: { guard: guard.id, bypassed_by: guard.unless.id } });
+        const bypassedEvent = { type: "guard_matched", data: { guard: guard.id, bypassed_by: guard.unless.id } };
+        guardTrace?.push(bypassedEvent);
+        evaluationObserver?.(bypassedEvent);
         continue;
       }
     }
-    guardTrace?.push({ type: "guard_matched", data: { guard: guard.id, then: guard.then } });
+    const matchedEvent = { type: "guard_matched", data: { guard: guard.id, then: guard.then } };
+    guardTrace?.push(matchedEvent);
+    evaluationObserver?.(matchedEvent);
     if (guard.then === "RESTRICT") {
       for (const verb of guard.forbids ?? []) if (!restrictions.has(verb)) restrictions.set(verb, guard.id);
       continue;
@@ -52,14 +60,17 @@ export async function evaluateSpec({ spec, skillRoot, observations, snapshot, ju
     let pendingNeeds = [];
     const checked = checkReads(spec, stage, observations.flat, facts, stage.needs ?? []);
     if (!checked.ok) {
+      evaluationObserver?.({ type: "stage_entered", data: { stage: stage.id } });
       return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "BLOCK", guard: stoppingGuard, stage: stage.id, row: null, effects: [], bodyRef: stage.body, needs: checked.needs, language, record: stage.record ?? { reentry: stage.reentry } }));
     }
     if (callPredicate(stage.done, s, `STAGES.${stage.id}.done`, predicateTimings)) continue;
+    evaluationObserver?.({ type: "stage_entered", data: { stage: stage.id } });
     if (stage.needs?.length) {
       pendingNeeds = stage.needs.filter((field) => isUnknown(observations.flat[field])).map((field) => needDescriptor(spec, field, stage.body));
       if (pendingNeeds.length > 0) return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "BLOCK", guard: stoppingGuard, stage: stage.id, row: null, effects: [], bodyRef: stage.body, needs: pendingNeeds, language, record: stage.record ?? { reentry: stage.reentry } }));
       row = String(observations.flat[stage.needs[0]]);
       plan = stage.branches?.[row];
+      evaluationObserver?.({ type: "branch_selected", data: { stage: stage.id, row } });
       if (isNoEffectNext(plan)) continue;
     }
     selectedStage = stage;
@@ -80,6 +91,7 @@ export async function evaluateSpec({ spec, skillRoot, observations, snapshot, ju
       row = matches[0] ?? null;
       if (!row) fail("L5", `Table ${stage.table} produced no row.`);
       plan = stage.branches[row];
+      evaluationObserver?.({ type: "table_row_selected", data: { table: stage.table, row } });
     } else if (!plan) plan = stage.effects;
     selectedRow = row;
     selectedPlan = plan;

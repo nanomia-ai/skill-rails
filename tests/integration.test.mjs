@@ -7,7 +7,7 @@ import Ajv2020 from "ajv/dist/2020.js";
 import { generatePackage, P2_PACKAGE_GITATTRIBUTES } from "../scripts/lib/generator.mjs";
 import { lintSimpleSkill } from "../scripts/lib/simple-lint.mjs";
 import { measureSimpleContextSurface } from "../scripts/lib/context-surface.mjs";
-import { buildP2 } from "../scripts/lib/build-core.mjs";
+import { buildP2, runFixtureSuite } from "../scripts/lib/build-core.mjs";
 import { copyTree, exists, listFiles, readJson, writeJsonAtomic, writeTextAtomic } from "../scripts/lib/io.mjs";
 import { enterSkill, stageSkill } from "../scripts/runtime/api.mjs";
 import { loadBuiltSkill } from "../scripts/runtime/loader.mjs";
@@ -187,10 +187,16 @@ test("progressive guidance lint fails closed on routing drift and orphans", asyn
   const intent = await readJson(join(ROOT, "fixtures", "intents", "p0.json"));
   intent.judgment_points = [{ id: "claim-risk", when: "A revision changes a claim.", points: ["Preserve the claim."] }];
   await generatePackage({ intent, output: root });
+  const topicPath = join(root, "references", "guidance", "claim-risk.md");
+  const originalTopic = await readFile(topicPath, "utf8");
+  await writeFile(topicPath, originalTopic.replace("Preserve the claim.", "REMOVED TOPIC POINT"), "utf8");
+  let lint = await lintSimpleSkill(root);
+  assert.ok(lint.diagnostics.some((item) => item.code === "SR_LEDGER_TEXT"), "topic target text remains required");
+  await writeFile(topicPath, originalTopic, "utf8");
   const indexPath = join(root, "references", "guidance-index.md");
   const originalIndex = await readFile(indexPath, "utf8");
   await writeFile(indexPath, originalIndex.replace("| `claim-risk`", "| `different-id`"), "utf8");
-  let lint = await lintSimpleSkill(root);
+  lint = await lintSimpleSkill(root);
   assert.ok(lint.diagnostics.some((item) => ["SR_GUIDANCE_PATH", "SR_GUIDANCE_INTENT"].includes(item.code)));
   await writeFile(indexPath, originalIndex, "utf8");
   await writeFile(join(root, "references", "guidance", "orphan.md"), "# Orphan\n", "utf8");
@@ -334,10 +340,13 @@ test("P1 evaluation validates its decision, helper, and authoring obligations", 
   assert.equal(JSON.parse(evaluated.stdout).release_readiness, "helper-implementation-required");
 
   await mkdir(join(complete, "tests"));
-  await writeFile(helperPath, `#!/usr/bin/env node\n// ${intent.exact_formats[0]}\n// ${intent.deterministic_helpers[0]}\nprocess.stdout.write("ready\\n");\n`, "utf8");
+  await writeFile(helperPath, "#!/usr/bin/env node\nprocess.stdout.write(\"ready\\n\");\n", "utf8");
   await writeFile(join(complete, "tests", "helper.test.mjs"), "// golden helper evidence\n", "utf8");
   const ledgerPath = join(complete, ".skill-rails", "obligation-ledger.json");
   const ledger = await readJson(ledgerPath);
+  assert.ok(ledger.atoms.some((item) => item.disposition === "review-required"), "P1 authoring obligations default to review-required");
+  evaluated = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", complete], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  assert.equal(JSON.parse(evaluated.stdout).release_readiness, "authoring-obligations-required");
   for (const atom of ledger.atoms.filter((item) => item.disposition === "review-required")) {
     atom.disposition = "projected";
     atom.targets = ["file:scripts/run.mjs"];
@@ -345,8 +354,51 @@ test("P1 evaluation validates its decision, helper, and authoring obligations", 
   }
   await writeJsonAtomic(ledgerPath, ledger);
   assert.equal((await lintSimpleSkill(complete)).ok, true);
+
+  const skillPath = join(complete, "SKILL.md");
+  const skill = await readFile(skillPath, "utf8");
+  await writeFile(skillPath, skill.replace(intent.exact_formats[0], "REMOVED FORMAT INTENT"), "utf8");
+  assert.ok((await lintSimpleSkill(complete)).diagnostics.some((item) => item.code === "SR_LEDGER_TEXT"), "universal intent remains required in SKILL.md");
+  await writeFile(skillPath, skill, "utf8");
+
+  const projected = ledger.atoms.find((item) => item.source.startsWith("intent.exact_formats"));
+  const originalTargets = projected.targets;
+  projected.targets = ["file:scripts/missing-helper.mjs"];
+  await writeJsonAtomic(ledgerPath, ledger);
+  assert.ok((await lintSimpleSkill(complete)).diagnostics.some((item) => item.code === "SR_LEDGER_LOCATOR"), "projected locators remain fail-closed");
+  projected.targets = originalTargets;
+  await writeJsonAtomic(ledgerPath, ledger);
+  assert.equal((await lintSimpleSkill(complete)).ok, true);
   evaluated = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", complete], { cwd: ROOT, encoding: "utf8", windowsHide: true });
   assert.equal(JSON.parse(evaluated.stdout).release_readiness, "forward-test-required");
+});
+
+test("P2 build credits skipped NEXT coverage only from evaluator-observed execution", async (t) => {
+  const base = await makeTestDir("skipped-next-coverage");
+  t.after(() => removeTestDir(base));
+  const valid = join(base, "valid");
+  await prepareSkippedNextPackage(valid);
+  const built = await buildP2(valid, { repeats: 1 });
+  assert.equal(built.fixtures.passed, 10);
+
+  const missing = join(base, "missing-claim");
+  await copyTree(valid, missing);
+  const missingPath = join(missing, "fixtures", "scenarios.json");
+  const missingScenarios = await readJson(missingPath);
+  missingScenarios[0].cover = missingScenarios[0].cover.filter((claim) => claim !== "branch:preflight/skip");
+  await writeJsonAtomic(missingPath, missingScenarios);
+  const missingValidation = await validateFull(missing);
+  assert.equal(missingValidation.ok, false);
+  assert.ok(missingValidation.diagnostics.some((item) => item.code === "L14" && item.pointer === "STAGES.preflight.branches.skip"));
+
+  const falseClaim = join(base, "false-claim");
+  await copyTree(valid, falseClaim);
+  const falsePath = join(falseClaim, "fixtures", "scenarios.json");
+  const falseScenarios = await readJson(falsePath);
+  const done = falseScenarios.find((fixture) => fixture.id === "done");
+  done.cover.push("branch:preflight/skip");
+  await writeJsonAtomic(falsePath, falseScenarios);
+  await assert.rejects(runFixtureSuite(falseClaim, { repeats: 1 }), /Fixture done claims coverage it did not execute: branch:preflight\/skip/);
 });
 
 test("P2 build fuzzes exact formats across structured values", async (t) => {
@@ -676,6 +728,27 @@ async function treeHashes(root) {
   const output = {};
   for (const path of await listFiles(root, { exclude: [".skill-rails"] })) output[path.slice(root.length + 1).replace(/\\/g, "/")] = await hashFile(path);
   return output;
+}
+
+async function prepareSkippedNextPackage(root) {
+  await copyTree(join(ROOT, "evals", "g0_5", "b-v5-clean"), root);
+  const specPath = join(root, "spec.mjs");
+  const source = await readFile(specPath, "utf8");
+  assert.match(source, /export const OBSERVATIONS = \{/);
+  assert.match(source, /export const STAGES = \[/);
+  await writeFile(specPath, source
+    .replace("export const OBSERVATIONS = {", 'export const OBSERVATIONS = {\n  "route.mode": { decided: true, domain: ["skip"] },')
+    .replace("export const STAGES = [", 'export const STAGES = [\n  { id: "preflight", reads: ["signal.pass"], done: s => s.signal.pass === "yes", needs: ["route.mode"], reentry: "rejudge", branches: { skip: ["NEXT"] }, body: "stage: preflight" },'), "utf8");
+
+  const bodyPath = join(root, "body.md");
+  const body = await readFile(bodyPath, "utf8");
+  await writeFile(bodyPath, body.replace("## stage: signal", "## stage: preflight\n\nJudgment: Treat route.mode value skip as the no-effect branch.\n\nWhy: Coverage must prove the branch that actually yielded.\n\n## stage: signal"), "utf8");
+
+  const scenariosPath = join(root, "fixtures", "scenarios.json");
+  const scenarios = await readJson(scenariosPath);
+  for (const fixture of scenarios) fixture.decided = { ...(fixture.decided ?? {}), "route.mode": "skip" };
+  scenarios[0].cover.unshift("stage:preflight", "branch:preflight/skip");
+  await writeJsonAtomic(scenariosPath, scenarios);
 }
 
 async function completeGeneratedP2ForRuntimeTest(root) {
