@@ -12,11 +12,13 @@
 
 ## 1. 현재 결정적 검증
 
-현재 배포 기준선은 commit `f8f42042c774a0276fd5d6f40013e6758039d8fc` (`feat: close P2 consumer path binding`)이며 작업 시작 시 `HEAD`, `origin/main`, `origin/HEAD`가 모두 그 commit을 가리켰고 worktree는 clean이었다. 이 기준선은 `ARTIFACTS.readers → Decision.stage_artifacts → guide`, exact-Decision alignment admission, judgment-only `NEXT` stage-state 격리를 포함한다. 그 기준선의 repository receipt는 vendor pass, lint pass, repository test 58/58 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass다.
+현재 배포 기준선은 commit `770cd3755d23c17a626822079c47d17b8387b326` (`fix: align fixture coverage and P1 provenance`)이다. `HEAD`와 `origin/main`은 이 commit으로 같고 integration worktree는 clean이다. 이 기준선은 `f8f42042c774a0276fd5d6f40013e6758039d8fc`의 `ARTIFACTS.readers → Decision.stage_artifacts → guide`, exact-Decision alignment admission, judgment-only `NEXT` stage-state 격리에 final-gate coverage와 P1 provenance correction을 더한다.
 
-현재 worktree에는 두 final-gate correction이 있다. P2 build fixture coverage는 evaluator의 내부 execution observer가 실제로 낸 guard·stage·judgment-branch·table-row event만 project하며, `coverageFor`는 더 이상 predicate를 재실행하거나 fixture fact에서 branch를 추론하지 않는다. 따라서 `skip:["NEXT"]` branch와 다음 stage를 같은 fixture가 정직하게 claim할 수 있지만, `done === true`로 건너뛴 branch의 거짓 claim은 계속 거부되고 L14의 모든 stage/branch 요구도 그대로다. 이 observer는 final Decision에 포함되지 않으므로 Decision schema, serialized bytes, hash, stage, row, effects가 바뀌지 않는다. P0/P1 simple lint는 universal intent의 `SKILL.md` 가시성, description frontmatter, routed topic text, locator resolution, `review-required` 기본값과 eval gate를 유지하면서, 그 universal atom의 canonical implementation target 파일에 원문 문장까지 중복할 의무만 제거했다.
+현재 commit의 두 final-gate correction은 다음과 같다. P2 build fixture coverage는 evaluator의 내부 execution observer가 실제로 낸 guard·stage·judgment-branch·table-row event만 project하며, `coverageFor`는 더 이상 predicate를 재실행하거나 fixture fact에서 branch를 추론하지 않는다. 따라서 `skip:["NEXT"]` branch와 다음 stage를 같은 fixture가 정직하게 claim할 수 있지만, `done === true`로 건너뛴 branch의 거짓 claim은 계속 거부되고 L14의 모든 stage/branch 요구도 그대로다. 이 observer는 final Decision에 포함되지 않으므로 Decision schema, serialized bytes, hash, stage, row, effects가 바뀌지 않는다. P0/P1 simple lint는 universal intent의 `SKILL.md` 가시성, description frontmatter, routed topic text, locator resolution, `review-required` 기본값과 eval gate를 유지하면서, 그 universal atom의 canonical implementation target 파일에 원문 문장까지 중복할 의무만 제거했다.
 
 Targeted runtime/integration test는 35/35 pass했다. Canonical pilot은 L0–L18 pass 뒤 정본에서 rebuild되어 mutation 20/20, scenario 10/10, 50회 불일치 0, format 256/256, build ID `sha256:b0bfffa83c9c4510f46a89936be40c41c4e874ab15eb7bcd7684096e73f082a3`, manifest content 15 + generated 37 = 52, embedded lint pass, real-state e2e 2/2를 기록했다. 논리 수렴 뒤 정확히 한 번 실행한 full `npm run verify`도 vendor pass, lint pass, repository test 59/59 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass였다.
+
+Push 뒤 공식 installer로 만든 Codex·Claude project-local 설치본은 exact `770cd3755d23c17a626822079c47d17b8387b326` archive와 249/249 path·byte가 같았다. Fresh Sol xhigh P1 author는 11/11 helper test, full lint, held-out byte equality, `open_obligations: 0`, `forward-test-required`를 기록했다. Fresh Fable Max P2 consumer는 stopping guard, 여러 static input, dynamic target/digest, fail-closed effect credit, 공개 `Decision.format.example` 기반 non-file verifier observation과 evidence `matching-pass`를 실행했다. 다만 fresh skipped-judgment, tampered Decision, evidence REPORT record/align은 실행하지 않아 전체 post-push 경험적 판정은 `PARTIAL`이다.
 
 최초 full verify에서 실패한 두 항목은 migration semantic-unit test와 G0.5 scorer test였다. 둘 다 제품 행동 결함이 아니라 raw-byte 입력이 checkout에서 CRLF로 바뀐 portability defect였고, 다섯 pattern의 raw-byte checkout protection으로 닫혔다.
 
@@ -300,6 +302,16 @@ P2 correction은 `evaluateSpec`의 optional internal observer와 `simulateSkill`
 
 P0/P1 correction은 Rule V가 이미 소유하는 universal intent atom에만 per-target exact-sentence conjunct를 제거한다. `SKILL.md` 원문 가시성, `intent.description`의 frontmatter equality, routed topic `when`/point의 index·topic text, `file:`/`eval:` locator resolution, generator의 `review-required` 기본값, eval의 `authoring-obligations-required` gate는 그대로다. P1 helper target에 원문을 복제하지 않은 정상 discharge, `SKILL.md` 원문 삭제·topic text 삭제·description mismatch·unresolvable locator 실패, open obligation eval 실패를 targeted test가 확인했다. 이 실행은 deterministic authoring/build evidence일 뿐 fresh author 또는 consumer 행동 evidence가 아니다.
 
+### 6.10 pushed byte의 fresh author·consumer audit
+
+공식 `npx skills@latest add nanomia-ai/skill-rails ... --copy --yes` 경로로 Codex와 Claude의 별도 project-local home에 설치했고, 두 설치본의 249개 파일은 exact `770cd3755d23c17a626822079c47d17b8387b326` Git archive와 path·byte가 모두 같았다.
+
+Fresh Sol xhigh author는 release-note drafter를 P1로 선택하고 AI의 포함·category 판단과 helper의 parsing·validation·exact rendering을 분리했다. 최종 package는 11/11 helper test, full lint, 338-byte held-out equality, `open_obligations: 0`, `behavior.status: unproven`, `release_readiness: forward-test-required`를 기록했다. Helper와 test target은 intent 원문을 복제하지 않고 `file:` locator로 obligation을 닫았다. 첫 test harness가 `os.tmpdir()` 아래 directory 3개를 만든 것은 lane containment 실패이며 제품 성공으로 세지 않는다. 해당 directory는 cleanup 금지 때문에 보존했다.
+
+Fresh Fable Max consumer는 stopping guard, 여러 static artifact, dynamic target descriptor와 live digest, argv verifier channel, agent-only effect claim의 `unproven` 유지, runtime-verified file proof, same-run fact recollection을 관찰했다. 최초 agent는 acquire Decision에 이미 있던 `format.example`을 요약에서 누락한 뒤 22개 임의 serialization을 시도하고 “public grammar가 없다”고 잘못 분류했다. Coordinator가 drift를 중단하고 같은 terminal에 명시된 example 한 가지만 재검증시켰다. Exact example에 live value를 대입하자 `result.verdict: pass`, `unknowns: []`, `status: DONE`, `stage: evidence`, `row: matching-pass`가 나왔다. 따라서 public-guidance product falsification은 철회하고 model/harness extraction 오류로 분류한다.
+
+이 audit에서 fresh skipped-judgment branch, tampered-Decision rejection, evidence-stage REPORT record/align은 실행하지 않았다. 35/35 deterministic regression이 skip leakage와 tamper rejection을 확인하지만 fresh behavior evidence로 승격하지 않는다. Post-push product falsification은 관찰하지 않았고 전체 empirical scope는 `PARTIAL`이다.
+
 ---
 
 ## 7. V5 보존 및 변경 원장
@@ -442,6 +454,9 @@ V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 - 한 개의 P0 single-match 흐름에서 필요한 judgment topic만 읽는 소비 행동
 - declared-column binding으로 검증자 pass를 정확한 selection·snapshot에만 credit하는 P2 pilot
 - 배포된 declared-column P2의 Sol/Fable/Luna fresh-consumer completion 경로와, mandatory consumption set 밖의 path discovery 때문에 `PARTIAL`로 제한된 composition
+- exact `770cd3755d23c17a626822079c47d17b8387b326`의 Codex·Claude 공식 project-local 설치본 249/249 byte identity
+- Fresh Sol xhigh P1 author의 locator-only obligation discharge, 11/11 helper test, held-out exact bytes, `open_obligations: 0`
+- Fresh Fable Max P2 consumer의 stopping guard, static/dynamic input, public format example, non-file verifier observation, evidence `matching-pass`; coordinator correction 전 model extraction drift는 제품 evidence에서 제외
 
 ---
 
@@ -461,10 +476,8 @@ V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 - 최신 suite의 Node 20/22/24 재실행
 - out-of-band writer가 capture 이후에도 쓰는 상황에서의 package 보존
 - 비-Windows host의 POSIX symlink 분기
-- corrected Decision/guide bytes에서 coordinator 답변이나 package source inspection 없이 현재 stage의 required artifact path/grammar를 발견하는 fresh-consumer closure
-- skipped judgment stage, stopping guard, 여러 static input, dynamic target, tampered Decision과 reinvocation을 한 corrected-byte fresh run에서 함께 관찰하는 chained coherence
-- consumer-closure correction의 commit·push·설치·배포
+- Fresh consumer가 skipped judgment branch, tampered Decision rejection, evidence REPORT record/align을 한 run에서 끝까지 연결한 chained coherence
 - public lane의 harness-trusted effect observation과 verifier truthfulness
-- final-gate correction byte를 사용한 fresh P1 author closure와 fresh P2 skipped-NEXT consumer behavior
+- final-gate correction byte를 사용한 fresh P2 skipped-NEXT consumer behavior
 
 이 항목들은 숨은 미완성 code marker가 아니라 별도 empirical scope다. 지원을 주장하려면 해당 범위를 직접 실행한 fresh evidence를 추가한다.

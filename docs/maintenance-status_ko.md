@@ -11,9 +11,10 @@
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 작업 시작 기준 commit: `f8f42042c774a0276fd5d6f40013e6758039d8fc` (`feat: close P2 consumer path binding`)
-- 작업 시작 시 `HEAD`, `origin/main`, `origin/HEAD`가 모두 위 commit이었고 worktree는 clean이었다.
-- 현재 worktree에는 final installed-byte gate가 드러낸 두 bounded correction과 그 test·문서·canonical pilot rebuild만 있다. Commit, push, install, publish, release는 수행하지 않았다.
+- 현재 기준 commit: `770cd3755d23c17a626822079c47d17b8387b326` (`fix: align fixture coverage and P1 provenance`)
+- `HEAD`와 `origin/main`은 위 commit으로 같고 integration worktree는 clean이다.
+- 이 commit은 `f8f42042c774a0276fd5d6f40013e6758039d8fc`의 consumer path binding 위에 final installed-byte gate가 드러낸 두 bounded correction을 더한다.
+- Commit과 normal push, 공식 project-local 설치 검증은 완료했다. 별도 version·publish·release는 수행하지 않았다.
 - `.codegraph/`는 이 checkout에 없어서 repository code 탐색에는 현재 owning source와 test만 사용했다.
 
 ---
@@ -48,14 +49,18 @@
 - Pilot manifest closure: content 15 + generated 37 = 52, verification pass.
 - Pilot embedded lint와 real-state e2e: L0–L18 pass, 2/2 pass.
 - 논리 수렴 뒤 정확히 한 번 실행한 full `npm run verify`: vendor pass, lint pass, repository test 59/59 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass.
+- 공식 installer로 Codex와 Claude의 별도 project-local home에 설치한 249개 파일은 exact `770cd3755d23c17a626822079c47d17b8387b326` archive와 path·byte가 모두 같았다.
+- Fresh Sol xhigh P1 author는 helper/test locator에 intent 문장을 복제하지 않고 11/11 helper test, full lint, held-out byte equality, `open_obligations: 0`, `forward-test-required`에 도달했다.
+- Fresh Fable Max P2 consumer는 stopping guard, 여러 static input, dynamic target/digest, fail-closed effect credit, 공개 `Decision.format.example` 기반 verifier result observation과 evidence `matching-pass`를 실행했다. 최초의 “format 공개 누락” 주장은 모델이 이미 받은 `decision.format`을 요약에서 빠뜨린 오류였고, 같은 terminal의 단일 재검증으로 철회됐다.
+- 최종 installed-byte 경험적 판정은 `PARTIAL`이다. Fresh consumer가 skipped-judgment branch, tampered-Decision rejection, evidence REPORT record/align을 직접 끝내지 않았고, Sol test harness가 첫 시도에 Lane B 밖 OS temp directory 3개를 만들었기 때문이다. 이들은 제품 falsification이 아니지만 verified로 승격하지 않는다.
 
 ---
 
 ## 4. 여전히 `UNPROVEN`인 범위
 
-- 이번 correction byte를 설치한 fresh P1 author가 declared consumption set만으로 obligation discharge를 끝내는 행동
-- 이번 correction byte를 사용한 fresh P2 consumer의 skipped-judgment 경로와 source-free path discovery
-- commit·push·설치·배포·release
+- Fresh P2 consumer의 skipped-judgment branch, tampered-Decision rejection, evidence REPORT record/align과 그 끝까지의 complete reinvocation chain
+- 생성 P1 skill의 fresh trigger 선택, AI category 판단과 실제 첫 산출물 유용성
+- 별도 version·publish·release
 - harness-trusted public effect observation과 verifier truthfulness
 - long-session/compaction, 여러 모델 반복, Linux/macOS POSIX symlink 분기
 - capture 뒤에도 계속 쓰는 out-of-band writer의 package 보존
@@ -67,7 +72,7 @@ Structural lint, deterministic build, fixture, manifest, e2e evidence를 fresh-a
 ## 5. 다음 세션 진입
 
 1. `AGENTS.md`, `CLAUDE.md`, 이 문서를 읽고 실제 `git status`와 `HEAD`를 확인한다.
-2. 현재 diff가 이 문서의 두 correction, proportional test, workflow paragraph, generated pilot rebuild, 두 docs update와 일치하는지 검토한다.
-3. 상세 evidence와 V5 보존 근거는 `docs/implementation-verification_ko.md` 6.9절과 7.2절을 확인한다.
-4. 별도 사용자 승인 전에는 commit, push, install, publish, release를 수행하지 않는다.
-5. Fresh behavior가 필요하면 corrected bytes의 별도 isolated author/consumer run으로 수행하고, deterministic receipt와 구분해 기록한다.
+2. `HEAD`와 `origin/main`이 `770cd3755d23c17a626822079c47d17b8387b326`인지, worktree가 clean인지 확인한다.
+3. 상세 deterministic·installed-byte evidence와 V5 보존 근거는 `docs/implementation-verification_ko.md` 6.9절, 6.10절, 7.2절을 확인한다.
+4. 남은 empirical claim이 실제로 필요할 때만 한 번의 clean consumer-only run으로 skipped judgment, tamper, final REPORT alignment를 연결한다. Repository verify나 P1 authoring을 반복하지 않는다.
+5. 새 product falsification이 없으면 현재 commit을 다시 설계하지 않는다. 별도 사용자 승인 전에는 version·publish·release를 수행하지 않는다.
