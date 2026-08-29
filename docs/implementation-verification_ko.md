@@ -320,9 +320,9 @@ Fresh Fable Max consumer는 stopping guard, 여러 static artifact, dynamic targ
 
 저작 진입점의 `매 편집 후 lint`는 논리 수렴 전 작은 수정마다 검사를 강제해 비수렴을 키울 수 있으므로, 의미 있는 변경 묶음이나 살아 있는 가설을 반증할 때 fast lint를 사용하고 설계 수렴 뒤 full lint·P2 build를 수행하도록 고쳤다. 공개 `Authoring judgment`가 사용자 목적과 실행 계약의 충돌 해결, 실패한 check의 product·fixture·harness·environment 전제 분리, 생성 스킬에 허용되는 짧은 recovery guard의 권한 경계를 소유한다. 상세 한국어 경험 문서는 맥락만 보존하고 생성 패키지에 복제하지 않는다.
 
-공개 `Authoring judgment`는 사용자 결과와 스킬이 해결할 근본 문제를 설계 기준으로 두고, 반복 작업이 결과를 더 가깝게 만들지 못할 때 현재 구현보다 framing·root cause·owning boundary와 더 단순한 대안을 다시 보게 한다. 새 evidence에 따라 해결 방법을 바꿀 수 있고 긴 문맥에서 필요할 때만 목적을 복기하지만, 정상적인 국소 수정에는 재기획을 요구하지 않는다. 정확 형식, Decision, evidence, 불가역 경계와 단일 정본은 그대로 구속하며 생성 P0/P1·P2 recovery guard는 바꾸지 않았다.
+공개 `Authoring judgment`는 사용자 결과와 스킬이 해결할 근본 문제를 설계 기준으로 두고, 반복 작업이 결과를 더 가깝게 만들지 못할 때 현재 구현보다 framing·root cause·owning boundary와 더 단순한 대안을 다시 보게 한다. 방향 원칙과 별도로 네 개의 범용 실패 사례가 행동·잘못된 전제·나쁜 결과의 인과를 보존하며, 표면 유사성이 아니라 같은 원인과 결과가 재현될 때만 적용한다. 새 evidence에 따라 해결 방법을 바꿀 수 있고 긴 문맥에서 필요할 때만 목적을 복기하지만, 정상적인 국소 수정에는 재기획을 요구하지 않는다. 정확 형식, Decision, evidence, 불가역 경계와 단일 정본은 그대로 구속하며 생성 P0/P1·P2 recovery guard는 바꾸지 않았다.
 
-현재 문구는 Fable xhigh와 Sol xhigh의 독립 read-only audit에서 의미 보존, 중복 제거, 정상 국소 수정의 비과잉 경계를 교차 검토했다. 두 감사 모두 정확한 계약 reference는 그대로 두고 이 판단 부품만 압축하라는 결론이었다. 이전 fresh Sol xhigh 행동 gate는 압축 전 bytes를 읽었으므로 현재 문구의 fresh-author 행동은 다시 관찰하기 전까지 `UNPROVEN`이다.
+현재 문구는 Fable xhigh의 기존 read-only 설계 감사에서 도출한 evidence-bound 인과 기준을 재사용하고, 최종 failure-case bytes를 기존 Sol xhigh 감사 에이전트가 다시 반증했다. Sol은 방향과 사례의 역할 분리, 네 사례의 인과, 정상 국소 수정의 비과잉 경계를 소폭 보완 후 통과로 판정했다. 이전 fresh Sol xhigh 행동 gate는 현재 failure-case bytes를 읽지 않았으므로 fresh-author 행동은 다시 관찰하기 전까지 `UNPROVEN`이다.
 
 P0/P1 생성물은 작은 수정과 예외가 늘지만 사용자 결과가 가까워지지 않을 때 결과와 접근을 다시 보도록 하되 의미·형식·비가역 경계·완료 증거를 계속 구속한다. P2 생성물은 판단을 현재 Decision이 열어 둔 domain work로 제한하고 Decision·evidence·loader step을 우회하지 못하게 한다. 저장된 stage result는 현재 task가 이 설치 skill과 project의 current Decision으로 명시하고 package와 covered project state가 생성 이후 변하지 않았음을 확인할 때만 소비하며, 발견한 파일·대화 기억·불확실한 상태에서는 반드시 새 stage를 실행한다. 이는 loader guidance correction이며 runtime, schema, Decision byte, P2 behavior source를 바꾸지 않는다.
 

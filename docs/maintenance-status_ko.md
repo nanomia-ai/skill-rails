@@ -35,7 +35,7 @@
 ## 3. 현재 증거
 
 - Targeted profile-generation regression, generic loader regression, repair-generated canonical P2 pilot과 현재 후보 bytes의 full verify가 모두 통과했다. 정확한 count, build ID, 이전 고유 receipt와 역사적 evidence card는 [구현·검증 기록](implementation-verification_ko.md) 1절과 6.11–6.12가 소유한다.
-- 공개 `Authoring judgment`는 Fable xhigh와 Sol xhigh의 독립 감사 뒤 사용자 결과·근본 문제·비수렴 시 재검토·적응형 복기만 남기고 중복 절차를 덜어냈다. 이전 fresh Sol xhigh gate는 압축 전 bytes를 읽었으므로 현재 문구의 fresh-author 행동과 생성 skill 소비자의 recovery guard 행동은 각각 `UNPROVEN`이다.
+- 공개 `Authoring judgment`는 사용자 결과·근본 문제를 향한 방향 원칙과 네 개의 범용 인과 실패 사례를 분리하고 중복 절차를 덜어냈다. Fable xhigh 감사 기준을 재사용한 최종 Sol xhigh 재감사는 의미 중복·과잉 재기획·표면 패턴 오용을 소폭 보완 후 통과로 판정했다. 이전 fresh Sol xhigh gate는 현재 failure-case bytes를 읽지 않았으므로 fresh-author 행동과 생성 skill 소비자의 recovery guard 행동은 각각 `UNPROVEN`이다.
 - 구조, 생성, 결정성 증거를 fresh-agent 행동 증거로 승격하지 않는다.
 
 ---
