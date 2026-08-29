@@ -1,5 +1,7 @@
 import { DECISION_SCHEMA, RUNTIME_VERSION, VALIDATOR_VERSION } from "./constants.mjs";
+import { readFile } from "node:fs/promises";
 import { performance } from "node:perf_hooks";
+import { join } from "node:path";
 import { isUnknown } from "./dsl.mjs";
 import { validateDomainValue } from "./domains.mjs";
 import { sha256 } from "./hash.mjs";
@@ -144,7 +146,7 @@ async function decisionParts(context) {
     decided: serializable(decided),
     record,
     reads: [...facts.keys()].sort(),
-    effects: serializable(effects),
+    effects: serializable(projection.effects),
     format: projection.format,
     template: projection.template,
     template_text: projection.templateText,
@@ -152,7 +154,7 @@ async function decisionParts(context) {
     stage_artifacts: projectStageArtifacts(spec, stage, guard),
     needs,
     proof_required: proofRequired,
-    reinvoke: effects.at?.(-1) === "NEXT" ? "after-effects" : null,
+    reinvoke: projection.effects.at?.(-1) === "NEXT" ? "after-effects" : null,
     assurance: "checked"
   };
 }
@@ -223,12 +225,36 @@ async function resolveProjection(spec, skillRoot, effects, record, bodyMarkdown)
       templateId ??= artifact?.template ?? null;
     }
   }
+  const hasProjectedFormat = Boolean(formatId && spec.FORMATS?.[formatId])
+    || (effects ?? []).some((effect) => Array.isArray(effect) && spec.FORMATS?.[effect[1]?.format]);
+  const formatFixtures = hasProjectedFormat ? await loadFormatFixtures(skillRoot) : null;
+  const examples = new Map();
+  const exampleFor = (id) => {
+    if (!examples.has(id)) {
+      const fixture = formatFixtures?.find((item) => item?.format === id && typeof item.expect === "string");
+      examples.set(id, fixture ? fixture.expect : formatExample(spec.FORMATS[id]));
+    }
+    return examples.get(id);
+  };
+  const projectedEffects = (effects ?? []).map((effect) => {
+    if (!Array.isArray(effect) || !spec.FORMATS?.[effect[1]?.format]) return effect;
+    return [effect[0], { ...(effect[1] ?? {}), format_example: exampleFor(effect[1].format) }];
+  });
   const format = formatId && spec.FORMATS?.[formatId]
-    ? { id: formatId, example: formatExample(spec.FORMATS[formatId]) }
+    ? { id: formatId, example: exampleFor(formatId) }
     : null;
   let templateText = null;
   if (templateId && spec.TEMPLATES?.[templateId]) templateText = await resolveTemplate(skillRoot, templateId, spec.TEMPLATES[templateId], bodyMarkdown);
-  return { format, template: templateId, templateText };
+  return { effects: projectedEffects, format, template: templateId, templateText };
+}
+
+async function loadFormatFixtures(skillRoot) {
+  try {
+    const fixtures = JSON.parse(await readFile(join(skillRoot, "fixtures", "formats.json"), "utf8"));
+    return Array.isArray(fixtures) ? fixtures : null;
+  } catch {
+    return null;
+  }
 }
 
 function formatExample(format) {

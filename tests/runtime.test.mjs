@@ -18,6 +18,8 @@ import { validateFast, importVerifiedSource } from "../scripts/runtime/validator
 import { makeTestDir, removeTestDir } from "./helpers.mjs";
 import { appendTraceEvent, createTraceEvent, readTrace } from "../scripts/runtime/trace-store.mjs";
 
+const PILOT_SKILL = join(ROOT, "fixtures", "next-core-single-skill-pilot", "skill");
+
 test("line formats round-trip exact fields", () => {
   const format = line("result", { count: "integer", verdict: ["pass", "fail"], detail: "text" });
   const rendered = format.render({ count: 2, verdict: "pass", detail: "checked" }, { timestamp: "2026-08-23T00:00:00Z" });
@@ -95,6 +97,31 @@ test("exclusive tables use their default only when no non-default row matches", 
   const observations = (value) => ({ flat: { "choice.value": value }, nested: { choice: { value } }, unknowns: [] });
   assert.equal((await evaluateSpec({ ...base, observations: observations("hit") })).row, "matched");
   assert.equal((await evaluateSpec({ ...base, observations: observations("miss") })).row, "fallback");
+});
+
+test("exact golden format is projected onto the owning effect without mutating the spec", async () => {
+  const spec = await import("../fixtures/next-core-single-skill-pilot/skill/spec.mjs");
+  const fixtures = JSON.parse(await readFile(join(PILOT_SKILL, "fixtures", "formats.json"), "utf8"));
+  const expected = fixtures.find((fixture) => fixture.format === "verifierResult").expect;
+  const sourceEffect = spec.STAGES.find((stage) => stage.id === "acquire").effects.find((effect) => Array.isArray(effect) && effect[0] === "WRITE");
+  const decision = await evaluateSpec({
+    spec,
+    skillRoot: PILOT_SKILL,
+    observations: {
+      flat: { "intent.token": "verify", "verifier.channel": "available", "result.verdict": "NONE" },
+      nested: { intent: { token: "verify" }, verifier: { channel: "available" }, result: { verdict: "NONE" } },
+      unknowns: []
+    },
+    snapshot: { fingerprint: "sha256:" + "a".repeat(64), status: "stable" },
+    decided: { "intent.token": "verify" },
+    runtime: { spec_hash: "sha256:" + "b".repeat(64), runtime_hash: "sha256:" + "c".repeat(64), dsl_hash: "sha256:" + "d".repeat(64), validator_hash: "sha256:" + "e".repeat(64), minimum_node_major: 20 }
+  });
+  const write = decision.effects.find((effect) => Array.isArray(effect) && effect[0] === "WRITE");
+
+  assert.equal(write[1].format_example, expected);
+  assert.equal(decision.format.example, expected);
+  assert.equal(Object.hasOwn(sourceEffect[1], "format_example"), false, "projection must not mutate spec effect args");
+  assert.ok(renderGuide(decision).includes(`WRITE(action=record-result,artifact=verifierResult,format=verifierResult,format_example=${expected})`));
 });
 
 test("selected stages and stopping guards project only their declared static artifacts", async () => {
