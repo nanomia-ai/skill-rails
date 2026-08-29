@@ -253,13 +253,16 @@ SKILL.md
 
 ### 8.1 Creator 정본
 
-- `SKILL.md`: 선택과 authoring 진입 절차
-- `references/`: 설치된 Skill Rails가 작업 종류에 따라 읽는 작성·P2 계약·평가·마이그레이션 규칙
-- `scripts/lib/`: profile, generator, obligation, migration, maintenance, semantic diff, build
-- `scripts/runtime/`: P2 validator, evaluator, guide, trace, alignment 원본
-- `schemas/`: 공개 Decision과 Trace Event 계약
-- `templates/`: creator가 만드는 초기 authoring 자산
-- `fixtures/`, `tests/`, `evals/`: 반증과 검증 증거
+설치 가능한 단일 skill package의 경계는 `skills/skill-rails/`다. 이 디렉터리 안에서는 다음 자산이 creator 정본이다.
+
+- `skills/skill-rails/SKILL.md`: 선택과 authoring 진입 절차
+- `skills/skill-rails/references/`: 설치된 Skill Rails가 작업 종류에 따라 읽는 작성·P2 계약·평가·마이그레이션 규칙
+- `skills/skill-rails/scripts/lib/`: profile, generator, obligation, migration, maintenance, semantic diff, build
+- `skills/skill-rails/scripts/runtime/`: P2 validator, evaluator, guide, trace, alignment 원본
+- `skills/skill-rails/schemas/`: 공개 Decision과 Trace Event 계약
+- `skills/skill-rails/templates/`: creator가 만드는 초기 authoring 자산
+
+Repository root의 `fixtures/`, `tests/`, `evals/`, `docs/`는 공개 source와 반증·검증 증거지만 설치 package에는 속하지 않는다. 따라서 GitHub에서 함께 유지하면서도 skill discovery와 설치 payload에는 노출하지 않는다.
 
 ### 8.2 생성된 P2의 정본
 
@@ -294,7 +297,7 @@ P2는 상태·승인·증거·순서·비가역 경계에 따라 다음 행동�
 
 Guard, stage, table row와 ordered effect를 deterministic하게 계산하되 runtime은 domain 작업이나 host tool call을 대신 실행하지 않는다. `UNKNOWN`을 false로 바꾸거나 agent claim을 verified evidence로 올리지 않으며, unresolved obligation과 `DEFERRED`는 release를 막는다.
 
-정확한 closed exports, observation 값, 평가 순서, body heading, template와 validation 규칙은 [P2 계약](../references/p2-contract.md)이 단독으로 소유한다. 이 제품 문서에는 그 계약을 다시 열거하지 않는다.
+정확한 closed exports, observation 값, 평가 순서, body heading, template와 validation 규칙은 [P2 계약](../skills/skill-rails/references/p2-contract.md)이 단독으로 소유한다. 이 제품 문서에는 그 계약을 다시 열거하지 않는다.
 
 ---
 
@@ -386,7 +389,7 @@ Trace는 steering과 evidence reference를 기록한다. raw tool output 전체�
 
 ### 11.5 Alignment
 
-개별 요구사항과 aggregate의 현재 closed vocabulary는 [평가 계약](../references/evaluation.md)이 소유한다. 이 설계의 안정 경계는 증거가 없거나 권위가 부족한 요구사항을 성공으로 승격하지 않는다는 것이다.
+개별 요구사항과 aggregate의 현재 closed vocabulary는 [평가 계약](../skills/skill-rails/references/evaluation.md)이 소유한다. 이 설계의 안정 경계는 증거가 없거나 권위가 부족한 요구사항을 성공으로 승격하지 않는다는 것이다.
 
 성공 문장이 trace에 있어도 요구 proof가 없으면 `unproven`이다. agent가 effect를 수행했다고 기록했지만 외부 관찰이 없으면 그 claim은 보존하되 verified로 바꾸지 않는다.
 
@@ -396,7 +399,7 @@ Trace는 steering과 evidence reference를 기록한다. raw tool output 전체�
 
 세 검증 단계는 속도와 evidence 수준을 분리한다. L-fast는 매 import 전에 source를 검사하고 manifest를 권위로 신뢰하지 않는다. L-structural은 빠른 author feedback을 위해 isolated import와 구조 검사를 더한다. L-full은 build에서 fixture, mutation, determinism, format과 manifest evidence까지 확인한다.
 
-Runtime은 validator가 허용한 제한된 ESM만 평가하며 별도 interpreter로 정본 의미를 복제하지 않는다. 정확한 validation contract는 [P2 계약](../references/p2-contract.md), L0–L18의 현재 구현 대응은 [구현·검증 기록](implementation-verification_ko.md)이 소유한다.
+Runtime은 validator가 허용한 제한된 ESM만 평가하며 별도 interpreter로 정본 의미를 복제하지 않는다. 정확한 validation contract는 [P2 계약](../skills/skill-rails/references/p2-contract.md), L0–L18의 현재 구현 대응은 [구현·검증 기록](implementation-verification_ko.md)이 소유한다.
 
 ---
 
@@ -452,13 +455,13 @@ Target과 evidence가 모두 실제로 resolve될 때만 `projected`로 바꾼�
 
 ### 13.4 생성
 
-실제 생성 명령과 작업별 reference 진입은 root [`SKILL.md`](../SKILL.md)가 조건부로 안내한다.
+실제 생성 명령과 작업별 reference 진입은 설치 package의 [`SKILL.md`](../skills/skill-rails/SKILL.md)가 조건부로 안내한다.
 
 P1/P2 output은 안전하게 실패하는 scaffold다. marker, unresolved atom, P2 DEFERRED를 사용자별 의미와 test로 교체하기 전에는 완성품이 아니다.
 
 ### 13.5 보수적 마이그레이션
 
-실제 마이그레이션 명령과 절차는 root [`SKILL.md`](../SKILL.md)가 조건부로 안내한다.
+실제 마이그레이션 명령과 절차는 설치 package의 [`SKILL.md`](../skills/skill-rails/SKILL.md)가 조건부로 안내한다.
 
 원본 project를 수정하지 않는다. 승인된 destination에 복사·생성한다. Markdown source는 parser-backed semantic atom(frontmatter metadata, heading/context, paragraph, nested list item, table row, code/HTML block, parser-consumed reference definition)으로 보존하고, Markdown 이외 regular source file은 파일 하나당 하나의 `file-text` 또는 `file-opaque` review atom으로 inventory한다. UTF-8 text는 exact raw text와 byte hash를 남기고, opaque file은 내용을 덤프하지 않고 byte hash·byte count와 preserve/map/dispose 명시 지시만 남긴다. exact format → observation → stage/guard/effect 순으로 옮기며 judgment는 body에 남긴다.
 
@@ -475,7 +478,7 @@ Migration atom은 별도 원장에 쓰지 않고 `.skill-rails/obligation-ledger
 
 ### 13.6 유지보수
 
-실제 유지보수 명령과 change envelope는 root [`SKILL.md`](../SKILL.md)가 조건부로 안내한다.
+실제 유지보수 명령과 change envelope는 설치 package의 [`SKILL.md`](../skills/skill-rails/SKILL.md)가 조건부로 안내한다.
 
 Intent-backed P0/P1은 `update-intent` operation만 허용한다. 현재 intent에서 생성되는 `SKILL.md`, adapter, guidance index, topic과 실제 파일이 다르면 덮어쓰지 않고 중단한다. Auto-profiled package에서 갱신된 intent가 다른 profile을 선택하면 명시적 재생성을 요구하고, explicit profile 결정은 그대로 고정해 감사 가능하게 남긴다. 정상 유지보수는 intent, ledger, projection, eval case를 원자적으로 갱신하고 별도 소유 helper와 파일은 보존한다. P2는 문장 위치가 아니라 stable ID를 주소로 사용하며, 변경 전후 predicate, stage, row, body, template, owner, fixture, generated artifact의 line diff와 semantic impact report를 함께 본다. whole-file 교체는 등록된 typed artifact(`spec.mjs`, `collectors/index.mjs`, `references/` 아래 기존 파일)에만 현재 hash를 요구하며 허용하고, 원자적 install은 package root를 단독 소유한 하나의 authorized writer를 전제한다. 외부 process의 동시 쓰기에 대한 잠금이나 보존은 제공하지 않으며, 그 경계는 성공이 아니라 `UNPROVEN`이다.
 
@@ -553,7 +556,7 @@ Script는 사용자 project의 현재 directory가 아니라 active `SKILL.md`�
 
 범용 설치 명령은 `npx skills@latest add nanomia-ai/skill-rails`이며, 정확한 target directory와 copy/symlink 방식은 installer가 소유한다. Manual 설치에서는 host가 정한 project-local discovery directory에 같은 package를 둔다. 설치된 정상 creator 명령은 package-local dependency만 사용하며 `npm ci`를 요구하지 않는다. Repository 자체의 test와 frozen self-evaluation을 실행하는 개발 경로는 dev dependency 설치 뒤 검증한다.
 
-Root `SKILL.md`를 package boundary로 쓰므로 현재 범용 installer는 tests와 설계 문서도 함께 복사한다. 이 파일들은 AI의 조건부 읽기 경로에 자동 포함되지 않아 행동과 context 계약을 바꾸지 않지만, 배포 byte 수는 늘린다. 이를 줄이기 위한 nested distribution layout은 source와 generated distribution의 ownership을 먼저 설계해야 하는 별도 repository migration이다.
+공식 Agent Skills 관례에 맞춘 `skills/skill-rails/`가 유일한 설치 경계다. 범용 installer에는 repository별 include/exclude manifest가 없으므로 root에 `SKILL.md`를 두지 않는다. Installer는 선택된 skill directory만 재귀 복사하고, repository root의 maintainer 문서·tests·evals·fixtures는 GitHub에서 계속 공개하되 설치 payload에서는 제외한다. 설치 package 안에는 discoverable `SKILL.md`가 정확히 하나뿐이며, fixture를 숨기기 위한 별도 예외 규칙은 두지 않는다.
 
 Claude plugin, marketplace manifest, hook은 단순 설치를 위해 추가하지 않는다. Managed marketplace는 package 구조, update, submission, 실제 host 검증을 별도로 소유해야 하는 후속 distribution 제품이다.
 
@@ -609,7 +612,7 @@ Codex와 Claude Code는 현재 fresh 행동 증거가 있는 project-local adapt
 
 ## 18. P2 version-5 호환 변경 기록의 경계
 
-P2의 현재 행동 계약은 [P2 계약](../references/p2-contract.md)과 코드가 소유한다. version-5 기준선에서 보존한 의미, 명시적으로 확장한 항목, 의도적으로 제외한 cross-skill capability와 그 검증 근거는 [구현·검증 기록](implementation-verification_ko.md)의 변경 원장이 소유한다.
+P2의 현재 행동 계약은 [P2 계약](../skills/skill-rails/references/p2-contract.md)과 코드가 소유한다. version-5 기준선에서 보존한 의미, 명시적으로 확장한 항목, 의도적으로 제외한 cross-skill capability와 그 검증 근거는 [구현·검증 기록](implementation-verification_ko.md)의 변경 원장이 소유한다.
 
 변경 원장이 요구하는 내용과 evidence 형식은 한 곳에서만 유지한다. 그 기록 없이 P2 호환 계약을 축소하거나 기계 판정 가능한 규칙을 산문으로 되돌리지 않는다.
 
@@ -694,13 +697,13 @@ Shape와 simple table에는 유리하다. 복잡 predicate는 표현 부족 또�
 
 ## 22. 공개 명령
 
-Creator 명령, 작업 순서와 작업별 operational reference는 root [`SKILL.md`](../SKILL.md)가 조건부로 안내한다. Repository 검증 명령은 `package.json`이 소유한다. 사람을 위한 README를 maintainer 진입점이나 검증 정본으로 사용하지 않고, 이 제품 설계 문서에 CLI 목록이나 두 번째 라우팅 표를 복제하지 않는다.
+Creator 명령, 작업 순서와 작업별 operational reference는 설치 package의 [`SKILL.md`](../skills/skill-rails/SKILL.md)가 조건부로 안내한다. Repository 검증 명령은 `package.json`이 소유한다. 사람을 위한 README를 maintainer 진입점이나 검증 정본으로 사용하지 않고, 이 제품 설계 문서에 CLI 목록이나 두 번째 라우팅 표를 복제하지 않는다.
 
 ---
 
 ## 23. 새 AI의 작업 시작 규칙
 
-Repository 유지보수를 이어받는 새 세션은 `AGENTS.md`, [유지보수 상태](maintenance-status_ko.md)와 실제 git 상태를 먼저 확인한다. Host가 `CLAUDE.md`를 제공하면 그 파일은 `AGENTS.md`로 연결하는 stub일 뿐 별도 정본이 아니다. 이 전체 제품·설계 정본은 제품 경계나 owning abstraction을 판단할 때만 읽고, skill 생성·유지보수 작업은 root `SKILL.md`의 조건부 라우팅을 따른다.
+Repository 유지보수를 이어받는 새 세션은 `AGENTS.md`, [유지보수 상태](maintenance-status_ko.md)와 실제 git 상태를 먼저 확인한다. Host가 `CLAUDE.md`를 제공하면 그 파일은 `AGENTS.md`로 연결하는 stub일 뿐 별도 정본이 아니다. 이 전체 제품·설계 정본은 제품 경계나 owning abstraction을 판단할 때만 읽고, skill 생성·유지보수 작업은 설치 package의 `skills/skill-rails/SKILL.md`가 제공하는 조건부 라우팅을 따른다.
 
 정확한 새 세션 문서 순서는 `AGENTS.md`가 소유하고, 유지보수 상태 문서는 현재 기준선과 continuation 값만 소유한다. 어느 문서에도 모든 세션의 최근 작업을 누적하지 않는다.
 

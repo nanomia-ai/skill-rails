@@ -164,7 +164,7 @@ The authoring agent asks a follow-up only when the answer would change what the 
 
 Most users do not need to run the commands below. Use them only when starting automation from an intent file or checking a generated package in a separate workflow.
 
-To work directly from an intent file, start with [`templates/intent-brief.json`](templates/intent-brief.json). Replace `<skill-rails>` with the installed directory:
+To work directly from an intent file, start with [`templates/intent-brief.json`](skills/skill-rails/templates/intent-brief.json). Replace `<skill-rails>` with the installed directory:
 
 ```bash
 node "<skill-rails>/scripts/init.mjs" --intent ./intent.json --out ./my-skill --profile auto
@@ -207,6 +207,6 @@ The P2 execution script calculates the next action and checks whether evidence e
 
 - [Product purpose and design boundaries (Korean)](docs/skill-rails_ko.md)
 - [Implementation scope and verification record (Korean)](docs/implementation-verification_ko.md)
-- [Authoring workflow](references/authoring-workflow.md)
-- [P2 contract](references/p2-contract.md)
-- [Evaluation method](references/evaluation.md)
+- [Authoring workflow](skills/skill-rails/references/authoring-workflow.md)
+- [P2 contract](skills/skill-rails/references/p2-contract.md)
+- [Evaluation method](skills/skill-rails/references/evaluation.md)

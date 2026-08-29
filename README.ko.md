@@ -164,7 +164,7 @@ Skill Rails를 사용해서 ./skills/release-check에 release-check 스킬을 �
 
 대부분의 사용자는 아래 명령을 직접 실행할 필요가 없습니다. 의도 파일로 자동화를 시작하거나 생성 결과를 별도 작업에서 검사할 때만 사용합니다.
 
-의도 파일에서 직접 시작하려면 [`templates/intent-brief.json`](templates/intent-brief.json)을 사용합니다. 아래 `<skill-rails>`는 설치된 경로로 바꿉니다.
+의도 파일에서 직접 시작하려면 [`templates/intent-brief.json`](skills/skill-rails/templates/intent-brief.json)을 사용합니다. 아래 `<skill-rails>`는 설치된 경로로 바꿉니다.
 
 ```bash
 node "<skill-rails>/scripts/init.mjs" --intent ./intent.json --out ./my-skill --profile auto
@@ -207,6 +207,6 @@ P2 실행 스크립트는 다음 행동을 계산하고 필요한 증거가 있�
 
 - [제품 목적과 설계 경계](docs/skill-rails_ko.md)
 - [구현 범위와 검증 기록](docs/implementation-verification_ko.md)
-- [작성 절차](references/authoring-workflow.md)
-- [P2 계약](references/p2-contract.md)
-- [평가 방식](references/evaluation.md)
+- [작성 절차](skills/skill-rails/references/authoring-workflow.md)
+- [P2 계약](skills/skill-rails/references/p2-contract.md)
+- [평가 방식](skills/skill-rails/references/evaluation.md)

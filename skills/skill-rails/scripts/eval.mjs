@@ -14,10 +14,11 @@ import { measureSimpleContextSurface } from "./lib/context-surface.mjs";
 const execFileAsync = promisify(execFile);
 
 try {
-  const args = parseArgs(process.argv.slice(2), { booleans: ["json", "write-report"], values: ["skill", "repeats"] });
-  const projectRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
-  const report = args.skill ? await evaluateSkill(resolve(args.skill), Number(args.repeats ?? 200)) : await evaluateG05(projectRoot);
-  if (args["write-report"]) await writeJsonAtomic(join(projectRoot, "evals", "latest-report.json"), report);
+  const args = parseArgs(process.argv.slice(2), { booleans: ["json", "write-report"], values: ["skill", "repeats", "suite-root"] });
+  const skillRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
+  const suiteRoot = resolve(args["suite-root"] ?? skillRoot);
+  const report = args.skill ? await evaluateSkill(resolve(args.skill), Number(args.repeats ?? 200)) : await evaluateG05(suiteRoot);
+  if (args["write-report"]) await writeJsonAtomic(join(suiteRoot, "evals", "latest-report.json"), report);
   process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   process.exitCode = report.ok ? 0 : 1;
 } catch (error) {
@@ -141,7 +142,12 @@ async function evaluateG05(projectRoot) {
 
 async function scoreFrozenEmpiricalGate(projectRoot) {
   const scorer = join(projectRoot, "scripts", "lib", "g05-score-v3.mjs");
-  const { stdout } = await execFileAsync(process.execPath, [scorer], { cwd: projectRoot, encoding: "utf8", maxBuffer: 4 * 1024 * 1024 });
+  const { stdout } = await execFileAsync(process.execPath, [scorer], {
+    cwd: projectRoot,
+    encoding: "utf8",
+    maxBuffer: 4 * 1024 * 1024,
+    env: { ...process.env, SKILL_RAILS_SUITE_ROOT: projectRoot }
+  });
   const report = JSON.parse(stdout);
   if (report.schema !== "skill-rails/g0.5-empirical-report/3") throw new Error(`Unexpected G0.5 empirical report schema: ${report.schema}`);
   return report;

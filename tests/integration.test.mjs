@@ -4,21 +4,21 @@ import { appendFile, mkdir, readFile, rm, symlink, writeFile } from "node:fs/pro
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import Ajv2020 from "ajv/dist/2020.js";
-import { generatePackage, P2_PACKAGE_GITATTRIBUTES } from "../scripts/lib/generator.mjs";
-import { lintSimpleSkill } from "../scripts/lib/simple-lint.mjs";
-import { measureSimpleContextSurface } from "../scripts/lib/context-surface.mjs";
-import { buildP2, runFixtureSuite } from "../scripts/lib/build-core.mjs";
-import { copyTree, exists, listFiles, readJson, writeJsonAtomic, writeTextAtomic } from "../scripts/lib/io.mjs";
-import { enterSkill, stageSkill } from "../scripts/runtime/api.mjs";
-import { loadBuiltSkill } from "../scripts/runtime/loader.mjs";
-import { alignDecision } from "../scripts/runtime/alignment.mjs";
-import { assertExternalStateDir, readTrace, recordHarnessEvidence } from "../scripts/runtime/trace-core.mjs";
-import { main as runtimeMain } from "../scripts/runtime/cli.mjs";
-import { hashFile } from "../scripts/runtime/hash.mjs";
-import { captureSnapshot } from "../scripts/runtime/snapshot.mjs";
-import { resolveTemplate } from "../scripts/runtime/templates.mjs";
-import { validateFull } from "../scripts/runtime/validator.mjs";
-import { ROOT, makeTestDir, removeTestDir } from "./helpers.mjs";
+import { generatePackage, P2_PACKAGE_GITATTRIBUTES } from "../skills/skill-rails/scripts/lib/generator.mjs";
+import { lintSimpleSkill } from "../skills/skill-rails/scripts/lib/simple-lint.mjs";
+import { measureSimpleContextSurface } from "../skills/skill-rails/scripts/lib/context-surface.mjs";
+import { buildP2, runFixtureSuite } from "../skills/skill-rails/scripts/lib/build-core.mjs";
+import { copyTree, exists, listFiles, readJson, writeJsonAtomic, writeTextAtomic } from "../skills/skill-rails/scripts/lib/io.mjs";
+import { enterSkill, stageSkill } from "../skills/skill-rails/scripts/runtime/api.mjs";
+import { loadBuiltSkill } from "../skills/skill-rails/scripts/runtime/loader.mjs";
+import { alignDecision } from "../skills/skill-rails/scripts/runtime/alignment.mjs";
+import { assertExternalStateDir, readTrace, recordHarnessEvidence } from "../skills/skill-rails/scripts/runtime/trace-core.mjs";
+import { main as runtimeMain } from "../skills/skill-rails/scripts/runtime/cli.mjs";
+import { hashFile } from "../skills/skill-rails/scripts/runtime/hash.mjs";
+import { captureSnapshot } from "../skills/skill-rails/scripts/runtime/snapshot.mjs";
+import { resolveTemplate } from "../skills/skill-rails/scripts/runtime/templates.mjs";
+import { validateFull } from "../skills/skill-rails/scripts/runtime/validator.mjs";
+import { ROOT, SKILL_ROOT, makeTestDir, removeTestDir } from "./helpers.mjs";
 
 test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) => {
   const base = await makeTestDir("profiles");
@@ -88,8 +88,8 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   const p2Cases = await readJson(join(outputs.p2, ".skill-rails", "eval-cases.json"));
   assert.ok(p2Cases[0].forbidden_actions.some((item) => item.includes("publishing a release")));
 
-  const p0Eval = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", outputs.p0], { cwd: ROOT, encoding: "utf8", windowsHide: true });
-  const p1Eval = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", outputs.p1], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  const p0Eval = spawnSync(process.execPath, [join(SKILL_ROOT, "scripts", "eval.mjs"), "--skill", outputs.p0], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  const p1Eval = spawnSync(process.execPath, [join(SKILL_ROOT, "scripts", "eval.mjs"), "--skill", outputs.p1], { cwd: ROOT, encoding: "utf8", windowsHide: true });
   assert.equal(p0Eval.status, 1);
   assert.equal(JSON.parse(p0Eval.stdout).release_readiness, "forward-test-required");
   assert.equal(p1Eval.status, 1);
@@ -183,7 +183,7 @@ test("P0 and P1 route only declared conditional judgment topics", async (t) => {
   assert.equal(largeSurface.routing_index_bytes, smallSurface.routing_index_bytes);
   assert.ok(largeSurface.on_demand_total_bytes > smallSurface.on_demand_total_bytes + 19000);
   assert.ok(largeSurface.fixed_context_bytes < largeSurface.total_guidance_bytes);
-  const evaluated = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", p0], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  const evaluated = spawnSync(process.execPath, [join(SKILL_ROOT, "scripts", "eval.mjs"), "--skill", p0], { cwd: ROOT, encoding: "utf8", windowsHide: true });
   assert.equal(evaluated.status, 1);
   assert.deepEqual(JSON.parse(evaluated.stdout).context_surface, smallSurface);
 
@@ -339,7 +339,7 @@ test("P1 evaluation validates its decision, helper, and authoring obligations", 
   await generatePackage({ intent, output: missing });
   await rm(join(missing, "scripts", "run.mjs"));
   assert.ok((await lintSimpleSkill(missing)).diagnostics.some((item) => item.code === "SR_P1_HELPER"));
-  const missingEval = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", missing], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  const missingEval = spawnSync(process.execPath, [join(SKILL_ROOT, "scripts", "eval.mjs"), "--skill", missing], { cwd: ROOT, encoding: "utf8", windowsHide: true });
   assert.equal(JSON.parse(missingEval.stdout).release_readiness, "invalid");
 
   const drift = join(base, "decision-drift");
@@ -354,7 +354,7 @@ test("P1 evaluation validates its decision, helper, and authoring obligations", 
   const helperPath = join(complete, "scripts", "run.mjs");
   const scaffold = await readFile(helperPath, "utf8");
   await writeFile(helperPath, scaffold.replace("// @skill-rails scaffold: replace this body with the approved deterministic helper and tests.\n", ""), "utf8");
-  let evaluated = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", complete], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  let evaluated = spawnSync(process.execPath, [join(SKILL_ROOT, "scripts", "eval.mjs"), "--skill", complete], { cwd: ROOT, encoding: "utf8", windowsHide: true });
   assert.equal(JSON.parse(evaluated.stdout).release_readiness, "helper-implementation-required");
 
   await mkdir(join(complete, "tests"));
@@ -363,7 +363,7 @@ test("P1 evaluation validates its decision, helper, and authoring obligations", 
   const ledgerPath = join(complete, ".skill-rails", "obligation-ledger.json");
   const ledger = await readJson(ledgerPath);
   assert.ok(ledger.atoms.some((item) => item.disposition === "review-required"), "P1 authoring obligations default to review-required");
-  evaluated = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", complete], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  evaluated = spawnSync(process.execPath, [join(SKILL_ROOT, "scripts", "eval.mjs"), "--skill", complete], { cwd: ROOT, encoding: "utf8", windowsHide: true });
   assert.equal(JSON.parse(evaluated.stdout).release_readiness, "authoring-obligations-required");
   for (const atom of ledger.atoms.filter((item) => item.disposition === "review-required")) {
     atom.disposition = "projected";
@@ -387,7 +387,7 @@ test("P1 evaluation validates its decision, helper, and authoring obligations", 
   projected.targets = originalTargets;
   await writeJsonAtomic(ledgerPath, ledger);
   assert.equal((await lintSimpleSkill(complete)).ok, true);
-  evaluated = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", complete], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  evaluated = spawnSync(process.execPath, [join(SKILL_ROOT, "scripts", "eval.mjs"), "--skill", complete], { cwd: ROOT, encoding: "utf8", windowsHide: true });
   assert.equal(JSON.parse(evaluated.stdout).release_readiness, "forward-test-required");
 });
 

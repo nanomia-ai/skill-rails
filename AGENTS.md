@@ -34,22 +34,22 @@ Skill Rails helps an AI create and maintain one standalone skill without keeping
 
 ## Canonical references
 
-- `SKILL.md` — skill-user entry procedure and the sole conditional router for creation, maintenance, P2, migration, and evaluation references
+- `skills/skill-rails/SKILL.md` — skill-user entry procedure and the sole conditional router for creation, maintenance, P2, migration, and evaluation references
 - `docs/maintenance-status_ko.md` — current milestone, exact continuation point, and next-session entry; read first when resuming repository work
 - `docs/skill-rails_ko.md` — current product purpose, architecture, and stable design boundaries; read when changing product behavior or owning abstractions
 - `docs/implementation-verification_ko.md` — exact implementation scope, support evidence, unproven boundaries, and P2 compatibility ledger; read for verification claims or P2 contract changes
 - `docs/authoring-lessons_ko.md` — detailed experience for high-cost core choices, nonconvergence recovery, and successor comprehension
 
-Do not read all project documents by default. For repository resumption or current-state work, start from the maintenance status and load another maintainer document only when the task requires its authority. For skill-user work, follow `SKILL.md` without preloading maintainer docs.
+Do not read all project documents by default. For repository resumption or current-state work, start from the maintenance status and load another maintainer document only when the task requires its authority. For skill-user work, follow `skills/skill-rails/SKILL.md` without preloading maintainer docs.
 
 ## Document ownership and update cadence
 
 - Maintainer documents preserve purpose, rationale, stable boundaries, ownership, and evidence or unknowns that code alone cannot explain. For exact behavior and change scope, inspect the current owning code, schema, and targeted tests; do not copy line-by-line implementation or command listings into prose unless that prose is itself the shipped contract.
-- `SKILL.md` and the references it conditionally routes are the shipped operational path for creating, migrating, maintaining, and evaluating skills. Keep commands and executable contracts there, with one canonical owner per rule.
+- `skills/skill-rails/SKILL.md` and the references it conditionally routes are the shipped operational path for creating, migrating, maintaining, and evaluating skills. Keep commands and executable contracts there, with one canonical owner per rule.
 - `docs/maintenance-status_ko.md` is a replaceable snapshot. Update it at a coherent milestone or handoff, not after every edit.
 - `docs/skill-rails_ko.md` changes only when the stable product purpose, architecture, or owning boundary changes.
 - `docs/implementation-verification_ko.md` changes when material implementation, support evidence, unproven scope, or P2 compatibility changes. Replace superseded current claims instead of appending a daily log, but never discard a unique receipt merely because a newer run exists. A receipt is superseded only when the newer evidence covers the same claim, bytes, host, scope, and authority; otherwise retain it or link its exact durable artifact or Git commit.
 - `docs/authoring-lessons_ko.md` preserves the causal history of major product turns and reusable lessons about creating and maintaining skills. Keep V5/V6-scale failures and the reason a later approach replaced them understandable to a cold successor; put routine chronology in Git or the orchestration record, and keep provider-specific operating details in the current handoff unless they generalize.
 - `README.md` and `README.ko.md` are human-facing public explanations. They are not maintainer entry points, design authorities, or evidence owners; a maintainer must follow the canonical routes above even when README wording later changes independently.
-- Do not create a second documentation index. This file owns maintainer routing; `SKILL.md` owns skill-user routing. If documents disagree, correct the owning document rather than explaining the conflict elsewhere.
+- Do not create a second documentation index. This file owns maintainer routing; `skills/skill-rails/SKILL.md` owns skill-user routing. If documents disagree, correct the owning document rather than explaining the conflict elsewhere.
 - A successor starts with this file and the maintenance snapshot, then opens the first document that owns its task. It may open further owner documents when the task crosses a boundary; do not turn progressive reading into a one-document prohibition. Before transferring coordinator authority, test that the successor can reconstruct the product's origin and major failure causes, locate the current evidence owner, and apply the rules to an unfamiliar counterexample.

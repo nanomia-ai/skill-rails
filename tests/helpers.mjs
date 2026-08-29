@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+export const SKILL_ROOT = join(ROOT, "skills", "skill-rails");
 export const TEST_ROOT = join(ROOT, ".skill-rails", "test-runs");
 
 export async function makeTestDir(label) {

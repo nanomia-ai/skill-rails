@@ -2,21 +2,21 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { analyzeSpecSource } from "../scripts/runtime/ast-policy.mjs";
-import { loadBody } from "../scripts/runtime/body.mjs";
-import { line } from "../scripts/runtime/dsl.mjs";
-import { validateDomainValue } from "../scripts/runtime/domains.mjs";
-import { alignDecision } from "../scripts/runtime/alignment.mjs";
-import { alignRun } from "../scripts/runtime/api.mjs";
-import { evaluateSpec } from "../scripts/runtime/evaluator.mjs";
-import { renderGuide } from "../scripts/runtime/guide.mjs";
-import { sha256 } from "../scripts/runtime/hash.mjs";
-import { main as runtimeMain } from "../scripts/runtime/cli.mjs";
-import { ROOT } from "./helpers.mjs";
-import { copyTree } from "../scripts/lib/io.mjs";
-import { validateFast, importVerifiedSource } from "../scripts/runtime/validator.mjs";
+import { analyzeSpecSource } from "../skills/skill-rails/scripts/runtime/ast-policy.mjs";
+import { loadBody } from "../skills/skill-rails/scripts/runtime/body.mjs";
+import { line } from "../skills/skill-rails/scripts/runtime/dsl.mjs";
+import { validateDomainValue } from "../skills/skill-rails/scripts/runtime/domains.mjs";
+import { alignDecision } from "../skills/skill-rails/scripts/runtime/alignment.mjs";
+import { alignRun } from "../skills/skill-rails/scripts/runtime/api.mjs";
+import { evaluateSpec } from "../skills/skill-rails/scripts/runtime/evaluator.mjs";
+import { renderGuide } from "../skills/skill-rails/scripts/runtime/guide.mjs";
+import { sha256 } from "../skills/skill-rails/scripts/runtime/hash.mjs";
+import { main as runtimeMain } from "../skills/skill-rails/scripts/runtime/cli.mjs";
+import { ROOT, SKILL_ROOT } from "./helpers.mjs";
+import { copyTree } from "../skills/skill-rails/scripts/lib/io.mjs";
+import { validateFast, importVerifiedSource } from "../skills/skill-rails/scripts/runtime/validator.mjs";
 import { makeTestDir, removeTestDir } from "./helpers.mjs";
-import { appendTraceEvent, createTraceEvent, readTrace } from "../scripts/runtime/trace-store.mjs";
+import { appendTraceEvent, createTraceEvent, readTrace } from "../skills/skill-rails/scripts/runtime/trace-store.mjs";
 
 const PILOT_SKILL = join(ROOT, "fixtures", "next-core-single-skill-pilot", "skill");
 
@@ -282,7 +282,7 @@ test("alignment API and CLI reject tampered Decisions before deriving expectatio
     const output = [];
     const errors = [];
     const exitCode = await runtimeMain([
-      "align", "--skill", skillRoot, "--runtime-dir", join(ROOT, "scripts", "runtime"),
+      "align", "--skill", skillRoot, "--runtime-dir", join(SKILL_ROOT, "scripts", "runtime"),
       "--decision", decisionPath, "--trace", tracePath
     ], { log(value) { output.push(String(value)); }, error(value) { errors.push(String(value)); } });
     assert.equal(exitCode, 2, `CLI accepted tampered ${field}: ${errors.join("\n")}`);
@@ -304,7 +304,7 @@ test("alignment API and CLI reject tampered Decisions before deriving expectatio
   tampered.effects = [];
   await writeFile(decisionPath, JSON.stringify(tampered), "utf8");
   assert.equal(await runtimeMain([
-    "record", "--skill", skillRoot, "--runtime-dir", join(ROOT, "scripts", "runtime"),
+    "record", "--skill", skillRoot, "--runtime-dir", join(SKILL_ROOT, "scripts", "runtime"),
     "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "alignment-run",
     "--type", "effect_claimed", "--data", '{"index":0,"verb":"RUN"}'
   ], { log() {}, error(value) { recordErrors.push(String(value)); } }), 1);
@@ -312,7 +312,7 @@ test("alignment API and CLI reject tampered Decisions before deriving expectatio
 
   await writeFile(decisionPath, JSON.stringify(decision), "utf8");
   assert.equal(await runtimeMain([
-    "record", "--skill", skillRoot, "--runtime-dir", join(ROOT, "scripts", "runtime"),
+    "record", "--skill", skillRoot, "--runtime-dir", join(SKILL_ROOT, "scripts", "runtime"),
     "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "alignment-run",
     "--type", "effect_claimed", "--data", '{"index":0,"verb":"RUN"}'
   ], { log() {}, error(value) { recordErrors.push(String(value)); } }), 0, recordErrors.join("\n"));
@@ -398,12 +398,12 @@ test("trace store serializes concurrent writers and rejects duplicate run emissi
   const output = [];
   const errors = [];
   const resumed = await runtimeMain([
-    "resume", "--skill", installedSkill, "--runtime-dir", join(ROOT, "scripts", "runtime"),
+    "resume", "--skill", installedSkill, "--runtime-dir", join(SKILL_ROOT, "scripts", "runtime"),
     "--trace", join(externalTrace, "resume-run.jsonl"), "--project", join(base, "project"), "--json"
   ], { log(value) { output.push(String(value)); }, error(value) { errors.push(String(value)); } });
   assert.equal(resumed, 0, errors.join("\n"));
   const resumeReport = JSON.parse(output[0]);
-  assert.match(resumeReport.next_command, new RegExp(escapeRegExp(join(ROOT, "scripts", "runtime", "run.mjs"))));
+  assert.match(resumeReport.next_command, new RegExp(escapeRegExp(join(SKILL_ROOT, "scripts", "runtime", "run.mjs"))));
   assert.match(resumeReport.next_command, /--trace-dir/);
   assert.match(resumeReport.next_command, /--run-id \"resume-run\"/);
 });

@@ -1,4 +1,4 @@
-scripts/**/vendor/** -text
+skills/skill-rails/scripts/**/vendor/** -text
 fixtures/migration-structures/SKILL.md -text
 evals/g0_5/** -text
 evals/g0/thresholds.json -text

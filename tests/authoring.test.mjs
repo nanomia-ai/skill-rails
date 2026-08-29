@@ -4,20 +4,20 @@ import { mkdir, readFile, symlink, unlink, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
-import { generatePackage } from "../scripts/lib/generator.mjs";
-import { buildP2 } from "../scripts/lib/build-core.mjs";
-import { inspectProseSkill, inferMigrationIntent, writeMigrationLedger } from "../scripts/lib/migration.mjs";
-import { maintainPackage } from "../scripts/lib/maintenance.mjs";
-import { semanticDiff, snapshotContract } from "../scripts/lib/semantic-diff.mjs";
-import { lintSimpleSkill } from "../scripts/lib/simple-lint.mjs";
-import { createDirectoryAtomic, exists, listFiles, readJson } from "../scripts/lib/io.mjs";
-import { hashFile, sha256 } from "../scripts/runtime/hash.mjs";
-import { parseArgs } from "../scripts/lib/args.mjs";
-import { validateFull } from "../scripts/runtime/validator.mjs";
-import { ROOT, makeTestDir, removeTestDir } from "./helpers.mjs";
+import { generatePackage } from "../skills/skill-rails/scripts/lib/generator.mjs";
+import { buildP2 } from "../skills/skill-rails/scripts/lib/build-core.mjs";
+import { inspectProseSkill, inferMigrationIntent, writeMigrationLedger } from "../skills/skill-rails/scripts/lib/migration.mjs";
+import { maintainPackage } from "../skills/skill-rails/scripts/lib/maintenance.mjs";
+import { semanticDiff, snapshotContract } from "../skills/skill-rails/scripts/lib/semantic-diff.mjs";
+import { lintSimpleSkill } from "../skills/skill-rails/scripts/lib/simple-lint.mjs";
+import { createDirectoryAtomic, exists, listFiles, readJson } from "../skills/skill-rails/scripts/lib/io.mjs";
+import { hashFile, sha256 } from "../skills/skill-rails/scripts/runtime/hash.mjs";
+import { parseArgs } from "../skills/skill-rails/scripts/lib/args.mjs";
+import { validateFull } from "../skills/skill-rails/scripts/runtime/validator.mjs";
+import { ROOT, SKILL_ROOT, makeTestDir, removeTestDir } from "./helpers.mjs";
 
 test("authoring CLIs fail closed on unknown options before running work", () => {
-  const result = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--help", "true"], {
+  const result = spawnSync(process.execPath, [join(SKILL_ROOT, "scripts", "eval.mjs"), "--help", "true"], {
     cwd: ROOT, encoding: "utf8", windowsHide: true
   });
   assert.notEqual(result.status, 0);
@@ -27,7 +27,7 @@ test("authoring CLIs fail closed on unknown options before running work", () => 
 });
 
 test("creator self-evaluation works without generated authoring state", () => {
-  const result = spawnSync(process.execPath, [join(ROOT, "scripts", "eval.mjs"), "--skill", ROOT], {
+  const result = spawnSync(process.execPath, [join(SKILL_ROOT, "scripts", "eval.mjs"), "--skill", SKILL_ROOT], {
     cwd: ROOT, encoding: "utf8", windowsHide: true
   });
   assert.equal(result.status, 1);
@@ -40,14 +40,14 @@ test("creator self-evaluation works without generated authoring state", () => {
 });
 
 test("starter intent template does not inject undeclared array requirements", async () => {
-  const intent = await readJson(join(ROOT, "templates", "intent-brief.json"));
+  const intent = await readJson(join(SKILL_ROOT, "templates", "intent-brief.json"));
   for (const [field, value] of Object.entries(intent)) if (Array.isArray(value)) assert.deepEqual(value, [], `${field} must start empty`);
 });
 
 test("human-only documentation stays outside installed skill routing", async () => {
   const entryPoints = await Promise.all([
-    readFile(join(ROOT, "SKILL.md"), "utf8"),
-    readFile(join(ROOT, "references", "authoring-workflow.md"), "utf8"),
+    readFile(join(SKILL_ROOT, "SKILL.md"), "utf8"),
+    readFile(join(SKILL_ROOT, "references", "authoring-workflow.md"), "utf8"),
     readFile(join(ROOT, "AGENTS.md"), "utf8"),
     readFile(join(ROOT, "CLAUDE.md"), "utf8"),
     readFile(join(ROOT, "README.md"), "utf8"),
@@ -55,14 +55,25 @@ test("human-only documentation stays outside installed skill routing", async () 
   ]);
   for (const entry of entryPoints) assert.doesNotMatch(entry, /readme-authoring\.md|platform-adapters\.md/);
   assert.equal(await exists(join(ROOT, "docs", "readme-authoring.md")), true);
-  assert.equal(await exists(join(ROOT, "references", "readme-authoring.md")), false);
-  assert.equal(await exists(join(ROOT, "references", "platform-adapters.md")), false);
+  assert.equal(await exists(join(SKILL_ROOT, "references", "readme-authoring.md")), false);
+  assert.equal(await exists(join(SKILL_ROOT, "references", "platform-adapters.md")), false);
+});
+
+test("the published skill directory excludes repository-only fixtures and nested skills", async () => {
+  assert.equal(await exists(join(ROOT, "SKILL.md")), false);
+  for (const directory of ["docs", "evals", "fixtures", "tests"]) {
+    assert.equal(await exists(join(SKILL_ROOT, directory)), false, `${directory} must stay outside the installed skill`);
+  }
+  const skillFiles = (await listFiles(SKILL_ROOT))
+    .map((path) => relative(SKILL_ROOT, path).replaceAll("\\", "/"))
+    .filter((path) => path === "SKILL.md" || path.endsWith("/SKILL.md"));
+  assert.deepEqual(skillFiles, ["SKILL.md"]);
 });
 
 test("P2 authoring aid requires consumer consumption-set disclosure", async () => {
   const [card, workflow] = await Promise.all([
-    readFile(join(ROOT, "templates", "authoring-card.md"), "utf8"),
-    readFile(join(ROOT, "references", "authoring-workflow.md"), "utf8")
+    readFile(join(SKILL_ROOT, "templates", "authoring-card.md"), "utf8"),
+    readFile(join(SKILL_ROOT, "references", "authoring-workflow.md"), "utf8")
   ]);
   assert.match(card, /Consumer consumption sets:/);
   assert.match(card, /one canonical `ARTIFACTS` entry/);
@@ -77,12 +88,12 @@ test("portable creator commands use only package-local runtime dependencies", as
   const base = await makeTestDir("thin-dependency-boundary");
   t.after(() => removeTestDir(base));
   const loader = pathToFileURL(join(ROOT, "fixtures", "reject-external-runtime-dependencies-loader.mjs")).href;
-  const run = (script, args) => spawnSync(process.execPath, ["--experimental-loader", loader, join(ROOT, "scripts", script), ...args], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  const run = (script, args) => spawnSync(process.execPath, ["--experimental-loader", loader, join(SKILL_ROOT, "scripts", script), ...args], { cwd: ROOT, encoding: "utf8", windowsHide: true });
   for (const profile of ["p0", "p1", "p2"]) {
     const result = run("init.mjs", ["--intent", join(ROOT, "fixtures", "intents", `${profile}.json`), "--out", join(base, profile)]);
     assert.equal(result.status, 0, result.stderr);
   }
-  for (const [script, args, expected] of [["lint.mjs", ["--self"], 0], ["build.mjs", ["--self"], 0], ["eval.mjs", ["--skill", ROOT], 1]]) {
+  for (const [script, args, expected] of [["lint.mjs", ["--self"], 0], ["build.mjs", ["--self"], 0], ["eval.mjs", ["--skill", SKILL_ROOT], 1]]) {
     const result = run(script, args);
     assert.equal(result.status, expected, result.stderr);
     assert.doesNotMatch(result.stderr, /External runtime dependency loaded/);
@@ -318,7 +329,7 @@ test("P2 typed-artifact maintenance preflights closed canonical paths and preser
   };
   const publicChangePath = join(base, "typed-artifact-change.json");
   await writeFile(publicChangePath, JSON.stringify(publicChange), "utf8");
-  const publicRun = spawnSync(process.execPath, [join(ROOT, "scripts", "maintain.mjs"), "--skill", root, "--change", publicChangePath, "--repeats", "1", "--json"], { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  const publicRun = spawnSync(process.execPath, [join(SKILL_ROOT, "scripts", "maintain.mjs"), "--skill", root, "--change", publicChangePath, "--repeats", "1", "--json"], { cwd: ROOT, encoding: "utf8", windowsHide: true });
   assert.equal(publicRun.status, 0, publicRun.stderr);
   const report = JSON.parse(publicRun.stdout).report;
   assert.deepEqual(report.artifact_receipts.map(({ kind, path }) => ({ kind, path })), [

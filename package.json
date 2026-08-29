@@ -1,6 +1,6 @@
 {
   "name": "@nanomia/skill-rails",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "description": "Create, migrate, maintain, and verify drift-resistant AI-agent skills.",
   "type": "module",
@@ -8,9 +8,9 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "node scripts/build.mjs --self",
-    "eval": "node scripts/eval.mjs",
-    "lint": "node scripts/lint.mjs --self",
+    "build": "node skills/skill-rails/scripts/build.mjs --self",
+    "eval": "node skills/skill-rails/scripts/eval.mjs --suite-root .",
+    "lint": "node skills/skill-rails/scripts/lint.mjs --self",
     "test": "node --test tests/*.test.mjs",
     "vendor:sync": "node scripts/lib/sync-vendor.mjs",
     "vendor:check": "node scripts/lib/sync-vendor.mjs --check",

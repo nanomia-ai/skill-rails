@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { join } from "node:path";
-import { readJson } from "../scripts/lib/io.mjs";
-import { selectProfile, validateIntent } from "../scripts/lib/profiles.mjs";
-import { createObligationLedger, mergeObligationLedger } from "../scripts/lib/obligations.mjs";
+import { readJson } from "../skills/skill-rails/scripts/lib/io.mjs";
+import { selectProfile, validateIntent } from "../skills/skill-rails/scripts/lib/profiles.mjs";
+import { createObligationLedger, mergeObligationLedger } from "../skills/skill-rails/scripts/lib/obligations.mjs";
 import { ROOT } from "./helpers.mjs";
 
 for (const profile of ["p0", "p1", "p2"]) {

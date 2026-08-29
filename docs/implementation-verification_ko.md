@@ -43,9 +43,19 @@ README 작성 가이드는 내용 변경 없이 `references/readme-authoring.md`
 
 변경 뒤 targeted authoring test 14/14와 repository Markdown local link 49-file scan이 통과했다. 이어 실행한 `npm run verify`는 vendor check, self lint, repository test 61/61, frozen G0.5 eval을 모두 통과했다. 이 변경은 creator runtime, profile selection, generated package shape, P2 version-5 contract와 host adapter projection을 바꾸지 않는다.
 
+### 0.3 v0.1.5 공식 설치 경계
+
+`npx skills@latest` 1.5.23은 root와 `skills/` 아래의 skill directory를 발견하고 선택된 directory 전체를 복사하지만, repository별 include/exclude manifest는 제공하지 않는다. Root `SKILL.md`를 설치 경계로 둔 v0.1.4는 기능 파일을 빠뜨린 것이 아니라 repository 전체 247개 파일과 fixture의 중첩 `SKILL.md`까지 설치 scope에 노출했다. 따라서 이는 fixture 기능 결함이나 host 행동 문제가 아니라 package boundary 제품 결함으로 분류했다.
+
+설치 가능한 creator 정본을 `skills/skill-rails/` 아래로 이동하고 repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 public GitHub source에 그대로 남겼다. 새 package에는 discoverable `SKILL.md`가 정확히 하나뿐이다. Maintainer 전용 G0.5 scorer와 lint는 기존 frozen hash를 바꾸지 않고, repository-only re-export bridge가 이동한 canonical runtime을 연결한다. 동결 protocol·과거 여덟 review receipt·P2 `SPEC.version = "5"` 행동 계약은 수정하지 않았다.
+
+현재 dirty candidate에서 `npx skills@latest add <local-repository> --skill skill-rails --agent codex claude-code gemini-cli -y`를 새 임시 Git project에서 실행했다. Installer는 skill 하나만 발견했고 canonical `.agents/skills/skill-rails`에는 61 files, `SKILL.md` 1개, repository-only directory의 file 0개가 있었다. `skills/skill-rails/` source와 설치본의 tree 비교는 missing 0, extra 0, byte difference 0이었고, 설치본 `init.mjs`로 P1 package를 생성한 뒤 설치본 `lint.mjs`가 pass했다. 이 receipt는 local working-tree source 배치와 실행 증거이며, GitHub remote source와 global destination은 push 뒤 별도로 확인한다.
+
+Targeted authoring·integration·runtime test 51/51이 먼저 통과했다. 첫 full verify에서 유일한 실패는 이동에 맞춰 frozen G0.5 scorer 자체를 수정했기 때문에 자기 hash seal과 충돌한 harness 문제였다. Frozen scorer bytes를 복원하고 repository-only bridge를 사용한 뒤 G0.5 targeted 2/2와 `npm run verify`의 vendor check, self lint, repository test 62/62, frozen G0.5 eval이 모두 통과했다. 이 변경이 fresh agent의 장기 trigger 품질을 높인다는 주장은 여전히 `UNPROVEN`이며 설치 경계 성공으로 승격하지 않는다.
+
 ## 1. 현재 결정적 검증
 
-현재 public 배포 기준선은 `v0.1.3` release commit `bfb83dd431d95432f1e60269f9ef2078c36c265a`다. `origin/main`과 annotated tag가 이 commit을 가리킨다. Human/maintainer 문서와 installed-skill reference 경계 정리 및 package 0.1.4 metadata는 local `main`의 현재 `HEAD`에 있으며 아직 push·tag·public release하지 않았다. 정확한 local hash와 dirty scope는 `git rev-parse HEAD`와 `git status --short`가 소유한다.
+현재 `origin/main`은 v0.1.4 문서 경계 정리 commit `f0a5ce152896d57ba744a01ff5b76c7c7bbc7a83`을 가리킨다. Package 0.1.5의 `skills/skill-rails/` 설치 경계 후보는 local `main`의 dirty tree에 있으며 위 0.3절의 full verify와 local-installer smoke를 통과했다. 정확한 local hash와 dirty scope는 `git rev-parse HEAD`와 `git status --short`가 소유하며, GitHub remote source와 global destination receipt는 아직 없다. Annotated tag와 별도 public release는 만들지 않았다.
 
 `d74d783`은 저작 과정의 검사 시점을 논리 수렴과 살아 있는 가설에 맞추고, 생성된 P0/P1에는 비수렴에서 한 발 물러설 짧은 recovery guard를, P2에는 현재 Decision이 연 domain work 안에서만 판단하도록 하는 guard를 투영했다. 저장된 P2 stage result는 현재 task·설치 skill·project의 current Decision임을 명시하고 package와 covered project state가 변하지 않았음을 확인할 때만 재사용한다. 대화 기억, 발견한 파일, 불확실한 상태에서는 새 stage를 실행한다. Runtime, schema, Decision byte와 P2 behavior source는 바꾸지 않았다.
 

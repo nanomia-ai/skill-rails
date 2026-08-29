@@ -2,10 +2,10 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
-import { copyTree, readJson, writeJsonAtomic } from "../scripts/lib/io.mjs";
-import { materializeRuntime } from "../scripts/lib/build-core.mjs";
-import { validateFull } from "../scripts/runtime/validator.mjs";
-import { hashFile } from "../scripts/runtime/hash.mjs";
+import { copyTree, readJson, writeJsonAtomic } from "../skills/skill-rails/scripts/lib/io.mjs";
+import { materializeRuntime } from "../skills/skill-rails/scripts/lib/build-core.mjs";
+import { validateFull } from "../skills/skill-rails/scripts/runtime/validator.mjs";
+import { hashFile } from "../skills/skill-rails/scripts/runtime/hash.mjs";
 import { ROOT, makeTestDir, removeTestDir } from "./helpers.mjs";
 
 const G05 = join(ROOT, "evals", "g0_5");
