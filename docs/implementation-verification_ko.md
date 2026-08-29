@@ -49,13 +49,15 @@ README 작성 가이드는 내용 변경 없이 `references/readme-authoring.md`
 
 설치 가능한 creator 정본을 `skills/skill-rails/` 아래로 이동하고 repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 public GitHub source에 그대로 남겼다. 새 package에는 discoverable `SKILL.md`가 정확히 하나뿐이다. Maintainer 전용 G0.5 scorer와 lint는 기존 frozen hash를 바꾸지 않고, repository-only re-export bridge가 이동한 canonical runtime을 연결한다. 동결 protocol·과거 여덟 review receipt·P2 `SPEC.version = "5"` 행동 계약은 수정하지 않았다.
 
-현재 dirty candidate에서 `npx skills@latest add <local-repository> --skill skill-rails --agent codex claude-code gemini-cli -y`를 새 임시 Git project에서 실행했다. Installer는 skill 하나만 발견했고 canonical `.agents/skills/skill-rails`에는 61 files, `SKILL.md` 1개, repository-only directory의 file 0개가 있었다. `skills/skill-rails/` source와 설치본의 tree 비교는 missing 0, extra 0, byte difference 0이었고, 설치본 `init.mjs`로 P1 package를 생성한 뒤 설치본 `lint.mjs`가 pass했다. 이 receipt는 local working-tree source 배치와 실행 증거이며, GitHub remote source와 global destination은 push 뒤 별도로 확인한다.
+Local candidate에서 `npx skills@latest add <local-repository> --skill skill-rails --agent codex claude-code gemini-cli -y`를 새 임시 Git project에서 실행했다. Installer는 skill 하나만 발견했고 canonical `.agents/skills/skill-rails`에는 61 files, `SKILL.md` 1개, repository-only directory의 file 0개가 있었다. `skills/skill-rails/` source와 설치본의 tree 비교는 missing 0, extra 0, byte difference 0이었고, 설치본 `init.mjs`로 P1 package를 생성한 뒤 설치본 `lint.mjs`가 pass했다.
+
+제품 commit `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`을 `origin/main`에 push한 뒤 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`를 실행했다. GitHub source에서도 하나의 skill만 발견했고 전역 canonical package는 61 files, `SKILL.md` 1개, repository-only file 0개, source와 path missing/extra 0이었다. Windows checkout과 설치본의 raw SHA-256 차이 42개는 모두 CRLF/LF projection이었고 newline 정규화 뒤 content difference는 0이었다. 전역 self lint, 설치본 P1 생성과 그 package lint가 통과했으며 Claude junction은 같은 canonical package를 가리켰다. 설치 직후 CLI의 cached security summary에는 Socket 1 alert가 보였지만, 갱신된 skills.sh skill page에서 Gen Agent Trust Hub·Socket·Snyk는 모두 Pass로 확인됐다.
 
 Targeted authoring·integration·runtime test 51/51이 먼저 통과했다. 첫 full verify에서 유일한 실패는 이동에 맞춰 frozen G0.5 scorer 자체를 수정했기 때문에 자기 hash seal과 충돌한 harness 문제였다. Frozen scorer bytes를 복원하고 repository-only bridge를 사용한 뒤 G0.5 targeted 2/2와 `npm run verify`의 vendor check, self lint, repository test 62/62, frozen G0.5 eval이 모두 통과했다. 이 변경이 fresh agent의 장기 trigger 품질을 높인다는 주장은 여전히 `UNPROVEN`이며 설치 경계 성공으로 승격하지 않는다.
 
 ## 1. 현재 결정적 검증
 
-현재 `origin/main`은 v0.1.4 문서 경계 정리 commit `f0a5ce152896d57ba744a01ff5b76c7c7bbc7a83`을 가리킨다. Package 0.1.5의 `skills/skill-rails/` 설치 경계 후보는 local `main`의 dirty tree에 있으며 위 0.3절의 full verify와 local-installer smoke를 통과했다. 정확한 local hash와 dirty scope는 `git rev-parse HEAD`와 `git status --short`가 소유하며, GitHub remote source와 global destination receipt는 아직 없다. Annotated tag와 별도 public release는 만들지 않았다.
+Package 0.1.5의 설치 product bytes는 `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`에서 `origin/main`에 들어갔고 위 0.3절의 full verify, local installer와 GitHub-source global installer smoke를 통과했다. `v0.1.5` annotated tag와 GitHub Release는 이 receipt를 포함한 evidence commit을 기준으로 배포한다. P2 behavior contract는 바뀌지 않았으며 이 release의 새 주장은 distribution boundary에 한정된다.
 
 `d74d783`은 저작 과정의 검사 시점을 논리 수렴과 살아 있는 가설에 맞추고, 생성된 P0/P1에는 비수렴에서 한 발 물러설 짧은 recovery guard를, P2에는 현재 Decision이 연 domain work 안에서만 판단하도록 하는 guard를 투영했다. 저장된 P2 stage result는 현재 task·설치 skill·project의 current Decision임을 명시하고 package와 covered project state가 변하지 않았음을 확인할 때만 재사용한다. 대화 기억, 발견한 파일, 불확실한 상태에서는 새 stage를 실행한다. Runtime, schema, Decision byte와 P2 behavior source는 바꾸지 않았다.
 
@@ -122,6 +124,8 @@ Codex와 Claude Code는 현재 검증된 project-local adapter다. 제품의 영
 `skills` 1.5.23 자체는 Node 22.20 이상을 요구한다. Skill Rails runtime 계약은 Node 20 이상이므로, Node 20 사용자는 manual project-local clone으로 같은 package를 설치할 수 있다.
 
 2026-08-30 KST의 v0.1.3 post-release smoke는 위 0.1절의 exact command와 clean worktree evidence를 추가했다. 성공한 installer message나 `skills list`는 배치만 증명하고 host가 실제로 어느 scope를 연 것은 증명하지 않는다. Claude retest에서 stale personal link를 제거한 것은 product 설치 절차를 추가하려는 조치가 아니라 project-local copy를 실제로 읽는지 변수를 분리하기 위한 환경 정리였다. Codex는 이번 fresh smoke에서 project-local entry를 사용했지만 이 한 관찰을 모든 host의 precedence 규칙이나 사용자 preflight로 일반화하지 않는다.
+
+2026-08-30 KST의 v0.1.5 global smoke는 root repository가 아니라 `skills/skill-rails/` 하나만 설치하는 현재 distribution boundary를 검증했다. Codex와 Gemini CLI는 universal `.agents` canonical package를 사용하고 Claude Code는 같은 package를 가리키는 junction을 사용했다. 이는 세 target의 배치와 설치본 creator 실행 증거이며, 각 host의 fresh AI trigger·장기 session 행동을 새로 검증한 것은 아니다.
 
 ---
 
