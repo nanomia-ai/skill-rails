@@ -60,7 +60,7 @@ If correct interpretation still requires conversation-only knowledge or an undec
 - P1: exact formats or deterministic helpers, scripts, templates, or validators are useful, but no state machine is required.
 - P2: use when state-dependent branches, guards, ordered effects, exact formats, or evidence-gated completion repeat.
 
-Do not choose P2 merely because the source is long. The generator records the selected profile, signals, and reasons in `.skill-rails/profile-decision.json`; `.skill-rails/intent.json` remains the canonical input.
+Do not choose P2 merely because the source is long. In auto selection, `exact_formats` alone selects P1 and counts as a P2 signal only when `state_dependent_behaviors` is also present; `completion_evidence` alone never raises the profile. The generator records the selected profile, signals, and reasons in `.skill-rails/profile-decision.json`; `.skill-rails/intent.json` remains the canonical input.
 
 For P0/P1, conditional judgment topics generate a small `references/guidance-index.md` and one Markdown file per stable topic. `SKILL.md` tells the using AI to read the index and open only matching topics. The index owns active routing conditions; topic files own their prose; the obligation ledger points back to both. Plain string judgment points stay in `SKILL.md`. Missing routing material fails lint. This is model-readable progressive disclosure, not a state machine or a host permission boundary.
 

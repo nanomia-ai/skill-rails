@@ -35,6 +35,8 @@ A valid template, a declared artifact reader, or a successful producing run does
 - `agent_claimed`: model self-report; insufficient for critical proof.
 - `human_confirmed`: only when a trusted channel records the human action and scope.
 
+Automated alignment treats `runtime_observed`, `harness_observed`, and `artifact_verified` as strong; `agent_claimed` and `human_confirmed` are weak and never satisfy an expectation by themselves, so evidence carrying only those authorities leaves it `unproven`.
+
 Grade what an event actually proves, not that it exists:
 
 - `runtime_observed` about the runtime's own repeatability is a structural check; it must not move an aggregate from `unproven` to `partial`.
