@@ -11,15 +11,22 @@
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 현재 기준 commit: `770cd3755d23c17a626822079c47d17b8387b326` (`fix: align fixture coverage and P1 provenance`)
-- `HEAD`와 `origin/main`은 위 commit으로 같고 integration worktree는 clean이다.
-- 이 commit은 `f8f42042c774a0276fd5d6f40013e6758039d8fc`의 consumer path binding 위에 final installed-byte gate가 드러낸 두 bounded correction을 더한다.
-- Commit과 normal push, 공식 project-local 설치 검증은 완료했다. 별도 version·publish·release는 수행하지 않았다.
+- 현재 제품 구현 기준 commit: `126be238574e8fb1f34caa64e241fc93e5a079dd` (`fix: project exact format into owning effects`)
+- 이 commit은 기존 consumer path binding과 final-gate correction 위에 exact-format 예시를 그 format을 소유한 effect에도 투영한다.
+- Commit과 normal push, 공식 project-local 설치 검증은 완료했다. 설치본의 root self-lint, 생성 pilot L0–L18, 설치 pilot의 exact effect projection이 pass했다.
+- Windows installer checkout의 일반 text 249개 전체는 byte-identical이라고 주장하지 않는다. `* -text`로 봉인된 생성 pilot 54개 파일만 Git blob과 54/54 byte-identical임을 확인했다.
+- 별도 version·publish·release는 수행하지 않았다.
 - `.codegraph/`는 이 checkout에 없어서 repository code 탐색에는 현재 owning source와 test만 사용했다.
 
 ---
 
 ## 2. 이번 correction의 owning boundary
+
+### P2 exact-format effect projection
+
+- `fixtures/formats.json`의 L15 golden `expect`가 `Decision.format.example`과 format-owning effect의 `format_example`에 같은 값으로 투영된다.
+- Spec effect는 mutation하지 않고 Decision만 복제한다. Fixture를 읽을 수 없으면 기존 합성 example로 fallback한다.
+- 별도 prose instruction이나 format 정본은 추가하지 않았다. WRITE effect 자체가 소비 위치를 소유한다.
 
 ### P2 skipped-`NEXT` fixture coverage
 
@@ -45,22 +52,24 @@
 - Skipped-NEXT regression: valid claim build pass; missing `branch:preflight/skip` claim은 `L14 STAGES.preflight.branches.skip` fail; `done === true` fixture의 false claim은 build-core가 거부; observer 유무의 Decision JSON과 hash 동일.
 - P1 regression: helper target에 intent 문장을 복제하지 않아도 discharge pass; review-required default와 `authoring-obligations-required` eval gate 유지; `SKILL.md` intent 삭제, topic text 삭제, description mismatch, unresolvable locator는 모두 fail.
 - Canonical pilot root lint: L0–L18 pass.
-- Canonical pilot formal build (`--repeats 50`): mutation 20/20, scenario 10/10, 반복 불일치 0, format round trip 256/256, build ID `sha256:b0bfffa83c9c4510f46a89936be40c41c4e874ab15eb7bcd7684096e73f082a3`.
+- Canonical pilot formal build (`--repeats 50`): mutation 20/20, scenario 10/10, 반복 불일치 0, format round trip 256/256, build ID `sha256:932d2462f413afd8c40d58a68e40f0efa4bbcd65c8b0c47a4ee16b855ea53003`.
 - Pilot manifest closure: content 15 + generated 37 = 52, verification pass.
 - Pilot embedded lint와 real-state e2e: L0–L18 pass, 2/2 pass.
-- 논리 수렴 뒤 정확히 한 번 실행한 full `npm run verify`: vendor pass, lint pass, repository test 59/59 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass.
+- 논리 수렴 뒤 실행한 full `npm run verify`: vendor pass, lint pass, repository test 60/60 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass.
 - 공식 installer로 Codex와 Claude의 별도 project-local home에 설치한 249개 파일은 exact `770cd3755d23c17a626822079c47d17b8387b326` archive와 path·byte가 모두 같았다.
 - Fresh Sol xhigh P1 author는 helper/test locator에 intent 문장을 복제하지 않고 11/11 helper test, full lint, held-out byte equality, `open_obligations: 0`, `forward-test-required`에 도달했다.
-- Fresh Fable Max P2 consumer는 stopping guard, 여러 static input, dynamic target/digest, fail-closed effect credit, 공개 `Decision.format.example` 기반 verifier result observation과 evidence `matching-pass`를 실행했다. 최초의 “format 공개 누락” 주장은 모델이 이미 받은 `decision.format`을 요약에서 빠뜨린 오류였고, 같은 terminal의 단일 재검증으로 철회됐다.
-- 최종 installed-byte 경험적 판정은 `PARTIAL`이다. Fresh consumer가 skipped-judgment branch, tampered-Decision rejection, evidence REPORT record/align을 직접 끝내지 않았고, Sol test harness가 첫 시도에 Lane B 밖 OS temp directory 3개를 만들었기 때문이다. 이들은 제품 falsification이 아니지만 verified로 승격하지 않는다.
+- Fresh Fable Max P2 consumer의 기존 `Decision.format.example` 복구에 이어, fresh Luna Max는 새 owning-effect `format_example`을 source inspection 없이 발견하고 verifier 실행, same-run reentry, `matching-pass / DONE`, final lane report까지 완료했다.
+- Luna의 acquire alignment는 `partial`, REPORT 기록 뒤 final alignment는 `unproven`이다. Agent claim만 존재하기 때문이며 fail-closed evidence 경계의 의도된 결과다.
+- 최종 경험적 판정은 `PARTIAL`이다. Fresh skipped-judgment와 tampered-Decision rejection, harness-trusted public effect observation은 직접 끝내지 않았다.
 
 ---
 
 ## 4. 여전히 `UNPROVEN`인 범위
 
-- Fresh P2 consumer의 skipped-judgment branch, tampered-Decision rejection, evidence REPORT record/align과 그 끝까지의 complete reinvocation chain
+- Fresh P2 consumer의 skipped-judgment branch와 tampered-Decision rejection
 - 생성 P1 skill의 fresh trigger 선택, AI category 판단과 실제 첫 산출물 유용성
 - 별도 version·publish·release
+- 공식 installer 경로 자체에서 시작한 fresh AI 행동. 다만 그 설치본의 생성 pilot 54개 파일은 fresh Luna가 사용한 package와 byte-identical이다.
 - harness-trusted public effect observation과 verifier truthfulness
 - long-session/compaction, 여러 모델 반복, Linux/macOS POSIX symlink 분기
 - capture 뒤에도 계속 쓰는 out-of-band writer의 package 보존
