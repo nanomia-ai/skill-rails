@@ -290,5 +290,5 @@ function classify(text, sourceKind = null) {
     [/^[-*]\s|\bexample\b|예시/i, "example", "low", 0.58, "List or example-like text may be a fixture rather than a rule."]
   ];
   for (const [pattern, kind, consequence, confidence, rationale] of rules) if (pattern.test(text)) return { kind, consequence, confidence, rationale };
-  return { kind: "judgment/body", consequence: "low", confidence: 0.51, rationale: "No deterministic structure is safe to infer from this prose alone." };
+  return { kind: "ambiguous/review-required", consequence: "low", confidence: 0.51, rationale: "No deterministic structure is safe to infer from this prose alone." };
 }

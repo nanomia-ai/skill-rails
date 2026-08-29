@@ -23,7 +23,7 @@ When a generated skill produces a durable output intended for later AI consumpti
 
 This limits the handoff context supplied for interpretation, not the files or tools the interpreted work legitimately requires.
 
-Ask the fresh consumer to interpret the output or continue the intended work. Check that it recovers the information needed for correct use, which may include the applicable purpose, terms, input identity and scope, constraints, evidence or uncertainty, result or status, and next action. Do not require irrelevant fields or repeated background.
+Ask the fresh consumer to interpret the output or continue the intended work. Check that it recovers the information needed for correct use, which may include the applicable purpose, terms, input identity and scope, constraints, evidence or uncertainty, result or status, and a durable condition -> action next step that remains correct after either side of the condition changes. Do not require irrelevant fields or repeated background.
 
 A valid template, a declared artifact reader, or a successful producing run does not prove downstream understanding. Missing handoff context remains `unproven`; do not expect the consumer to scan the skill package or unrelated project files to reconstruct it.
 

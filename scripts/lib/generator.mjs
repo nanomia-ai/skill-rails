@@ -227,7 +227,7 @@ export function renderSimpleSkillMarkdown(intent, profile) {
   const sections = renderIntentSections(intent);
   const progressive = judgmentTopics(intent).length > 0 ? `\n\n${renderGuidanceEntry()}` : "";
   const helperGate = profile === "p1"
-    ? "\n\n## Helper gate\n\nBefore first use, replace the marked P1 helper scaffold and add golden tests. Until then, stop on `SR_P1_SCAFFOLD`. Run `node <this-skill>/scripts/run.mjs` only after that gate passes. Resolve `<this-skill>` from this SKILL.md location."
+    ? "\n\n## Helper gate\n\nIf `node <this-skill>/scripts/run.mjs` emits `SR_P1_SCAFFOLD`, authoring is incomplete: stop, replace the marked P1 helper scaffold, and add golden tests before use. Resolve `<this-skill>` from this SKILL.md location."
     : "";
   const body = `# ${title(intent.name)}\n\n${intent.problem.trim()}${sections ? `\n\n${sections}` : ""}${helperGate}${progressive}\n\n## Workflow\n\n1. Confirm that the request fits the stated use cases and not a near miss.\n2. Work from the declared inputs and produce only the declared outputs.\n3. Respect every boundary, state-dependent rule, exact format, and external dependency shown above.\n4. Claim completion only with the declared evidence.\n\n${SIMPLE_ADAPTIVE_JUDGMENT}`;
   return renderSkillMarkdown({ name: intent.name, description: intent.description, body });
@@ -242,7 +242,7 @@ function renderIntentSections(intent) {
 
 function bullets(items = []) { return items.map((item) => `- ${item}`).join("\n"); }
 function normalizeNewlines(text) { return String(text).replace(/\r\n/g, "\n"); }
-function shortDescription(text) { return String(text).replace(/\s+/g, " ").trim().slice(0, 80); }
+function shortDescription(text) { return String(text).replace(/\s+/g, " ").trim(); }
 function title(name) { return String(name).split("-").map((part) => part ? part[0].toUpperCase() + part.slice(1) : part).join(" "); }
 
 export { AUTHORING_ROOT };

@@ -8,6 +8,14 @@
 
 ---
 
+## 0. 현재 완료 지점: 실사용 교훈의 좁은 보정
+
+네 모델 실사용 자료를 Claude Fable max와 Codex Sol xhigh로 독립 교차검수한 뒤, 합의된 bounded product correction을 local working tree에 적용했다. 변경 범위는 P1 scaffold 상태 안내, 동일 obligation atom 신용 보존, adapter description 무손실 projection, migration 기본 abstention, downstream condition -> action 안내, 그리고 `SKILL.md` description lint 소유권이다. P2 version-5 runtime·schema·effect authority는 바꾸지 않았다.
+
+Canonical pilot은 공식 repair-generated 경로와 기존 50회 반복 범위로 재생성했다. `npm run verify`는 vendor check, self lint, repository test 61/61, frozen G0.5 eval까지 통과했다. 정확한 파일, build ID, 회귀 범위와 남은 `UNPROVEN`은 [구현·검증 기록](implementation-verification_ko.md) 0절이 소유한다.
+
+다음 작업은 최종 diff와 working-tree 범위를 재확인하고, 실사용 test/harness 관찰과 product correction을 섞지 않은 채 사용자에게 변경점·검증·남은 `UNPROVEN`을 보고하는 것이다. Commit, push, version, publish, release는 별도 명시 권한 전까지 수행하지 않는다.
+
 ## 1. 저장소 기준선
 
 - branch: `main`

@@ -52,6 +52,13 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
     assert.match(simpleSkill, /repeated small fixes stop moving the user's requested result closer/);
     assert.match(simpleSkill, /confirm that the check and its setup observe the stated outcome/);
   }
+  const p1Intent = await readJson(join(ROOT, "fixtures", "intents", "p1.json"));
+  assert.ok(p1Intent.description.length > 80);
+  const p1Skill = await readFile(join(outputs.p1, "SKILL.md"), "utf8");
+  assert.match(p1Skill, /If `node <this-skill>\/scripts\/run\.mjs` emits `SR_P1_SCAFFOLD`, authoring is incomplete/);
+  assert.doesNotMatch(p1Skill, /Before first use, replace the marked P1 helper scaffold/);
+  const p1Adapter = await readFile(join(outputs.p1, "agents", "openai.yaml"), "utf8");
+  assert.ok(p1Adapter.includes(p1Intent.description), p1Adapter);
   const p2Skill = await readFile(join(outputs.p2, "SKILL.md"), "utf8");
   assert.match(p2Skill, /current task explicitly identifies a complete saved stage-result file/);
   assert.match(p2Skill, /If any condition is absent or uncertain, run `node "<skill-root>\/scripts\/skill-rails\/run\.mjs" stage/);

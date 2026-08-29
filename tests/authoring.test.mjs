@@ -156,6 +156,7 @@ test("migration preserves Markdown semantic units, metadata, and parser-consumed
   assert.equal(frontmatter.source_span, "1-10");
   assert.deepEqual(frontmatter.context, []);
   assert.equal(paragraph.original_text, "Run the verification command and record its result.\nThe second sentence stays in this paragraph.");
+  assert.equal(paragraph.candidate_class, "ambiguous/review-required");
   assert.equal(outerItem.original_text, "- Block publication when verification fails.\n  Keep this continuation with the item.\n  - Check the child evidence.\n    Keep nested detail with the child.");
   assert.equal(nestedItem.original_text, "  - Check the child evidence.\n    Keep nested detail with the child.");
   assert.equal(code.original_text, "```sh\nif verify; then\n  echo \"verified\"\nfi\n```");
@@ -509,6 +510,9 @@ test("P0 and P1 maintenance regenerates intent projections without replacing aut
     operations: [{ type: "update-intent", patch: { description: `${p1Intent.description} Use only with verified source facts.` } }]
   });
   assert.equal(await readFile(helperPath, "utf8"), authoredHelper);
+  const maintainedP1Skill = await readFile(join(p1, "SKILL.md"), "utf8");
+  assert.match(maintainedP1Skill, /If `node <this-skill>\/scripts\/run\.mjs` emits `SR_P1_SCAFFOLD`, authoring is incomplete/);
+  assert.doesNotMatch(maintainedP1Skill, /Before first use, replace the marked P1 helper scaffold/);
   assert.equal((await lintSimpleSkill(p1)).ok, true);
 
   const beforeUnsupported = sha256(await readFile(join(p0, "SKILL.md")));

@@ -135,7 +135,6 @@ async function validateSimpleAtom(root, atom, evalCases, diagnostics, skillSourc
 
 function isUniversalSimpleIntentSource(source) {
   return source.startsWith("intent.")
-    && source !== "intent.description"
     && !/^intent\.judgment_points\[\d+\]\.(?:when|points\[\d+\])$/.test(source);
 }
 

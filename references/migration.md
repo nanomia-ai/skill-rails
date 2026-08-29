@@ -22,6 +22,8 @@ One source atom may map to multiple targets. Every target must map back to a sou
 
 Use: judgment/body, observation/collector, guard, stage/done/evidence, table row, format, template, example, order, ownership, artifact, role, declaration, deferred, duplicate, obsolete, or ambiguous/review-required.
 
+Classification hints may identify deterministic source structure, but they must abstain to `ambiguous/review-required` when that structure is not safely inferable; an unrecognized atom is not judgment merely by default.
+
 Move exact formats first, then observable predicates, then stages, guards, and effect order. Leave genuine judgment in body. Leave machine-decidable rules without collectors in `DEFERRED` with an owner, fixture, and removal condition.
 
 ## Stop conditions

@@ -10,6 +10,21 @@
 
 ---
 
+## 0. 2026-08-29 실사용 교차검수 후 보정
+
+네 모델의 실제 사용 기록을 원시 증거로 다시 검토하고, Claude Fable max 설계 도전과 Codex Sol xhigh 기술·계약 검토를 서로 독립적으로 받은 뒤 다음의 좁은 보정을 적용했다.
+
+- P1 helper 안내는 “첫 사용 전”이라는 시간 기준 대신, `scripts/run.mjs`가 `SR_P1_SCAFFOLD`를 내보내는지라는 관찰 가능한 상태를 기준으로 중단한다.
+- P0/P1 intent 배열을 유지보수할 때 source 좌표와 text가 정확히 같은 atom은 이미 작성한 disposition·target·evidence를 보존하고, 새로 생기거나 편집된 atom은 그 신용을 상속하지 않는다.
+- `agents/openai.yaml`의 `short_description`은 canonical description을 공백 정규화해 보존한다. 현재 공식 Codex skill metadata 문서에서 임의의 80자 제한은 확인되지 않았으며, 기존 절단은 네 실사용 lane 모두에서 단어 중간을 잘랐다. 이 변경이 모델별 trigger 품질을 높이는지는 별도 fresh evidence가 없으므로 `UNPROVEN`이다.
+- 결정적 구조를 안전하게 추론하지 못한 migration atom은 judgment로 단정하지 않고 `ambiguous/review-required`로 남긴다. 정규식 어휘를 늘리거나 자동 판정 권한을 넓히지 않았다.
+- fresh downstream의 next action은 현재 시점의 명령문이 아니라 상태가 바뀐 뒤에도 맞는 condition -> action으로 기록한다.
+- 설명 전체를 adapter가 보존하면서 드러난 lint 공백도 함께 닫았다. Intent-backed simple skill의 portable description은 `SKILL.md`에 남아 있어야 하며, adapter에 같은 문자열이 있다는 이유로 그 삭제를 통과시키지 않는다.
+
+회귀 증거는 profile 9/9, 선택된 integration 2/2, 선택된 authoring 2/2가 통과했다. Canonical pilot은 공식 `--repair-generated --repeats 50` 경로로 다시 만들었고 build ID는 `sha256:6e2ed86affa4e9ea65b50d787be390eee344b8e07f5fb972d661dd94cab62e54`, L0-L18 pass, mutation 20/20, scenario 10/10·50회·불일치 0, format 1/1·round trip 256/256이다. 이어서 `npm run verify`가 vendor check, self lint, repository test 61/61, frozen G0.5 eval을 모두 통과했다.
+
+P2 `SPEC.version = "5"`, Decision·Trace schema, runtime effect authority, host permission 경계는 바꾸지 않았다. 실제 cross-model trigger 개선, 장기 session/compaction, E005에서 관찰된 checkout byte drift의 harness 재현은 여전히 `UNPROVEN`이며 이번 product patch의 성공으로 승격하지 않는다.
+
 ## 1. 현재 결정적 검증
 
 현재 제품 구현 기준선은 local `main`의 `HEAD`다. `origin/main`은 아직 `cb8e06dabbc81bff41614e1e70791b51c4a697fd`이며 local 변경은 push·version·publish·release하지 않았다. 정확한 local hash는 `git rev-parse HEAD`가 소유한다.
@@ -337,6 +352,7 @@ Authoring workflow에는 이미 구현된 P2 `maintain --diagnose --query`와 `u
 Generated-loader targeted regression 1/1이 pass했고 canonical pilot은 generated file을 직접 편집하지 않고 repair-generated rebuild로 갱신했다. 결과는 L0–L18, mutation 20/20, scenario 10/10, 50회 반복 불일치 0, format 256/256, build ID `sha256:71fe532518672eff1cc0fd1e8c2992544ca91f679f06152c08f421f91493f4c1`이다. 이어 현재 후보 bytes에서 한 번 실행한 full `npm run verify`는 vendor pass, root lint pass, repository test 60/60 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass였다. Runtime, schema, Decision byte, spec behavior source는 바뀌지 않았다. Fresh agent가 이 수정된 generic guidance만으로 proof를 기록하는 행동은 아직 `UNPROVEN`이다.
 
 ---
+
 
 ## 7. P2 version-5 보존 및 변경 원장
 

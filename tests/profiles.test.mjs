@@ -98,3 +98,25 @@ test("ledger v2 upgrades discard obsolete simple projections without erasing P2 
     disposition: "projected", targets: ["spec:STAGES/operate"], evidence: ["fixture:ready"]
   });
 });
+
+test("whole-field maintenance preserves exact unchanged authored obligations", async () => {
+  const p1 = await readJson(join(ROOT, "fixtures", "intents", "p1.json"));
+  const previous = createObligationLedger(p1, "p1");
+  const authored = previous.atoms.find((atom) => atom.source === "intent.exact_formats[0]");
+  authored.disposition = "projected";
+  authored.targets = ["file:scripts/run.mjs"];
+  authored.evidence = ["file:tests/helper.test.mjs"];
+
+  const updated = structuredClone(p1);
+  updated.exact_formats.push("fixed compatibility section");
+  const merged = mergeObligationLedger(previous, updated, "p1", ["exact_formats"]);
+  const preserved = merged.atoms.find((atom) => atom.source === authored.source);
+  const added = merged.atoms.find((atom) => atom.source === "intent.exact_formats[1]");
+
+  assert.deepEqual({ disposition: preserved.disposition, targets: preserved.targets, evidence: preserved.evidence }, {
+    disposition: "projected", targets: ["file:scripts/run.mjs"], evidence: ["file:tests/helper.test.mjs"]
+  });
+  assert.deepEqual({ disposition: added.disposition, targets: added.targets, evidence: added.evidence }, {
+    disposition: "review-required", targets: [], evidence: []
+  });
+});

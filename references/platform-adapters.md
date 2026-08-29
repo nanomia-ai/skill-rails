@@ -11,7 +11,7 @@
 
 ## Portable core
 
-Keep portable `name` and `description` in `SKILL.md`. Generate platform metadata from the canonical intent instead of manually maintaining divergent skill bodies. The creator and every generated skill remain one package; an installer may copy or symlink that package but does not become a runtime dependency.
+Keep portable `name` and `description` in `SKILL.md`. Generate platform metadata from the canonical intent instead of manually maintaining divergent skill bodies. Preserve the normalized canonical description in an adapter; do not silently truncate it without a verified host contract. The creator and every generated skill remain one package; an installer may copy or symlink that package but does not become a runtime dependency.
 
 Skill Rails requires Node.js 20 or newer. Normal installed-skill commands use Node built-ins and package-local code. The creator carries the parser needed for migration, so `init`, `migrate`, `maintain`, `lint`, `build`, and `eval --skill` do not require a separate `npm ci`. Repository development and the frozen self-evaluation corpus still use dev dependencies and begin with `npm ci`.
 

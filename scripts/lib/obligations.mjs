@@ -21,7 +21,6 @@ export function createObligationLedger(intent, profile) {
 
 export function mergeObligationLedger(previous, intent, profile, changedFields = []) {
   const fresh = createObligationLedger(intent, profile);
-  const changed = new Set(changedFields);
   const prior = new Map((previous?.atoms ?? []).map((item) => [`${item.source}\0${item.text}`, item]));
   fresh.atoms = fresh.atoms.map((item) => {
     const field = item.source.match(/^intent\.([a-z_]+)/)?.[1];
@@ -30,7 +29,7 @@ export function mergeObligationLedger(previous, intent, profile, changedFields =
       && ["p0", "p1"].includes(profile)
       && !usesRetiredIntentProjection(existing);
     const compatibleProjection = previous?.schema === fresh.schema || profile === "p2" || legacySimpleProjection;
-    if (existing && !changed.has(field) && compatibleProjection) return { ...item, disposition: existing.disposition, targets: existing.targets, evidence: existing.evidence };
+    if (existing && compatibleProjection) return { ...item, disposition: existing.disposition, targets: existing.targets, evidence: existing.evidence };
     if (profile === "p2" && field !== "description") return { ...item, disposition: "review-required", targets: [], evidence: [] };
     return item;
   });
