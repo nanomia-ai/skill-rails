@@ -160,8 +160,6 @@ and never claim completion without proof.
 
 The authoring agent asks a follow-up only when the answer would change what the skill must do, must not do, or produce. It records those answers in files, selects the profile, implements the real rules and tests, and runs the checks. Its final report separates what it actually executed from what still needs to be tried in the real installation environment.
 
-For manual installation on Node.js 20 or in an environment where the installer cannot run, see the [platform installation reference](references/platform-adapters.md).
-
 ## Run the scripts directly
 
 Most users do not need to run the commands below. Use them only when starting automation from an intent file or checking a generated package in a separate workflow.
@@ -210,7 +208,5 @@ The P2 execution script calculates the next action and checks whether evidence e
 - [Product purpose and design boundaries (Korean)](docs/skill-rails_ko.md)
 - [Implementation scope and verification record (Korean)](docs/implementation-verification_ko.md)
 - [Authoring workflow](references/authoring-workflow.md)
-- [Skill README authoring guide](references/readme-authoring.md)
 - [P2 contract](references/p2-contract.md)
 - [Evaluation method](references/evaluation.md)
-- [Current platform adapters](references/platform-adapters.md)

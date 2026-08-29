@@ -254,7 +254,7 @@ SKILL.md
 ### 8.1 Creator 정본
 
 - `SKILL.md`: 선택과 authoring 진입 절차
-- `references/`: 작업 종류에 따라 읽는 작성·P2 계약·평가·마이그레이션·플랫폼·README 작성 규칙
+- `references/`: 설치된 Skill Rails가 작업 종류에 따라 읽는 작성·P2 계약·평가·마이그레이션 규칙
 - `scripts/lib/`: profile, generator, obligation, migration, maintenance, semantic diff, build
 - `scripts/runtime/`: P2 validator, evaluator, guide, trace, alignment 원본
 - `schemas/`: 공개 Decision과 Trace Event 계약
@@ -694,7 +694,7 @@ Shape와 simple table에는 유리하다. 복잡 predicate는 표현 부족 또�
 
 ## 22. 공개 명령
 
-Creator 명령, 작업 순서와 작업별 operational reference는 root [`SKILL.md`](../SKILL.md)가 조건부로 안내한다. Repository 검증 명령은 `package.json`과 README에서 확인한다. 이 제품 설계 문서에 CLI 목록이나 두 번째 라우팅 표를 복제하지 않는다.
+Creator 명령, 작업 순서와 작업별 operational reference는 root [`SKILL.md`](../SKILL.md)가 조건부로 안내한다. Repository 검증 명령은 `package.json`이 소유한다. 사람을 위한 README를 maintainer 진입점이나 검증 정본으로 사용하지 않고, 이 제품 설계 문서에 CLI 목록이나 두 번째 라우팅 표를 복제하지 않는다.
 
 ---
 

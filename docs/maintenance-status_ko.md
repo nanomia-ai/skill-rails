@@ -2,27 +2,27 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-08-29 KST
+최종 갱신: 2026-08-30 KST
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 완료 지점: 실사용 교훈의 좁은 보정
+## 0. 현재 완료 지점: v0.1.4 문서 경계 정리와 공식 설치 검증
 
-네 모델 실사용 자료를 Claude Fable max와 Codex Sol xhigh로 독립 교차검수한 뒤, 합의된 bounded product correction을 local working tree에 적용했다. 변경 범위는 P1 scaffold 상태 안내, 동일 obligation atom 신용 보존, adapter description 무손실 projection, migration 기본 abstention, downstream condition -> action 안내, 그리고 `SKILL.md` description lint 소유권이다. P2 version-5 runtime·schema·effect authority는 바꾸지 않았다.
+실사용 교훈의 좁은 product correction은 commit `0205a0b`에, release metadata는 `bfb83dd`에 반영했다. Package version 0.1.3과 annotated tag `v0.1.3`을 `origin/main`에 push했고, release candidate의 `npm run verify`는 vendor check, self lint, repository test 61/61, frozen G0.5 eval을 통과했다.
 
-Canonical pilot은 공식 repair-generated 경로와 기존 50회 반복 범위로 재생성했다. `npm run verify`는 vendor check, self lint, repository test 61/61, frozen G0.5 eval까지 통과했다. 정확한 파일, build ID, 회귀 범위와 남은 `UNPROVEN`은 [구현·검증 기록](implementation-verification_ko.md) 0절이 소유한다.
+배포 뒤 기존 clean·inactive worktree 두 개에서 `npx skills@latest add nanomia-ai/skill-rails`를 그대로 실행했다. Codex와 실제 Claude Code process의 project-local 설치는 version 0.1.3, 248 files, missing/extras 0으로 일치했고, Windows에서 Git blob과 달랐던 94개 파일은 모두 CRLF projection뿐이었다. Fresh Codex는 project-local entry로 P1 생성과 세 fixture·lint를 통과했다. Claude는 사용자 personal v0.1.2가 project v0.1.3보다 우선하는 공식 same-name precedence를 재현했으며, personal Claude Code 연결을 제거한 뒤 새 session이 project-local v0.1.3을 사용해 같은 bounded smoke를 통과했다.
 
-다음 작업은 최종 diff와 working-tree 범위를 재확인하고, 실사용 test/harness 관찰과 product correction을 섞지 않은 채 사용자에게 변경점·검증·남은 `UNPROVEN`을 보고하는 것이다. Commit, push, version, publish, release는 별도 명시 권한 전까지 수행하지 않는다.
+Core product defect는 발견되지 않았다. Local `main`의 package version 0.1.4는 설치된 AI가 읽는 operational reference와 사람·maintainer 문서를 다시 분리한다. Maintainer 전용이던 platform adapter reference와 그 skill-user route를 제거하고, README 작성 가이드는 `docs/`로 옮기되 모든 자동 route를 해제했다. Targeted authoring test 14/14, Markdown local link 49-file scan과 `npm run verify`의 vendor check·self lint·repository test 61/61·frozen G0.5 eval이 통과했다. 정확한 설치 receipt와 변경 증거, 남은 `UNPROVEN`은 [구현·검증 기록](implementation-verification_ko.md) 0.1–0.2절이 소유한다.
 
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 현재 local 제품 구현 기준: local `main`의 `HEAD`. 정확한 hash는 `git rev-parse HEAD`로 확인한다.
-- `origin/main`: `cb8e06dabbc81bff41614e1e70791b51c4a697fd`; local `main`이 앞서며 push하지 않았다.
-- package version: `0.1.2`; version bump, publish, release는 수행하지 않았다. Fresh-use evidence가 닫힌 뒤 별도 release commit에서 다음 version을 정한다.
-- Local `HEAD`에는 후임자 인수인계 전 operational reference·generic P2 loader·문서 라우팅 정리가 포함돼 있다. 제품 runtime·schema·Decision byte를 바꾸는 작업은 아니다.
+- 현재 배포 기준: `bfb83dd431d95432f1e60269f9ef2078c36c265a`, annotated tag `v0.1.3`, package version 0.1.3.
+- `origin/main`과 release tag는 위 v0.1.3 commit에 있다. Local `main`의 현재 `HEAD`는 검증된 문서 소유권 정리와 package 0.1.4 metadata를 포함하며 아직 push·tag·public release하지 않았다.
+- P2 runtime·schema·Decision byte·effect authority는 v0.1.3에서 바뀌지 않았다.
+- Local package version은 0.1.4다. Push, tag와 public release는 이 검증된 local commit과 별도로 승인된 배포 단계다.
 
 ---
 
@@ -42,9 +42,10 @@ Canonical pilot은 공식 repair-generated 경로와 기존 50회 반복 범위�
 
 ## 3. 현재 증거
 
-- Targeted profile-generation regression, generic loader regression, repair-generated canonical P2 pilot과 현재 후보 bytes의 full verify가 모두 통과했다. 정확한 count, build ID, 이전 고유 receipt와 역사적 evidence card는 [구현·검증 기록](implementation-verification_ko.md) 1절과 6.11–6.12가 소유한다.
-- 공개 `Authoring judgment`는 사용자 결과·근본 문제를 향한 방향 원칙과 네 개의 범용 인과 실패 사례를 분리하고 중복 절차를 덜어냈다. Fable xhigh 감사 기준을 재사용한 최종 Sol xhigh 재감사는 의미 중복·과잉 재기획·표면 패턴 오용을 소폭 보완 후 통과로 판정했다. 이전 fresh Sol xhigh gate는 현재 failure-case bytes를 읽지 않았으므로 fresh-author 행동과 생성 skill 소비자의 recovery guard 행동은 각각 `UNPROVEN`이다.
-- 구조, 생성, 결정성 증거를 fresh-agent 행동 증거로 승격하지 않는다.
+- v0.1.3 release candidate full verify와 기존 targeted/canonical evidence는 [구현·검증 기록](implementation-verification_ko.md) 0절, 1절, 6.11–6.12가 소유한다.
+- 통제 exact-byte 네 모델 suite는 narrow fixture와 bounded extension을 수행했지만 Opus/Sonnet의 첫 heading 해석 drift, Sol/Orca lifecycle incident, stale global precedence를 product defect로 승격하지 않았다.
+- 공식 latest install은 Codex와 Claude 양쪽에서 clean project placement를 통과했다. Fresh Codex는 local entry 사용을, fresh Claude는 personal collision 제거 뒤 local entry 사용을 실제 authoring receipt로 증명했다.
+- 구조, 배치, 생성자 자기 fixture를 별도 fresh consumer 행동 증거로 승격하지 않는다.
 
 ---
 
@@ -53,14 +54,15 @@ Canonical pilot은 공식 repair-generated 경로와 기존 50회 반복 범위�
 - Fresh consumer가 새 recovery guard와 saved-Decision 재사용 조건을 실제로 올바르게 해석하는 행동
 - Fresh P2 consumer의 skipped-judgment branch, tampered-Decision rejection과 harness-trusted public effect observation
 - 생성 P0/P1 skill의 반복 trigger precision, 첫 산출물 유용성과 long-session/compaction 회복
-- 여러 모델·host에서의 최종 실제 사용 검증과 대형 Devflow 계열 부하
+- 여러 모델·host에서의 통계적 trigger precision과 대형 Devflow 계열 부하
 - Linux/macOS POSIX symlink 분기와 capture 뒤 out-of-band writer의 package 보존
-- 다음 version, publish, release
+- Claude personal/project 동명판을 함께 유지하면서 project가 이기는 행동은 host precedence상 지원되지 않는다. 다른 host의 same-name precedence는 `UNPROVEN`이다.
+- 생성된 `ready-file-verifier`를 별도 fresh consumer가 암시적으로 호출하는 forward test
+- human/maintainer 문서와 installed-skill routing 경계 정리는 local commit에서 검증됐으며 public patch release가 남음
 
 ---
 
 ## 5. 정확한 다음 단계
 
-1. 변경 파일, 삭제한 dead path, 남은 `UNPROVEN`을 사용자에게 표로 보고한다. 별도 명시적 권한 전에는 commit, push, version, publish, release를 수행하지 않는다.
-2. 사용자 인수인계 지시가 오면 이번 냉간 저작 행동 gate를 통과한 fresh Sol xhigh 후보에게 authority를 이전한다.
-3. 인수인계 뒤 clean isolated actual-use lanes에서 아직 증명되지 않은 소비 행동을 검증한다. 기존 deterministic suite를 이유 없이 반복하지 않는다.
+1. Orca test worktree는 dirty bytes와 active terminal이 없음을 확인한 정확한 대상부터 제거한다.
+2. Push, tag와 public release는 별도 배포 단계로 남긴다. Runtime regression이나 네 모델 suite를 이유 없이 반복하지 않는다.

@@ -2,7 +2,7 @@
 
 문서 상태: 현재 구현과 evidence의 기록 정본
 
-기준일: 2026-08-29 KST
+기준일: 2026-08-30 KST
 
 이 문서는 정확한 구현 범위, 지원 수준, P2 version-5 호환 변경 근거, 실행 증거와 미검증 경계를 소유한다. 제품의 안정적인 목적과 설계 경계는 [제품·설계 정본](skill-rails_ko.md), 다음 세션의 작업 시작점은 [유지보수 상태](maintenance-status_ko.md)를 따른다. 여기서 version 5는 `SPEC.version` 호환 계보이며 package release version이 아니다.
 
@@ -25,9 +25,27 @@
 
 P2 `SPEC.version = "5"`, Decision·Trace schema, runtime effect authority, host permission 경계는 바꾸지 않았다. 실제 cross-model trigger 개선, 장기 session/compaction, E005에서 관찰된 checkout byte drift의 harness 재현은 여전히 `UNPROVEN`이며 이번 product patch의 성공으로 승격하지 않는다.
 
+### 0.1 v0.1.3 공식 설치와 동일 이름 scope 충돌
+
+`v0.1.3` release commit `bfb83dd431d95432f1e60269f9ef2078c36c265a`를 `origin/main`과 annotated tag에 배포한 뒤, frozen scenario HEAD `58555267162d64c9688b26a5019b41ad4191f483`의 기존 clean·inactive worktree 두 개에서 `npx skills@latest add nanomia-ai/skill-rails`를 그대로 실행했다. 당시 `latest`는 `skills` 1.5.23이었다. Codex와 실제 Claude Code process는 각각 agent를 자동 감지했고 project-local 설치를 exit 0으로 끝냈다.
+
+두 설치본은 package version 0.1.3, 248 files, missing 0, extras 0, `skills-lock.json` computed hash `54efe9d4fc26a003d89c12bacde005bbf7a068fe0abf17d0eb88790fad50f1ad`로 같았다. Git blob raw hash와 다른 94개 파일은 모두 CRLF를 LF로 바꾸면 release commit blob과 일치했고, 그 밖의 content difference는 0이었다. 이는 현재 Windows checkout projection이지 Skill Rails body rewrite나 기능 결함이 아니다.
+
+Fresh Codex는 project-local `.agents/skills/skill-rails/SKILL.md`와 그 reference를 읽고 P1 `ready-file-verifier`를 만들었다. Pass, wrong-content, missing fixture와 fast/default/full lint가 통과했고 scaffold와 open obligation은 0이었다. Eval은 별도 fresh consumer가 없으므로 의도대로 `forward-test-required`와 behavior `unproven`을 유지했다.
+
+첫 fresh Claude는 project-local v0.1.3을 목록에서 발견했지만 `Skill("skill-rails")`가 사용자 personal `C:\Users\joinj\.claude\skills\skill-rails`의 v0.1.2를 열었다. Claude Code 공식 precedence가 enterprise > personal > project이므로 이는 clean project install 실패가 아니라 실제 사용 환경에서 재현 가능한 same-name scope collision이다. Claude Code에 연결된 personal 동명판만 제거한 뒤 새 Claude session은 project-local `.claude/skills/skill-rails/SKILL.md` junction과 같은 worktree의 `.agents/skills/skill-rails/SKILL.md`를 사용했고, 같은 P1 생성·세 fixture·lint를 통과했다. 따라서 clean project-local 설치와 기능은 `verified`, personal/project 동명 공존에서 project copy 선택은 `unsupported-by-host-precedence`, 다른 host의 동일 precedence는 `UNPROVEN`이다. Core runtime이나 profile code는 바꾸지 않았고, 이 관찰은 설치된 skill의 운영 절차를 늘리지 않고 host·환경 evidence로만 보존한다.
+
+### 0.2 v0.1.4 문서 소유권과 installed-skill routing 경계
+
+`references/`를 설치된 AI가 실제 저작·유지보수·평가 중 조건부로 읽는 operational material로 한정했다. Maintainer·배포자용 `references/platform-adapters.md`는 삭제했고, 안정적인 portable-core·adapter 설계는 [제품·설계 정본](skill-rails_ko.md), 버전·host별 support evidence는 이 문서가 계속 소유한다. Root `SKILL.md`의 platform reference route와 public README의 링크도 함께 제거했다.
+
+README 작성 가이드는 내용 변경 없이 `references/readme-authoring.md`에서 `docs/readme-authoring.md`로 옮겼다. 사용자가 README 작업에 직접 제공할 human-authoring material이므로 `SKILL.md`, `AGENTS.md`, `CLAUDE.md`, authoring workflow와 public README의 자동 route를 모두 제거했다. 회귀 검사는 새 문서의 존재, 두 예전 reference의 부재, 여섯 entry surface의 무연결 상태를 확인한다.
+
+변경 뒤 targeted authoring test 14/14와 repository Markdown local link 49-file scan이 통과했다. 이어 실행한 `npm run verify`는 vendor check, self lint, repository test 61/61, frozen G0.5 eval을 모두 통과했다. 이 변경은 creator runtime, profile selection, generated package shape, P2 version-5 contract와 host adapter projection을 바꾸지 않는다.
+
 ## 1. 현재 결정적 검증
 
-현재 제품 구현 기준선은 local `main`의 `HEAD`다. `origin/main`은 아직 `cb8e06dabbc81bff41614e1e70791b51c4a697fd`이며 local 변경은 push·version·publish·release하지 않았다. 정확한 local hash는 `git rev-parse HEAD`가 소유한다.
+현재 public 배포 기준선은 `v0.1.3` release commit `bfb83dd431d95432f1e60269f9ef2078c36c265a`다. `origin/main`과 annotated tag가 이 commit을 가리킨다. Human/maintainer 문서와 installed-skill reference 경계 정리 및 package 0.1.4 metadata는 local `main`의 현재 `HEAD`에 있으며 아직 push·tag·public release하지 않았다. 정확한 local hash와 dirty scope는 `git rev-parse HEAD`와 `git status --short`가 소유한다.
 
 `d74d783`은 저작 과정의 검사 시점을 논리 수렴과 살아 있는 가설에 맞추고, 생성된 P0/P1에는 비수렴에서 한 발 물러설 짧은 recovery guard를, P2에는 현재 Decision이 연 domain work 안에서만 판단하도록 하는 guard를 투영했다. 저장된 P2 stage result는 현재 task·설치 skill·project의 current Decision임을 명시하고 package와 covered project state가 변하지 않았음을 확인할 때만 재사용한다. 대화 기억, 발견한 파일, 불확실한 상태에서는 새 stage를 실행한다. Runtime, schema, Decision byte와 P2 behavior source는 바꾸지 않았다.
 
@@ -65,6 +83,7 @@ Node 20·22·24 결과를 그때의 49개 suite 결과로 확대하지 않는다
 | 생성 skill explicit invocation | verified | verified |
 | 생성 skill implicit positive trigger | verified | verified |
 | 설치 상태 near-miss non-trigger | verified 1회 | unproven |
+| same-name personal/project precedence | project-local selected in current smoke; broad rule unproven | personal overrides project by host contract; current collision and cleanup verified |
 | absolute/skill-relative script invocation | verified | verified |
 | read-only package + external state | verified-local | verified-local |
 | long-session compaction recovery | unproven | unproven |
@@ -91,6 +110,8 @@ Codex와 Claude Code는 현재 검증된 project-local adapter다. 제품의 영
 설치 payload는 186 files, 1,313,275 bytes였다. Root `SKILL.md`가 package boundary이므로 repository test와 설계 기록도 함께 복사된다. 이 파일들은 자동 prompt loading 경로가 아니어서 context 동작을 바꾸지 않지만, nested distribution layout보다 설치 byte 수가 크다. 이를 줄이는 repository relocation은 이번 설치 hotfix에 포함하지 않았다.
 
 `skills` 1.5.23 자체는 Node 22.20 이상을 요구한다. Skill Rails runtime 계약은 Node 20 이상이므로, Node 20 사용자는 manual project-local clone으로 같은 package를 설치할 수 있다.
+
+2026-08-30 KST의 v0.1.3 post-release smoke는 위 0.1절의 exact command와 clean worktree evidence를 추가했다. 성공한 installer message나 `skills list`는 배치만 증명하고 host가 실제로 어느 scope를 연 것은 증명하지 않는다. Claude retest에서 stale personal link를 제거한 것은 product 설치 절차를 추가하려는 조치가 아니라 project-local copy를 실제로 읽는지 변수를 분리하기 위한 환경 정리였다. Codex는 이번 fresh smoke에서 project-local entry를 사용했지만 이 한 관찰을 모든 host의 precedence 규칙이나 사용자 preflight로 일반화하지 않는다.
 
 ---
 

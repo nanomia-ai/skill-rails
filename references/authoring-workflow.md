@@ -85,8 +85,7 @@ Apply the terminal, observation, guard, stage, table, and effect sequence below 
 9. Write judgment-only body sections.
 10. Add positive, negative, counterexample, and mutation fixtures.
 11. Generate the thin loader and platform metadata.
-12. If the user requested a README, read [readme-authoring.md](readme-authoring.md) and write it from the implemented behavior and available evidence. Do not treat the guide as a fixed section template.
-13. Run L-fast, L-structural lint, L-full build, and behavior evaluation.
+12. Run L-fast, L-structural lint, L-full build, and behavior evaluation.
 
 Every generated P2 package reserves a package-root `.gitattributes` with exact bytes `* -text\n`. The builder emits its owned runtime and schema text with LF, then records exact raw hashes including `.gitattributes` in `generated_files`; verification never normalizes bytes, and Git checkouts preserve every sealed file instead of applying platform newline conversion. A pre-existing noncanonical file is a collision and is never overwritten or merged; an unowned file with the canonical bytes requires an explicit `--repair-generated` rebuild to transfer ownership. P0 and P1 package shape is unchanged.
 

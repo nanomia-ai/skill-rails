@@ -26,12 +26,6 @@ Skill Rails helps an AI create and maintain one standalone skill without keeping
 - Do not commit, push, publish, or deploy unless the user explicitly requests that action. Keep unrelated milestones in separate commits when the user asks for a checkpoint.
 - If an implementation choice changes a product boundary, behavior contract, or irreversible action, stop and obtain the user's direction.
 
-## README and public documentation
-
-Before creating or revising a skill README, read [references/readme-authoring.md](references/readme-authoring.md) completely.
-
-- Treat the guide as a quality and review protocol, not a fixed template. The user's audience, purpose, tone, and exclusions take priority; public claims must stay inside the implementation and evidence actually verified.
-
 ## Verification
 
 - Run checks proportional to the change while iterating.
@@ -40,7 +34,7 @@ Before creating or revising a skill README, read [references/readme-authoring.md
 
 ## Canonical references
 
-- `SKILL.md` — skill-user entry procedure and the sole conditional router for creation, maintenance, P2, migration, evaluation, installation, and README references
+- `SKILL.md` — skill-user entry procedure and the sole conditional router for creation, maintenance, P2, migration, and evaluation references
 - `docs/maintenance-status_ko.md` — current milestone, exact continuation point, and next-session entry; read first when resuming repository work
 - `docs/skill-rails_ko.md` — current product purpose, architecture, and stable design boundaries; read when changing product behavior or owning abstractions
 - `docs/implementation-verification_ko.md` — exact implementation scope, support evidence, unproven boundaries, and P2 compatibility ledger; read for verification claims or P2 contract changes
@@ -51,7 +45,7 @@ Do not read all project documents by default. For repository resumption or curre
 ## Document ownership and update cadence
 
 - Maintainer documents preserve purpose, rationale, stable boundaries, ownership, and evidence or unknowns that code alone cannot explain. For exact behavior and change scope, inspect the current owning code, schema, and targeted tests; do not copy line-by-line implementation or command listings into prose unless that prose is itself the shipped contract.
-- `SKILL.md` and the references it conditionally routes are the shipped operational path for creating, migrating, maintaining, evaluating, and installing skills. Keep commands and executable contracts there, with one canonical owner per rule.
+- `SKILL.md` and the references it conditionally routes are the shipped operational path for creating, migrating, maintaining, and evaluating skills. Keep commands and executable contracts there, with one canonical owner per rule.
 - `docs/maintenance-status_ko.md` is a replaceable snapshot. Update it at a coherent milestone or handoff, not after every edit.
 - `docs/skill-rails_ko.md` changes only when the stable product purpose, architecture, or owning boundary changes.
 - `docs/implementation-verification_ko.md` changes when material implementation, support evidence, unproven scope, or P2 compatibility changes. Replace superseded current claims instead of appending a daily log, but never discard a unique receipt merely because a newer run exists. A receipt is superseded only when the newer evidence covers the same claim, bytes, host, scope, and authority; otherwise retain it or link its exact durable artifact or Git commit.

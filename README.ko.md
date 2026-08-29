@@ -160,8 +160,6 @@ Skill Rails를 사용해서 ./skills/release-check에 release-check 스킬을 �
 
 작성 AI는 답에 따라 스킬이 해야 할 일, 하지 말아야 할 일, 만들어야 할 결과물이 달라지는 경우에만 추가로 질문합니다. 그 답을 파일에 기록하고, 알맞은 프로필을 선택하고, 실제 규칙과 테스트를 만든 뒤 검증을 실행합니다. 마지막에는 이미 실행해서 확인한 내용과 실제 설치 환경에서 추가로 시험해야 할 내용을 구분해 보고합니다.
 
-Node.js 20 또는 설치 프로그램을 사용할 수 없는 환경의 수동 설치 방법과 도구별 경로는 [플랫폼 설치 참고 문서](references/platform-adapters.md)에서 확인할 수 있습니다.
-
 ## 스크립트를 직접 실행하는 경우
 
 대부분의 사용자는 아래 명령을 직접 실행할 필요가 없습니다. 의도 파일로 자동화를 시작하거나 생성 결과를 별도 작업에서 검사할 때만 사용합니다.
@@ -210,7 +208,5 @@ P2 실행 스크립트는 다음 행동을 계산하고 필요한 증거가 있�
 - [제품 목적과 설계 경계](docs/skill-rails_ko.md)
 - [구현 범위와 검증 기록](docs/implementation-verification_ko.md)
 - [작성 절차](references/authoring-workflow.md)
-- [스킬 README 작성 가이드](references/readme-authoring.md)
 - [P2 계약](references/p2-contract.md)
 - [평가 방식](references/evaluation.md)
-- [현재 플랫폼별 설치 방식](references/platform-adapters.md)
