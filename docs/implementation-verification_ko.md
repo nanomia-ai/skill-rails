@@ -314,6 +314,14 @@ Fresh Fable Max consumer는 stopping guard, 여러 static artifact, dynamic targ
 
 이 audit에서 fresh skipped-judgment branch, tampered-Decision rejection, evidence-stage REPORT record/align은 실행하지 않았다. 35/35 deterministic regression이 skip leakage와 tamper rejection을 확인하지만 fresh behavior evidence로 승격하지 않는다. Post-push product falsification은 관찰하지 않았고 전체 empirical scope는 `PARTIAL`이다.
 
+### 6.11 적응형 저작 판단과 현재 Decision handoff 명료화
+
+저작 진입점의 `매 편집 후 lint`는 논리 수렴 전 작은 수정마다 검사를 강제해 비수렴을 키울 수 있으므로, 의미 있는 변경 묶음이나 살아 있는 가설을 반증할 때 fast lint를 사용하고 설계 수렴 뒤 full lint·P2 build를 수행하도록 고쳤다. 공개 `Authoring judgment`가 사용자 목적과 실행 계약의 충돌 해결, 실패한 check의 product·fixture·harness·environment 전제 분리, 생성 스킬에 허용되는 짧은 recovery guard의 권한 경계를 소유한다. 상세 한국어 경험 문서는 맥락만 보존하고 생성 패키지에 복제하지 않는다.
+
+P0/P1 생성물은 작은 수정과 예외가 늘지만 사용자 결과가 가까워지지 않을 때 결과와 접근을 다시 보도록 하되 의미·형식·비가역 경계·완료 증거를 계속 구속한다. P2 생성물은 판단을 현재 Decision이 열어 둔 domain work로 제한하고 Decision·evidence·loader step을 우회하지 못하게 한다. 저장된 stage result는 현재 task가 이 설치 skill과 project의 current Decision으로 명시하고 package와 covered project state가 생성 이후 변하지 않았음을 확인할 때만 소비하며, 발견한 파일·대화 기억·불확실한 상태에서는 반드시 새 stage를 실행한다. 이는 loader guidance correction이며 runtime, schema, Decision byte, V5 behavior source를 바꾸지 않는다.
+
+Targeted profile-generation integration은 P0/P1/P2 projection과 fail-closed stage fallback을 pass했다. Canonical P2 pilot build는 L0–L18, mutation 20/20, scenario 10/10, 50회 반복 불일치 0, format round trip 256/256을 pass했고 build ID는 `sha256:e93fc57d5e748859c3f955184d4d86de9c0d946a620b51dca8d08b4102a2f06e`다. 이 증거는 생성·구조·결정성만 증명한다. Fresh consumer가 recovery guard와 saved-Decision 조건을 실제로 올바르게 해석하는 행동은 `UNPROVEN`이다.
+
 ---
 
 ## 7. V5 보존 및 변경 원장

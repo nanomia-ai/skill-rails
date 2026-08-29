@@ -47,7 +47,16 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.equal(await exists(join(outputs.p0, ".gitattributes")), false);
   assert.equal(await exists(join(outputs.p1, ".gitattributes")), false);
   assert.equal(await readFile(join(outputs.p2, ".gitattributes"), "utf8"), P2_PACKAGE_GITATTRIBUTES);
+  for (const profile of ["p0", "p1"]) {
+    const simpleSkill = await readFile(join(outputs[profile], "SKILL.md"), "utf8");
+    assert.match(simpleSkill, /repeated small fixes stop moving the user's requested result closer/);
+    assert.match(simpleSkill, /confirm that the check and its setup observe the stated outcome/);
+  }
   const p2Skill = await readFile(join(outputs.p2, "SKILL.md"), "utf8");
+  assert.match(p2Skill, /current task explicitly identifies a complete saved stage-result file/);
+  assert.match(p2Skill, /If any condition is absent or uncertain, run `node "<skill-root>\/scripts\/skill-rails\/run\.mjs" stage/);
+  assert.match(p2Skill, /Use judgment only within domain work that the current Decision leaves open/);
+  assert.match(p2Skill, /never skip, reorder, or substitute for the Decision/);
   assert.match(p2Skill, /Decision body, `stage_artifacts`, and ordered effects/);
   assert.match(p2Skill, /do not infer replacement paths from collector or authoring files/);
   assert.doesNotMatch(p2Skill, /BLOCK: consumer guidance missing/);

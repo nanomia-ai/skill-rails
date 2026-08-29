@@ -18,7 +18,7 @@ Keep a judgment point as a string when every invocation needs it. When a large P
 
 ## Authoring judgment
 
-Use this section to choose and review an authoring design; it does not override the user's explicit intent or the selected profile and runtime contracts.
+Use this section to choose and review an authoring design. The user's purpose and preferences guide the design; the selected profile and runtime contracts govern execution until deliberately changed at their owning source. If they conflict, surface the incompatibility and revisit the profile or canonical owner instead of forcing one through the other. Ask the user only when the resolution changes a product boundary or irreversible action.
 
 Start with the first useful result a user of the target skill must produce, then work backward. Mechanize rules that are repeatable and can be checked reliably; keep interpretation, tradeoffs, and value judgment in concise prose with enough context to prevent misunderstanding. Do not optimize for brevity itself. When the manual needed to understand or operate a mechanism grows larger or harder to use than the prose it replaces, reconsider the boundary and whether the mechanism is earning its cost.
 
@@ -26,7 +26,9 @@ For a high-cost decision, compare an independent alternative and the simplest wo
 
 Watch for nonconvergence: exceptions, explanations, and tests keep growing while no new evidence shows the first user result getting closer. Stop patching that layer and return to its parent premise, the user outcome, and the owning boundary; if the premise no longer holds, replace the approach. Do not turn one agent failure under constrained reasoning or an unsuitable role, or a structural pass without observed behavior, into universal machinery.
 
-After the design has logically converged, verify it with a high-information representative flow that exercises the coupled risks, then with a fresh agent using only the declared consumption set. Record what each check actually observed, and mark every remaining uncertainty `unproven`.
+Before changing the product to satisfy a failed check, identify which premise broke — product, fixture, harness, or environment — and repair the owning premise rather than making the product fit an invalid check. After the design has logically converged, verify it with a high-information representative flow that exercises the coupled risks, then with a fresh agent using only the declared consumption set. Record what each check actually observed, and mark every remaining uncertainty `unproven`.
+
+Generated guidance may carry a short recovery guard, but scope it to choices the target skill leaves to judgment. It must not authorize bypassing exact formats, mechanical rules, the current P2 Decision, evidence requirements, irreversible boundaries, or host permissions; detailed authoring history does not belong in every generated skill.
 
 ## Fresh-consumer closure
 
