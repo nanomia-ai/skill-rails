@@ -4,25 +4,27 @@
 
 기준일: 2026-08-29 KST
 
-이 문서는 정확한 구현 범위, 지원 수준, V5 변경 근거, 실행 증거와 미검증 경계를 소유한다. 제품의 안정적인 목적과 설계 경계는 [제품·설계 정본](skill-rails_ko.md), 다음 세션의 작업 시작점은 [유지보수 상태](maintenance-status_ko.md)를 따른다.
+이 문서는 정확한 구현 범위, 지원 수준, P2 version-5 호환 변경 근거, 실행 증거와 미검증 경계를 소유한다. 제품의 안정적인 목적과 설계 경계는 [제품·설계 정본](skill-rails_ko.md), 다음 세션의 작업 시작점은 [유지보수 상태](maintenance-status_ko.md)를 따른다. 여기서 version 5는 `SPEC.version` 호환 계보이며 package release version이 아니다.
 
-이 문서를 일일 작업 일지처럼 누적하지 않는다. 새 evidence가 생기면 현재 수치와 주장 범위를 갱신하고, 제품 경계나 V5 의미가 바뀔 때만 변경 원장에 이유와 보존 증거를 추가한다. 코드·test와 충돌하면 성공을 추정하지 말고 주장을 `unproven`으로 낮춘 뒤 같은 변경에서 이 기록을 고친다.
+이 문서를 일일 작업 일지처럼 누적하지 않는다. 새 evidence가 생기면 현재 수치와 주장 범위를 갱신하고, 제품 경계나 P2 호환 의미가 바뀔 때만 변경 원장에 이유와 보존 증거를 추가한다. 그러나 새 실행이 있다는 이유만으로 고유 receipt를 삭제하지 않는다. 같은 claim, bytes, host, scope, authority를 실제로 포괄할 때만 이전 receipt를 대체하고, 그렇지 않으면 본문이나 정확한 durable artifact·Git commit 링크로 보존한다. 코드·test와 충돌하면 성공을 추정하지 말고 주장을 `unproven`으로 낮춘 뒤 같은 변경에서 이 기록을 고친다.
 
 ---
 
 ## 1. 현재 결정적 검증
 
-현재 제품 구현 기준선은 commit `126be238574e8fb1f34caa64e241fc93e5a079dd` (`fix: project exact format into owning effects`)이다. 이 기준선은 `770cd3755d23c17a626822079c47d17b8387b326`의 consumer path binding, exact-Decision alignment admission, judgment-only `NEXT` stage-state 격리, final-gate coverage와 P1 provenance correction 위에 exact-format 소비 경로를 닫는다.
+현재 제품 구현 기준선은 local `main`의 `HEAD`다. `origin/main`은 아직 `cb8e06dabbc81bff41614e1e70791b51c4a697fd`이며 local 변경은 push·version·publish·release하지 않았다. 정확한 local hash는 `git rev-parse HEAD`가 소유한다.
 
-현재 delta는 exact format의 L15 golden fixture 첫 `expect`를 `Decision.format.example`뿐 아니라 그 format을 소유한 effect의 `format_example`에도 투영한다. Spec effect는 변경하지 않고 Decision projection만 복제하며, fixture가 없거나 읽히지 않으면 기존 합성 example로 fail-safe fallback한다. 형식이 필요한 WRITE 바로 옆에서 같은 정본 예시를 소비하게 하므로 별도 산문이나 두 번째 format 정본을 만들지 않는다. 이전 final-gate correction인 evaluator execution observer와 P0/P1 simple-lint provenance 경계는 그대로다.
+`d74d783`은 저작 과정의 검사 시점을 논리 수렴과 살아 있는 가설에 맞추고, 생성된 P0/P1에는 비수렴에서 한 발 물러설 짧은 recovery guard를, P2에는 현재 Decision이 연 domain work 안에서만 판단하도록 하는 guard를 투영했다. 저장된 P2 stage result는 현재 task·설치 skill·project의 current Decision임을 명시하고 package와 covered project state가 변하지 않았음을 확인할 때만 재사용한다. 대화 기억, 발견한 파일, 불확실한 상태에서는 새 stage를 실행한다. Runtime, schema, Decision byte와 P2 behavior source는 바꾸지 않았다.
 
-Targeted runtime test는 14/14 pass했다. Canonical pilot은 L0–L18 pass 뒤 정본에서 rebuild되어 mutation 20/20, scenario 10/10, 50회 불일치 0, format 256/256, build ID `sha256:932d2462f413afd8c40d58a68e40f0efa4bbcd65c8b0c47a4ee16b855ea53003`, manifest content 15 + generated 37 = 52, embedded lint pass, real-state e2e 2/2를 기록했다. 논리 수렴 뒤 실행한 full `npm run verify`도 vendor pass, lint pass, repository test 60/60 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass였다.
+현재 local delta는 generic P2 loader와 operational reference를 실제 runtime contract에 맞춘다. `artifact_verified`는 current Decision의 matching `proof.reference`를 `--data`로 전달하고, route terminal은 `ROUTE:<target-id>`, alignment verdict는 실제 closed vocabulary로 표기한다. 유지보수 reference는 `--diagnose --query`와 operation별 최소 JSON shape를 제공하고, installer version은 2026-08-23 실측 snapshot으로 한정한다. Targeted generated-loader regression 1/1이 pass했고 canonical pilot은 공식 repair-generated 경로로 rebuild되어 L0–L18, mutation 20/20, scenario 10/10, 50회 반복 불일치 0, format round trip 256/256, build ID `sha256:71fe532518672eff1cc0fd1e8c2992544ca91f679f06152c08f421f91493f4c1`을 기록했다. 이는 현재 guidance의 생성·구조·결정성 증거다. Fresh consumer가 새 generic proof 문장을 실제로 따라가는 행동은 아직 `UNPROVEN`이다.
 
-Commit `126be23` push 뒤 공식 installer로 만든 project-local 설치본은 Git과 같은 249개 path를 가졌고 root self-lint와 생성 pilot L0–L18이 pass했다. Windows checkout은 일반 text 파일의 line ending을 바꿀 수 있으므로 249개 전체를 byte-identical이라고 주장하지 않는다. 대신 package-root `* -text`가 보호하는 생성 pilot 54개 파일은 Git blob과 54/54 byte-identical이었고, 설치본 stage는 owning WRITE의 `format_example`과 같은 `Decision.format.example`을 출력했다.
+직전 `126be238574e8fb1f34caa64e241fc93e5a079dd` exact-format 기준선의 targeted runtime test는 14/14 pass했다. 당시 canonical pilot은 mutation 20/20, scenario 10/10, 50회 불일치 0, format 256/256, build ID `sha256:932d2462f413afd8c40d58a68e40f0efa4bbcd65c8b0c47a4ee16b855ea53003`, manifest content 15 + generated 37 = 52, embedded lint pass, real-state e2e 2/2를 기록했다. 당시 full `npm run verify`도 vendor pass, lint pass, repository test 60/60 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass였다. 이 receipt는 현재 후보 bytes의 full-verify 결과가 아니다.
 
-Fresh Luna Max consumer는 이와 byte-identical한 생성 pilot을 `SKILL.md`, `references/canon.md`, `references/verify.md`, Decision/guide만 읽고 사용했다. Source inspection 없이 owning WRITE의 `format_example`을 찾아 verifier를 실행하고 같은 run에 재진입해 `stage=evidence`, `row=matching-pass`, `status=DONE`에 도달했으며 최종 lane report도 만들었다. Effect claim JSON의 첫 shell quoting·shape 시도는 agent 실행 오류였고, 공개 문장의 effect index/verb 지시로 top-level `index`/`verb` shape를 회복했다. Acquire alignment는 agent claim 때문에 `partial`, 최종 REPORT를 기록한 뒤 alignment도 `agent-claim-only` 때문에 `unproven`으로 남았다. 이는 agent 자기주장을 강한 effect 관찰로 승격하지 않는 의도된 경계이며 제품 성공으로 확대하지 않는다. Fresh skipped-judgment와 tampered Decision은 여전히 실행하지 않아 전체 경험적 판정은 `PARTIAL`이다.
+`126be23` push 뒤 공식 installer로 만든 project-local 설치본은 Git과 같은 249개 path를 가졌고 root self-lint와 생성 pilot L0–L18이 pass했다. Windows checkout은 일반 text 파일의 line ending을 바꿀 수 있으므로 249개 전체를 byte-identical이라고 주장하지 않는다. 대신 package-root `* -text`가 보호하는 생성 pilot 54개 파일은 Git blob과 54/54 byte-identical이었고, 설치본 stage는 owning WRITE의 `format_example`과 같은 `Decision.format.example`을 출력했다.
 
-최초 full verify에서 실패한 두 항목은 migration semantic-unit test와 G0.5 scorer test였다. 둘 다 제품 행동 결함이 아니라 raw-byte 입력이 checkout에서 CRLF로 바뀐 portability defect였고, 다섯 pattern의 raw-byte checkout protection으로 닫혔다.
+Fresh Luna Max consumer는 이와 byte-identical한 생성 pilot을 `SKILL.md`, `references/canon.md`, `references/verify.md`, Decision/guide만 읽고 사용했다. Source inspection 없이 owning WRITE의 `format_example`을 찾아 verifier를 실행하고 같은 run에 재진입해 `stage=evidence`, `row=matching-pass`, `status=DONE`에 도달했으며 최종 lane report도 만들었다. Acquire alignment는 agent claim 때문에 `partial`, 최종 REPORT 뒤 alignment도 `agent-claim-only` 때문에 `unproven`으로 남았다. 이는 자기주장을 강한 effect 관찰로 승격하지 않는 의도된 경계다. Fresh skipped-judgment와 tampered Decision은 실행하지 않아 전체 경험적 판정은 `PARTIAL`이다.
+
+당시 최초 full verify의 migration semantic-unit와 G0.5 scorer 실패는 제품 행동 결함이 아니라 checkout에서 raw-byte 입력이 CRLF로 바뀐 portability defect였고, 다섯 pattern의 raw-byte checkout protection으로 닫혔다. 이와 별도로 은퇴한 continuation 설계의 냉시작 행동은 [역사적 증거 카드 03](evidence/proof-03-cold-behavior_ko.md)에 보존한다. 그 카드의 bytes를 현재 package 성공으로 승격하지 않는다.
 
 `b277a4c` (`chore: release v0.1.2`) 기준선에서 마지막으로 관찰한 값은 다음과 같다. 이 값들을 현재 tree의 결과로 인용하지 않는다.
 
@@ -270,18 +272,18 @@ Typed-artifact delta에서 `tests/authoring.test.mjs`에 추가한 두 test는 �
 
 수치는 pilot 보고서가 각 receipt의 재현 명령과 함께 소유한다. 은퇴한 설계(continuation receipt, singleton recorded-JSON 상관, 합성 runtime-state fixture)는 mechanism과 함께 제거했고, 그 흔적은 pilot 보고서의 부록 한 줄로만 남는다.
 
-### 6.7 P2 package byte 소유권과 V5 호환
+### 6.7 P2 package byte 소유권과 version-5 호환
 
 Fresh `core.autocrlf=true` clone은 repository verify 52/52를 통과했지만, 기존 pilot package manifest는 checkout newline 변환 뒤 14개 mismatch를 냈고 real-state e2e는 0/2였다. Hash를 정규화하면 raw-byte sealing을 약화하므로 채택하지 않았다. 대신 P2 build가 정확히 `* -text\n`인 package-root `.gitattributes`를 생성하고 manifest `generated_files`에 봉인한다. 기존 비정본 파일은 자동 병합·덮어쓰지 않고 `SR_GENERATED_COLLISION`으로 멈추며, manifest가 소유하지 않은 정본 파일도 명시적 `--repair-generated` rebuild 전에는 ownership을 가져오지 않는다. P0/P1 package shape와 root corpus용 다섯 `-text` pattern은 그대로다.
 
-배포 기준선 `0b70194`의 byte-portability delta는 V5 Decision 의미를 바꾸지 않았다. 근거는 다음과 같다.
+배포 기준선 `0b70194`의 byte-portability delta는 P2 version-5 Decision 의미를 바꾸지 않았다. 근거는 다음과 같다.
 
-- `scripts/runtime/manifest.mjs`는 생성 파일의 필수 집합에 `.gitattributes`를 추가했지만 hashing, Decision 계산, schema에는 normalization이나 새 의미를 추가하지 않았다. `schemas/`와 `references/v5-contract.md`는 변경하지 않았다.
+- `scripts/runtime/manifest.mjs`는 생성 파일의 필수 집합에 `.gitattributes`를 추가했지만 hashing, Decision 계산, schema에는 normalization이나 새 의미를 추가하지 않았다. 당시 `schemas/`와 P2 계약 의미는 변경하지 않았다.
 - pilot package가 내장한 runtime과 schema는 canonical build input에서 생성되며, 생성 package는 진입점 네 개와 package byte 보존용 `.gitattributes`만 추가한다.
 - pilot은 기존 stage `reentry` 값과 기존 표·format 문법만 사용하며 새 runtime mode, 새 declaration, 새 alignment 기대 종류를 추가하지 않는다.
 - `replace-artifact`는 authoring/유지보수 도구 표면이고 생성 package의 실행 계약이 아니다.
 
-현재 consumer-closure correction은 별도 V5 Decision 확장이므로 7절 Decision 변경 원장에 새 행을 추가한다.
+현재 consumer-closure correction은 별도 version-5 Decision 확장이므로 7절 Decision 변경 원장에 새 행을 추가한다.
 
 ### 6.8 `f8f4204` 기준선의 fresh-consumer 판정
 
@@ -318,19 +320,31 @@ Fresh Fable Max consumer는 stopping guard, 여러 static artifact, dynamic targ
 
 저작 진입점의 `매 편집 후 lint`는 논리 수렴 전 작은 수정마다 검사를 강제해 비수렴을 키울 수 있으므로, 의미 있는 변경 묶음이나 살아 있는 가설을 반증할 때 fast lint를 사용하고 설계 수렴 뒤 full lint·P2 build를 수행하도록 고쳤다. 공개 `Authoring judgment`가 사용자 목적과 실행 계약의 충돌 해결, 실패한 check의 product·fixture·harness·environment 전제 분리, 생성 스킬에 허용되는 짧은 recovery guard의 권한 경계를 소유한다. 상세 한국어 경험 문서는 맥락만 보존하고 생성 패키지에 복제하지 않는다.
 
-P0/P1 생성물은 작은 수정과 예외가 늘지만 사용자 결과가 가까워지지 않을 때 결과와 접근을 다시 보도록 하되 의미·형식·비가역 경계·완료 증거를 계속 구속한다. P2 생성물은 판단을 현재 Decision이 열어 둔 domain work로 제한하고 Decision·evidence·loader step을 우회하지 못하게 한다. 저장된 stage result는 현재 task가 이 설치 skill과 project의 current Decision으로 명시하고 package와 covered project state가 생성 이후 변하지 않았음을 확인할 때만 소비하며, 발견한 파일·대화 기억·불확실한 상태에서는 반드시 새 stage를 실행한다. 이는 loader guidance correction이며 runtime, schema, Decision byte, V5 behavior source를 바꾸지 않는다.
+공개 `Authoring judgment`는 사용자 결과와 스킬이 해결할 근본 문제를 설계 기준으로 두고, 반복 작업이 결과를 더 가깝게 만들지 못할 때 현재 구현보다 framing·root cause·owning boundary와 더 단순한 대안을 다시 보게 한다. 새 evidence에 따라 해결 방법을 바꿀 수 있고 긴 문맥에서 필요할 때만 목적을 복기하지만, 정상적인 국소 수정에는 재기획을 요구하지 않는다. 정확 형식, Decision, evidence, 불가역 경계와 단일 정본은 그대로 구속하며 생성 P0/P1·P2 recovery guard는 바꾸지 않았다.
+
+현재 문구는 Fable xhigh와 Sol xhigh의 독립 read-only audit에서 의미 보존, 중복 제거, 정상 국소 수정의 비과잉 경계를 교차 검토했다. 두 감사 모두 정확한 계약 reference는 그대로 두고 이 판단 부품만 압축하라는 결론이었다. 이전 fresh Sol xhigh 행동 gate는 압축 전 bytes를 읽었으므로 현재 문구의 fresh-author 행동은 다시 관찰하기 전까지 `UNPROVEN`이다.
+
+P0/P1 생성물은 작은 수정과 예외가 늘지만 사용자 결과가 가까워지지 않을 때 결과와 접근을 다시 보도록 하되 의미·형식·비가역 경계·완료 증거를 계속 구속한다. P2 생성물은 판단을 현재 Decision이 열어 둔 domain work로 제한하고 Decision·evidence·loader step을 우회하지 못하게 한다. 저장된 stage result는 현재 task가 이 설치 skill과 project의 current Decision으로 명시하고 package와 covered project state가 생성 이후 변하지 않았음을 확인할 때만 소비하며, 발견한 파일·대화 기억·불확실한 상태에서는 반드시 새 stage를 실행한다. 이는 loader guidance correction이며 runtime, schema, Decision byte, P2 behavior source를 바꾸지 않는다.
 
 Targeted profile-generation integration은 P0/P1/P2 projection과 fail-closed stage fallback을 pass했다. Canonical P2 pilot build는 L0–L18, mutation 20/20, scenario 10/10, 50회 반복 불일치 0, format round trip 256/256을 pass했고 build ID는 `sha256:e93fc57d5e748859c3f955184d4d86de9c0d946a620b51dca8d08b4102a2f06e`다. 이 증거는 생성·구조·결정성만 증명한다. Fresh consumer가 recovery guard와 saved-Decision 조건을 실제로 올바르게 해석하는 행동은 `UNPROVEN`이다.
 
+### 6.12 Generic operational guidance 정합화
+
+두 독립 read-only audit가 같은 public-path gap을 확인했다. Runtime은 `artifact_verified` proof를 `data.reference`로 선택하지만 generic generated loader와 P2 계약 예시는 그 값을 전달하지 않았고, pilot 전용 `references/verify.md`와 harness가 별도로 올바른 값을 공급해 누락을 가렸다. Generator와 P2 계약은 current Decision의 matching `proof.reference`를 `--data`로 전달하도록 맞췄다. 같은 audit에서 effect terminal의 plain `ROUTE`를 실제 validator 문법인 `ROUTE:<target-id>`로, evaluation의 존재하지 않는 `not_applicable` verdict를 실제 alignment vocabulary로 고쳤다.
+
+Authoring workflow에는 이미 구현된 P2 `maintain --diagnose --query`와 `update-intent`, `replace-body-section`, `replace-resource`, `replace-artifact`의 최소 change shape를 추가했다. 이는 새 maintenance mechanism이 아니라 cold maintainer가 source/test를 열어 public JSON envelope를 역추론해야 했던 문서 공백을 닫는다. `skills` 1.5.23은 최신 주장 대신 2026-08-23 실측 installer snapshot으로 한정했다.
+
+Generated-loader targeted regression 1/1이 pass했고 canonical pilot은 generated file을 직접 편집하지 않고 repair-generated rebuild로 갱신했다. 결과는 L0–L18, mutation 20/20, scenario 10/10, 50회 반복 불일치 0, format 256/256, build ID `sha256:71fe532518672eff1cc0fd1e8c2992544ca91f679f06152c08f421f91493f4c1`이다. 이어 현재 후보 bytes에서 한 번 실행한 full `npm run verify`는 vendor pass, root lint pass, repository test 60/60 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass였다. Runtime, schema, Decision byte, spec behavior source는 바뀌지 않았다. Fresh agent가 이 수정된 generic guidance만으로 proof를 기록하는 행동은 아직 `UNPROVEN`이다.
+
 ---
 
-## 7. V5 보존 및 변경 원장
+## 7. P2 version-5 보존 및 변경 원장
 
-### 7.0 V5 Decision 위치 보존
+### 7.0 Version-5 Decision 위치 보존
 
-V5의 18개 공개 위치는 현재 typed Decision에서 다음과 같이 보존한다.
+Version-5 기준선의 18개 공개 위치는 현재 typed Decision에서 다음과 같이 보존한다.
 
-| V5 위치 | 현재 Decision |
+| version-5 위치 | 현재 Decision |
 | --- | --- |
 | `skill` | `skill` |
 | `snapshot` | `snapshot.{fingerprint,status,unknowns}` |
@@ -375,11 +389,11 @@ V5의 18개 공개 위치는 현재 typed Decision에서 다음과 같이 보존
 
 ### 7.2 명시적으로 변경·확장한 항목
 
-| V5 기준 | 현재 구현 | 이유와 보존 방식 |
+| version-5 기준 | 현재 구현 | 이유와 보존 방식 |
 | --- | --- | --- |
 | cross-skill import/composition surface | `SPEC.profile="single"`과 `SPEC.imports=[]`만 허용하고 foreign body reference를 거부 | 단일-skill 경계를 지키고 activation·handoff drift를 만들지 않음 |
 | source-first lint, sandbox 아님 | positive-list AST + every-load L-fast + authoring L-structural + build-only L-full + verified same-process ESM | arbitrary code 신뢰를 줄이되 별도 interpreter로 의미를 복제하지 않음 |
-| kernel v5 8줄 | kernel v6 8줄 | record/proof, evidence-backed skip, ASK/receipt 예외, enter-hash를 명시하며 기존 의미 위치를 유지 |
+| version-5 kernel 8줄의 행동 위치 | versioned Decision과 compact guide에 해당 의미 통합 | record/proof, evidence-backed skip, ASK/receipt 예외, enter-hash를 명시하며 별도 kernel 문서를 행동 정본으로 두지 않음 |
 | stage JSON 18 위치 | versioned typed Decision + fingerprint | 18 위치 대응표를 보존하고 stale/replay/proof 정보를 추가 |
 | 기본 stage text | 같은 Decision의 compact guide | 전체 JSON/body 대신 현재 행동만 읽게 함 |
 | stage evidence 중심 | trace authority + alignment | “해야 함”과 “실제로 했음”을 분리하고 증거가 없으면 `unproven` |
@@ -388,18 +402,19 @@ V5의 18개 공개 위치는 현재 typed Decision에서 다음과 같이 보존
 | ko/en body pair 중심 | 기본 single-language, `body_ko.md`가 실제로 있을 때만 parity 검사; 없는 언어를 `--lang`으로 요청하면 fallback하지 않고 L7로 거부 | 불필요한 이중 body와 잘못된 언어의 조용한 대체를 피함; 별도 pair-profile selector는 아직 없음 |
 | context recovery와 interception의 경계가 약함 | enter-hash recovery와 effect interception을 분리 | 복구를 enforcement로 과장하지 않음 |
 | 기존 gate 묶음 | G0.5, authoring/runtime/platform/eval gate 분리 | 가장 위험한 제품 가설을 먼저 중지 가능 |
-| 복잡 skill 중심 | P0/P1/P2 최소 충분 profile | V5를 축소하지 않고 단순 skill 과설계를 방지 |
+| 복잡 skill 중심 | P0/P1/P2 최소 충분 profile | version-5 P2 계약을 축소하지 않고 단순 skill 과설계를 방지 |
 | P0/P1 판단 산문이 한 `SKILL.md`에 집중 | profile과 독립적인 conditional guidance index + stable topic files | 큰 판단형 skill을 P2로 올리지 않고 필요한 산문만 읽게 하며 보편 경계·정확 형식·stop rule은 entry에 유지 |
 | 선택된 stage/guard의 project artifact path가 Decision에 없음 | `ARTIFACTS.readers`에서 required `Decision.stage_artifacts`와 guide를 계산 | 기존 ARTIFACTS를 path·writer·template의 단일 정본으로 유지하면서 소비 AI가 collector/source inspection 없이 현재 정적 의존성을 찾게 함; non-file observation과 stage 선택 전 동적 입력에는 artifact/null을 강제하지 않음 |
 | alignment가 same `decision_id`로 scope하지만 supplied document와 emission의 exact equality를 검사하지 않음 | `alignDecision`이 supplied self-seal과 runtime-observed emission structural equality를 expectation보다 먼저 검사 | exact-Decision이라는 기존 evidence 의미를 실제 admission invariant로 복구하고 다섯 변조 field의 API/CLI regression과 record exact-match regression으로 rollback을 막음 |
 | judgment-only `NEXT` skip이 다음 stage에 prior row·plan state를 남길 수 있음 | row·plan·pending needs를 stage iteration-local로 만들고 선택된 bundle만 loop 밖으로 승격 | 선언 stage 순서와 ordered-effect 의미를 보존하며 stage·row·effects·record/body·proof·reinvoke·`stage_artifacts` full-coherence regression으로 확인 |
 | L14가 요구하는 skipped judgment branch를 final Decision만으로는 build evidence에 투영할 수 없음 | evaluator-observed internal execution event를 build fixture coverage token으로 투영 | L14를 약화하지 않고 `skip:["NEXT"]`와 다음 stage를 함께 증명하며, predicate replay·fact inference·Decision field 추가를 피함; valid/missing/false-claim/purity regression으로 rollback을 막음 |
+| exact format 예시가 `Decision.format.example`에만 있고 실행 effect와 떨어져 있음 | format을 소유한 effect에 같은 정본 값의 `format_example`을 투영 | spec·fixture를 두 번째 정본으로 복제하지 않고 실제 WRITE 소비 위치에서 정확한 형식을 찾게 함; targeted runtime, canonical build와 installed fresh Luna receipt로 제한 검증 |
 
 ### 7.3 의도적으로 제외한 capability
 
 Cross-skill import/composition은 현재 구현하지 않는다. Parser와 runtime은 `SPEC.profile="single"`, 빈 imports, 자기 skill의 body reference만 허용한다. 여러 skill의 activation, handoff, 상태 전달을 추가하면 줄이려던 drift surface가 다시 늘어나기 때문이다. 향후 필요해도 현재 single profile을 몰래 넓히지 말고 별도 profile과 독립 검증으로 설계한다.
 
-V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
+P2 version-5 호환 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 
 1. 무엇이 바뀌는가
 2. 왜 바꾸는가
@@ -442,7 +457,7 @@ V5 의미를 바꾸는 수정은 이 원장에 다음을 함께 기록한다.
 - conservative migration과 비-Markdown inventory
 - stable-ID maintenance와 semantic diff
 - 등록된 typed `replace-artifact` 유지보수와 원자적 install receipt
-- P2 V5 validator L0–L18
+- P2 validator L0–L18
 - positive-list AST와 two-level validation
 - deterministic evaluator와 compact guide
 - evaluator-observed execution event에서 fixture coverage를 계산하는 L14 build evidence path

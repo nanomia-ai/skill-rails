@@ -18,13 +18,11 @@ Keep a judgment point as a string when every invocation needs it. When a large P
 
 ## Authoring judgment
 
-Use this section to choose and review an authoring design. The user's purpose and preferences guide the design; the selected profile and runtime contracts govern execution until deliberately changed at their owning source. If they conflict, surface the incompatibility and revisit the profile or canonical owner instead of forcing one through the other. Ask the user only when the resolution changes a product boundary or irreversible action.
+Anchor the design in the user's desired result and the underlying problem the skill exists to solve, then work backward from the first useful result. Mechanize rules that are repeatable and can be checked reliably; keep interpretation, tradeoffs, and value judgment in concise prose with enough context to prevent misunderstanding. Do not optimize for brevity itself. When the manual needed to understand or operate a mechanism grows larger or harder to use than the prose it replaces, reconsider the boundary and whether the mechanism is earning its cost.
 
-Start with the first useful result a user of the target skill must produce, then work backward. Mechanize rules that are repeatable and can be checked reliably; keep interpretation, tradeoffs, and value judgment in concise prose with enough context to prevent misunderstanding. Do not optimize for brevity itself. When the manual needed to understand or operate a mechanism grows larger or harder to use than the prose it replaces, reconsider the boundary and whether the mechanism is earning its cost.
+For a high-cost decision, compare the simplest workable alternative and one genuinely independent approach before extending the current design. Use a fresh review when it can challenge the framing, not merely optimize inside it. Treat existing implementations, history, tests, and failures as evidence, not answer keys. A single agent failure under constrained reasoning or an unsuitable role, and a structural pass without observed behavior, are signals to diagnose rather than universal rules. Keep each behavior or fact owned by one canonical source; other surfaces should route to or project from that owner instead of becoming parallel truths.
 
-For a high-cost decision, compare an independent alternative and the simplest workable alternative before extending the current design. Treat existing implementations, history, tests, and failures as evidence, not answer keys. Keep each behavior or fact owned by one canonical source; other surfaces should route to or project from that owner instead of becoming parallel truths.
-
-Watch for nonconvergence: exceptions, explanations, and tests keep growing while no new evidence shows the first user result getting closer. Stop patching that layer and return to its parent premise, the user outcome, and the owning boundary; if the premise no longer holds, replace the approach. Do not turn one agent failure under constrained reasoning or an unsuitable role, or a structural pass without observed behavior, into universal machinery.
+As evidence changes, improve how the problem is being solved, not only the current implementation; consistency with an earlier plan is not a goal. When exceptions, explanations, or tests keep growing without new evidence that the desired result is closer, step back from the symptom and re-examine the whole problem: its framing, root cause, owning boundary, and simpler alternatives. Replace the approach when its premise no longer holds; ordinary local fixes need no reframing. In a long session, when the original purpose may be fading, briefly restate the result, why the current approach still serves it, and what evidence would change course — when useful, not on a schedule.
 
 Before changing the product to satisfy a failed check, identify which premise broke — product, fixture, harness, or environment — and repair the owning premise rather than making the product fit an invalid check. After the design has logically converged, verify it with a high-information representative flow that exercises the coupled risks, then with a fresh agent using only the declared consumption set. Record what each check actually observed, and mark every remaining uncertainty `unproven`.
 
@@ -63,6 +61,8 @@ This contract does not create a second migration ledger or a progressive query l
 
 ## Creation order
 
+Apply the terminal, observation, guard, stage, table, and effect sequence below to P2. Keep P0/P1 thin by using only the steps their selected profile actually needs.
+
 1. Write the intent brief and evaluation cases.
 2. Atomize obligations and record their source and consequence.
 3. For P2, copy `templates/authoring-card.md` into the work package, complete its observations, judgment inputs, owners, artifacts, terminals, and named consumer consumption sets, then project approved decisions into the canonical spec and obligation ledger. Put each static consumer artifact path in `ARTIFACTS`, bind it to its selected stage or stopping guard with `readers`, and place any required grammar on a mandatory structured or selected guidance surface. The card is an authoring aid, not a behavior source or consumer guidance.
@@ -85,7 +85,22 @@ The obligation ledger is provenance, not a second behavior source. Keep original
 
 ## Maintenance
 
-Address stable IDs, not prose locations. Before a change, query affected predicates, stages, rows, body sections, templates, owners, fixtures, and generated artifacts. After a change, review the semantic diff as well as the line diff.
+Address stable IDs, not prose locations. Before a P2 change, query affected predicates, stages, rows, body sections, templates, owners, fixtures, and generated artifacts:
+
+```text
+node "<skill-root>/scripts/maintain.mjs" --skill <folder> --diagnose --query <stable-id-or-text>
+```
+
+Pass the actual update as `--change <change.json>`. The file has one envelope, `{ "id": "<change-id>", "intent": "<why>", "operations": [...] }`, and each operation uses the smallest matching shape:
+
+| Owner | Operation shape |
+| --- | --- |
+| canonical intent | `{ "type": "update-intent", "patch": { "<intent-field>": <value> } }` |
+| existing P2 body section | `{ "type": "replace-body-section", "id": "stage: <id>", "content": "Judgment: ...\\n\\nWhy: ..." }` (add `"language": "ko"` for `body_ko.md`) |
+| reference or template resource | `{ "type": "replace-resource", "path": "references/<file>.md", "content": "..." }` |
+| registered whole P2 artifact | `{ "type": "replace-artifact", "kind": "spec|collector|reference", "path": "<canonical-path>", "profile": "p2", "expected_hash": "sha256:<current-hash>", "content": "..." }` |
+
+Use only operations whose owner the change actually affects. After a change, review the emitted semantic diff as well as the line diff.
 
 Update the AI-facing body sections and stage references in the same transaction as any binding change: structural validation cannot see prose drift, so a package passes L0–L18 while its shipped reference still instructs a cold model to look for a retired mechanism. Delete a retired fixture in the same transaction that retires its mechanism, or it stays manifest-bound and reads as live behavior.
 

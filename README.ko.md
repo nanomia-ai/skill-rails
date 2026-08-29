@@ -188,7 +188,7 @@ node "<skill-rails>/scripts/eval.mjs" --skill ./my-skill
 
 ## 지금까지 검증한 범위
 
-현재 환경은 코드 형식 검사와 전체 테스트 49/49를 통과했습니다. 여기에는 외부 runtime dependency를 차단한 상태에서 일반 creator 명령과 parser-backed migration을 실행한 검사도 포함됩니다. 미리 고정해 둔 정상 사례는 통과시키고, 일부러 결함을 심은 사례는 모두 실패로 찾아내는지도 확인했습니다. 앞서 진행한 Node.js 20·22·24 호환성 검사에서는 당시의 35개 테스트가 각 버전에서 모두 통과했습니다. 새 프로젝트에서 시작한 에이전트 세션으로 P1과 P2 스킬을 각각 만든 뒤, 현재 지원하는 두 설치 방식에서 같은 생성 결과를 사용했습니다. P2는 필수 파일과 참조 관계 검사(L0–L18), 일부 규칙을 고의로 망가뜨렸을 때 실패하는지 확인하는 테스트, 상태별 반복 실행, 실행 기록과 증거 대조도 통과했습니다. 별도의 fresh author와 consumer 한 쌍은 P0의 다섯 조건부 주제 중 현재 요청과 일치하는 한 주제만 읽었지만, 다중 일치·no-match·near-miss와 큰 index의 routing recall은 아직 검증하지 않았습니다.
+`b277a4c` v0.1.2 릴리스 기준선의 기록된 환경은 코드 형식 검사와 전체 테스트 49/49를 통과했습니다. 여기에는 외부 runtime dependency를 차단한 상태에서 일반 creator 명령과 parser-backed migration을 실행한 검사도 포함됩니다. 미리 고정해 둔 정상 사례는 통과시키고, 일부러 결함을 심은 사례는 모두 실패로 찾아내는지도 확인했습니다. 앞서 진행한 Node.js 20·22·24 호환성 검사에서는 당시의 35개 테스트가 각 버전에서 모두 통과했습니다. 새 프로젝트에서 시작한 에이전트 세션으로 P1과 P2 스킬을 각각 만든 뒤, 검증된 두 설치 방식에서 같은 생성 결과를 사용했습니다. P2는 필수 파일과 참조 관계 검사(L0–L18), 일부 규칙을 고의로 망가뜨렸을 때 실패하는지 확인하는 테스트, 상태별 반복 실행, 실행 기록과 증거 대조도 통과했습니다. 별도의 fresh author와 consumer 한 쌍은 P0의 다섯 조건부 주제 중 현재 요청과 일치하는 한 주제만 읽었지만, 다중 일치·no-match·near-miss와 큰 index의 routing recall은 아직 검증하지 않았습니다.
 
 이 결과가 뒷받침하는 범위는 Windows의 프로젝트 로컬 실행입니다. GitHub 원격 package도 `skills` 1.5.23으로 Codex, Claude Code, Cursor target에 설치했고, node_modules가 없는 설치본의 migration이 예상한 12개 semantic atom kind를 보존했으며 생성 P2가 L0–L18을 통과했습니다. 이는 발견·복사·설치 명령 실행 증거이지 모든 대상 host의 fresh-agent 행동 증거는 아닙니다. Marketplace 배포, Linux/macOS, 다양한 사용자 요청에서 스킬이 정확히 호출되는지, 긴 대화가 실제로 압축된 뒤에도 규칙을 빠짐없이 복구하는지는 아직 검증하지 않았습니다.
 
@@ -211,6 +211,6 @@ P2 실행 스크립트는 다음 행동을 계산하고 필요한 증거가 있�
 - [구현 범위와 검증 기록](docs/implementation-verification_ko.md)
 - [작성 절차](references/authoring-workflow.md)
 - [스킬 README 작성 가이드](references/readme-authoring.md)
-- [P2 계약](references/v5-contract.md)
+- [P2 계약](references/p2-contract.md)
 - [평가 방식](references/evaluation.md)
 - [현재 플랫폼별 설치 방식](references/platform-adapters.md)

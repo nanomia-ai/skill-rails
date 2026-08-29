@@ -59,6 +59,8 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.match(p2Skill, /never skip, reorder, or substitute for the Decision/);
   assert.match(p2Skill, /Decision body, `stage_artifacts`, and ordered effects/);
   assert.match(p2Skill, /do not infer replacement paths from collector or authoring files/);
+  assert.match(p2Skill, /artifact_verified --data '\{"reference":"<proof\.reference>"\}'/);
+  assert.match(p2Skill, /matching proof reference from the current Decision/);
   assert.doesNotMatch(p2Skill, /BLOCK: consumer guidance missing/);
   assert.match(p2Skill, /bound to the exact Decision/);
   assert.match(p2Skill, /do not automatically carry to the new Decision/);

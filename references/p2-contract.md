@@ -1,4 +1,6 @@
-# P2 V5 contract
+# P2 runtime contract
+
+The current P2 wire/spec lineage remains `SPEC.version = "5"` for compatibility. This is not the Skill Rails package release version, and it does not name a separate product generation.
 
 ## Contents
 
@@ -34,7 +36,7 @@ UNKNOWN is not false. Only fields listed in `acceptsUnknown` may receive it insi
 
 ## Evaluation rules
 
-Evaluate guards in array order. ASK, BLOCK, and ROUTE stop; RESTRICT accumulates forbidden effect verbs and continues. Evaluate stages in order and select the first whose `done` is not true. A stage owns either a `record` or `reentry`. Every effect plan ends in exactly one of NEXT, ASK, WAIT, ROUTE, BLOCK, or DONE.
+Evaluate guards in array order. ASK, BLOCK, and `ROUTE:<target-id>` stop; RESTRICT accumulates forbidden effect verbs and continues. Evaluate stages in order and select the first whose `done` is not true. A stage owns either a `record` or `reentry`. Every effect plan ends in exactly one of NEXT, ASK, WAIT, BLOCK, DONE, or `ROUTE:<target-id>`.
 
 The runtime calculates and validates effect plans; it does not claim to intercept model tool calls. Without trusted harness evidence, execution adherence remains checked or unproven, never enforced.
 
@@ -58,7 +60,7 @@ node <generated-skill>/scripts/skill-rails/run.mjs render --skill <generated-ski
 node <generated-skill>/scripts/skill-rails/run.mjs role --skill <generated-skill> --role <id>
 node <generated-skill>/scripts/skill-rails/run.mjs lint --skill <generated-skill> [--fast]
 node <generated-skill>/scripts/skill-rails/run.mjs record --skill <generated-skill> --decision <stage-result.json> --type <effect_claimed|proof_recorded|receipt_recorded> [--data <json>]
-node <generated-skill>/scripts/skill-rails/run.mjs record --skill <generated-skill> --decision <stage-result.json> --type artifact_verified --artifact <path> --project <project>
+node <generated-skill>/scripts/skill-rails/run.mjs record --skill <generated-skill> --decision <stage-result.json> --type artifact_verified --data '{"reference":"<proof.reference>"}' --artifact <path> --project <project>
 node <generated-skill>/scripts/skill-rails/run.mjs align --skill <generated-skill> --decision <stage-result.json> [--trace <trace.jsonl>]
 node <generated-skill>/scripts/skill-rails/run.mjs resume --skill <generated-skill> --trace <trace.jsonl> --project <project>
 ```

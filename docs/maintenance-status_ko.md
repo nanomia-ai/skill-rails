@@ -4,84 +4,55 @@
 
 최종 갱신: 2026-08-29 KST
 
-이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품 계약은 [제품·설계 정본](skill-rails_ko.md), 정확한 수치·지원 주장·V5 변경 근거는 [구현·검증 기록](implementation-verification_ko.md)이 소유한다. 과거 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
+이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 현재 제품 구현 기준 commit: `126be238574e8fb1f34caa64e241fc93e5a079dd` (`fix: project exact format into owning effects`)
-- 이 commit은 기존 consumer path binding과 final-gate correction 위에 exact-format 예시를 그 format을 소유한 effect에도 투영한다.
-- Commit과 normal push, 공식 project-local 설치 검증은 완료했다. 설치본의 root self-lint, 생성 pilot L0–L18, 설치 pilot의 exact effect projection이 pass했다.
-- Windows installer checkout의 일반 text 249개 전체는 byte-identical이라고 주장하지 않는다. `* -text`로 봉인된 생성 pilot 54개 파일만 Git blob과 54/54 byte-identical임을 확인했다.
-- 별도 version·publish·release는 수행하지 않았다.
-- `.codegraph/`는 이 checkout에 없어서 repository code 탐색에는 현재 owning source와 test만 사용했다.
+- 현재 local 제품 구현 기준: local `main`의 `HEAD`. 정확한 hash는 `git rev-parse HEAD`로 확인한다.
+- `origin/main`: `cb8e06dabbc81bff41614e1e70791b51c4a697fd`; local `main`이 앞서며 push하지 않았다.
+- package version: `0.1.2`; version bump, publish, release는 수행하지 않았다. Fresh-use evidence가 닫힌 뒤 별도 release commit에서 다음 version을 정한다.
+- Local `HEAD`에는 후임자 인수인계 전 operational reference·generic P2 loader·문서 라우팅 정리가 포함돼 있다. 제품 runtime·schema·Decision byte를 바꾸는 작업은 아니다.
 
 ---
 
-## 2. 이번 correction의 owning boundary
+## 2. 완료된 제품 변경
 
-### P2 exact-format effect projection
+`d74d783`은 저작과 생성 skill의 비수렴 복구를 다음 경계로 정리한다.
 
-- `fixtures/formats.json`의 L15 golden `expect`가 `Decision.format.example`과 format-owning effect의 `format_example`에 같은 값으로 투영된다.
-- Spec effect는 mutation하지 않고 Decision만 복제한다. Fixture를 읽을 수 없으면 기존 합성 example로 fallback한다.
-- 별도 prose instruction이나 format 정본은 추가하지 않았다. WRITE effect 자체가 소비 위치를 소유한다.
+- 작은 편집마다 검사를 강제하지 않는다. 의미 있는 변경 묶음 또는 살아 있는 가설을 반증할 때 fast lint를 사용하고, 설계와 authored behavior가 논리적으로 수렴한 뒤 full lint와 P2 build를 실행한다.
+- P0/P1 생성물은 작은 수정·예외만 늘고 사용자 결과가 가까워지지 않을 때 결과와 접근을 다시 보게 하되, 의미·정확 형식·비가역 경계·완료 증거는 계속 지킨다.
+- P2 생성물은 현재 Decision이 연 domain work 안에서만 판단한다. Decision, evidence, loader step을 우회하지 않는다.
+- 저장된 P2 stage result는 현재 task가 이 설치 skill과 project의 current Decision으로 명시되고 package와 covered project state가 생성 뒤 변하지 않았음을 확인할 때만 재사용한다. 대화 기억, 발견한 파일, 불확실한 상태에서는 새 stage를 실행한다.
+- 이 변경은 authoring/loader guidance correction이다. Runtime, schema, Decision byte, P2 behavior source는 바꾸지 않았다.
 
-### P2 skipped-`NEXT` fixture coverage
-
-- `scripts/runtime/evaluator.mjs`의 optional internal observer가 evaluator가 실제로 실행한 guard match, stage entry, judgment branch selection, table-row selection을 기록한다.
-- `scripts/runtime/api.mjs`의 fixture simulation만 observer를 전달하고, `scripts/lib/build-core.mjs`는 그 event를 기존 `guard:`·`unless:`·`stage:`·`branch:`·`row:` token으로 project한다.
-- Build coverage는 더 이상 guard predicate를 재실행하지 않고 fixture fact나 final Decision에서 skipped branch를 추론하지 않는다.
-- L14는 그대로 모든 guard/stage/branch/table-row claim을 요구한다. `done === true`인 stage는 branch event를 내지 않으므로 false skip claim도 계속 거부한다.
-- Observer event는 final Decision에 들어가지 않는다. Decision schema, JSON bytes, `decision_id`, stage, row, effects, record/body/proof/reinvoke/`stage_artifacts`는 observer 유무와 완전히 같다.
-
-### P0/P1 simple-lint provenance
-
-- Universal intent atom은 계속 항상 읽는 `SKILL.md`에 원문으로 보여야 한다.
-- `intent.description`은 frontmatter description equality를, routed judgment topic은 guidance index/topic text를 계속 검사한다.
-- `file:`/`eval:` locator resolution, P1 helper 존재, generator의 `review-required` 기본값과 eval fail-closed gate는 그대로다.
-- 제거한 것은 Rule V가 이미 보장하는 universal atom에 대해 canonical implementation target 파일도 같은 문장을 포함해야 한다는 중복 conjunct뿐이다. 따라서 target은 helper 같은 실제 구현을, evidence는 그 check를 가리킬 수 있다.
-- 공개 authoring workflow의 기존 obligation-ledger 문단 하나를 이 경계에 맞게 교체했다. 별도 manual이나 parallel truth는 추가하지 않았다.
+현재 local 정합화는 이미 존재하는 runtime을 cold AI가 공개 문서만으로 정확히 호출하게 한다. Generic P2 loader·계약·평가 vocabulary·유지보수 workflow·설치기 snapshot을 실제 구현과 맞췄으며, 정확한 변경과 증거는 [구현·검증 기록](implementation-verification_ko.md) 6.11–6.12가 소유한다. 활성 경로가 없던 `kernel-v6.md`와 구 `v5-contract.md` filename shim은 제거하고 P2 계약은 `p2-contract.md` 하나가 소유한다. 사용자는 구 V5 경로 호환이 필요 없다고 명시했다.
 
 ---
 
-## 3. 현재 검증 receipt
+## 3. 현재 증거
 
-- Targeted `node --test tests/runtime.test.mjs tests/integration.test.mjs`: 35/35 pass.
-- Skipped-NEXT regression: valid claim build pass; missing `branch:preflight/skip` claim은 `L14 STAGES.preflight.branches.skip` fail; `done === true` fixture의 false claim은 build-core가 거부; observer 유무의 Decision JSON과 hash 동일.
-- P1 regression: helper target에 intent 문장을 복제하지 않아도 discharge pass; review-required default와 `authoring-obligations-required` eval gate 유지; `SKILL.md` intent 삭제, topic text 삭제, description mismatch, unresolvable locator는 모두 fail.
-- Canonical pilot root lint: L0–L18 pass.
-- Canonical pilot formal build (`--repeats 50`): mutation 20/20, scenario 10/10, 반복 불일치 0, format round trip 256/256, build ID `sha256:932d2462f413afd8c40d58a68e40f0efa4bbcd65c8b0c47a4ee16b855ea53003`.
-- Pilot manifest closure: content 15 + generated 37 = 52, verification pass.
-- Pilot embedded lint와 real-state e2e: L0–L18 pass, 2/2 pass.
-- 논리 수렴 뒤 실행한 full `npm run verify`: vendor pass, lint pass, repository test 60/60 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass.
-- 공식 installer로 Codex와 Claude의 별도 project-local home에 설치한 249개 파일은 exact `770cd3755d23c17a626822079c47d17b8387b326` archive와 path·byte가 모두 같았다.
-- Fresh Sol xhigh P1 author는 helper/test locator에 intent 문장을 복제하지 않고 11/11 helper test, full lint, held-out byte equality, `open_obligations: 0`, `forward-test-required`에 도달했다.
-- Fresh Fable Max P2 consumer의 기존 `Decision.format.example` 복구에 이어, fresh Luna Max는 새 owning-effect `format_example`을 source inspection 없이 발견하고 verifier 실행, same-run reentry, `matching-pass / DONE`, final lane report까지 완료했다.
-- Luna의 acquire alignment는 `partial`, REPORT 기록 뒤 final alignment는 `unproven`이다. Agent claim만 존재하기 때문이며 fail-closed evidence 경계의 의도된 결과다.
-- 최종 경험적 판정은 `PARTIAL`이다. Fresh skipped-judgment와 tampered-Decision rejection, harness-trusted public effect observation은 직접 끝내지 않았다.
+- Targeted profile-generation regression, generic loader regression, repair-generated canonical P2 pilot과 현재 후보 bytes의 full verify가 모두 통과했다. 정확한 count, build ID, 이전 고유 receipt와 역사적 evidence card는 [구현·검증 기록](implementation-verification_ko.md) 1절과 6.11–6.12가 소유한다.
+- 공개 `Authoring judgment`는 Fable xhigh와 Sol xhigh의 독립 감사 뒤 사용자 결과·근본 문제·비수렴 시 재검토·적응형 복기만 남기고 중복 절차를 덜어냈다. 이전 fresh Sol xhigh gate는 압축 전 bytes를 읽었으므로 현재 문구의 fresh-author 행동과 생성 skill 소비자의 recovery guard 행동은 각각 `UNPROVEN`이다.
+- 구조, 생성, 결정성 증거를 fresh-agent 행동 증거로 승격하지 않는다.
 
 ---
 
 ## 4. 여전히 `UNPROVEN`인 범위
 
-- Fresh P2 consumer의 skipped-judgment branch와 tampered-Decision rejection
-- 생성 P1 skill의 fresh trigger 선택, AI category 판단과 실제 첫 산출물 유용성
-- 별도 version·publish·release
-- 공식 installer 경로 자체에서 시작한 fresh AI 행동. 다만 그 설치본의 생성 pilot 54개 파일은 fresh Luna가 사용한 package와 byte-identical이다.
-- harness-trusted public effect observation과 verifier truthfulness
-- long-session/compaction, 여러 모델 반복, Linux/macOS POSIX symlink 분기
-- capture 뒤에도 계속 쓰는 out-of-band writer의 package 보존
-
-Structural lint, deterministic build, fixture, manifest, e2e evidence를 fresh-agent 행동 evidence로 승격하지 않는다.
+- Fresh consumer가 새 recovery guard와 saved-Decision 재사용 조건을 실제로 올바르게 해석하는 행동
+- Fresh P2 consumer의 skipped-judgment branch, tampered-Decision rejection과 harness-trusted public effect observation
+- 생성 P0/P1 skill의 반복 trigger precision, 첫 산출물 유용성과 long-session/compaction 회복
+- 여러 모델·host에서의 최종 실제 사용 검증과 대형 Devflow 계열 부하
+- Linux/macOS POSIX symlink 분기와 capture 뒤 out-of-band writer의 package 보존
+- 다음 version, publish, release
 
 ---
 
-## 5. 다음 세션 진입
+## 5. 정확한 다음 단계
 
-1. `AGENTS.md`, `CLAUDE.md`, 이 문서를 읽고 실제 `git status`와 `HEAD`를 확인한다.
-2. `HEAD`와 `origin/main`이 `770cd3755d23c17a626822079c47d17b8387b326`인지, worktree가 clean인지 확인한다.
-3. 상세 deterministic·installed-byte evidence와 V5 보존 근거는 `docs/implementation-verification_ko.md` 6.9절, 6.10절, 7.2절을 확인한다.
-4. 남은 empirical claim이 실제로 필요할 때만 한 번의 clean consumer-only run으로 skipped judgment, tamper, final REPORT alignment를 연결한다. Repository verify나 P1 authoring을 반복하지 않는다.
-5. 새 product falsification이 없으면 현재 commit을 다시 설계하지 않는다. 별도 사용자 승인 전에는 version·publish·release를 수행하지 않는다.
+1. 변경 파일, 삭제한 dead path, 남은 `UNPROVEN`을 사용자에게 표로 보고한다. 별도 명시적 권한 전에는 commit, push, version, publish, release를 수행하지 않는다.
+2. 사용자 인수인계 지시가 오면 이번 냉간 저작 행동 gate를 통과한 fresh Sol xhigh 후보에게 authority를 이전한다.
+3. 인수인계 뒤 clean isolated actual-use lanes에서 아직 증명되지 않은 소비 행동을 검증한다. 기존 deterministic suite를 이유 없이 반복하지 않는다.

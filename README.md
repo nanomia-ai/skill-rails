@@ -188,7 +188,7 @@ node "<skill-rails>/scripts/eval.mjs" --skill ./my-skill
 
 ## What has been verified
 
-The current environment passes code linting and all 49 tests, including a dependency-blocked run of the normal creator commands and parser-backed migration. It also distinguishes the expected results in a fixed suite of normal and deliberately broken cases. Earlier compatibility runs on Node.js 20, 22, and 24 each passed the then-current 35-test suite. Fresh project-local sessions created P1 and P2 skills and used the same generated packages through both current installation layouts. P2 also passed required-file and reference checks (L0–L18), tests that deliberately break rules and expect failure, repeatable state scenarios, and comparisons between execution records and required evidence. A separate fresh author/consumer pair read only the one relevant topic from a five-topic P0 package; multi-match, no-match, near-miss, and large-index routing recall remain unverified.
+At the `b277a4c` v0.1.2 release baseline, the recorded environment passed code linting and all 49 tests, including a dependency-blocked run of the normal creator commands and parser-backed migration. It also distinguished the expected results in a fixed suite of normal and deliberately broken cases. Earlier compatibility runs on Node.js 20, 22, and 24 each passed the then-current 35-test suite. Fresh project-local sessions created P1 and P2 skills and used the same generated packages through both tested installation layouts. P2 also passed required-file and reference checks (L0–L18), tests that deliberately break rules and expect failure, repeatable state scenarios, and comparisons between execution records and required evidence. A separate fresh author/consumer pair read only the one relevant topic from a five-topic P0 package; multi-match, no-match, near-miss, and large-index routing recall remain unverified.
 
 Those results support the tested Windows project-local path. The GitHub remote package was also installed with `skills` 1.5.23 into Codex, Claude Code, and Cursor targets; its node_modules-free migration preserved the 12 expected semantic atom kinds and its generated P2 passed L0–L18. This proves discovery, copying, and installed command execution, not fresh-agent behavior on every target. Marketplace distribution, Linux/macOS behavior, broad trigger precision, and recovery after real long-session compaction remain unverified.
 
@@ -211,6 +211,6 @@ The P2 execution script calculates the next action and checks whether evidence e
 - [Implementation scope and verification record (Korean)](docs/implementation-verification_ko.md)
 - [Authoring workflow](references/authoring-workflow.md)
 - [Skill README authoring guide](references/readme-authoring.md)
-- [P2 contract](references/v5-contract.md)
+- [P2 contract](references/p2-contract.md)
 - [Evaluation method](references/evaluation.md)
 - [Current platform adapters](references/platform-adapters.md)

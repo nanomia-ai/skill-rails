@@ -25,7 +25,7 @@ npx skills@latest add nanomia-ai/skill-rails
 
 The installer selects the target agent and whether to link or copy. It does not install Skill Rails runtime dependencies and must not rewrite the skill body. Treat installer discovery and placement as structural evidence only; actual triggering, script-root resolution, and task output remain `unproven` until exercised in that host.
 
-The current `skills` 1.5.23 release requires Node.js 22.20 or newer even though Skill Rails itself runs on Node.js 20 or newer. On Node.js 20, use a manual project-local clone. Normal skill use no longer requires `npm ci` after either installation path.
+In the installer snapshot observed on 2026-08-23, `skills` 1.5.23 required Node.js 22.20 or newer even though Skill Rails itself runs on Node.js 20 or newer. On Node.js 20, use a manual project-local clone. Normal skill use no longer requires `npm ci` after either installation path. This dated observation is not a claim about the installer's latest release.
 
 The root package currently includes repository tests and design records because the installer treats a root `SKILL.md` directory as the package boundary. Those extra files are not part of the AI loading route and do not change the portable behavior, but they make the installed copy larger. Moving the canonical package into a nested distribution directory would be a separate repository-layout migration, not an installation hotfix.
 
@@ -66,7 +66,7 @@ Current implementation status:
 - Codex project-local discovery plus explicit and implicit invocation: `verified` by clean cold-agent runs. One installed near-miss also did not trigger. Long-session re-entry remains `unproven`.
 - Claude Code project-local discovery, `${CLAUDE_SKILL_DIR}` use, plus explicit and implicit invocation: `verified` by clean cold-agent runs. Installed near-miss behavior and compaction recovery remain `unproven`.
 - Cross-consumption: a Claude-created P1 package ran in Codex and a Codex-created P2 package ran in Claude without translation; copied trees were byte-identical.
-- Universal installer discovery, copy, and dependency-free installed migration: `verified` structurally on Windows with the GitHub remote package and `skills` 1.5.23. This does not upgrade target-host model behavior.
+- Universal installer discovery, copy, and dependency-free installed migration: `verified` structurally on Windows with the GitHub remote package and `skills` 1.5.23 in the 2026-08-23 snapshot. This does not upgrade target-host model behavior or claim current installer-version support.
 - Other installer-supported hosts: placement is structurally available; trigger behavior, skill-root handling, and task output are `unproven`.
 - H1 recovery hook: `unsupported` in the current generated artifact; the Decision/enter-hash fallback remains available.
 - H2 effect interception: `unsupported` and explicitly outside scope.

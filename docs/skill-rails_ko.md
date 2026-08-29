@@ -2,7 +2,7 @@
 
 문서 상태: 현재 제품 목적과 안정적인 설계 경계의 정본
 
-기준일: 2026-08-23 KST
+기준일: 2026-08-29 KST
 
 핵심 범위: 에이전트에 종속되지 않는 스킬 작성·유지보수·검증 구조
 
@@ -14,7 +14,7 @@
 - 생성된 스킬이 실행될 때 무엇이 일어나는가
 - 어떤 불변조건과 판단 경계를 지켜야 하는가
 
-정확한 구현 범위, 검증 수치, adapter 지원, V5 변경 원장은 [구현·검증 기록](implementation-verification_ko.md)이 소유한다. 다음 세션의 마지막 작업 위치와 이어서 할 일은 [유지보수 상태](maintenance-status_ko.md)가 소유한다. 최초 구현 당시의 통합 기획 원문은 Git commit `4929b5b`에 보존하며 평상시 AI 진입 경로에는 넣지 않는다.
+정확한 구현 범위, 검증 수치, adapter 지원, P2 version-5 호환 변경 원장은 [구현·검증 기록](implementation-verification_ko.md)이 소유한다. 여기서 version 5는 현재 `SPEC.version` 계보의 호환 기준선이며 package release version이나 별도 제품 세대를 뜻하지 않는다. 다음 세션의 마지막 작업 위치와 이어서 할 일은 [유지보수 상태](maintenance-status_ko.md)가 소유한다. 최초 구현 당시의 통합 기획 원문은 Git commit `4929b5b`에 보존하며 평상시 AI 진입 경로에는 넣지 않는다.
 
 이 문서에는 작업 chronology나 매 실행 수치를 누적하지 않는다. 현재 코드와 설계가 충돌하면 동작을 추정하지 말고 검증을 중단한 뒤 정본 또는 구현을 같은 변경에서 정합시킨다.
 
@@ -133,7 +133,7 @@ Skill Rails 자체도 하나의 스킬이며, 한 번의 제작 결과도 하나
 - 기존 의미의 삭제 또는 축소
 - 모호한 마이그레이션 atom의 처분
 - 비가역적 효과 경계
-- V5 핵심 변경
+- P2 version-5 호환 계약의 핵심 변경
 
 ### 4.2 AI 작성자
 
@@ -173,7 +173,7 @@ Codex와 Claude Code의 발견 경로 및 skill-root 표현 차이는 adapter가
 20. 단순한 스킬은 P0/P1로 남겨 P2 복잡성을 피한다.
 21. 마이그레이션 원문은 coverage와 별도 삭제 승인 전까지 보존한다.
 22. 현재 또는 이후의 모든 adapter는 동일 portable core를 공유한다.
-23. V5 핵심을 삭제·축소·변경하면 [구현·검증 기록](implementation-verification_ko.md)의 변경 원장에 이유와 동등성 검사를 먼저 기록한다.
+23. P2 version-5 호환 계약의 핵심을 삭제·축소·변경하면 [구현·검증 기록](implementation-verification_ko.md)의 변경 원장에 이유와 동등성 검사를 먼저 기록한다.
 
 ---
 
@@ -190,7 +190,7 @@ intent brief ── obligation ledger ── authoring card
    │
    ├─ P0: 짧은 판단 지침
    ├─ P1: 지침 + 결정적 helper/template/test
-   └─ P2: V5 spec + body + collector + fixture + embedded runtime
+   └─ P2: version-5-compatible spec + body + collector + fixture + embedded runtime
                                              │
                                              ▼
                                   snapshot → Decision → compact guide
@@ -209,7 +209,7 @@ Creator repository는 authoring 도구와 P2 runtime 원본을 가진다. P2 bui
 | --- | --- | --- | --- |
 | P0 | 판단 중심이며 상태 분기·정확 형식·반복 helper가 없음 | 얇고 명확한 `SKILL.md` 중심 | 산문 품질과 forward model test 필요 |
 | P1 | 결정적 변환·검사·template은 필요하지만 state machine은 불필요 | `SKILL.md` + 필요한 script/reference/template/test | helper 동작은 검증 가능, 모델 사용 행동은 별도 증거 필요 |
-| P2 | 상태 의존 행동 또는 비가역 경계가 있거나, exact format이 상태 의존 행동과 결합됨 | V5 `spec.mjs` + body + collectors + fixtures + self-contained runtime | 구조·결정·trace를 강하게 검증, tool-call 강제는 하지 않음 |
+| P2 | 상태 의존 행동 또는 비가역 경계가 있거나, exact format이 상태 의존 행동과 결합됨 | version-5-compatible `spec.mjs` + body + collectors + fixtures + self-contained runtime | 구조·결정·trace를 강하게 검증, tool-call 강제는 하지 않음 |
 
 ### 7.1 P2 상승 신호
 
@@ -254,7 +254,7 @@ SKILL.md
 ### 8.1 Creator 정본
 
 - `SKILL.md`: 선택과 authoring 진입 절차
-- `references/`: 작업 종류에 따라 읽는 작성·V5·평가·마이그레이션·플랫폼·README 작성 규칙
+- `references/`: 작업 종류에 따라 읽는 작성·P2 계약·평가·마이그레이션·플랫폼·README 작성 규칙
 - `scripts/lib/`: profile, generator, obligation, migration, maintenance, semantic diff, build
 - `scripts/runtime/`: P2 validator, evaluator, guide, trace, alignment 원본
 - `schemas/`: 공개 Decision과 Trace Event 계약
@@ -288,13 +288,13 @@ SKILL.md
 
 ---
 
-## 9. V5 행동 모델
+## 9. P2 행동 모델과 version-5 호환 기준선
 
 P2는 상태·승인·증거·순서·비가역 경계에 따라 다음 행동이 달라질 때만 사용한다. `spec.mjs`가 행동의 유일한 정본이고, body는 판단 기준과 이유만 소유한다. Collector가 관찰한 값, 모델이나 사람의 판단, 사용자의 구조화 결정은 서로 다른 출처이며 증거 권위도 같지 않다.
 
 Guard, stage, table row와 ordered effect를 deterministic하게 계산하되 runtime은 domain 작업이나 host tool call을 대신 실행하지 않는다. `UNKNOWN`을 false로 바꾸거나 agent claim을 verified evidence로 올리지 않으며, unresolved obligation과 `DEFERRED`는 release를 막는다.
 
-정확한 closed exports, observation 값, 평가 순서, body heading, template와 validation 규칙은 [V5 계약](../references/v5-contract.md)이 단독으로 소유한다. 이 제품 문서에는 그 계약을 다시 열거하지 않는다.
+정확한 closed exports, observation 값, 평가 순서, body heading, template와 validation 규칙은 [P2 계약](../references/p2-contract.md)이 단독으로 소유한다. 이 제품 문서에는 그 계약을 다시 열거하지 않는다.
 
 ---
 
@@ -364,7 +364,7 @@ Trace와 lock은 skill root 밖에서 호출자가 `--trace-dir`로 명시한 st
 
 ### 11.1 Decision
 
-Decision은 현재 run의 작고 versioned한 계약이다. Snapshot, guard와 restrict, 현재 stage와 row, ordered effects, 선택된 stage/guard의 정적 `stage_artifacts`, 필요한 format·template·body, proof와 reinvoke 조건을 같은 계산 결과로 묶는다. `ARTIFACTS`가 path·writer·template의 단일 정본이고 `readers`가 `stage.<id>` 또는 `guard.<id>` 소비를 선언하므로, runtime은 현재 분기에 필요한 artifact만 투영한다. V5의 공개 위치는 삭제하지 않고 typed grouping으로 보존하며 replay와 evidence 경계에 필요한 fingerprint와 assurance를 추가한다. 정확한 위치 대응은 [구현·검증 기록](implementation-verification_ko.md)의 V5 원장이 소유한다.
+Decision은 현재 run의 작고 versioned한 계약이다. Snapshot, guard와 restrict, 현재 stage와 row, ordered effects, 선택된 stage/guard의 정적 `stage_artifacts`, 필요한 format·template·body, proof와 reinvoke 조건을 같은 계산 결과로 묶는다. `ARTIFACTS`가 path·writer·template의 단일 정본이고 `readers`가 `stage.<id>` 또는 `guard.<id>` 소비를 선언하므로, runtime은 현재 분기에 필요한 artifact만 투영한다. Version-5 기준선의 공개 위치는 삭제하지 않고 typed grouping으로 보존하며 replay와 evidence 경계에 필요한 fingerprint와 assurance를 추가한다. 정확한 위치 대응은 [구현·검증 기록](implementation-verification_ko.md)의 P2 호환 원장이 소유한다.
 
 ### 11.2 Compact guide
 
@@ -386,7 +386,7 @@ Trace는 steering과 evidence reference를 기록한다. raw tool output 전체�
 
 ### 11.5 Alignment
 
-개별 요구사항은 `satisfied`, `violated`, `unproven`, `not_applicable`로 판정한다. aggregate는 `aligned`, `partial`, `unproven`, `misaligned`, `stale`이다.
+개별 요구사항과 aggregate의 현재 closed vocabulary는 [평가 계약](../references/evaluation.md)이 소유한다. 이 설계의 안정 경계는 증거가 없거나 권위가 부족한 요구사항을 성공으로 승격하지 않는다는 것이다.
 
 성공 문장이 trace에 있어도 요구 proof가 없으면 `unproven`이다. agent가 effect를 수행했다고 기록했지만 외부 관찰이 없으면 그 claim은 보존하되 verified로 바꾸지 않는다.
 
@@ -396,7 +396,7 @@ Trace는 steering과 evidence reference를 기록한다. raw tool output 전체�
 
 세 검증 단계는 속도와 evidence 수준을 분리한다. L-fast는 매 import 전에 source를 검사하고 manifest를 권위로 신뢰하지 않는다. L-structural은 빠른 author feedback을 위해 isolated import와 구조 검사를 더한다. L-full은 build에서 fixture, mutation, determinism, format과 manifest evidence까지 확인한다.
 
-Runtime은 validator가 허용한 제한된 ESM만 평가하며 별도 interpreter로 정본 의미를 복제하지 않는다. 정확한 validation contract는 [V5 계약](../references/v5-contract.md), L0–L18의 현재 구현 대응은 [구현·검증 기록](implementation-verification_ko.md)이 소유한다.
+Runtime은 validator가 허용한 제한된 ESM만 평가하며 별도 interpreter로 정본 의미를 복제하지 않는다. 정확한 validation contract는 [P2 계약](../references/p2-contract.md), L0–L18의 현재 구현 대응은 [구현·검증 기록](implementation-verification_ko.md)이 소유한다.
 
 ---
 
@@ -452,22 +452,13 @@ Target과 evidence가 모두 실제로 resolve될 때만 `projected`로 바꾼�
 
 ### 13.4 생성
 
-```text
-node <skill-root>/scripts/init.mjs \
-  --intent <intent.json> \
-  --out <folder> \
-  [--profile auto|p0|p1|p2]
-```
+실제 생성 명령과 작업별 reference 진입은 root [`SKILL.md`](../SKILL.md)가 조건부로 안내한다.
 
 P1/P2 output은 안전하게 실패하는 scaffold다. marker, unresolved atom, P2 DEFERRED를 사용자별 의미와 test로 교체하기 전에는 완성품이 아니다.
 
 ### 13.5 보수적 마이그레이션
 
-```text
-node <skill-root>/scripts/migrate.mjs \
-  --source <old-skill> \
-  --out <folder>
-```
+실제 마이그레이션 명령과 절차는 root [`SKILL.md`](../SKILL.md)가 조건부로 안내한다.
 
 원본 project를 수정하지 않는다. 승인된 destination에 복사·생성한다. Markdown source는 parser-backed semantic atom(frontmatter metadata, heading/context, paragraph, nested list item, table row, code/HTML block, parser-consumed reference definition)으로 보존하고, Markdown 이외 regular source file은 파일 하나당 하나의 `file-text` 또는 `file-opaque` review atom으로 inventory한다. UTF-8 text는 exact raw text와 byte hash를 남기고, opaque file은 내용을 덤프하지 않고 byte hash·byte count와 preserve/map/dispose 명시 지시만 남긴다. exact format → observation → stage/guard/effect 순으로 옮기며 judgment는 body에 남긴다.
 
@@ -484,11 +475,7 @@ Migration atom은 별도 원장에 쓰지 않고 `.skill-rails/obligation-ledger
 
 ### 13.6 유지보수
 
-```text
-node <skill-root>/scripts/maintain.mjs \
-  --skill <folder> \
-  --change <change.json>
-```
+실제 유지보수 명령과 change envelope는 root [`SKILL.md`](../SKILL.md)가 조건부로 안내한다.
 
 Intent-backed P0/P1은 `update-intent` operation만 허용한다. 현재 intent에서 생성되는 `SKILL.md`, adapter, guidance index, topic과 실제 파일이 다르면 덮어쓰지 않고 중단한다. Auto-profiled package에서 갱신된 intent가 다른 profile을 선택하면 명시적 재생성을 요구하고, explicit profile 결정은 그대로 고정해 감사 가능하게 남긴다. 정상 유지보수는 intent, ledger, projection, eval case를 원자적으로 갱신하고 별도 소유 helper와 파일은 보존한다. P2는 문장 위치가 아니라 stable ID를 주소로 사용하며, 변경 전후 predicate, stage, row, body, template, owner, fixture, generated artifact의 line diff와 semantic impact report를 함께 본다. whole-file 교체는 등록된 typed artifact(`spec.mjs`, `collectors/index.mjs`, `references/` 아래 기존 파일)에만 현재 hash를 요구하며 허용하고, 원자적 install은 package root를 단독 소유한 하나의 authorized writer를 전제한다. 외부 process의 동시 쓰기에 대한 잠금이나 보존은 제공하지 않으며, 그 경계는 성공이 아니라 `UNPROVEN`이다.
 
@@ -620,17 +607,17 @@ Codex와 Claude Code는 현재 fresh 행동 증거가 있는 project-local adapt
 
 ---
 
-## 18. V5 변경 기록의 경계
+## 18. P2 version-5 호환 변경 기록의 경계
 
-P2의 현재 행동 계약은 [V5 계약](../references/v5-contract.md)과 코드가 소유한다. V5에서 보존한 의미, 명시적으로 확장한 항목, 의도적으로 제외한 cross-skill capability와 그 검증 근거는 [구현·검증 기록](implementation-verification_ko.md)의 변경 원장이 소유한다.
+P2의 현재 행동 계약은 [P2 계약](../references/p2-contract.md)과 코드가 소유한다. version-5 기준선에서 보존한 의미, 명시적으로 확장한 항목, 의도적으로 제외한 cross-skill capability와 그 검증 근거는 [구현·검증 기록](implementation-verification_ko.md)의 변경 원장이 소유한다.
 
-변경 원장이 요구하는 내용과 evidence 형식은 한 곳에서만 유지한다. 그 기록 없이 V5를 축소하거나 기계 판정 가능한 규칙을 산문으로 되돌리지 않는다.
+변경 원장이 요구하는 내용과 evidence 형식은 한 곳에서만 유지한다. 그 기록 없이 P2 호환 계약을 축소하거나 기계 판정 가능한 규칙을 산문으로 되돌리지 않는다.
 
 ---
 
 ## 19. 채택한 보편적 설계 패턴과 독창성 경계
 
-이 프로젝트는 특정 외부 프로젝트의 문법, source code, CLI, wire format을 복사하지 않았다. 다음은 고신뢰 도구에서 보편적으로 유효한 패턴을 V5 목적에 맞게 독자 구현한 것이다.
+이 프로젝트는 특정 외부 프로젝트의 문법, source code, CLI, wire format을 복사하지 않았다. 다음은 고신뢰 도구에서 보편적으로 유효한 패턴을 Skill Rails의 목적과 P2 호환 경계에 맞게 독자 구현한 것이다.
 
 - 얇은 loader와 progressive disclosure
 - intent-first authoring
@@ -653,7 +640,7 @@ P2의 현재 행동 계약은 [V5 계약](../references/v5-contract.md)과 코�
 - 범용 security boundary
 - 외부 runtime 의존
 
-생성된 P2 runtime에 직접 vendoring하는 제3자 source는 JavaScript AST parsing을 위한 Acorn과 Acorn-walk 배포 파일뿐이며, 원본 license를 그대로 보존한다. Creator repository는 Acorn·Acorn-walk, migration 입력을 구조적으로 나누는 Markdown-it, G0.5 JSON Schema 검증용 Ajv를 dev dependency로 사용한다. Markdown-it은 creator의 migration 경로에서만 실행되며 생성된 skill runtime에는 포함되지 않는다. 이를 제외한 제품 logic은 V5와 이 저장소의 설계에 따라 작성했다.
+생성된 P2 runtime에 직접 vendoring하는 제3자 source는 JavaScript AST parsing을 위한 Acorn과 Acorn-walk 배포 파일뿐이며, 원본 license를 그대로 보존한다. Creator repository는 Acorn·Acorn-walk, migration 입력을 구조적으로 나누는 Markdown-it, G0.5 JSON Schema 검증용 Ajv를 dev dependency로 사용한다. Markdown-it은 creator의 migration 경로에서만 실행되며 생성된 skill runtime에는 포함되지 않는다. 이를 제외한 제품 logic은 P2 version-5 호환 기준선과 이 저장소의 설계에 따라 작성했다.
 
 ---
 
@@ -707,15 +694,15 @@ Shape와 simple table에는 유리하다. 복잡 predicate는 표현 부족 또�
 
 ## 22. 공개 명령
 
-Creator 명령과 작업 순서는 root [`SKILL.md`](../SKILL.md)와 [작성 절차](../references/authoring-workflow.md)가 소유한다. 생성 P2 runtime의 명령과 fail-closed 입력 규칙은 [V5 계약](../references/v5-contract.md)이 소유한다. Repository 검증 명령은 `package.json`과 README에서 확인한다. 이 제품 설계 문서에 CLI 목록을 복제하지 않는다.
+Creator 명령, 작업 순서와 작업별 operational reference는 root [`SKILL.md`](../SKILL.md)가 조건부로 안내한다. Repository 검증 명령은 `package.json`과 README에서 확인한다. 이 제품 설계 문서에 CLI 목록이나 두 번째 라우팅 표를 복제하지 않는다.
 
 ---
 
 ## 23. 새 AI의 작업 시작 규칙
 
-Repository 유지보수를 이어받는 새 세션은 `AGENTS.md`, `CLAUDE.md`, [유지보수 상태](maintenance-status_ko.md)를 먼저 읽고 실제 git 상태를 확인한다. 이 전체 제품·설계 정본은 제품 경계나 owning abstraction을 판단할 때 읽고, 생성·마이그레이션·P2·평가·adapter·README 작업은 root `SKILL.md`가 안내하는 해당 `references/`만 추가로 읽는다.
+Repository 유지보수를 이어받는 새 세션은 `AGENTS.md`, [유지보수 상태](maintenance-status_ko.md)와 실제 git 상태를 먼저 확인한다. Host가 `CLAUDE.md`를 제공하면 그 파일은 `AGENTS.md`로 연결하는 stub일 뿐 별도 정본이 아니다. 이 전체 제품·설계 정본은 제품 경계나 owning abstraction을 판단할 때만 읽고, skill 생성·유지보수 작업은 root `SKILL.md`의 조건부 라우팅을 따른다.
 
-정확한 새 세션 순서와 handoff 필드는 유지보수 상태 문서가 소유한다. 여기에는 모든 세션의 최근 작업을 누적하지 않는다.
+정확한 새 세션 문서 순서는 `AGENTS.md`가 소유하고, 유지보수 상태 문서는 현재 기준선과 continuation 값만 소유한다. 어느 문서에도 모든 세션의 최근 작업을 누적하지 않는다.
 
 ### 23.1 코드 증가 규칙
 
@@ -733,7 +720,7 @@ Repository 유지보수를 이어받는 새 세션은 `AGENTS.md`, `CLAUDE.md`, 
 ### 23.2 변경 완료 체크리스트
 
 - [ ] 하나의 creator / 하나의 generated skill 경계 유지
-- [ ] V5 정본과 body 판단 경계 유지
+- [ ] P2 version-5 호환 정본과 body 판단 경계 유지
 - [ ] UNKNOWN·snapshot·evidence fail-closed 유지
 - [ ] 현재 context만 제공하는 progressive read 유지
 - [ ] P0/P1에 P2 복잡성 누수 없음

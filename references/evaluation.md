@@ -42,7 +42,7 @@ Grade what an event actually proves, not that it exists:
 - An `effect_claimed` event recorded by the model carries `agent_claimed` authority; that is weak evidence and leaves the expectation `unproven` with reason `agent-claim-only`.
 - Authority decides effect credit, not event type: the effect expectation matches events of type `effect_observed` or `effect_claimed` for that index and verb, and is satisfied by the first one whose authority is strong. A trusted adapter recording `effect_claimed` at strong authority therefore counts, while `effect_observed` at weak authority does not.
 
-Alignment verdicts are `satisfied`, `violated`, `unproven`, or `not_applicable`. Aggregate results are `aligned`, `partial`, `unproven`, `misaligned`, or `stale`.
+Alignment verdicts are `satisfied`, `violated`, or `unproven`. Aggregate results are `aligned`, `partial`, `unproven`, `misaligned`, or `stale`.
 
 ## Context surface
 

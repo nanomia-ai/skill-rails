@@ -19,7 +19,8 @@ Skill Rails helps an AI create and maintain one standalone skill without keeping
 
 - Understand the whole authoring, generated-package, and using-agent flow before changing one local symptom.
 - Prefer a coherent correction at the owning abstraction over accumulating special cases or parallel sources of truth.
-- Do not silently weaken the V5 contract or reduce a rule that can be mechanized back into prose. A better design is allowed, but record what changed, why it is safer or clearer, and which evidence supports it in `docs/implementation-verification_ko.md`.
+- When a shipped operational contract changes, update its canonical creator code, routed reference, generated projection, and proportional regression evidence in the same coherent change. Do not land a reference-only or generated-only half-update.
+- Do not silently weaken the P2 version-5 compatibility contract or reduce a rule that can be mechanized back into prose. A better design is allowed, but record what changed, why it is safer or clearer, and which evidence supports it in `docs/implementation-verification_ko.md`.
 - Preserve existing user changes and keep all writes inside this repository unless the user explicitly expands the scope.
 - Never hand-edit generated files governed by `.generated.json`; change the canonical source and rebuild.
 - Do not commit, push, publish, or deploy unless the user explicitly requests that action. Keep unrelated milestones in separate commits when the user asks for a checkpoint.
@@ -29,15 +30,7 @@ Skill Rails helps an AI create and maintain one standalone skill without keeping
 
 Before creating or revising a skill README, read [references/readme-authoring.md](references/readme-authoring.md) completely.
 
-- Treat the guide as a quality and review protocol, not a fixed template.
-- Lead with the concrete problem, the mechanism that changes it, and the immediate result.
-- Name files, inputs, code paths, outputs, and checks instead of relying on abstract method labels.
-- Make mechanical execution and the remaining judgment boundary visible when they are central to the product.
-- Write for a reader with no project history. Define internal terms at first use.
-- Apply user feedback to every similar pattern in the document, not only the quoted sentence.
-- Keep English and Korean README claims, examples, commands, and boundaries equivalent while writing naturally in each language.
-- Describe verified support and unverified areas separately. Do not turn current platform support into the identity of the product.
-- Explain Skill Rails on its own terms. Do not include research or competitor provenance unless the user asks for it or attribution is required.
+- Treat the guide as a quality and review protocol, not a fixed template. The user's audience, purpose, tone, and exclusions take priority; public claims must stay inside the implementation and evidence actually verified.
 
 ## Verification
 
@@ -47,13 +40,22 @@ Before creating or revising a skill README, read [references/readme-authoring.md
 
 ## Canonical references
 
-- `SKILL.md` — agent entry procedure and conditional reference routing
-- `references/authoring-workflow.md` — creation and maintenance order
-- `references/v5-contract.md` — P2 behavior contract
-- `references/readme-authoring.md` — README authoring and review protocol
+- `SKILL.md` — skill-user entry procedure and the sole conditional router for creation, maintenance, P2, migration, evaluation, installation, and README references
 - `docs/maintenance-status_ko.md` — current milestone, exact continuation point, and next-session entry; read first when resuming repository work
 - `docs/skill-rails_ko.md` — current product purpose, architecture, and stable design boundaries; read when changing product behavior or owning abstractions
-- `docs/implementation-verification_ko.md` — exact implementation scope, support evidence, unproven boundaries, and V5 change ledger; read for verification claims or V5 changes
+- `docs/implementation-verification_ko.md` — exact implementation scope, support evidence, unproven boundaries, and P2 compatibility ledger; read for verification claims or P2 contract changes
 - `docs/authoring-lessons_ko.md` — detailed experience for high-cost core choices, nonconvergence recovery, and successor comprehension
 
-Do not read all project documents by default. Start from the maintenance status, then load the product design, implementation evidence, or authoring lessons only when the task requires that authority.
+Do not read all project documents by default. For repository resumption or current-state work, start from the maintenance status and load another maintainer document only when the task requires its authority. For skill-user work, follow `SKILL.md` without preloading maintainer docs.
+
+## Document ownership and update cadence
+
+- Maintainer documents preserve purpose, rationale, stable boundaries, ownership, and evidence or unknowns that code alone cannot explain. For exact behavior and change scope, inspect the current owning code, schema, and targeted tests; do not copy line-by-line implementation or command listings into prose unless that prose is itself the shipped contract.
+- `SKILL.md` and the references it conditionally routes are the shipped operational path for creating, migrating, maintaining, evaluating, and installing skills. Keep commands and executable contracts there, with one canonical owner per rule.
+- `docs/maintenance-status_ko.md` is a replaceable snapshot. Update it at a coherent milestone or handoff, not after every edit.
+- `docs/skill-rails_ko.md` changes only when the stable product purpose, architecture, or owning boundary changes.
+- `docs/implementation-verification_ko.md` changes when material implementation, support evidence, unproven scope, or P2 compatibility changes. Replace superseded current claims instead of appending a daily log, but never discard a unique receipt merely because a newer run exists. A receipt is superseded only when the newer evidence covers the same claim, bytes, host, scope, and authority; otherwise retain it or link its exact durable artifact or Git commit.
+- `docs/authoring-lessons_ko.md` preserves the causal history of major product turns and reusable lessons about creating and maintaining skills. Keep V5/V6-scale failures and the reason a later approach replaced them understandable to a cold successor; put routine chronology in Git or the orchestration record, and keep provider-specific operating details in the current handoff unless they generalize.
+- `README.md` and `README.ko.md` are human-facing public explanations. They are not maintainer entry points, design authorities, or evidence owners; a maintainer must follow the canonical routes above even when README wording later changes independently.
+- Do not create a second documentation index. This file owns maintainer routing; `SKILL.md` owns skill-user routing. If documents disagree, correct the owning document rather than explaining the conflict elsewhere.
+- A successor starts with this file and the maintenance snapshot, then opens the first document that owns its task. It may open further owner documents when the task crosses a boundary; do not turn progressive reading into a one-document prohibition. Before transferring coordinator authority, test that the successor can reconstruct the product's origin and major failure causes, locate the current evidence owner, and apply the rules to an unfamiliar counterexample.
