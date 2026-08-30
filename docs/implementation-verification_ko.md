@@ -55,13 +55,13 @@ Local candidate에서 `npx skills@latest add <local-repository> --skill skill-ra
 
 Targeted authoring·integration·runtime test 51/51이 먼저 통과했다. 첫 full verify에서 유일한 실패는 이동에 맞춰 frozen G0.5 scorer 자체를 수정했기 때문에 자기 hash seal과 충돌한 harness 문제였다. Frozen scorer bytes를 복원하고 repository-only bridge를 사용한 뒤 G0.5 targeted 2/2와 `npm run verify`의 vendor check, self lint, repository test 62/62, frozen G0.5 eval이 모두 통과했다. 이 변경이 fresh agent의 장기 trigger 품질을 높인다는 주장은 여전히 `UNPROVEN`이며 설치 경계 성공으로 승격하지 않는다.
 
-### 0.4 v0.1.6 source 경계
+### 0.4 v0.1.6 release 경계
 
 Package source version `0.1.6`은 related-skill authoring correction `90afd43`과 P2 observation evidence correction `f269f29`를 하나의 patch 경계로 식별한다. 첫 교정은 여러 standalone skill이 shared domain input·helper를 재사용할 수 있다는 안내를 더하되 각 skill의 profile과 P2 `spec.mjs`/`body.md` 배타 소유를 보존한다. 두 번째 교정은 observation preparation을 한 owner로 통합해 missing, `null`, object-valued input, source lane, raw `"UNKNOWN"`, live/simulate/scenario/L5 parity와 evaluator-event-only coverage를 같은 의미로 고정한다.
 
 유사 결함 범위는 collector·`fixture.s`·`judged`·`decided`의 네 입력 lane, live/simulate/scenario expectation/L5의 네 소비 경로, missing/explicit `null`/object/wrong-lane/reserved sentinel과 guard coverage credit까지 훑었다. Targeted runtime·integration 39/39, frozen G0.5 2/2, repository test 67/67과 full `npm run verify`가 통과했고 canonical pilot은 build ID `sha256:1a901e5e01b8680dcfc76140681a170aaf8a22750826bfc04c95ae0238b45736`, L0-L18, mutation 20/20, scenario 10/10·50회 불일치 0, format round trip 256/256을 기록했다. Fable xhigh와 Sol xhigh의 독립 설계·기술 검토 및 구현 후 최종 audit도 MUST-fix 없이 PASS했다.
 
-이 patch는 새 grammar, Decision/Trace schema, effect authority, coverage token 또는 `SPEC.version = "5"` 의미를 바꾸지 않는다. 저장소 밖 version-5 package가 문서화되지 않은 raw UNKNOWN 내부 표현이나 잘못된 fixture source lane에 의존하는지는 `UNPROVEN`이며, exact raw `"UNKNOWN"`을 known application data로 지원하는 일은 별도 versioned product boundary다. Source version 상승은 tag·GitHub Release·설치 receipt가 아니므로 공식 배포는 그 절차를 별도로 완료할 때까지 `v0.1.5`다.
+이 patch는 새 grammar, Decision/Trace schema, effect authority, coverage token 또는 `SPEC.version = "5"` 의미를 바꾸지 않는다. 저장소 밖 version-5 package가 문서화되지 않은 raw UNKNOWN 내부 표현이나 잘못된 fixture source lane에 의존하는지는 `UNPROVEN`이며, exact raw `"UNKNOWN"`을 known application data로 지원하는 일은 별도 versioned product boundary다. 이 문서를 포함한 release commit을 `main`, annotated `v0.1.6` tag와 GitHub Release의 동일 경계로 배포한다. 공식 설치와 installed-package fingerprint는 별도 소비 환경 변경이며 아직 새 evidence로 주장하지 않는다.
 
 ## 1. 현재 결정적 검증
 

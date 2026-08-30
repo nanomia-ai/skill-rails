@@ -8,7 +8,7 @@
 
 ---
 
-## 0. 현재 완료 지점: v0.1.5 배포와 v0.1.6 source 경계
+## 0. 현재 완료 지점: v0.1.6 공식 배포 경계
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -21,11 +21,11 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 ## 1. 저장소 기준선
 
 - branch: `main`
-- Package source version: 0.1.6. 이 경계는 related-skill authoring correction `90afd43`과 P2 observation evidence correction `f269f29`를 포함한다.
-- 현재 공식 배포는 여전히 `v0.1.5`이며, 그 설치 product bytes는 `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`이 소유한다.
-- `v0.1.5` annotated tag와 GitHub Release는 기존 global receipt를 가리킨다. `v0.1.6` tag·GitHub Release·공식 설치 receipt는 아직 없다.
+- Package version: 0.1.6. 이 경계는 related-skill authoring correction `90afd43`, P2 observation evidence correction `f269f29`, version boundary `5e2c300`을 포함한다.
+- 현재 공식 배포는 `v0.1.6` annotated tag와 GitHub Release가 이 snapshot을 포함한 release commit을 가리키는 형태다.
+- `v0.1.5`의 설치 product bytes와 global receipt는 역사적 증거로 유지한다. `v0.1.6` 공식 설치 receipt는 아직 없으며 배포 성공으로 설치 성공을 대신 주장하지 않는다.
 - P2 runtime/validator는 observation input parity bug fix로 `0.2.1`/`0.3.1`이 됐다. Schema, Decision 위치, effect authority, coverage token과 `SPEC.version = "5"` 호환 경계는 바뀌지 않았다.
-- 전역 canonical install은 `C:\Users\joinj\.agents\skills\skill-rails`이고 Claude Code junction도 이 경로를 가리킨다.
+- 기존 전역 canonical install은 `C:\Users\joinj\.agents\skills\skill-rails`이고 Claude Code junction도 이 경로를 가리킨다. 사용자가 별도로 설치하기 전에는 이를 `v0.1.6` 설치본이라고 주장하지 않는다.
 
 ---
 
@@ -73,6 +73,6 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 
 ## 5. 정확한 다음 단계
 
-1. Package source `0.1.6`과 두 교정은 `main`에 보존한다. `v0.1.6` tag·GitHub Release·설치는 사용자의 별도 지시 전에는 수행하지 않는다.
-2. Devflow 최종 결과에서 새 core 결함이나 migration 요구가 없는지 확인한 뒤, `v0.1.6` 공식 설치 receipt와 release 여부를 별도 결정한다. 올바른 version-5 package는 새 runtime으로 rebuild하면 되고 spec/fixture migration은 필요 없다.
+1. Package `0.1.6`과 두 교정을 `main`, annotated `v0.1.6` tag, GitHub Release에 같은 release commit으로 배포한다.
+2. 사용자가 설치를 지시하면 공식 설치 명령으로 `v0.1.6` source를 설치하고 package fingerprint·creator 실행을 별도 receipt로 남긴다. 올바른 version-5 package는 새 runtime으로 rebuild하면 되고 spec/fixture migration은 필요 없다.
 3. 새 결함이나 product boundary 변경 없이 비용이 큰 네 모델 suite를 반복하지 않는다. Test worktree 정리는 별도 작업으로 취급하고 dirty bytes와 active writer가 없음을 정확한 대상마다 확인한 뒤 수행한다.
