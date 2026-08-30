@@ -8,22 +8,22 @@
 
 ---
 
-## 0. 현재 완료 지점: v0.1.5 배포와 미배포 저작·P2 evidence 교정
+## 0. 현재 완료 지점: v0.1.5 배포와 v0.1.6 source 경계
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
 제품 commit `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`은 `npm run verify`의 vendor check, self lint, repository test 62/62와 frozen G0.5 eval을 통과했다. Local source와 GitHub source 설치가 각각 skill 하나만 발견했고, 설치본은 61 files, `SKILL.md` 1개, repository-only file 0개였다. Local install은 source 대비 missing/extra/raw difference 0, global install은 path missing/extra 0과 newline-normalized content difference 0이었으며 둘 다 설치본 P1 생성과 lint를 통과했다.
 
-배포 뒤 Devflow 포팅 피드백을 제품 경계와 대조한 결과 구현 차단이나 P2 core 결함은 없었고, 여러 standalone skill이 repository 규약을 공유할 때 cold author가 소유 경계를 첫 저작 경로에서 찾기 어려운 안내 공백을 확인했다. Local `main`은 이 공백을 고친 한 commit만 `origin/main`보다 앞서며 아직 push·version·publish·release하지 않았다. 설치 진입점은 profile을 skill별로 고르고 shared domain input·helper를 재사용하되, P2 behavior와 judgment는 각각 `spec.mjs`와 `body.md`가 계속 배타 소유한다고 명시한다. `ARTIFACTS` path 선언은 존재·내용·freshness·evidence authority를 증명하지 않는다.
+배포 뒤 Devflow 포팅 피드백을 제품 경계와 대조한 결과 구현 차단이나 P2 core 결함은 없었고, 여러 standalone skill이 repository 규약을 공유할 때 cold author가 소유 경계를 첫 저작 경로에서 찾기 어려운 안내 공백을 확인했다. Source candidate의 첫 교정은 설치 진입점에서 profile을 skill별로 고르고 shared domain input·helper를 재사용하되, P2 behavior와 judgment는 각각 `spec.mjs`와 `body.md`가 계속 배타 소유한다고 명시한다. `ARTIFACTS` path 선언은 존재·내용·freshness·evidence authority를 증명하지 않는다.
 
-이어 Devflow가 제기한 L14 guard 증거 문제를 최신 후보에서 재현해 현재 P2 제품 결함으로 확인했다. Live, simulate, scenario expectation, L5가 observation source를 서로 다르게 전처리해 missing input이 fixture에서만 predicate를 실행하고 coverage를 얻을 수 있었다. 미배포 후보는 한 observation preparation owner로 collector/`s`/`judged`/`decided`를 통합했고, raw `"UNKNOWN"`의 version-5 예약 의미와 evaluator event-only coverage를 보존하면서 이 false proof를 닫았다. Fable xhigh 설계 반증과 Sol xhigh 기술 검토, 구현 후 두 최종 read-only audit는 현재 수정이 새 grammar 없이 원인을 닫는 최소 일관 교정이라고 PASS했다.
+이어 Devflow가 제기한 L14 guard 증거 문제를 최신 후보에서 재현해 현재 P2 제품 결함으로 확인했다. Live, simulate, scenario expectation, L5가 observation source를 서로 다르게 전처리해 missing input이 fixture에서만 predicate를 실행하고 coverage를 얻을 수 있었다. 두 번째 교정은 한 observation preparation owner로 collector/`s`/`judged`/`decided`를 통합했고, raw `"UNKNOWN"`의 version-5 예약 의미와 evaluator event-only coverage를 보존하면서 이 false proof를 닫았다. Fable xhigh 설계 반증과 Sol xhigh 기술 검토, 구현 후 두 최종 read-only audit는 현재 수정이 새 grammar 없이 원인을 닫는 최소 일관 교정이라고 PASS했다. 이 두 교정을 package source version `0.1.6`의 patch 경계로 묶었다.
 
 ## 1. 저장소 기준선
 
 - branch: `main`
-- Package version: 0.1.5. 설치 product bytes는 `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`이 소유한다.
-- 이 snapshot을 포함한 local `main`은 related-skill authoring correction과 P2 observation evidence correction 두 commit을 포함해 `origin/main`보다 ahead 2다. 이 후보는 배포된 0.1.5 bytes가 아니다.
-- `v0.1.5` annotated tag와 GitHub Release는 이 global receipt를 포함한 evidence commit을 가리킨다.
+- Package source version: 0.1.6. 이 경계는 related-skill authoring correction `90afd43`과 P2 observation evidence correction `f269f29`를 포함한다.
+- 현재 공식 배포는 여전히 `v0.1.5`이며, 그 설치 product bytes는 `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`이 소유한다.
+- `v0.1.5` annotated tag와 GitHub Release는 기존 global receipt를 가리킨다. `v0.1.6` tag·GitHub Release·공식 설치 receipt는 아직 없다.
 - P2 runtime/validator는 observation input parity bug fix로 `0.2.1`/`0.3.1`이 됐다. Schema, Decision 위치, effect authority, coverage token과 `SPEC.version = "5"` 호환 경계는 바뀌지 않았다.
 - 전역 canonical install은 `C:\Users\joinj\.agents\skills\skill-rails`이고 Claude Code junction도 이 경로를 가리킨다.
 
@@ -73,6 +73,6 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 
 ## 5. 정확한 다음 단계
 
-1. 현재 related-skill과 P2 observation correction은 두 local commit으로만 보존하고 Devflow 포팅이 끝날 때까지 push·version·publish·release하지 않는다.
-2. Devflow 최종 결과에서 새 core 결함이나 migration 요구가 없는지 확인한 뒤, 현재 후보의 공식 설치 receipt와 version/release 여부를 별도 결정한다. 올바른 version-5 package는 새 runtime으로 rebuild하면 되고 spec/fixture migration은 필요 없다.
+1. Package source `0.1.6`과 두 교정은 `main`에 보존한다. `v0.1.6` tag·GitHub Release·설치는 사용자의 별도 지시 전에는 수행하지 않는다.
+2. Devflow 최종 결과에서 새 core 결함이나 migration 요구가 없는지 확인한 뒤, `v0.1.6` 공식 설치 receipt와 release 여부를 별도 결정한다. 올바른 version-5 package는 새 runtime으로 rebuild하면 되고 spec/fixture migration은 필요 없다.
 3. 새 결함이나 product boundary 변경 없이 비용이 큰 네 모델 suite를 반복하지 않는다. Test worktree 정리는 별도 작업으로 취급하고 dirty bytes와 active writer가 없음을 정확한 대상마다 확인한 뒤 수행한다.
