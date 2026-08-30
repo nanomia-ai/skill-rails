@@ -8,7 +8,7 @@
 
 ---
 
-## 0. 현재 완료 지점: v0.1.6 공식 배포와 설치 evidence
+## 0. 현재 완료 지점: v0.1.6 공식 배포와 v0.1.7 source candidate
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -18,14 +18,15 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 
 이어 Devflow가 제기한 L14 guard 증거 문제를 최신 후보에서 재현해 현재 P2 제품 결함으로 확인했다. Live, simulate, scenario expectation, L5가 observation source를 서로 다르게 전처리해 missing input이 fixture에서만 predicate를 실행하고 coverage를 얻을 수 있었다. 두 번째 교정은 한 observation preparation owner로 collector/`s`/`judged`/`decided`를 통합했고, raw `"UNKNOWN"`의 version-5 예약 의미와 evaluator event-only coverage를 보존하면서 이 false proof를 닫았다. Fable xhigh 설계 반증과 Sol xhigh 기술 검토, 구현 후 두 최종 read-only audit는 현재 수정이 새 grammar 없이 원인을 닫는 최소 일관 교정이라고 PASS했다. 이 두 교정을 package source version `0.1.6`의 patch 경계로 묶었다.
 
+후속 Devflow 실측은 current task가 이미 선택한 exact file을 public P2 stage에 전달할 typed input이 없다는 경계를 드러냈다. 보존 checkpoint `d03050f`의 optional `targetPath`/`--target`, containment, collector·snapshot 전달, trace·resume 연속성과 read-block guard의 `pending_reads`/`guard-pending:` evidence를 released `f269f29` observation owner 위에 합성했다. 두 true semantic conflict는 released v0.1.6 쪽으로 판정해 raw `"UNKNOWN"`은 모든 lane에서 예약 sentinel로 유지하고, fixture materialization과 L5 `checkReads`는 `observations.mjs`가 계속 소유한다. 새 byte 계보는 runtime `0.3.1`, validator `0.4.1`, kernel `6`이며 package source candidate는 `0.1.7`이다.
+
 ## 1. 저장소 기준선
 
-- branch: `main`
-- Package version: 0.1.6. 이 경계는 related-skill authoring correction `90afd43`, P2 observation evidence correction `f269f29`, version boundary `5e2c300`을 포함한다.
-- 현재 공식 배포는 `v0.1.6` annotated tag와 GitHub Release가 이 snapshot을 포함한 release commit을 가리키는 형태다.
-- `v0.1.5`의 설치 product bytes와 global receipt는 역사적 증거로 유지한다. `v0.1.6`은 공식 GitHub source를 사용한 global 설치와 설치본 실행 evidence까지 별도로 확보했다.
-- P2 runtime/validator는 observation input parity bug fix로 `0.2.1`/`0.3.1`이 됐다. Schema, Decision 위치, effect authority, coverage token과 `SPEC.version = "5"` 호환 경계는 바뀌지 않았다.
-- 전역 canonical `v0.1.6` install은 `C:\Users\joinj\.agents\skills\skill-rails`이고 Claude Code junction도 이 경로를 가리킨다. Codex와 Gemini CLI는 같은 universal package를 사용한다.
+- branch: `jmp-develop/v017-target-lane-union`
+- Package source version: 0.1.7. Mechanics union commit은 `d03050f` checkpoint와 released observation correction `f269f29`의 S1/S2 판정을 기록한다.
+- 현재 공식 배포와 전역 canonical install은 여전히 `v0.1.6`이다. `v0.1.7` tag·GitHub Release·공식 설치 receipt는 없고, 이 source candidate를 설치 evidence로 승격하지 않는다.
+- P2 runtime/validator는 union byte 계보로 `0.3.1`/`0.4.1`이다. `0.3.0`/`0.4.0`은 landed downstream projection에 쓰인 소진 번호라 재사용하지 않았다.
+- `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 바뀌지 않았다.
 
 ---
 
@@ -38,6 +39,8 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - 설치 package 안의 중첩 fixture skill과 repository-only 파일을 금지하는 회귀 검사를 추가했다.
 - P2 live/simulate/scenario/L5가 한 observation preparation owner를 사용하고, 누락값은 predicate·coverage 전에 `UNKNOWN`으로 막힌다.
 - `fixture.s`/`judged`/`decided` source lane, explicit presence, object-valued observation, version-5 raw `"UNKNOWN"` 예약어를 validator와 회귀 증거로 고정했다.
+- Optional public `targetPath`/`--target`을 portable project-relative path로 정규화하고 lexical·realpath containment 뒤 collector와 custom `snapshotBasis`에만 전달한다. Traced `decision_emitted.data.targetPath`와 CLI `resume`은 normalized target을 연속 투영하며 target이 없을 때 기존 shape를 유지한다.
+- Unknown read로 guard가 멈출 때 evaluator는 `guard_matched.pending_reads`를 내고 build coverage는 `guard-pending:<id>`로 구분한다. L14는 실제 predicate match와 pending-read block을 각각 대응하는 token으로만 인정한다.
 
 ---
 
@@ -57,6 +60,8 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - P2 observation 교정의 targeted runtime·integration 39/39가 pass했다. Canonical pilot은 공식 repair-generated 경로에서 build ID `sha256:1a901e5e01b8680dcfc76140681a170aaf8a22750826bfc04c95ae0238b45736`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했다. Full verify 뒤 Fable/Sol 최종 audit도 MUST-fix 없이 PASS했다.
 - Release 뒤 `skills` 1.5.23으로 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`를 실행했다. Installer는 skill 하나만 발견했고 release package와 설치본은 모두 62 files, `SKILL.md` 1개였다. Path와 CRLF를 제외한 content 차이는 0, installed self lint와 임시 P0 생성·full lint는 pass했고 임시 산출물은 제거했다.
 - Installer security summary는 Gen Safe, Socket 1 alert, Snyk Low Risk를 표시했다. 이는 외부 scanner signal이며 설치·실행 실패가 아니지만, 현재 alert의 상세 원인과 최신 재평가 상태는 이번 제품 receipt로 해소하거나 Pass로 승격하지 않는다.
+- v0.1.7 mechanics candidate의 focused reconciled integration regression 4/4, runtime+integration 42/42, self lint가 pass했다. Canonical pilot은 worktree builder로 재생성되어 build ID `sha256:d2855deb87b5b1b4cbcba467975cbfcc87c7661e7072ffc6478e13b85f49ca1c`, runtime/validator `0.3.1`/`0.4.1`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했고 embedded lint와 real-state e2e 2/2도 pass했다.
+- Release-boundary `npm run verify`는 문서 경계 commit에서 정확히 한 번 실행할 예정이며, 아직 이 source-preparation snapshot의 성공 claim이 아니다.
 
 ---
 
@@ -70,11 +75,13 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - 실제 Devflow 완료물에서 이 안내가 별도 seam audit 비용을 줄이는지, 여러 package의 shared source 변경이 장기간 국소적으로 유지되는지, 다른 model·host가 같은 최소 소비를 선택하는지
 - shared source에서 여러 P2 `spec.mjs`/`body.md`로 자동 projection하거나 freshness를 증명하는 workspace mechanism은 구현하지 않았고 `UNPROVEN`이다.
 - 저장소 밖 version-5 package가 문서화되지 않은 raw UNKNOWN 내부 표현이나 `fixture.s`의 잘못된 source lane에 의존하는 수량은 `UNPROVEN`이다. Exact raw 문자열 `"UNKNOWN"`을 known application data로 쓰는 것은 version 5에서 지원하지 않으며, 이를 바꾸려면 별도 versioned boundary가 필요하다.
+- Fresh agent가 optional `--target`을 올바른 경우에만 공급하고 saved trace에서 resume continuity를 실제로 따르는 행동은 `UNPROVEN`이다.
+- v0.1.7 설치본 bytes·creator 실행과 downstream Devflow 아홉 package의 uniform rebuild는 설치 전이므로 `UNPROVEN`이다.
 
 ---
 
 ## 5. 정확한 다음 단계
 
-1. 진행 중인 Devflow 작업은 현재 coherent edit를 중단하거나 과거 결과를 재해석하지 않는다. 다음 자연스러운 Skill Rails 사용 경계에서 installed `v0.1.6`을 다시 로드하고 이후 저작·유지보수에 새 guidance를 적용한다.
-2. Devflow 완료 경계에서 P2 package만 새 runtime으로 정상 rebuild하고 guard fixture가 correct source lane과 evaluator-observed coverage를 사용하는지 확인한다. 올바른 version-5 package는 spec/fixture migration이 필요 없고, 진단 없이 `--repair-generated`를 사용하지 않는다.
-3. 새 결함이나 product boundary 변경 없이 비용이 큰 네 모델 suite를 반복하지 않는다. Test worktree 정리는 별도 작업으로 취급하고 dirty bytes와 active writer가 없음을 정확한 대상마다 확인한 뒤 수행한다.
+1. 구현·검증 정본과 제품·설계 정본에 v0.1.7 union 경계를 기록하고 이 docs commit에서 `npm run verify`를 정확히 한 번 실행한다.
+2. 사용자의 별도 지시 없이는 tag·push·publish·global install을 하지 않는다. 설치 전에는 installation evidence를 만들거나 주장하지 않는다.
+3. 설치가 별도로 완료된 뒤에만 Devflow 아홉 P2 package를 installed v0.1.7 builder로 한 commit에서 rebuild한다. 현재 repository 밖 Devflow/JGNote/sample은 수정하지 않는다.
