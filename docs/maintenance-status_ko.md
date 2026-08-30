@@ -8,7 +8,7 @@
 
 ---
 
-## 0. 현재 완료 지점: v0.1.6 공식 배포와 v0.1.7 source candidate
+## 0. 현재 완료 지점: v0.1.6 공식 배포와 v0.1.7 release candidate 경계
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -61,7 +61,7 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - Release 뒤 `skills` 1.5.23으로 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`를 실행했다. Installer는 skill 하나만 발견했고 release package와 설치본은 모두 62 files, `SKILL.md` 1개였다. Path와 CRLF를 제외한 content 차이는 0, installed self lint와 임시 P0 생성·full lint는 pass했고 임시 산출물은 제거했다.
 - Installer security summary는 Gen Safe, Socket 1 alert, Snyk Low Risk를 표시했다. 이는 외부 scanner signal이며 설치·실행 실패가 아니지만, 현재 alert의 상세 원인과 최신 재평가 상태는 이번 제품 receipt로 해소하거나 Pass로 승격하지 않는다.
 - v0.1.7 mechanics candidate의 focused reconciled integration regression 4/4, runtime+integration 42/42, self lint가 pass했다. Canonical pilot은 worktree builder로 재생성되어 build ID `sha256:d2855deb87b5b1b4cbcba467975cbfcc87c7661e7072ffc6478e13b85f49ca1c`, runtime/validator `0.3.1`/`0.4.1`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했고 embedded lint와 real-state e2e 2/2도 pass했다.
-- Release-boundary `npm run verify`는 문서 경계 commit에서 정확히 한 번 실행할 예정이며, 아직 이 source-preparation snapshot의 성공 claim이 아니다.
+- Release-boundary staged tree에서 `npm run verify`를 정확히 한 번 실행해 vendor check, self lint, repository test 70/70과 frozen G0.5 eval이 모두 pass했다.
 
 ---
 
@@ -82,6 +82,6 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 
 ## 5. 정확한 다음 단계
 
-1. 구현·검증 정본과 제품·설계 정본에 v0.1.7 union 경계를 기록하고 이 docs commit에서 `npm run verify`를 정확히 한 번 실행한다.
+1. v0.1.7 candidate는 mechanics union, package preparation, release-boundary documentation의 세 coherent commit으로 보존한다. Owner가 별도로 배포를 승인하기 전에는 이 tree를 공식 release나 install로 부르지 않는다.
 2. 사용자의 별도 지시 없이는 tag·push·publish·global install을 하지 않는다. 설치 전에는 installation evidence를 만들거나 주장하지 않는다.
 3. 설치가 별도로 완료된 뒤에만 Devflow 아홉 P2 package를 installed v0.1.7 builder로 한 commit에서 rebuild한다. 현재 repository 밖 Devflow/JGNote/sample은 수정하지 않는다.

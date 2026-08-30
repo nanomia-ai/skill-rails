@@ -309,11 +309,12 @@ Runtime은 AI 대신 일을 수행하는 agent runtime이 아니다. 목적은 *
 
 1. `spec.mjs`를 import하기 전에 허용 AST와 source 구조를 검사한다.
 2. collector·judged·decided와 fixture 입력을 한 의미 정규화 경로로 완전한 observation snapshot에 묶는다. 누락값은 predicate 실행 전 `UNKNOWN`으로 남고, fixture 검증도 live runtime과 같은 읽기 경계를 사용한다.
-3. guard, stage, table row, ordered effects를 결정적으로 계산한다.
-4. 선택된 stage와 멈춘 guard가 읽는 정적 artifact를 `ARTIFACTS.readers`에서 투영해 현재 Decision과 compact guide를 만든다.
-5. 필요한 body section과 template만 전달한다.
-6. runtime 관찰, agent claim, artifact evidence를 서로 다른 권위로 trace에 기록한다.
-7. 요구된 proof와 실제 evidence를 비교해 alignment를 계산한다.
+3. Task나 role이 이미 선택한 단일 project-relative file target이 있으면 public stage input에서 정규화·containment 검사한 뒤 collector와 snapshot basis에만 전달한다.
+4. guard, stage, table row, ordered effects를 결정적으로 계산한다.
+5. 선택된 stage와 멈춘 guard가 읽는 정적 artifact를 `ARTIFACTS.readers`에서 투영해 현재 Decision과 compact guide를 만든다.
+6. 필요한 body section과 template만 전달한다.
+7. runtime 관찰, agent claim, artifact evidence를 서로 다른 권위로 trace에 기록한다.
+8. 요구된 proof와 실제 evidence를 비교해 alignment를 계산한다.
 
 ### 10.2 하지 않는 일
 
@@ -323,6 +324,7 @@ Runtime은 AI 대신 일을 수행하는 agent runtime이 아니다. 목적은 *
 - 빠진 증거를 성공으로 추론
 - validation 실패 후 body에서 임의 결정 복원
 - 다른 skill 호출 또는 설치
+- target 탐색·추론 또는 judgment/decided 값으로 승격
 
 ### 10.3 실행 흐름
 
@@ -355,7 +357,7 @@ align
 
 ### 10.5 Snapshot과 TOCTOU
 
-관찰 시작과 끝의 fingerprint가 다르면 decision은 stale로 종료한다. collector가 읽는 대상과 snapshot basis가 어긋나지 않는지 검사한다. build와 runtime은 path 정규화, package boundary, symlink/junction, manifest hash를 확인해 다른 파일로 바뀌는 우회를 막는다.
+관찰 시작과 끝의 fingerprint가 다르면 decision은 stale로 종료한다. collector가 읽는 대상과 snapshot basis가 어긋나지 않는지 검사한다. Caller-selected target은 portable relative path로 정규화하고 lexical·realpath containment를 통과한 뒤 같은 `ctx.targetPath`로 collector와 custom snapshot basis에 전달한다. Target이 없으면 기존 context를 유지하며, 존재·file type·내용·freshness는 collector observation이 별도로 확인한다. Build와 runtime은 path 정규화, package boundary, symlink/junction, manifest hash를 확인해 다른 파일로 바뀌는 우회를 막는다.
 
 ### 10.6 설치 package 밖의 state
 

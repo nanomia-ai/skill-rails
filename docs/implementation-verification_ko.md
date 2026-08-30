@@ -65,6 +65,14 @@ Package source version `0.1.6`은 related-skill authoring correction `90afd43`�
 
 Release 뒤 `skills` 1.5.23의 공식 GitHub-source 명령 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`를 실행했다. Installer는 discoverable skill 하나를 설치했고 source와 canonical global package는 각각 62 files, `SKILL.md` 1개였다. Directory diff는 path 차이 0, CRLF를 제외한 content 차이 0이었고 installed package self lint와 설치본 creator의 임시 P0 생성·full lint가 pass했다. Canonical package는 Codex·Gemini CLI가 공유하고 Claude Code junction이 같은 경로를 가리킨다. Installer security summary의 Socket 1 alert는 외부 scanner 상태로 별도 보존하며, 기능 evidence로 이를 무시하거나 상세 원인 확인 없이 제품 finding으로 확대하지 않는다.
 
+### 0.5 v0.1.7 release candidate 경계
+
+Package source version `0.1.7`은 released `v0.1.6` 설치 evidence commit `e3caa49` 위에서 보존 checkpoint `d03050f`를 `git cherry-pick -n`으로 합성한 새 계보다. Mechanics commit `c739bff`는 checkpoint의 public `targetPath`/`--target`, lexical·realpath containment, collector·snapshot 전달, traced `decision_emitted.data.targetPath`와 CLI resume 연속성, read-block `pending_reads`와 `guard-pending:` evidence를 유지한다. 동시에 released observation correction `f269f29`가 소유한 두 semantic ruling을 보존한다. S1은 exact raw `"UNKNOWN"`을 every-lane version-5 reserved sentinel로 유지하고, S2는 `observations.mjs`의 fixture preparation과 L5 `checkReads`를 단일 owner로 유지한다. Checkpoint의 literal-UNKNOWN-known 해석, `normalizeFixtureObservations`, `fixtureState`는 union에 들어오지 않았다.
+
+서로 다른 landed byte에 이미 쓰인 `0.3.0`/`0.4.0`은 재사용하지 않고 union runtime은 `0.3.1`, validator는 `0.4.1`, kernel은 `6`으로 기록했다. Package version은 `0.1.7`이다. `SPEC.version = "5"`, Decision/Trace schema, 14 closed exports, effect authority와 host permission 경계는 바뀌지 않았다. 이는 released `v0.1.6`을 다시 쓰거나 tag를 이동하는 일이 아니라 별도 release candidate다.
+
+Focused reconciled integration regression 4/4, runtime+integration 42/42와 self lint가 pass했다. Canonical pilot은 worktree builder의 `--repeats 50`으로 재생성되어 build ID `sha256:d2855deb87b5b1b4cbcba467975cbfcc87c7661e7072ffc6478e13b85f49ca1c`, runtime/validator `0.3.1`/`0.4.1`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했고 embedded lint와 real-state e2e 2/2도 pass했다. 이 문서를 포함한 staged release-boundary tree에서 `npm run verify`를 한 번 실행해 vendor check, self lint, repository test 70/70과 frozen G0.5 eval이 모두 pass했다. Tag·push·publish·global install은 실행하지 않았고 installation evidence도 주장하지 않는다. Fresh-agent target/resume 소비, downstream Devflow 아홉 package rebuild, non-Windows symlink branch는 `UNPROVEN`이다.
+
 ## 1. 현재 결정적 검증
 
 Package 0.1.5의 설치 product bytes는 `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`에서 `origin/main`에 들어갔고 위 0.3절의 full verify, local installer와 GitHub-source global installer smoke를 통과했다. `v0.1.5` annotated tag와 GitHub Release는 이 receipt를 포함한 evidence commit을 기준으로 배포한다. P2 behavior contract는 바뀌지 않았으며 이 release의 새 주장은 distribution boundary에 한정된다.
@@ -424,6 +432,22 @@ Targeted runtime·integration은 39/39 pass했다. 새 회귀는 `s`/`judged`/`d
 
 현재 `UNPROVEN`은 저장소 밖 version-5 package가 문서화되지 않은 raw sentinel 내부 표현이나 잘못된 fixture source lane에 의존하는 수량이다. 올바른 version-5 package는 rebuild만으로 patch runtime을 받으며 spec/fixture migration이 필요 없다. Literal `"UNKNOWN"` data 지원, out-of-band unknown fixture grammar, Decision schema 변경은 이 수정에 포함하지 않는다.
 
+### 6.15 Caller-selected P2 stage target 공개 계약
+
+Phase-4 실측 R1은 generated Work package가 이미 exact active card를 알고도 public `stageSkill`/CLI가 그 path를 받을 수 없어, collector가 argv나 project card state를 사적으로 다시 해석하거나 runtime을 우회하게 되는 owning-boundary 결함을 드러냈다. Devflow 전용 `cardPath`, judged/decided 오용, first-card 추론, 범용 context bag은 두 번째 truth owner와 숨은 모호성을 만들기 때문에 채택하지 않았다.
+
+Public stage API는 optional string `targetPath`, CLI는 stage 전용 `--target <project-relative-path>` 하나만 추가한다. Runtime은 non-empty portable relative path에서 empty/`.` segment만 제거하고 absolute, backslash, drive-like colon, 모든 `..` segment를 거부한 뒤 lexical·realpath containment를 검사한다. 유효한 값은 같은 normalized string을 observation collector와 custom `snapshotBasis`의 `ctx.targetPath`에 전달한다. Target이 없으면 이 property 자체를 생략해 기존 collector/snapshot context를 보존한다. Target은 judgment나 decided domain value가 아니고 Decision에 새 parallel field로 들어가지 않으며, package의 declared collector가 ordinary observation과 snapshot material로 만들 때만 기존 snapshot→Decision 경로에 참여한다. 존재, regular-file 여부, 내용 유효성, freshness는 계속 collector가 별도 관찰한다. Trace가 켜진 stage는 normalized target이 있을 때만 기존 `decision_emitted.data.targetPath`에 그 값을 붙이고, deferred·stale·일반 Decision emission 모두 같은 projection을 쓴다. CLI `resume`은 마지막 `decision_emitted`의 값을 안전하게 quote한 `--target`으로 `next_command` 끝에 다시 붙인다. Target이 없는 event data와 resume command는 이전 shape 그대로이며, 이는 Decision field나 같은 run-id에서 target 변경을 금지하는 invariant가 아니다.
+
+Canonical generator와 routed P2/authoring guidance는 task나 role이 이미 한 target을 선택한 경우에만 `--target`을 공급하고 그 외 package에서는 생략하도록 갱신했다. Released runtime `0.2.1`에서 target-bearing union runtime `0.3.1`로 올렸고, read-block coverage semantics는 validator `0.3.1`에서 `0.4.1`로 올렸다. P0/P1, `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision/Trace schema, closed exports, effect authority는 바뀌지 않았다. Canonical pilot은 generated file을 손으로 편집하지 않고 `node skills/skill-rails/scripts/build.mjs --skill fixtures/next-core-single-skill-pilot/skill --repeats 50 --json`으로 rebuild했다. Pilot spec·fixture·schema·domain behavior는 그대로이고 build ID는 `sha256:d2855deb87b5b1b4cbcba467975cbfcc87c7661e7072ffc6478e13b85f49ca1c`이다.
+
+Rollback regression은 generic generated P2 package에서 public API와 CLI의 normalized target equality, collector fact delivery, target-aware snapshot fingerprint, target-absent legacy context, absolute·traversal·non-string 거부, Windows junction physical escape 거부를 같은 public surface로 확인한다. 같은 test가 target-bearing normal·deferred emission과 stale regression의 normalized trace data, resume의 quoted 동일 target, target-absent event data의 기존 object shape와 flag 없는 resume command도 확인한다. Focused reconciled regression 4/4, runtime+integration 42/42, self lint, pilot L0–L18·mutation 20/20·scenario 10/10·repeat 50·format 256/256이 pass했다. Fresh-agent target 소비와 resume 실행, 실제 Devflow empirical scenario, non-Windows POSIX symlink branch는 `UNPROVEN`이다.
+
+### 6.16 Read-block guard trace와 coverage token 정직성
+
+Unknown read로 guard가 중단될 때 evaluator는 기존 BLOCK Decision·needs·predicate 의미를 유지하면서 `guard_matched`를 먼저 내보내고 `pending_reads`를 기록한다. `guard_evaluated`는 reads가 해결되고 predicate가 실행된 경우에만 남겨 trace가 실제 실행을 단일 source로 설명한다. 따라서 build의 `coverageFor`는 predicate가 실제 match한 event를 `guard:<id>`, unresolved required read로 BLOCK한 event를 `guard-pending:<id>`로 각각 project하며, L14는 두 token 중 하나를 허용하되 fixture claim과 실제 event의 mode가 어긋나면 full build가 거부한다.
+
+회귀는 omitted와 raw `"UNKNOWN"` decided input이 같은 BLOCK·needs로 수렴하고 `pending_reads`가 있는 observer/trace에서도 Decision이 변하지 않는지 확인한다. Pending token을 actual-match fixture에 붙이거나 actual token을 read-block fixture에 붙이는 양방향 false claim은 거부된다. 이 교정은 fixture materialization의 두 번째 owner를 만들지 않으며 released 6.14절의 observation preparation과 L5 `checkReads`를 그대로 소비한다.
+
 ---
 
 
@@ -498,6 +522,7 @@ Version-5 기준선의 18개 공개 위치는 현재 typed Decision에서 다음
 | judgment-only `NEXT` skip이 다음 stage에 prior row·plan state를 남길 수 있음 | row·plan·pending needs를 stage iteration-local로 만들고 선택된 bundle만 loop 밖으로 승격 | 선언 stage 순서와 ordered-effect 의미를 보존하며 stage·row·effects·record/body·proof·reinvoke·`stage_artifacts` full-coherence regression으로 확인 |
 | L14가 요구하는 skipped judgment branch를 final Decision만으로는 build evidence에 투영할 수 없음 | evaluator-observed internal execution event를 build fixture coverage token으로 투영 | L14를 약화하지 않고 `skip:["NEXT"]`와 다음 stage를 함께 증명하며, predicate replay·fact inference·Decision field 추가를 피함; valid/missing/false-claim/purity regression으로 rollback을 막음 |
 | live collection, simulate, scenario expectation, L5가 observation source를 서로 다르게 정규화 | 한 `observations.mjs` preparation owner가 collector/`s`/`judged`/`decided`의 presence·binding·reserved UNKNOWN·domain·flat/nested/unknown receipt를 계산 | 누락값이 predicate를 실행하거나 coverage를 얻는 false proof를 제거하고 version-5 raw sentinel 호환을 보존함; source-lane·live/simulate parity·known/false coverage regression으로 rollback을 막음 |
+| public stage 호출자가 task/role이 이미 선택한 exact project file을 전달할 typed input이 없음 | optional API `targetPath` / CLI `--target`을 runtime이 normalized `ctx.targetPath`로 collector와 snapshot basis에 전달하고 traced `decision_emitted.data`에서 resume command로 연속 투영 | judged/decided, argv 재해석, target 추론, parallel Decision field나 package opt-in 없이 기존 observation→snapshot→Decision 경로를 보존함; target-absent context·trace data·resume command와 Decision schema는 그대로이며 API/CLI 정상·거부·physical containment·trace/resume regression으로 rollback을 막음 |
 | exact format 예시가 `Decision.format.example`에만 있고 실행 effect와 떨어져 있음 | format을 소유한 effect에 같은 정본 값의 `format_example`을 투영 | spec·fixture를 두 번째 정본으로 복제하지 않고 실제 WRITE 소비 위치에서 정확한 형식을 찾게 함; targeted runtime, canonical build와 installed fresh Luna receipt로 제한 검증 |
 
 ### 7.3 의도적으로 제외한 capability
@@ -553,6 +578,7 @@ P2 version-5 호환 의미를 바꾸는 수정은 이 원장에 다음을 함께
 - evaluator-observed execution event에서 fixture coverage를 계산하는 L14 build evidence path
 - `ARTIFACTS.readers`에서 선택된 stage/guard의 정적 `stage_artifacts`를 투영하는 Decision schema 2
 - supplied Decision self-seal과 runtime-emitted structural equality를 expectation보다 먼저 검사하는 exact-Decision alignment
+- caller-selected project-relative file을 collector와 snapshot basis에 전달하고 traced resume에 연속 투영하는 optional public stage `targetPath` / `--target`
 - Decision/Trace schemas, authority, alignment, resume
 - transactional deterministic build와 manifest
 - self-contained P2 package
