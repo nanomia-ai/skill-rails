@@ -308,7 +308,7 @@ Runtime은 AI 대신 일을 수행하는 agent runtime이 아니다. 목적은 *
 ### 10.1 하는 일
 
 1. `spec.mjs`를 import하기 전에 허용 AST와 source 구조를 검사한다.
-2. collector·judged·decided 입력을 하나의 snapshot에 묶는다.
+2. collector·judged·decided와 fixture 입력을 한 의미 정규화 경로로 완전한 observation snapshot에 묶는다. 누락값은 predicate 실행 전 `UNKNOWN`으로 남고, fixture 검증도 live runtime과 같은 읽기 경계를 사용한다.
 3. guard, stage, table row, ordered effects를 결정적으로 계산한다.
 4. 선택된 stage와 멈춘 guard가 읽는 정적 artifact를 `ARTIFACTS.readers`에서 투영해 현재 Decision과 compact guide를 만든다.
 5. 필요한 body section과 template만 전달한다.

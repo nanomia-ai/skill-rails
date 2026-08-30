@@ -3,16 +3,11 @@ import { join, resolve } from "node:path";
 import { evaluateSpec } from "./evaluator.mjs";
 import { sha256 } from "./hash.mjs";
 import { MINIMUM_NODE_MAJOR } from "./constants.mjs";
-import { nestFlat } from "./collectors.mjs";
+import { prepareFixtureInputs } from "./observations.mjs";
 
 export async function loadScenarioFixtures(skillRoot) {
   const path = join(resolve(skillRoot), "fixtures", "scenarios.json");
   try { return JSON.parse(await readFile(path, "utf8")); } catch { return []; }
-}
-
-export function fixtureState(fixture) {
-  const flat = { ...(fixture.s ?? {}), ...(fixture.judged ?? {}), ...(fixture.decided ?? {}) };
-  return nestFlat(flat);
 }
 
 export async function validateScenarioExpectations(skillRoot, spec, fixtures) {
@@ -32,13 +27,11 @@ export async function validateScenarioExpectations(skillRoot, spec, fixtures) {
       diagnostics.push(diag(pointer, "Scenario fixture requires a stable id and expect object."));
       continue;
     }
-    const flat = { ...(fixture.s ?? {}), ...(fixture.judged ?? {}), ...(fixture.decided ?? {}) };
-    const observations = { flat, nested: fixtureState(fixture), unknowns: [] };
     try {
+      const { observations, snapshot, judged, decided } = prepareFixtureInputs(spec, fixture);
       const decision = await evaluateSpec({
         spec, skillRoot: resolve(skillRoot), observations,
-        snapshot: { fingerprint: fixture.snapshot ?? sha256({ fixture: fixture.id }), status: "stable" },
-        judged: fixture.judged ?? {}, decided: fixture.decided ?? {}, runtime
+        snapshot, judged, decided, runtime
       });
       for (const field of ["stage", "row", "status"]) {
         if (Object.hasOwn(fixture.expect, field) && decision[field] !== fixture.expect[field]) diagnostics.push(diag(`${pointer}.expect.${field}`, `Expected ${field}=${fixture.expect[field]}, got ${decision[field]}.`));

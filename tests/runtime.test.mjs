@@ -4,8 +4,9 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { analyzeSpecSource } from "../skills/skill-rails/scripts/runtime/ast-policy.mjs";
 import { loadBody } from "../skills/skill-rails/scripts/runtime/body.mjs";
-import { line } from "../skills/skill-rails/scripts/runtime/dsl.mjs";
+import { isUnknown, line, unknown } from "../skills/skill-rails/scripts/runtime/dsl.mjs";
 import { validateDomainValue } from "../skills/skill-rails/scripts/runtime/domains.mjs";
+import { bindObservationInputs, prepareFixtureInputs } from "../skills/skill-rails/scripts/runtime/observations.mjs";
 import { alignDecision } from "../skills/skill-rails/scripts/runtime/alignment.mjs";
 import { alignRun } from "../skills/skill-rails/scripts/runtime/api.mjs";
 import { evaluateSpec } from "../skills/skill-rails/scripts/runtime/evaluator.mjs";
@@ -47,6 +48,50 @@ test("named, list, object, NONE, and UNKNOWN domains fail closed", () => {
   assert.equal(validateDomainValue({ id: "card-number" }, { id: "00.1", extra: "x" }).ok, false);
   assert.equal(validateDomainValue("path", "../escape").ok, false);
   assert.equal(validateDomainValue("integer", unknown).unknown, true);
+});
+
+test("all P2 observation input lanes share one version-5 UNKNOWN and presence contract", () => {
+  const spec = { OBSERVATIONS: {
+    "state.mode": { collector: "test/state.mode", domain: ["ready", "waiting"] },
+    "state.path": { collector: "test/state.path", domain: "path" },
+    "state.card": { collector: "test/state.card", domain: { id: "card-number", status: ["open", "done"] } },
+    "review.answer": { judged: true, domain: ["pass", "finding"] },
+    "route.target": { decided: true, domain: "path" }
+  } };
+  const tagged = unknown("review-unavailable", { owner: "reviewer" });
+  const prepared = prepareFixtureInputs(spec, {
+    id: "shared-normalization",
+    s: { state: { mode: "UNKNOWN", path: "state/input.json", card: { id: "00.1", status: "open" } } },
+    judged: { "review.answer": tagged },
+    decided: { "route.target": "UNKNOWN" }
+  });
+
+  assert.equal(isUnknown(prepared.observations.flat["state.mode"]), true);
+  assert.equal(isUnknown(prepared.observations.flat["route.target"]), true, "raw UNKNOWN remains the reserved v5 sentinel even for path domains");
+  assert.equal(prepared.observations.flat["review.answer"], tagged, "tagged unknown metadata is preserved");
+  assert.deepEqual(prepared.observations.flat["state.card"], { id: "00.1", status: "open" }, "object-valued observations remain atomic");
+  assert.deepEqual(prepared.observations.unknowns.map(({ field, reason }) => [field, reason]), [
+    ["state.mode", "unknown"],
+    ["review.answer", "review-unavailable"],
+    ["route.target", "unknown"]
+  ]);
+  assert.equal(isUnknown(prepared.judged["review.answer"]), true);
+  assert.equal(isUnknown(prepared.decided["route.target"]), true);
+
+  const missing = prepareFixtureInputs(spec, { id: "missing", s: { "state.mode": "ready", "state.path": "state/input.json", "state.card": { id: "00.1", status: "open" } } });
+  assert.equal(missing.observations.unknowns.find(({ field }) => field === "review.answer")?.reason, "fixture-missing");
+  assert.throws(() => prepareFixtureInputs(spec, { id: "wrong-lane", s: { "route.target": "state/input.json" } }), (error) => error.code === "SR_INPUT_SOURCE");
+  assert.throws(() => bindObservationInputs(spec, { "route.target": null }, "decided", "sha256:" + "a".repeat(64), false), (error) => error.code === "SR_INPUT_DOMAIN");
+});
+
+test("version-5 AST rejects UNKNOWN as a declared or compared literal observation value", async () => {
+  const clean = await readFile(join(ROOT, "evals", "g0_5", "b-v5-clean", "spec.mjs"), "utf8");
+  const declared = analyzeSpecSource(clean.replace('["yes", "no"]', '["yes", "no", "UNKNOWN"]'));
+  assert.ok(declared.diagnostics.some((item) => item.code === "L3" && /reserved.*UNKNOWN/i.test(item.message)));
+  const compared = analyzeSpecSource(clean
+    .replace('domain: ["yes", "no"]', 'domain: "text"')
+    .replace('s.signal.pass === "yes"', 's.signal.pass === "UNKNOWN"'));
+  assert.ok(compared.diagnostics.some((item) => item.code === "L4" && /reserved.*UNKNOWN/i.test(item.message)));
 });
 
 test("positive-list permits private pure helpers and derives their reads", async () => {

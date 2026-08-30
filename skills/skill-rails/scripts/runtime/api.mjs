@@ -5,7 +5,8 @@ import { randomUUID } from "node:crypto";
 import { validateFast, validateFull, importVerifiedSource } from "./validator.mjs";
 import { computeFingerprints } from "./manifest.mjs";
 import { loadBuiltSkill, reverifyBuiltSkill } from "./loader.mjs";
-import { loadCollectorRegistry, collectObservations, nestFlat, normalizeFixtureObservations } from "./collectors.mjs";
+import { loadCollectorRegistry, collectObservations } from "./collectors.mjs";
+import { bindObservationInputs, prepareFixtureInputs } from "./observations.mjs";
 import { captureSnapshot, compareSnapshots } from "./snapshot.mjs";
 import { evaluateSpec } from "./evaluator.mjs";
 import { renderGuide } from "./guide.mjs";
@@ -17,7 +18,6 @@ import { alignDecision } from "./alignment.mjs";
 import { DECISION_SCHEMA, KERNEL_VERSION, RUNTIME_VERSION, VALIDATOR_VERSION } from "./constants.mjs";
 import { sha256, stableStringify } from "./hash.mjs";
 import { fail } from "./diagnostics.mjs";
-import { validateDomainValue } from "./domains.mjs";
 import { resolveInside } from "./path-policy.mjs";
 
 export async function loadAuthoringSkill(skillRoot, runtimeDir = null) {
@@ -80,8 +80,8 @@ async function stageSkillOnce({ skillRoot, projectRoot, judged = {}, decided = {
   }
   const registry = await loadCollectorRegistry(root);
   const start = await captureSnapshot(projectRoot, registry.snapshotBasis);
-  const parsedJudged = bindInputs(loaded.spec, judged, "judged", start.fingerprint);
-  const parsedDecided = bindInputs(loaded.spec, decided, "decided", start.fingerprint);
+  const parsedJudged = bindObservationInputs(loaded.spec, judged, "judged", start.fingerprint);
+  const parsedDecided = bindObservationInputs(loaded.spec, decided, "decided", start.fingerprint);
   const observations = await collectObservations(loaded.spec, registry, { projectRoot: resolve(projectRoot), skillRoot: root, snapshot: start }, { ...parsedJudged, ...parsedDecided });
   const end = await captureSnapshot(projectRoot, registry.snapshotBasis);
   const snapshot = compareSnapshots(start, end);
@@ -119,15 +119,7 @@ export async function simulateSkill({ skillRoot, fixture, runtimeDir = null, lan
     const validation = await validateFull(root, { language });
     if (!validation.ok) fail("SR_LFULL_FAILED", "L-full rejected the package.", { details: validation.diagnostics });
   }
-  const observations = normalizeFixtureObservations(loaded.spec, fixture.s ?? {});
-  const snapshot = { fingerprint: fixture.snapshot ?? sha256({ fixture: fixture.id ?? fixture.s }), status: "stable" };
-  const judged = bindInputs(loaded.spec, fixture.judged ?? {}, "judged", snapshot.fingerprint, false);
-  const decided = bindInputs(loaded.spec, fixture.decided ?? {}, "decided", snapshot.fingerprint, false);
-  for (const [field, value] of Object.entries({ ...judged, ...decided })) {
-    observations.flat[field] = value;
-  }
-  observations.nested = nestFlat(observations.flat);
-  observations.unknowns = observations.unknowns.filter(({ field }) => !Object.hasOwn(judged, field) && !Object.hasOwn(decided, field));
+  const { observations, snapshot, judged, decided } = prepareFixtureInputs(loaded.spec, fixture);
   const decision = await evaluateSpec({ spec: loaded.spec, skillRoot: root, observations, snapshot, judged, decided, runtime: loaded.runtime, language, predicateTimings, evaluationObserver });
   return { decision, guide: renderGuide(decision) };
 }
@@ -180,34 +172,6 @@ export async function alignRun({ decision, tracePath }) {
 }
 
 export { validateFast, validateFull, recordEvidence, readTrace };
-
-function bindInputs(spec, input, kind, snapshotFingerprint, requireBinding = true) {
-  const output = {};
-  for (const [field, raw] of Object.entries(input)) {
-    const declaration = spec.OBSERVATIONS?.[field];
-    if (!declaration?.[kind]) fail("SR_INPUT_SOURCE", `${field} is not declared as ${kind}.`);
-    const parsed = parseBoundValue(raw);
-    if (requireBinding && parsed.snapshot && !snapshotFingerprint.startsWith(parsed.snapshot)) fail("SR_INPUT_STALE", `${kind} value for ${field} is bound to a different snapshot.`);
-    if (!validateInput(declaration.domain, parsed.value)) fail("SR_INPUT_DOMAIN", `${kind} value for ${field} is outside its domain.`);
-    output[field] = parsed.value;
-  }
-  return output;
-}
-
-function parseBoundValue(raw) {
-  if (typeof raw !== "string") return { value: raw, snapshot: null };
-  const binding = /^(.*)@(sha256:[0-9a-f]{8,64})$/.exec(raw);
-  const valueText = binding ? binding[1] : raw;
-  const snapshot = binding ? binding[2] : null;
-  let value = valueText;
-  if (/^\d+$/.test(valueText)) value = Number(valueText);
-  else if (/^(?:\[|\{)/.test(valueText)) { try { value = JSON.parse(valueText); } catch { /* retain string */ } }
-  return { value, snapshot };
-}
-
-function validateInput(domain, value) {
-  return validateDomainValue(domain, value).ok;
-}
 
 async function pathExists(path) {
   try { await access(path, fsConstants.R_OK); return true; }

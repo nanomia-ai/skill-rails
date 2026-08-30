@@ -3,9 +3,9 @@ import { constants as fsConstants } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { hashFile } from "./hash.mjs";
-import { UNKNOWN, isUnknown, unknown } from "./dsl.mjs";
-import { validateDomainValue } from "./domains.mjs";
+import { unknown } from "./dsl.mjs";
 import { fail } from "./diagnostics.mjs";
+import { normalizeObservationSet } from "./observations.mjs";
 
 export async function loadCollectorRegistry(skillRoot) {
   const path = join(resolve(skillRoot), "collectors", "index.mjs");
@@ -23,59 +23,17 @@ export async function loadCollectorRegistry(skillRoot) {
 }
 
 export async function collectObservations(spec, registry, context, supplied = {}) {
-  const flat = {};
-  const unknowns = [];
+  const raw = {};
   for (const [field, declaration] of Object.entries(spec.OBSERVATIONS ?? {})) {
     let value;
-    if (declaration.judged || declaration.decided) value = supplied[field] ?? unknown(`missing-${declaration.judged ? "judged" : "decided"}`, field);
+    if (declaration.judged || declaration.decided) value = Object.hasOwn(supplied, field) ? supplied[field] : unknown(`missing-${declaration.judged ? "judged" : "decided"}`, field);
     else {
       const collector = registry.collectors[declaration.collector];
       if (!collector) fail("L2", `Collector is not registered: ${declaration.collector}`, { pointer: `OBSERVATIONS.${field}` });
       try { value = await collector(context); }
       catch (error) { value = unknown("collector-error", { field, message: error.message }); }
     }
-    if (value === "UNKNOWN") value = UNKNOWN;
-    const validation = validateDomainValue(declaration.domain, value);
-    if (!validation.ok) fail("L3", `Collector or input returned a value outside ${field}'s domain.`, { pointer: `OBSERVATIONS.${field}`, details: { value } });
-    if (isUnknown(value)) unknowns.push({ field, reason: value.reason, details: value.details ?? null });
-    flat[field] = value;
+    raw[field] = value;
   }
-  return { flat, nested: nestFlat(flat), unknowns };
+  return normalizeObservationSet(spec, raw, { missingReason: "observation-missing", pointerPrefix: "OBSERVATIONS", valueLabel: "Collector or input value" });
 }
-
-export function normalizeFixtureObservations(spec, input) {
-  const flattened = hasDottedKeys(input) ? input : flattenNested(input);
-  const flat = {};
-  const unknowns = [];
-  for (const [field, declaration] of Object.entries(spec.OBSERVATIONS ?? {})) {
-    let value = Object.hasOwn(flattened, field) ? flattened[field] : unknown("fixture-missing", field);
-    if (value === "UNKNOWN") value = UNKNOWN;
-    const validation = validateDomainValue(declaration.domain, value);
-    if (!validation.ok) fail("L3", `Fixture value is outside ${field}'s domain.`, { pointer: `fixture.s.${field}`, details: { value } });
-    if (isUnknown(value)) unknowns.push({ field, reason: value.reason, details: value.details ?? null });
-    flat[field] = value;
-  }
-  return { flat, nested: nestFlat(flat), unknowns };
-}
-
-export function nestFlat(flat) {
-  const root = {};
-  for (const [path, value] of Object.entries(flat)) {
-    const segments = path.split(".");
-    let current = root;
-    for (const segment of segments.slice(0, -1)) current = current[segment] ??= {};
-    current[segments.at(-1)] = value;
-  }
-  return root;
-}
-
-export function flattenNested(value, prefix = "", output = {}) {
-  for (const [key, item] of Object.entries(value ?? {})) {
-    const path = prefix ? `${prefix}.${key}` : key;
-    if (item && typeof item === "object" && !Array.isArray(item) && !isUnknown(item)) flattenNested(item, path, output);
-    else output[path] = item;
-  }
-  return output;
-}
-
-function hasDottedKeys(value) { return Object.keys(value ?? {}).some((key) => key.includes(".")); }

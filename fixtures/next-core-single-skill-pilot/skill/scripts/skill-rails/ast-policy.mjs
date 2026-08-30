@@ -129,6 +129,7 @@ export function analyzeSpecSource(source, sourcePath = "spec.mjs") {
   const observationDomains = {};
   for (const [field, declaration] of Object.entries(observations)) {
     if (!declaration || !isValidDomainDeclaration(declaration.domain)) diagnostics.push(diag("L3", sourcePath, `Observation ${field} has an invalid static domain.`));
+    else if (Array.isArray(declaration.domain) && declaration.domain.includes("UNKNOWN")) diagnostics.push(diag("L3", sourcePath, `Observation ${field} uses reserved version-5 sentinel string UNKNOWN in its domain.`));
     else observationDomains[field] = declaration.domain;
   }
 
@@ -271,6 +272,7 @@ function validateTypedComparisons(functionNode, domains, diagnostics, sourcePath
         const domain = comparisonDomain(operand, observed, domains);
         const ordering = [">", ">=", "<", "<="].includes(node.operator);
         if (ordering && domain !== "integer") diagnostics.push(diag("L4", sourcePath, `Ordering comparison requires integer domain: ${observed}`, node.loc?.start));
+        if (literal === "UNKNOWN" && memberChain(operand)?.slice(1).join(".") === observed) diagnostics.push(diag("L4", sourcePath, `Comparison uses reserved version-5 sentinel string UNKNOWN: ${observed}`, node.loc?.start));
         if (!validateDomainValue(domain, literal).ok) diagnostics.push(diag("L4", sourcePath, `Comparison literal is outside ${observed} domain: ${JSON.stringify(literal)}`, node.loc?.start));
       }
       if (left && right && domainClass(comparisonDomain(node.left, left, domains)) !== domainClass(comparisonDomain(node.right, right, domains))) diagnostics.push(diag("L4", sourcePath, `Comparison domains are incompatible: ${left} and ${right}`, node.loc?.start));

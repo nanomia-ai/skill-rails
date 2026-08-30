@@ -9,10 +9,11 @@ import { hashFile, sha256 } from "./hash.mjs";
 import { loadBody, parseBody, resolveBodySection, validateBodyKinds } from "./body.mjs";
 import { extractInlineTemplates, resolveTemplate, validateTemplateDeclaration } from "./templates.mjs";
 import { isPortableRelativePath } from "./path-policy.mjs";
-import { fixtureState, loadScenarioFixtures, validateScenarioExpectations } from "./scenario-checks.mjs";
+import { loadScenarioFixtures, validateScenarioExpectations } from "./scenario-checks.mjs";
 import { validateFormatFixtures } from "./format-checks.mjs";
 import { validateAuthoringLedger } from "./authoring-ledger.mjs";
-import { nestFlat } from "./collectors.mjs";
+import { nestFlat, prepareFixtureInputs } from "./observations.mjs";
+import { checkReads } from "./evaluator.mjs";
 
 export async function validateFast(skillRoot) {
   const root = resolve(skillRoot);
@@ -62,6 +63,7 @@ export async function validateFull(skillRoot, options = {}) {
     check("L2", Boolean(declaration && typeof declaration === "object" && !Array.isArray(declaration)), `OBSERVATIONS.${field}`, "Observation declaration must be an object.");
     check("L2", Boolean(declaration.judged || declaration.decided || (declaration.collector && collectorNames.has(declaration.collector))), `OBSERVATIONS.${field}`, "Observed field requires a registered collector, judged, or decided source.");
     check("L3", isValidDomainDeclaration(declaration.domain), `OBSERVATIONS.${field}.domain`, "Observation domain is invalid.");
+    check("L3", !(Array.isArray(declaration.domain) && declaration.domain.includes("UNKNOWN")), `OBSERVATIONS.${field}.domain`, "Exact string UNKNOWN is reserved for the version-5 unknown observation sentinel.");
     check("L3", [declaration.judged, declaration.decided, Boolean(declaration.collector)].filter(Boolean).length === 1, `OBSERVATIONS.${field}`, "Observation must have exactly one source class.");
   }
 
@@ -93,8 +95,15 @@ export async function validateFull(skillRoot, options = {}) {
     check("L5", defaultMatches, `TABLES.${tableId}.rows`, "Last table row must be an unconditional default with reads=[].");
     if (table.exclusive) {
       for (const fixture of await loadScenarioFixtures(skillRoot)) {
-        const state = fixtureState(fixture);
-        const matches = rows.slice(0, -1).filter((row) => { try { return row.when(state) === true; } catch { return false; } });
+        let prepared;
+        try { prepared = prepareFixtureInputs(spec, fixture); }
+        catch { continue; }
+        const matches = rows.slice(0, -1).filter((row) => {
+          try {
+            if (!checkReads(spec, row, prepared.observations.flat, new Map()).ok) return false;
+            return row.when(prepared.observations.nested) === true;
+          } catch { return false; }
+        });
         check("L5", matches.length <= 1, `TABLES.${tableId}.fixture:${fixture.id}`, `Exclusive table has overlapping non-default rows: ${matches.map((row) => row.state).join(", ")}`);
       }
     }

@@ -9,7 +9,7 @@ import { lintSimpleSkill } from "../skills/skill-rails/scripts/lib/simple-lint.m
 import { measureSimpleContextSurface } from "../skills/skill-rails/scripts/lib/context-surface.mjs";
 import { buildP2, runFixtureSuite } from "../skills/skill-rails/scripts/lib/build-core.mjs";
 import { copyTree, exists, listFiles, readJson, writeJsonAtomic, writeTextAtomic } from "../skills/skill-rails/scripts/lib/io.mjs";
-import { enterSkill, stageSkill } from "../skills/skill-rails/scripts/runtime/api.mjs";
+import { enterSkill, simulateSkill, stageSkill } from "../skills/skill-rails/scripts/runtime/api.mjs";
 import { loadBuiltSkill } from "../skills/skill-rails/scripts/runtime/loader.mjs";
 import { alignDecision } from "../skills/skill-rails/scripts/runtime/alignment.mjs";
 import { assertExternalStateDir, readTrace, recordHarnessEvidence } from "../skills/skill-rails/scripts/runtime/trace-core.mjs";
@@ -417,6 +417,52 @@ test("P2 build credits skipped NEXT coverage only from evaluator-observed execut
   done.cover.push("branch:preflight/skip");
   await writeJsonAtomic(falsePath, falseScenarios);
   await assert.rejects(runFixtureSuite(falseClaim, { repeats: 1 }), /Fixture done claims coverage it did not execute: branch:preflight\/skip/);
+});
+
+test("P2 missing guard inputs cannot earn coverage through a fixture-only execution path", async (t) => {
+  const base = await makeTestDir("guard-input-parity");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  await copyTree(join(ROOT, "evals", "g0_5", "b-v5-clean"), root);
+
+  const specPath = join(root, "spec.mjs");
+  const source = await readFile(specPath, "utf8");
+  await writeFile(specPath, source
+    .replace("export const OBSERVATIONS = {", 'export const OBSERVATIONS = {\n  "guard.target": { decided: true, domain: ["block", "pass"] },')
+    .replace("export const GUARDS = [", 'export const GUARDS = [\n  { id: "input-present", reads: ["guard.target"], when: s => s.guard.target === "block", then: "BLOCK", body: "guard: input-present" },'), "utf8");
+  const bodyPath = join(root, "body.md");
+  const body = await readFile(bodyPath, "utf8");
+  await writeFile(bodyPath, body.replace("## guard: read-only-session", "## guard: input-present\n\nExplain why a current input is required before this guard can decide.\n\n## guard: read-only-session"), "utf8");
+
+  const fixturesPath = join(root, "fixtures", "scenarios.json");
+  const fixtures = await readJson(fixturesPath);
+  for (const fixture of fixtures) fixture.decided = { ...(fixture.decided ?? {}), "guard.target": "pass" };
+  const known = structuredClone(fixtures[0]);
+  known.id = "guard-known";
+  known.decided["guard.target"] = "block";
+  known.expect = { guard: "input-present", stage: null, status: "BLOCK", effects: [] };
+  known.cover = ["guard:input-present"];
+  const missing = structuredClone(fixtures[0]);
+  missing.id = "guard-missing";
+  delete missing.decided["guard.target"];
+  missing.expect = { guard: "input-present", stage: null, status: "BLOCK", effects: [] };
+  missing.cover = [];
+  fixtures.push(known, missing);
+  await writeJsonAtomic(fixturesPath, fixtures);
+
+  await buildP2(root, { repeats: 2 });
+  const simulated = await simulateSkill({ skillRoot: root, fixture: missing, runtimeDir: join(root, "scripts", "skill-rails") });
+  const live = await stageSkill({ skillRoot: root, projectRoot: base });
+  for (const decision of [simulated.decision, live.decision]) {
+    assert.equal(decision.status, "BLOCK");
+    assert.equal(decision.guard.id, "input-present");
+    assert.deepEqual(decision.needs.map(({ field }) => field), ["guard.target"]);
+    assert.deepEqual(decision.effects, []);
+  }
+
+  missing.cover.push("guard:input-present");
+  await writeJsonAtomic(fixturesPath, fixtures);
+  await assert.rejects(runFixtureSuite(root, { repeats: 1 }), /Fixture guard-missing claims coverage it did not execute: guard:input-present/);
 });
 
 test("P2 build fuzzes exact formats across structured values", async (t) => {

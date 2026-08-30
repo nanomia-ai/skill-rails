@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-08-30 KST
+최종 갱신: 2026-08-31 KST
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 완료 지점: v0.1.5 배포와 미배포 related-skill 저작 경계 교정
+## 0. 현재 완료 지점: v0.1.5 배포와 미배포 저작·P2 evidence 교정
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -16,13 +16,15 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 
 배포 뒤 Devflow 포팅 피드백을 제품 경계와 대조한 결과 구현 차단이나 P2 core 결함은 없었고, 여러 standalone skill이 repository 규약을 공유할 때 cold author가 소유 경계를 첫 저작 경로에서 찾기 어려운 안내 공백을 확인했다. Local `main`은 이 공백을 고친 한 commit만 `origin/main`보다 앞서며 아직 push·version·publish·release하지 않았다. 설치 진입점은 profile을 skill별로 고르고 shared domain input·helper를 재사용하되, P2 behavior와 judgment는 각각 `spec.mjs`와 `body.md`가 계속 배타 소유한다고 명시한다. `ARTIFACTS` path 선언은 존재·내용·freshness·evidence authority를 증명하지 않는다.
 
+이어 Devflow가 제기한 L14 guard 증거 문제를 최신 후보에서 재현해 현재 P2 제품 결함으로 확인했다. Live, simulate, scenario expectation, L5가 observation source를 서로 다르게 전처리해 missing input이 fixture에서만 predicate를 실행하고 coverage를 얻을 수 있었다. 미배포 후보는 한 observation preparation owner로 collector/`s`/`judged`/`decided`를 통합했고, raw `"UNKNOWN"`의 version-5 예약 의미와 evaluator event-only coverage를 보존하면서 이 false proof를 닫았다. Fable xhigh 설계 반증과 Sol xhigh 기술 검토, 구현 후 두 최종 read-only audit는 현재 수정이 새 grammar 없이 원인을 닫는 최소 일관 교정이라고 PASS했다.
+
 ## 1. 저장소 기준선
 
 - branch: `main`
 - Package version: 0.1.5. 설치 product bytes는 `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`이 소유한다.
-- Local `main`은 related-skill authoring correction 한 commit을 포함해 `origin/main`보다 ahead 1이다. 이 후보는 배포된 0.1.5 bytes가 아니다.
+- 이 snapshot을 포함한 local `main`은 related-skill authoring correction과 P2 observation evidence correction 두 commit을 포함해 `origin/main`보다 ahead 2다. 이 후보는 배포된 0.1.5 bytes가 아니다.
 - `v0.1.5` annotated tag와 GitHub Release는 이 global receipt를 포함한 evidence commit을 가리킨다.
-- P2 runtime 의미, schema, Decision byte, effect authority와 `SPEC.version = "5"` 호환 경계는 바뀌지 않았다.
+- P2 runtime/validator는 observation input parity bug fix로 `0.2.1`/`0.3.1`이 됐다. Schema, Decision 위치, effect authority, coverage token과 `SPEC.version = "5"` 호환 경계는 바뀌지 않았다.
 - 전역 canonical install은 `C:\Users\joinj\.agents\skills\skill-rails`이고 Claude Code junction도 이 경로를 가리킨다.
 
 ---
@@ -34,6 +36,8 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - G0.5 scorer와 lint의 봉인된 바이트 및 protocol fingerprint는 유지하고, repository-only re-export bridge로 이동한 canonical runtime에 연결한다.
 - Package scripts, tests, maintainer routing, 사람용 README source link와 제품 설계 문서가 새 소유 경계를 가리킨다.
 - 설치 package 안의 중첩 fixture skill과 repository-only 파일을 금지하는 회귀 검사를 추가했다.
+- P2 live/simulate/scenario/L5가 한 observation preparation owner를 사용하고, 누락값은 predicate·coverage 전에 `UNKNOWN`으로 막힌다.
+- `fixture.s`/`judged`/`decided` source lane, explicit presence, object-valued observation, version-5 raw `"UNKNOWN"` 예약어를 validator와 회귀 증거로 고정했다.
 
 ---
 
@@ -47,9 +51,10 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - GitHub-source global smoke: 1 skill discovered; installed 61 files; `SKILL.md` 1; forbidden repository-only file 0; path missing·extra 0; raw 42 differences는 모두 CRLF/LF이며 normalized difference 0; global self lint와 installed creator P1 generation·lint pass.
 - skills.sh current skill page: Gen Agent Trust Hub, Socket, Snyk 모두 Pass.
 - 구조·배치·creator 실행을 fresh agent의 장기 행동 증거로 승격하지 않는다.
-- 미배포 후보의 `npm run verify`: vendor check, self lint, repository test 64/64, frozen G0.5 eval pass.
+- 미배포 후보의 `npm run verify`: vendor check, self lint, repository test 67/67, frozen G0.5 eval pass.
 - Fresh Sonnet high는 관련 skill suite 반례에서 profile-local 선택과 P2 `spec.mjs`/`body.md` 배타 소유를 도출했다. 첫 authority 답변의 file-presence 과장을 public contract에서 교정했고, 별도 Fresh Sonnet high가 `ARTIFACTS` 선언은 path·writer·reader와 stage projection만 성립시키며 존재·내용·freshness는 `UNPROVEN`이라고 정확히 구분했다.
 - Fable xhigh의 근본 설계 반증과 Sol xhigh의 기술·호환 검토를 교차했다. Sol이 최초 문구의 P2 합성 모호성을 발견했고 Fable이 재검토 후 기존 PASS를 철회해 같은 결함을 확인했으며, runtime/schema/version-5를 넓히지 않는 문구·회귀 교정으로 닫았다.
+- P2 observation 교정의 targeted runtime·integration 39/39가 pass했다. Canonical pilot은 공식 repair-generated 경로에서 build ID `sha256:1a901e5e01b8680dcfc76140681a170aaf8a22750826bfc04c95ae0238b45736`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했다. Full verify 뒤 Fable/Sol 최종 audit도 MUST-fix 없이 PASS했다.
 
 ---
 
@@ -62,11 +67,12 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - Claude personal/project 동명판을 함께 유지하면서 project가 이기는 행동은 host precedence상 지원되지 않는다. 다른 host의 same-name precedence도 `UNPROVEN`이다.
 - 실제 Devflow 완료물에서 이 안내가 별도 seam audit 비용을 줄이는지, 여러 package의 shared source 변경이 장기간 국소적으로 유지되는지, 다른 model·host가 같은 최소 소비를 선택하는지
 - shared source에서 여러 P2 `spec.mjs`/`body.md`로 자동 projection하거나 freshness를 증명하는 workspace mechanism은 구현하지 않았고 `UNPROVEN`이다.
+- 저장소 밖 version-5 package가 문서화되지 않은 raw UNKNOWN 내부 표현이나 `fixture.s`의 잘못된 source lane에 의존하는 수량은 `UNPROVEN`이다. Exact raw 문자열 `"UNKNOWN"`을 known application data로 쓰는 것은 version 5에서 지원하지 않으며, 이를 바꾸려면 별도 versioned boundary가 필요하다.
 
 ---
 
 ## 5. 정확한 다음 단계
 
-1. 현재 related-skill correction은 commit 상태로만 보존하고 Devflow 포팅이 끝날 때까지 push·version·publish·release하지 않는다.
-2. Devflow 최종 결과에서 새 core 결함이나 migration 요구가 없는지 확인한 뒤, 현재 후보의 공식 설치 receipt와 version/release 여부를 별도 결정한다.
+1. 현재 related-skill과 P2 observation correction은 두 local commit으로만 보존하고 Devflow 포팅이 끝날 때까지 push·version·publish·release하지 않는다.
+2. Devflow 최종 결과에서 새 core 결함이나 migration 요구가 없는지 확인한 뒤, 현재 후보의 공식 설치 receipt와 version/release 여부를 별도 결정한다. 올바른 version-5 package는 새 runtime으로 rebuild하면 되고 spec/fixture migration은 필요 없다.
 3. 새 결함이나 product boundary 변경 없이 비용이 큰 네 모델 suite를 반복하지 않는다. Test worktree 정리는 별도 작업으로 취급하고 dirty bytes와 active writer가 없음을 정확한 대상마다 확인한 뒤 수행한다.

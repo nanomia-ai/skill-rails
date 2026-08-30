@@ -402,6 +402,18 @@ P2에서는 shared file이나 helper가 소비되는 domain input 또는 impleme
 
 여전히 `UNPROVEN`인 것은 실제 여러 package에서 shared rulebook 변경이 장기간 국소적으로 유지되는지, 다른 모델·host도 같은 최소 소비를 선택하는지, section-only 소비가 실제 토큰을 절약하는지, Devflow가 이 안내만으로 별도 seam audit를 줄이는지다. 두 독립 프로젝트에서 반복 fan-out drift가 관찰되기 전에는 workspace compiler나 provenance grammar를 core에 추가하지 않는다.
 
+### 6.14 L14 관찰 정규화와 guard coverage 신뢰 교정
+
+Devflow가 보고한 “값을 읽지 못한 guard가 테스트된 것으로 보일 수 있다”는 문제를 최신 후보 byte에서 독립 재현했다. Live `stage`는 collector와 `judged`/`decided` 값을 `UNKNOWN`으로 정규화해 predicate 전에 막았지만, `simulate`는 fixture `s`만 정규화한 뒤 `judged`/`decided`를 raw overlay했고 scenario expectation과 L5 exclusive-table 검사는 세 lane을 raw object spread로 합쳤다. 따라서 같은 fixture가 live에서는 predicate 미실행 `BLOCK`인데 simulate/scenario에서는 raw 문자열을 읽어 `guard_matched`를 만들 수 있었다. Build가 실제 evaluator event만 coverage로 인정하는 원칙은 옳았고, 그 event를 만드는 입력 의미가 source lane마다 달랐던 것이 제품 결함이었다.
+
+교정은 새 grammar나 scorer를 추가하지 않고 `observations.mjs` 하나가 presence, snapshot binding, source lane, version-5 `UNKNOWN`, domain, flat/nested state, unknown receipt를 소유하게 했다. Collector는 raw 관찰 adapter, API와 scenario/L5는 같은 preparation owner의 소비자가 됐다. `null`처럼 존재하지만 domain 밖인 값은 누락으로 바뀌지 않고 fail-closed하며, object-valued observation은 중첩 fixture에서도 하나의 값으로 유지된다. `fixture.s`가 `judged`/`decided` source를 대신할 수 없고, L5도 evaluator의 `checkReads`를 통과한 row만 predicate로 평가한다. Runtime은 `0.2.1`, validator는 `0.3.1`로 patch 상승했지만 Decision schema, 14 exports, `SPEC.version = "5"`, effect authority와 coverage token은 그대로다.
+
+Fable xhigh는 장기적으로 raw 문자열과 meta-state를 완전히 분리하는 out-of-band fixture 표현이 더 자연스럽다고 반증했고, Sol xhigh는 이를 version 5에 즉시 넣거나 path/text의 `"UNKNOWN"`을 known data로 바꾸면 기존 fail-closed 실행이 effect-capable로 뒤집힐 수 있다고 지적했다. 중재안은 version-5에서 exact raw `"UNKNOWN"`을 모든 top-level observation domain의 예약 compatibility sentinel로 명문화하고, 새 collector는 branded `UNKNOWN`/`unknown()`을 쓰게 하는 것이다. Domain별로 같은 byte의 의미가 바뀌는 규칙과 새 fixture 문법은 채택하지 않았다. Exact raw 문자열 `"UNKNOWN"`을 known application data로 지원하는 일은 현재 결함 수정이 아니라 별도 versioned product boundary다.
+
+Targeted runtime·integration은 39/39 pass했다. 새 회귀는 `s`/`judged`/`decided`의 missing·raw/tagged UNKNOWN, object observation, `null` presence, wrong-lane fixture를 확인하고, live와 simulate가 같은 missing guard를 effects 없는 `BLOCK + needs`로 계산하는지 검증한다. Known positive fixture만 `guard_matched` credit을 얻고 missing fixture의 false coverage claim은 build suite가 거부한다. Canonical pilot은 generated file을 손으로 고치지 않고 공식 `--repair-generated --repeats 50` 경로로 rebuild했으며 build ID `sha256:1a901e5e01b8680dcfc76140681a170aaf8a22750826bfc04c95ae0238b45736`, L0–L18 pass, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했다. 이어 현재 후보 전체에서 `npm run verify`를 한 번 실행해 vendor check, self lint, repository test 67/67, frozen G0.5 clean control과 seeded defect 5/5, required run 8/8, empirical gate를 모두 통과했다.
+
+현재 `UNPROVEN`은 저장소 밖 version-5 package가 문서화되지 않은 raw sentinel 내부 표현이나 잘못된 fixture source lane에 의존하는 수량이다. 올바른 version-5 package는 rebuild만으로 patch runtime을 받으며 spec/fixture migration이 필요 없다. Literal `"UNKNOWN"` data 지원, out-of-band unknown fixture grammar, Decision schema 변경은 이 수정에 포함하지 않는다.
+
 ---
 
 
@@ -475,6 +487,7 @@ Version-5 기준선의 18개 공개 위치는 현재 typed Decision에서 다음
 | alignment가 same `decision_id`로 scope하지만 supplied document와 emission의 exact equality를 검사하지 않음 | `alignDecision`이 supplied self-seal과 runtime-observed emission structural equality를 expectation보다 먼저 검사 | exact-Decision이라는 기존 evidence 의미를 실제 admission invariant로 복구하고 다섯 변조 field의 API/CLI regression과 record exact-match regression으로 rollback을 막음 |
 | judgment-only `NEXT` skip이 다음 stage에 prior row·plan state를 남길 수 있음 | row·plan·pending needs를 stage iteration-local로 만들고 선택된 bundle만 loop 밖으로 승격 | 선언 stage 순서와 ordered-effect 의미를 보존하며 stage·row·effects·record/body·proof·reinvoke·`stage_artifacts` full-coherence regression으로 확인 |
 | L14가 요구하는 skipped judgment branch를 final Decision만으로는 build evidence에 투영할 수 없음 | evaluator-observed internal execution event를 build fixture coverage token으로 투영 | L14를 약화하지 않고 `skip:["NEXT"]`와 다음 stage를 함께 증명하며, predicate replay·fact inference·Decision field 추가를 피함; valid/missing/false-claim/purity regression으로 rollback을 막음 |
+| live collection, simulate, scenario expectation, L5가 observation source를 서로 다르게 정규화 | 한 `observations.mjs` preparation owner가 collector/`s`/`judged`/`decided`의 presence·binding·reserved UNKNOWN·domain·flat/nested/unknown receipt를 계산 | 누락값이 predicate를 실행하거나 coverage를 얻는 false proof를 제거하고 version-5 raw sentinel 호환을 보존함; source-lane·live/simulate parity·known/false coverage regression으로 rollback을 막음 |
 | exact format 예시가 `Decision.format.example`에만 있고 실행 effect와 떨어져 있음 | format을 소유한 effect에 같은 정본 값의 `format_example`을 투영 | spec·fixture를 두 번째 정본으로 복제하지 않고 실제 WRITE 소비 위치에서 정확한 형식을 찾게 함; targeted runtime, canonical build와 installed fresh Luna receipt로 제한 검증 |
 
 ### 7.3 의도적으로 제외한 capability
