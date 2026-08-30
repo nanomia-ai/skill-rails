@@ -8,7 +8,7 @@
 
 ---
 
-## 0. 현재 완료 지점: v0.1.6 공식 배포 경계
+## 0. 현재 완료 지점: v0.1.6 공식 배포와 설치 evidence
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -23,9 +23,9 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - branch: `main`
 - Package version: 0.1.6. 이 경계는 related-skill authoring correction `90afd43`, P2 observation evidence correction `f269f29`, version boundary `5e2c300`을 포함한다.
 - 현재 공식 배포는 `v0.1.6` annotated tag와 GitHub Release가 이 snapshot을 포함한 release commit을 가리키는 형태다.
-- `v0.1.5`의 설치 product bytes와 global receipt는 역사적 증거로 유지한다. `v0.1.6` 공식 설치 receipt는 아직 없으며 배포 성공으로 설치 성공을 대신 주장하지 않는다.
+- `v0.1.5`의 설치 product bytes와 global receipt는 역사적 증거로 유지한다. `v0.1.6`은 공식 GitHub source를 사용한 global 설치와 설치본 실행 evidence까지 별도로 확보했다.
 - P2 runtime/validator는 observation input parity bug fix로 `0.2.1`/`0.3.1`이 됐다. Schema, Decision 위치, effect authority, coverage token과 `SPEC.version = "5"` 호환 경계는 바뀌지 않았다.
-- 기존 전역 canonical install은 `C:\Users\joinj\.agents\skills\skill-rails`이고 Claude Code junction도 이 경로를 가리킨다. 사용자가 별도로 설치하기 전에는 이를 `v0.1.6` 설치본이라고 주장하지 않는다.
+- 전역 canonical `v0.1.6` install은 `C:\Users\joinj\.agents\skills\skill-rails`이고 Claude Code junction도 이 경로를 가리킨다. Codex와 Gemini CLI는 같은 universal package를 사용한다.
 
 ---
 
@@ -55,6 +55,8 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - Fresh Sonnet high는 관련 skill suite 반례에서 profile-local 선택과 P2 `spec.mjs`/`body.md` 배타 소유를 도출했다. 첫 authority 답변의 file-presence 과장을 public contract에서 교정했고, 별도 Fresh Sonnet high가 `ARTIFACTS` 선언은 path·writer·reader와 stage projection만 성립시키며 존재·내용·freshness는 `UNPROVEN`이라고 정확히 구분했다.
 - Fable xhigh의 근본 설계 반증과 Sol xhigh의 기술·호환 검토를 교차했다. Sol이 최초 문구의 P2 합성 모호성을 발견했고 Fable이 재검토 후 기존 PASS를 철회해 같은 결함을 확인했으며, runtime/schema/version-5를 넓히지 않는 문구·회귀 교정으로 닫았다.
 - P2 observation 교정의 targeted runtime·integration 39/39가 pass했다. Canonical pilot은 공식 repair-generated 경로에서 build ID `sha256:1a901e5e01b8680dcfc76140681a170aaf8a22750826bfc04c95ae0238b45736`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했다. Full verify 뒤 Fable/Sol 최종 audit도 MUST-fix 없이 PASS했다.
+- Release 뒤 `skills` 1.5.23으로 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`를 실행했다. Installer는 skill 하나만 발견했고 release package와 설치본은 모두 62 files, `SKILL.md` 1개였다. Path와 CRLF를 제외한 content 차이는 0, installed self lint와 임시 P0 생성·full lint는 pass했고 임시 산출물은 제거했다.
+- Installer security summary는 Gen Safe, Socket 1 alert, Snyk Low Risk를 표시했다. 이는 외부 scanner signal이며 설치·실행 실패가 아니지만, 현재 alert의 상세 원인과 최신 재평가 상태는 이번 제품 receipt로 해소하거나 Pass로 승격하지 않는다.
 
 ---
 
@@ -73,6 +75,6 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 
 ## 5. 정확한 다음 단계
 
-1. Package `0.1.6`과 두 교정을 `main`, annotated `v0.1.6` tag, GitHub Release에 같은 release commit으로 배포한다.
-2. 사용자가 설치를 지시하면 공식 설치 명령으로 `v0.1.6` source를 설치하고 package fingerprint·creator 실행을 별도 receipt로 남긴다. 올바른 version-5 package는 새 runtime으로 rebuild하면 되고 spec/fixture migration은 필요 없다.
+1. 진행 중인 Devflow 작업은 현재 coherent edit를 중단하거나 과거 결과를 재해석하지 않는다. 다음 자연스러운 Skill Rails 사용 경계에서 installed `v0.1.6`을 다시 로드하고 이후 저작·유지보수에 새 guidance를 적용한다.
+2. Devflow 완료 경계에서 P2 package만 새 runtime으로 정상 rebuild하고 guard fixture가 correct source lane과 evaluator-observed coverage를 사용하는지 확인한다. 올바른 version-5 package는 spec/fixture migration이 필요 없고, 진단 없이 `--repair-generated`를 사용하지 않는다.
 3. 새 결함이나 product boundary 변경 없이 비용이 큰 네 모델 suite를 반복하지 않는다. Test worktree 정리는 별도 작업으로 취급하고 dirty bytes와 active writer가 없음을 정확한 대상마다 확인한 뒤 수행한다.

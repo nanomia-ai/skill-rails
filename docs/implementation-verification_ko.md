@@ -61,7 +61,9 @@ Package source version `0.1.6`은 related-skill authoring correction `90afd43`�
 
 유사 결함 범위는 collector·`fixture.s`·`judged`·`decided`의 네 입력 lane, live/simulate/scenario expectation/L5의 네 소비 경로, missing/explicit `null`/object/wrong-lane/reserved sentinel과 guard coverage credit까지 훑었다. Targeted runtime·integration 39/39, frozen G0.5 2/2, repository test 67/67과 full `npm run verify`가 통과했고 canonical pilot은 build ID `sha256:1a901e5e01b8680dcfc76140681a170aaf8a22750826bfc04c95ae0238b45736`, L0-L18, mutation 20/20, scenario 10/10·50회 불일치 0, format round trip 256/256을 기록했다. Fable xhigh와 Sol xhigh의 독립 설계·기술 검토 및 구현 후 최종 audit도 MUST-fix 없이 PASS했다.
 
-이 patch는 새 grammar, Decision/Trace schema, effect authority, coverage token 또는 `SPEC.version = "5"` 의미를 바꾸지 않는다. 저장소 밖 version-5 package가 문서화되지 않은 raw UNKNOWN 내부 표현이나 잘못된 fixture source lane에 의존하는지는 `UNPROVEN`이며, exact raw `"UNKNOWN"`을 known application data로 지원하는 일은 별도 versioned product boundary다. 이 문서를 포함한 release commit을 `main`, annotated `v0.1.6` tag와 GitHub Release의 동일 경계로 배포한다. 공식 설치와 installed-package fingerprint는 별도 소비 환경 변경이며 아직 새 evidence로 주장하지 않는다.
+이 patch는 새 grammar, Decision/Trace schema, effect authority, coverage token 또는 `SPEC.version = "5"` 의미를 바꾸지 않는다. 저장소 밖 version-5 package가 문서화되지 않은 raw UNKNOWN 내부 표현이나 잘못된 fixture source lane에 의존하는지는 `UNPROVEN`이며, exact raw `"UNKNOWN"`을 known application data로 지원하는 일은 별도 versioned product boundary다. 이 문서를 포함한 release commit을 `main`, annotated `v0.1.6` tag와 GitHub Release의 동일 경계로 배포했다.
+
+Release 뒤 `skills` 1.5.23의 공식 GitHub-source 명령 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`를 실행했다. Installer는 discoverable skill 하나를 설치했고 source와 canonical global package는 각각 62 files, `SKILL.md` 1개였다. Directory diff는 path 차이 0, CRLF를 제외한 content 차이 0이었고 installed package self lint와 설치본 creator의 임시 P0 생성·full lint가 pass했다. Canonical package는 Codex·Gemini CLI가 공유하고 Claude Code junction이 같은 경로를 가리킨다. Installer security summary의 Socket 1 alert는 외부 scanner 상태로 별도 보존하며, 기능 evidence로 이를 무시하거나 상세 원인 확인 없이 제품 finding으로 확대하지 않는다.
 
 ## 1. 현재 결정적 검증
 
