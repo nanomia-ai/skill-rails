@@ -8,16 +8,19 @@
 
 ---
 
-## 0. 현재 완료 지점: v0.1.5 공식 Agent Skills 설치 경계 배포
+## 0. 현재 완료 지점: v0.1.5 배포와 미배포 related-skill 저작 경계 교정
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
 제품 commit `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`은 `npm run verify`의 vendor check, self lint, repository test 62/62와 frozen G0.5 eval을 통과했다. Local source와 GitHub source 설치가 각각 skill 하나만 발견했고, 설치본은 61 files, `SKILL.md` 1개, repository-only file 0개였다. Local install은 source 대비 missing/extra/raw difference 0, global install은 path missing/extra 0과 newline-normalized content difference 0이었으며 둘 다 설치본 P1 생성과 lint를 통과했다.
 
+배포 뒤 Devflow 포팅 피드백을 제품 경계와 대조한 결과 구현 차단이나 P2 core 결함은 없었고, 여러 standalone skill이 repository 규약을 공유할 때 cold author가 소유 경계를 첫 저작 경로에서 찾기 어려운 안내 공백을 확인했다. Local `main`은 이 공백을 고친 한 commit만 `origin/main`보다 앞서며 아직 push·version·publish·release하지 않았다. 설치 진입점은 profile을 skill별로 고르고 shared domain input·helper를 재사용하되, P2 behavior와 judgment는 각각 `spec.mjs`와 `body.md`가 계속 배타 소유한다고 명시한다. `ARTIFACTS` path 선언은 존재·내용·freshness·evidence authority를 증명하지 않는다.
+
 ## 1. 저장소 기준선
 
 - branch: `main`
 - Package version: 0.1.5. 설치 product bytes는 `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`이 소유한다.
+- Local `main`은 related-skill authoring correction 한 commit을 포함해 `origin/main`보다 ahead 1이다. 이 후보는 배포된 0.1.5 bytes가 아니다.
 - `v0.1.5` annotated tag와 GitHub Release는 이 global receipt를 포함한 evidence commit을 가리킨다.
 - P2 runtime 의미, schema, Decision byte, effect authority와 `SPEC.version = "5"` 호환 경계는 바뀌지 않았다.
 - 전역 canonical install은 `C:\Users\joinj\.agents\skills\skill-rails`이고 Claude Code junction도 이 경로를 가리킨다.
@@ -44,6 +47,9 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - GitHub-source global smoke: 1 skill discovered; installed 61 files; `SKILL.md` 1; forbidden repository-only file 0; path missing·extra 0; raw 42 differences는 모두 CRLF/LF이며 normalized difference 0; global self lint와 installed creator P1 generation·lint pass.
 - skills.sh current skill page: Gen Agent Trust Hub, Socket, Snyk 모두 Pass.
 - 구조·배치·creator 실행을 fresh agent의 장기 행동 증거로 승격하지 않는다.
+- 미배포 후보의 `npm run verify`: vendor check, self lint, repository test 64/64, frozen G0.5 eval pass.
+- Fresh Sonnet high는 관련 skill suite 반례에서 profile-local 선택과 P2 `spec.mjs`/`body.md` 배타 소유를 도출했다. 첫 authority 답변의 file-presence 과장을 public contract에서 교정했고, 별도 Fresh Sonnet high가 `ARTIFACTS` 선언은 path·writer·reader와 stage projection만 성립시키며 존재·내용·freshness는 `UNPROVEN`이라고 정확히 구분했다.
+- Fable xhigh의 근본 설계 반증과 Sol xhigh의 기술·호환 검토를 교차했다. Sol이 최초 문구의 P2 합성 모호성을 발견했고 Fable이 재검토 후 기존 PASS를 철회해 같은 결함을 확인했으며, runtime/schema/version-5를 넓히지 않는 문구·회귀 교정으로 닫았다.
 
 ---
 
@@ -54,11 +60,13 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - 여러 모델·host에서의 통계적 trigger precision과 대형 Devflow 계열 부하
 - Linux/macOS POSIX symlink 분기와 capture 뒤 out-of-band writer의 package 보존
 - Claude personal/project 동명판을 함께 유지하면서 project가 이기는 행동은 host precedence상 지원되지 않는다. 다른 host의 same-name precedence도 `UNPROVEN`이다.
+- 실제 Devflow 완료물에서 이 안내가 별도 seam audit 비용을 줄이는지, 여러 package의 shared source 변경이 장기간 국소적으로 유지되는지, 다른 model·host가 같은 최소 소비를 선택하는지
+- shared source에서 여러 P2 `spec.mjs`/`body.md`로 자동 projection하거나 freshness를 증명하는 workspace mechanism은 구현하지 않았고 `UNPROVEN`이다.
 
 ---
 
 ## 5. 정확한 다음 단계
 
-1. v0.1.5 distribution release에 남은 작업은 없다.
-2. 이후에는 새 결함이나 product boundary 변경 없이 비용이 큰 네 모델 suite를 반복하지 않는다.
-3. Test worktree 정리는 별도 작업으로 취급하고 dirty bytes와 active writer가 없음을 정확한 대상마다 확인한 뒤 수행한다.
+1. 현재 related-skill correction은 commit 상태로만 보존하고 Devflow 포팅이 끝날 때까지 push·version·publish·release하지 않는다.
+2. Devflow 최종 결과에서 새 core 결함이나 migration 요구가 없는지 확인한 뒤, 현재 후보의 공식 설치 receipt와 version/release 여부를 별도 결정한다.
+3. 새 결함이나 product boundary 변경 없이 비용이 큰 네 모델 suite를 반복하지 않는다. Test worktree 정리는 별도 작업으로 취급하고 dirty bytes와 active writer가 없음을 정확한 대상마다 확인한 뒤 수행한다.

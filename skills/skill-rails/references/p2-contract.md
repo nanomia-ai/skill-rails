@@ -32,7 +32,7 @@ All predicates declare `reads`. The validator derives state reads from the AST a
 
 UNKNOWN is not false. Only fields listed in `acceptsUnknown` may receive it inside a predicate. `judged` and `decided` values are bound to a snapshot. A guard bypass must use collector-observed durable evidence, never a model-supplied judgment or decision alone.
 
-`ARTIFACTS` owns static project-relative consumer paths. Its `writer` is the skill id, a declared role, or a named `external.*`/`project.*` actor; its `readers` may name stages, guards, roles, or external/project consumers. The current Decision projects entries read by its selected stage or stopping guard as `stage_artifacts`. Non-file observations do not declare null or placeholder artifacts.
+`ARTIFACTS` owns static project-relative consumer path declarations. Its `writer` is the skill id, a declared role, or a named `external.*`/`project.*` actor; its `readers` may name stages, guards, roles, or external/project consumers. The current Decision projects entries read by its selected stage or stopping guard as `stage_artifacts`. A declaration proves neither that the path currently exists nor that its contents are valid or fresh; collect and verify those facts separately when the behavior requires them. Non-file observations do not declare null or placeholder artifacts.
 
 ## Evaluation rules
 

@@ -386,6 +386,22 @@ Authoring workflow에는 이미 구현된 P2 `maintain --diagnose --query`와 `u
 
 Generated-loader targeted regression 1/1이 pass했고 canonical pilot은 generated file을 직접 편집하지 않고 repair-generated rebuild로 갱신했다. 결과는 L0–L18, mutation 20/20, scenario 10/10, 50회 반복 불일치 0, format 256/256, build ID `sha256:71fe532518672eff1cc0fd1e8c2992544ca91f679f06152c08f421f91493f4c1`이다. 이어 현재 후보 bytes에서 한 번 실행한 full `npm run verify`는 vendor pass, root lint pass, repository test 60/60 pass, eval clean control valid, fixture probe 10 total / 3 divergences, seeded defects 5/5 검출, required run 8/8 충족, empirical gate pass였다. Runtime, schema, Decision byte, spec behavior source는 바뀌지 않았다. Fresh agent가 이 수정된 generic guidance만으로 proof를 기록하는 행동은 아직 `UNPROVEN`이다.
 
+### 6.13 관련 skill suite의 공유 규칙 소유 경계
+
+Devflow의 실제 포팅 피드백은 구현 차단이나 P2 core 결함이 아니라 첫 저작 진입점의 범위 설명 공백으로 분류했다. Maintainer 설계에는 이미 한 번에 standalone skill 하나를 만든다는 경계가 있었지만 설치된 `SKILL.md`와 저작 workflow만 읽는 cold author는 여러 skill이 한 규약집을 공유할 때 프로필, 기계 규칙, 판단 문서의 소유자를 바로 찾기 어려웠다. 활성 Devflow worktree나 그 결과물은 이 판단과 변경을 위해 열거나 수정하지 않았다.
+
+변경은 한 target skill마다 프로필을 독립 선택한다는 경계와 관련 skill suite의 공유 domain material을 연결하는 방식을 설치 경로에 추가한다. 반복 가능한 공통 domain operation은 repository-owned helper·validator·harness에 둘 수 있고, 공통 domain 지식과 판단 문서는 안정적인 path·heading을 가진 한 정본으로 유지한다. 각 skill은 cold consumer가 반드시 알아야 하는 보편 경계·중지 조건·최소 해석만 mandatory path에 포함하고 나머지는 필요한 때와 이유가 명확한 durable dependency로 연결한다. P0/P1은 기존 `external_dependencies`를 사용하며, generated skill이 다른 skill을 호출하거나 전체 규약집을 기본 로드하게 하지 않는다.
+
+P2에서는 shared file이나 helper가 소비되는 domain input 또는 implementation일 뿐 두 번째 behavior source가 아니다. Observable condition, guard, stage, table, exact format, ordered effect, ownership, completion evidence는 계속 `spec.mjs`가 배타 소유하고, judgment criteria와 그 적용 framing은 `body.md`가 소유한다. 외부 project input/context path는 기존 `ARTIFACTS`의 `project.*`/`external.*` writer와 stage·guard `readers`를 통해 Decision `stage_artifacts`에 선언이 투영될 수 있지만, 이 선언은 path 존재·file contents·freshness·behavior·judgment·evidence authority를 검증하거나 부여하지 않는다. 공유 source에서 여러 P2 package 정본으로 자동 투영하는 기능은 구현되지 않았고 `UNPROVEN`이다.
+
+이는 workspace policy engine, cross-package runtime, 자동 fan-out, shared-source compiler를 추가하지 않는다. Generator, runtime, schema, Decision byte, effect authority, `SPEC.version = "5"`와 P2 self-contained package 경계는 모두 그대로다. 최초 Fable xhigh 설계 반증과 Sol xhigh 기술 검토는 안내-only 최소 변경에 합의했지만, commit 후 교차 재검토에서 Sol이 profile-generic shared-owner 문구와 P2 배타 소유 계약 사이의 합성 모호성을 MUST로 발견했다. Fable은 현재 P2 contract와 validator/evaluator를 다시 대조한 뒤 기존 PASS를 철회하고 이 반증을 좁은 P2 문구 결함으로 확인했다. 최종안은 shared asset의 재사용 이점은 보존하되 P2 정본과 evidence authority를 명시적으로 돌려놓는 것으로 중재했다.
+
+최초 Fresh Claude Sonnet high는 당시 설치 `SKILL.md`와 그 문서가 명시적으로 연결한 `authoring-workflow.md`만 읽고 낯선 세-skill compliance 반례를 풀어 profile-local 선택, repository helper, 필수 경계의 mandatory 배치, 큰 판단의 조건부 소비, cross-skill runtime 금지를 도출했다. 그러나 이 probe는 P2 내부에서 exact behavior와 judgment의 최종 소유자를 충분히 분해해 관찰하지 않았고, 그 뒤 합성 문구가 교정됐으므로 현재 bytes의 fresh-author 행동 증거로 승격하지 않는다. 교정 뒤 새 Fresh Sonnet high는 `spec.mjs`와 `body.md`의 배타 소유, shared file/helper의 input·implementation 한정, cross-skill runtime 금지를 올바르게 도출했지만 `ARTIFACTS` path 선언을 file 존재 증거로 한 단계 과장했다. 따라서 P2 소유 합성 행동은 PASS, artifact presence authority 해석은 FAIL로 분리했고 현재 문구에 존재·내용·freshness 비증명 경계를 추가했다. 마지막 교정 뒤 또 다른 Fresh Sonnet high가 `SKILL.md`와 routed `p2-contract.md`만 읽고, 선언이 project-relative path·writer·reader와 active stage 투영만 성립시키며 path 존재·실제 write·내용 유효성·freshness·stage verification은 별도 observation·digest·verifier·trace 없이는 모두 `UNPROVEN`이라고 답해 이 좁은 authority 해석은 PASS다.
+
+새 회귀 검사는 설치 경로가 이 경계를 계속 노출하는지와 실제 P0 생성물이 `docs/compliance.md#incident-identifiers` 같은 정밀한 shared dependency를 cold-user path에 투영하는지를 확인한다. 최초 새 assertion의 heading 대소문자 불일치는 generator 결함이 아니라 test expectation 오류로 분류해 expectation만 실제 `External Dependencies`에 맞췄다. 현재 후보에서 `npm run verify`는 vendor check, self lint, repository test 64/64, frozen G0.5 clean control, fixture probe 10 total / 3 divergences, seeded defects 5/5, required run 8/8, empirical gate를 모두 통과했다.
+
+여전히 `UNPROVEN`인 것은 실제 여러 package에서 shared rulebook 변경이 장기간 국소적으로 유지되는지, 다른 모델·host도 같은 최소 소비를 선택하는지, section-only 소비가 실제 토큰을 절약하는지, Devflow가 이 안내만으로 별도 seam audit를 줄이는지다. 두 독립 프로젝트에서 반복 fan-out drift가 관찰되기 전에는 workspace compiler나 provenance grammar를 core에 추가하지 않는다.
+
 ---
 
 

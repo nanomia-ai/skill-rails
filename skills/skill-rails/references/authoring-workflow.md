@@ -4,6 +4,7 @@
 
 - Intent brief
 - Authoring judgment
+- Related skill suites
 - Fresh-consumer closure
 - Profile selection
 - Creation order
@@ -36,6 +37,18 @@ These cases preserve causal patterns observed while building and maintaining com
 Before changing the product to satisfy a failed check, identify which premise broke — product, fixture, harness, or environment — and repair the owning premise rather than making the product fit an invalid check. After the design has logically converged, verify it with a high-information representative flow that exercises the coupled risks, then with a fresh agent using only the declared consumption set. Record what each check actually observed, and mark every remaining uncertainty `unproven`.
 
 Generated guidance may carry a short recovery guard, but scope it to choices the target skill leaves to judgment. It must not authorize bypassing exact formats, mechanical rules, the current P2 Decision, evidence requirements, irreversible boundaries, or host permissions; detailed authoring history does not belong in every generated skill.
+
+## Related skill suites
+
+Skill Rails creates and maintains one standalone target skill at a time; choose P0, P1, or P2 for that skill, not for its plugin or repository. When several skills depend on the same domain material, preserve one repository-owned source rather than copying it into every package or making one generated skill invoke another. Each target skill's profile contract still owns how that skill behaves.
+
+Put repeatable shared domain operations in one repository helper, validator, or harness and name that dependency and the check that observes it from each affected skill. Keep shared domain knowledge and judgment in one canonical document with a stable project-relative path and heading. Embed only the universal boundaries, stop conditions, and minimum interpretation that a cold user of the target skill needs on its declared consumption path; for the rest, state when and why the precise shared section is needed instead of loading the whole rulebook by default.
+
+For P2, a shared file or helper is consumed domain input or implementation, not a second behavior source. The target skill's observable conditions, guards, stages, tables, exact formats, ordered effects, ownership, and completion evidence stay in `spec.mjs`; its judgment criteria and their framing stay in `body.md`. Naming a shared dependency grants it no behavior, judgment, freshness, or evidence authority.
+
+For P0/P1, record that durable path and heading in `external_dependencies` so the generated guidance exposes the dependency. For P2, declare an external project input or context path once in `ARTIFACTS`, use a `project.*` or `external.*` writer, and name only the stages or guards that consume it as `readers`; the current Decision then supplies that declaration through `stage_artifacts`. `ARTIFACTS` selects a file path, not a heading, and proves neither that the file exists nor that its contents are valid or fresh. Keep the selected file small enough for its consumer, and project approved behavior or judgment into `spec.mjs` or `body.md` at its canonical owner.
+
+This is an authoring boundary, not a workspace policy engine: Skill Rails does not validate an entire suite, propagate a shared edit across packages, or prove that an external dependency is current. Until repository-owned checks or fresh-consumer evidence observe those effects, report them as `unproven` rather than widening the core grammar.
 
 ## Fresh-consumer closure
 

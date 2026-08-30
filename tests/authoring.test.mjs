@@ -84,6 +84,41 @@ test("P2 authoring aid requires consumer consumption-set disclosure", async () =
   assert.match(workflow, /neither counts as consumer disclosure/);
 });
 
+test("related-skill guidance keeps profiles local and P2 behavior at its canonical owners", async () => {
+  const [entry, workflow, contract] = await Promise.all([
+    readFile(join(SKILL_ROOT, "SKILL.md"), "utf8"),
+    readFile(join(SKILL_ROOT, "references", "authoring-workflow.md"), "utf8"),
+    readFile(join(SKILL_ROOT, "references", "p2-contract.md"), "utf8")
+  ]);
+  assert.match(entry, /one target skill at a time/);
+  assert.match(entry, /never for an entire plugin or repository/);
+  assert.match(entry, /each target package keeps behavior and judgment at its profile's canonical owners/);
+  assert.match(entry, /never make one generated skill invoke another/);
+  assert.match(workflow, /For P0\/P1, record that durable path and heading in `external_dependencies`/);
+  assert.match(workflow, /For P2, a shared file or helper is consumed domain input or implementation, not a second behavior source/);
+  assert.match(workflow, /observable conditions, guards, stages, tables, exact formats, ordered effects, ownership, and completion evidence stay in `spec\.mjs`/);
+  assert.match(workflow, /judgment criteria and their framing stay in `body\.md`/);
+  assert.match(workflow, /Naming a shared dependency grants it no behavior, judgment, freshness, or evidence authority/);
+  assert.match(workflow, /proves neither that the file exists nor that its contents are valid or fresh/);
+  assert.match(contract, /`spec\.mjs` exclusively owns observable conditions, guards, stage order, decision tables, effect order, exact formats, ownership, and completion evidence/);
+  assert.match(contract, /`body\.md` owns judgment criteria and reasons/);
+  assert.match(contract, /A declaration proves neither that the path currently exists nor that its contents are valid or fresh/);
+  assert.match(workflow, /does not validate an entire suite, propagate a shared edit across packages/);
+  assert.match(workflow, /report them as `unproven` rather than widening the core grammar/);
+});
+
+test("simple profiles expose a precise shared dependency on the cold-user path", async (t) => {
+  const base = await makeTestDir("shared-dependency-guidance");
+  t.after(() => removeTestDir(base));
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p0.json"));
+  intent.external_dependencies = ["When reviewing incident data, read docs/compliance.md#incident-identifiers because the repository owns the current identifier contract."];
+  const output = join(base, "skill");
+  await generatePackage({ intent, output, requestedProfile: "p0" });
+  const generated = await readFile(join(output, "SKILL.md"), "utf8");
+  assert.match(generated, /## External Dependencies\n\n- When reviewing incident data, read docs\/compliance\.md#incident-identifiers because the repository owns the current identifier contract\./);
+  assert.match(generated, /Respect every boundary, state-dependent rule, exact format, and external dependency shown above/);
+});
+
 test("portable creator commands use only package-local runtime dependencies", async (t) => {
   const base = await makeTestDir("thin-dependency-boundary");
   t.after(() => removeTestDir(base));
