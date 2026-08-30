@@ -6,9 +6,9 @@ import { hashFile, sha256 } from "./hash.mjs";
 
 const execFileAsync = promisify(execFile);
 
-export async function captureSnapshot(projectRoot, snapshotBasis = null) {
+export async function captureSnapshot(projectRoot, snapshotBasis = null, context = null) {
   const root = resolve(projectRoot);
-  const material = snapshotBasis ? await snapshotBasis({ projectRoot: root }) : await defaultBasis(root);
+  const material = snapshotBasis ? await snapshotBasis(context ? { ...context, projectRoot: root } : { projectRoot: root }) : await defaultBasis(root);
   return {
     fingerprint: sha256(material),
     material,

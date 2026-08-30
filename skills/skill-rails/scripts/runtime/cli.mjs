@@ -22,7 +22,7 @@ export async function main(argv = process.argv.slice(2), io = console) {
         return 0;
       }
       case "stage": {
-        const value = await stageSkill({ skillRoot, projectRoot: resolve(parsed.project ?? process.cwd()), judged: pairs(parsed.judged), decided: pairs(parsed.decided), runtimeDir, language: parsed.lang ?? "en", traceDir: parsed["trace-dir"], runId: parsed["run-id"] });
+        const value = await stageSkill({ skillRoot, projectRoot: resolve(parsed.project ?? process.cwd()), targetPath: parsed.target, judged: pairs(parsed.judged), decided: pairs(parsed.decided), runtimeDir, language: parsed.lang ?? "en", traceDir: parsed["trace-dir"], runId: parsed["run-id"] });
         const envelope = { schema: "skill-rails/stage-result/1", decision: value.decision, guide: value.guide, run_id: value.runId, trace_path: value.tracePath };
         emit(envelope, parsed.json, io, () => value.guide ?? JSON.stringify(value.decision, null, 2));
         if (value.runId && !parsed.json) io.error(`trace run: ${value.runId}`);
@@ -91,7 +91,8 @@ export async function main(argv = process.argv.slice(2), io = console) {
         if (!last) throw new Error("Trace contains no decision_emitted event.");
         const alignment = alignDecision(last, events);
         const runPath = join(runtimeDir, "run.mjs");
-        emit({ schema: "skill-rails/resume/1", last_decision: last, last_verified_decision: alignment.aggregate === "aligned" ? last : null, alignment, next_command: `node ${commandArg(runPath)} stage --skill ${commandArg(skillRoot)} --project ${commandArg(parsed.project ?? process.cwd())} --trace-dir ${commandArg(dirname(tracePath))} --run-id ${commandArg(lastEvent.run_id)}` }, parsed.json, io, JSON.stringify);
+        const targetOption = typeof lastEvent.data?.targetPath === "string" ? ` --target ${commandArg(lastEvent.data.targetPath)}` : "";
+        emit({ schema: "skill-rails/resume/1", last_decision: last, last_verified_decision: alignment.aggregate === "aligned" ? last : null, alignment, next_command: `node ${commandArg(runPath)} stage --skill ${commandArg(skillRoot)} --project ${commandArg(parsed.project ?? process.cwd())} --trace-dir ${commandArg(dirname(tracePath))} --run-id ${commandArg(lastEvent.run_id)}${targetOption}` }, parsed.json, io, JSON.stringify);
         return 0;
       }
       default: throw new Error(`Unknown command: ${command ?? "<missing>"}`);
@@ -108,7 +109,7 @@ function parseArgs(argv) {
   const result = { _: [] };
   const booleans = new Set(["json", "stats", "fast", "full", "debug"]);
   const repeated = new Set(["judged", "decided"]);
-  const values = new Set(["skill", "runtime-dir", "lang", "project", "trace-dir", "run-id", "fixture", "role", "decision", "type", "authority", "data", "artifact", "trace"]);
+  const values = new Set(["skill", "runtime-dir", "lang", "project", "target", "trace-dir", "run-id", "fixture", "role", "decision", "type", "authority", "data", "artifact", "trace"]);
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (!arg.startsWith("--")) {
@@ -150,7 +151,7 @@ function validateCommandArgs(command, parsed) {
   const common = ["skill", "runtime-dir", "lang", "json", "debug"];
   const commands = {
     enter: { positions: 2, options: [] },
-    stage: { positions: 2, options: ["project", "judged", "decided", "trace-dir", "run-id"] },
+    stage: { positions: 2, options: ["project", "target", "judged", "decided", "trace-dir", "run-id"] },
     simulate: { positions: 3, options: ["fixture", "fast", "full"] },
     render: { positions: 2, options: ["stats"] },
     role: { positions: 3, options: ["role"] },

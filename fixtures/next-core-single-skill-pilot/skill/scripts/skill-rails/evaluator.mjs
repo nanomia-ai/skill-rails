@@ -18,7 +18,12 @@ export async function evaluateSpec({ spec, skillRoot, observations, snapshot, ju
 
   for (const guard of spec.GUARDS ?? []) {
     const checked = checkReads(spec, guard, observations.flat, facts);
-    if (!checked.ok) return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "BLOCK", guard: { id: guard.id, then: "BLOCK", reason: checked.reason }, stage: null, row: null, effects: [], bodyRef: guard.body, needs: checked.needs, language }));
+    if (!checked.ok) {
+      const matchedEvent = { type: "guard_matched", data: { guard: guard.id, then: "BLOCK", pending_reads: checked.needs.map((need) => need.field) } };
+      guardTrace?.push(matchedEvent);
+      evaluationObserver?.(matchedEvent);
+      return finalize(await decisionParts({ spec, skillRoot, snapshot, runtime, observations, judged, decided, facts, bypassed, restrictions, status: "BLOCK", guard: { id: guard.id, then: "BLOCK", reason: checked.reason }, stage: null, row: null, effects: [], bodyRef: guard.body, needs: checked.needs, language }));
+    }
     const evaluatedEvent = { type: "guard_evaluated", data: { guard: guard.id } };
     guardTrace?.push(evaluatedEvent);
     evaluationObserver?.(evaluatedEvent);

@@ -271,7 +271,7 @@ function coverageFor(executionEvents) {
   const coverage = new Set();
   for (const event of executionEvents) {
     if (event.type === "guard_matched") {
-      coverage.add(`guard:${event.data.guard}`);
+      coverage.add(event.data.pending_reads?.length > 0 ? `guard-pending:${event.data.guard}` : `guard:${event.data.guard}`);
       if (event.data.bypassed_by) coverage.add(`unless:${event.data.guard}/${event.data.bypassed_by}`);
     } else if (event.type === "stage_entered") {
       coverage.add(`stage:${event.data.stage}`);

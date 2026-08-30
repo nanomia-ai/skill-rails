@@ -17,6 +17,9 @@ Evaluate creator usability, generated-skill usability, and task-output quality s
 
 Use fresh contexts and provide only the raw skill, task, and input artifact. Hide intended fixes, prior failures, and expected answers. Compare with no-skill or old-skill baselines, include trigger near misses and held-out states, and inspect transcripts, tool order, evidence, and outputs.
 
+P2 scenario/simulate fixtures spell unobserved values as the literal string `"UNKNOWN"` or by omission; every observation lane normalizes that raw spelling to the reserved sentinel before predicates run.
+For guard coverage, a `cover` entry `guard:<id>` is credited only when the guard predicate matched; a guard blocked on an unresolved required read is credited as `guard-pending:<id>`, and guard coverage accepts either token.
+
 ## Fresh downstream testing
 
 When a generated skill produces a durable output intended for later AI consumption, test that handoff separately from the skill-consumer run. Give a fresh context only the output and the durable dependencies that the output explicitly identifies. Do not also provide the original task, generated skill, producer transcript, or expected interpretation unless the output declares one of them as a required dependency.

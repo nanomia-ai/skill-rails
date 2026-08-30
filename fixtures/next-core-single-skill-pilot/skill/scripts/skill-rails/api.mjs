@@ -18,7 +18,7 @@ import { alignDecision } from "./alignment.mjs";
 import { DECISION_SCHEMA, KERNEL_VERSION, RUNTIME_VERSION, VALIDATOR_VERSION } from "./constants.mjs";
 import { sha256, stableStringify } from "./hash.mjs";
 import { fail } from "./diagnostics.mjs";
-import { resolveInside } from "./path-policy.mjs";
+import { normalizeProjectTarget, resolveInside } from "./path-policy.mjs";
 
 export async function loadAuthoringSkill(skillRoot, runtimeDir = null) {
   const root = resolve(skillRoot);
@@ -60,8 +60,11 @@ export async function stageSkill(options) {
   finally { await release?.(); }
 }
 
-async function stageSkillOnce({ skillRoot, projectRoot, judged = {}, decided = {}, runtimeDir = null, language = "en", traceDir = null, runId = null }) {
+async function stageSkillOnce({ skillRoot, projectRoot, targetPath = null, judged = {}, decided = {}, runtimeDir = null, language = "en", traceDir = null, runId = null }) {
   const root = resolve(skillRoot);
+  const targetProvided = targetPath !== null && targetPath !== undefined;
+  let project = targetProvided ? resolve(projectRoot) : null;
+  const targetContext = targetProvided ? { targetPath: await normalizeProjectTarget(project, targetPath) } : null;
   const loaded = await loadBuiltSkill(root, { runtimeDir: runtimeDir ?? await inferRuntimeDir(root) });
   let effectiveRunId = runId;
   if (traceDir) {
@@ -74,16 +77,18 @@ async function stageSkillOnce({ skillRoot, projectRoot, judged = {}, decided = {
     if (traceDir) {
       await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "spec_loaded", authority: "runtime_observed", spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: decision.snapshot.fingerprint, data: { skill: loaded.spec.SPEC.id } });
       await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "review_required", authority: "runtime_observed", decision_id: decision.decision_id, spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: decision.snapshot.fingerprint, data: { status: "BLOCK", reason: "deferred-authoring", deferred: loaded.spec.DEFERRED.map((item) => item.id) } });
-      await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "decision_emitted", authority: "runtime_observed", decision_id: decision.decision_id, spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: decision.snapshot.fingerprint, data: { status: decision.status, decision } });
+      await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "decision_emitted", authority: "runtime_observed", decision_id: decision.decision_id, spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: decision.snapshot.fingerprint, data: { status: decision.status, decision, ...(targetContext ?? {}) } });
     }
     return { decision, guide: "BLOCK: unresolved DEFERRED authoring items remain. Complete them and rebuild before runtime use.", runId: effectiveRunId, tracePath };
   }
+  project ??= resolve(projectRoot);
   const registry = await loadCollectorRegistry(root);
-  const start = await captureSnapshot(projectRoot, registry.snapshotBasis);
+  const start = await captureSnapshot(project, registry.snapshotBasis, targetContext);
   const parsedJudged = bindObservationInputs(loaded.spec, judged, "judged", start.fingerprint);
   const parsedDecided = bindObservationInputs(loaded.spec, decided, "decided", start.fingerprint);
-  const observations = await collectObservations(loaded.spec, registry, { projectRoot: resolve(projectRoot), skillRoot: root, snapshot: start }, { ...parsedJudged, ...parsedDecided });
-  const end = await captureSnapshot(projectRoot, registry.snapshotBasis);
+  const collectorContext = { projectRoot: project, skillRoot: root, snapshot: start, ...(targetContext ?? {}) };
+  const observations = await collectObservations(loaded.spec, registry, collectorContext, { ...parsedJudged, ...parsedDecided });
+  const end = await captureSnapshot(project, registry.snapshotBasis, targetContext);
   const snapshot = compareSnapshots(start, end);
   if (traceDir) {
     // Trace storage may intentionally live under the project. Record only after
@@ -97,7 +102,7 @@ async function stageSkillOnce({ skillRoot, projectRoot, judged = {}, decided = {
     await reverifyBuiltSkill(loaded);
     if (traceDir) {
       await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "snapshot_stale", authority: "runtime_observed", decision_id: decision.decision_id, spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: snapshot.fingerprint, data: { start: snapshot.start_fingerprint, end: snapshot.end_fingerprint } });
-      await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "decision_emitted", authority: "runtime_observed", decision_id: decision.decision_id, spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: snapshot.fingerprint, data: { status: decision.status, decision } });
+      await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "decision_emitted", authority: "runtime_observed", decision_id: decision.decision_id, spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: snapshot.fingerprint, data: { status: decision.status, decision, ...(targetContext ?? {}) } });
     }
     return { decision, guide: null, runId: effectiveRunId, tracePath };
   }
@@ -107,7 +112,7 @@ async function stageSkillOnce({ skillRoot, projectRoot, judged = {}, decided = {
   const guide = renderGuide(decision, { enterHash: enter.enter_hash });
   await reverifyBuiltSkill(loaded);
   if (traceDir) {
-    for (const event of decisionTraceEvents(decision, guide, guardTrace)) await appendTraceEvent(traceDir, { ...event, run_id: effectiveRunId });
+    for (const event of decisionTraceEvents(decision, guide, guardTrace, targetContext)) await appendTraceEvent(traceDir, { ...event, run_id: effectiveRunId });
   }
   return { decision, guide, runId: effectiveRunId, tracePath };
 }
@@ -217,13 +222,13 @@ function observationTraceEvents(loaded, observations, snapshot) {
   return events;
 }
 
-function decisionTraceEvents(decision, guide, guardTrace) {
+function decisionTraceEvents(decision, guide, guardTrace, targetContext) {
   const base = { authority: "runtime_observed", decision_id: decision.decision_id, spec_fingerprint: decision.spec.fingerprint, snapshot_fingerprint: decision.snapshot.fingerprint };
   const events = guardTrace.map((event) => ({ ...base, ...event }));
   if (decision.stage) events.push({ ...base, type: "stage_entered", data: { stage: decision.stage, row: decision.row } });
   for (const [index, effect] of decision.effects.entries()) if (Array.isArray(effect)) events.push({ ...base, type: "effect_planned", data: { index, verb: effect[0], args: effect[1] } });
   if (["ASK", "WAIT", "BLOCK"].includes(decision.status)) events.push({ ...base, type: "review_required", data: { status: decision.status, needs: decision.needs } });
-  events.push({ ...base, type: "decision_emitted", data: { status: decision.status, stage: decision.stage, row: decision.row, decision } });
+  events.push({ ...base, type: "decision_emitted", data: { status: decision.status, stage: decision.stage, row: decision.row, decision, ...(targetContext ?? {}) } });
   events.push({ ...base, type: "guide_rendered", data: { guide_hash: sha256(guide) } });
   return events;
 }

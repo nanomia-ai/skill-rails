@@ -11,8 +11,8 @@ This P2 skill routes a work or verify intent while preventing a verifier claim f
 - <code>ARTIFACTS</code> is the single source for the five static project paths and the verifier-result output. Its <code>readers</code> declare which stage consumes each artifact, collectors and the real-state host reuse those paths, and Decision schema 2 projects only the selected stage's <code>stage_artifacts</code> into the compact guide.
 - The generated loader binds record and alignment evidence to the exact Decision file, does not carry it across reinvocation automatically, and tells consumers to use current <code>stage_artifacts</code> instead of inspecting collectors or authoring files for replacement paths.
 - <code>DECLARATIONS</code> contains only <code>complexityBudget</code>. Continuation is an ordinary declared identity column, not another runtime mode or declaration.
-- The embedded schemas and 28 shared runtime files came from the creator tree used for the canonical build. The generated package adds only the four entry points <code>align.mjs</code>, <code>lint.mjs</code>, <code>run.mjs</code>, and <code>trace.mjs</code>, while its manifest-bound package-root <code>.gitattributes</code> preserves those emitted bytes across Git checkout modes.
-- The canonical build embeds runtime 0.2.0, validator 0.3.0, and Decision schema <code>skill-rails/decision/2</code>. Trace schema is unchanged; alignment now rejects an unsealed supplied Decision or one that is not stable-structurally equal to its runtime-observed emission before deriving expectations.
+- The embedded schemas and 29 shared runtime files came from the creator tree used for the canonical build. The generated package adds only the four entry points <code>align.mjs</code>, <code>lint.mjs</code>, <code>run.mjs</code>, and <code>trace.mjs</code>, while its manifest-bound package-root <code>.gitattributes</code> preserves those emitted bytes across Git checkout modes.
+- The canonical build embeds runtime 0.3.1, validator 0.4.1, and Decision schema <code>skill-rails/decision/2</code>. Trace schema is unchanged; alignment now rejects an unsealed supplied Decision or one that is not stable-structurally equal to its runtime-observed emission before deriving expectations.
 
 ## 3. Binding rule
 
@@ -47,13 +47,13 @@ A pass is creditable only when every row above holds. Stale proof, a mismatched 
 
 The pilot root contains five files outside the generated skill: <code>intent.json</code>, this report, and <code>real-state/e2e-host.mjs</code>, <code>real-state/e2e.test.mjs</code>, and <code>real-state/verifier.mjs</code>.
 
-The skill contains 54 physical files:
+The skill contains 55 physical files:
 
 - Manifest content hashes, 15 entries: <code>.skill-rails/eval-cases.json</code>, <code>.skill-rails/intent.json</code>, <code>.skill-rails/obligation-ledger.json</code>, <code>.skill-rails/profile-decision.json</code>, <code>SKILL.md</code>, <code>body.md</code>, <code>collectors/index.mjs</code>, <code>fixtures/formats.json</code>, <code>fixtures/lint/manifest.json</code>, <code>fixtures/scenarios.json</code>, <code>references/canon.md</code>, <code>references/purpose.md</code>, <code>references/verify.md</code>, <code>references/work.md</code>, and <code>templates/lane-report.md</code>.
-- Generated hashes, 37 entries: package-root <code>.gitattributes</code>, <code>SKILL.md</code>, <code>agents/openai.yaml</code>, both files under <code>schemas/</code>, and these 32 runtime paths under <code>scripts/skill-rails/</code>: <code>align.mjs</code>, <code>alignment.mjs</code>, <code>api.mjs</code>, <code>ast-policy.mjs</code>, <code>authoring-ledger.mjs</code>, <code>body.mjs</code>, <code>cli.mjs</code>, <code>collectors.mjs</code>, <code>constants.mjs</code>, <code>diagnostics.mjs</code>, <code>domains.mjs</code>, <code>dsl.mjs</code>, <code>evaluator.mjs</code>, <code>format-checks.mjs</code>, <code>guide.mjs</code>, <code>hash.mjs</code>, <code>lint.mjs</code>, <code>loader.mjs</code>, <code>manifest.mjs</code>, <code>path-policy.mjs</code>, <code>run.mjs</code>, <code>scenario-checks.mjs</code>, <code>snapshot.mjs</code>, <code>templates.mjs</code>, <code>trace-core.mjs</code>, <code>trace-store.mjs</code>, <code>trace.mjs</code>, <code>validator.mjs</code>, <code>vendor/ACORN-LICENSE</code>, <code>vendor/ACORN-WALK-LICENSE</code>, <code>vendor/acorn-walk.mjs</code>, and <code>vendor/acorn.mjs</code>.
+- Generated hashes, 38 entries: package-root <code>.gitattributes</code>, <code>SKILL.md</code>, <code>agents/openai.yaml</code>, both files under <code>schemas/</code>, and these 33 runtime paths under <code>scripts/skill-rails/</code>: <code>align.mjs</code>, <code>alignment.mjs</code>, <code>api.mjs</code>, <code>ast-policy.mjs</code>, <code>authoring-ledger.mjs</code>, <code>body.mjs</code>, <code>cli.mjs</code>, <code>collectors.mjs</code>, <code>constants.mjs</code>, <code>diagnostics.mjs</code>, <code>domains.mjs</code>, <code>dsl.mjs</code>, <code>evaluator.mjs</code>, <code>format-checks.mjs</code>, <code>guide.mjs</code>, <code>hash.mjs</code>, <code>lint.mjs</code>, <code>loader.mjs</code>, <code>manifest.mjs</code>, <code>observations.mjs</code>, <code>path-policy.mjs</code>, <code>run.mjs</code>, <code>scenario-checks.mjs</code>, <code>snapshot.mjs</code>, <code>templates.mjs</code>, <code>trace-core.mjs</code>, <code>trace-store.mjs</code>, <code>trace.mjs</code>, <code>validator.mjs</code>, <code>vendor/ACORN-LICENSE</code>, <code>vendor/ACORN-WALK-LICENSE</code>, <code>vendor/acorn-walk.mjs</code>, and <code>vendor/acorn.mjs</code>.
 - Three additional package files: <code>.generated.json</code>, <code>authoring-card.md</code>, and <code>spec.mjs</code>. The manifest records <code>spec.mjs</code> through <code>spec_hash</code>; <code>SKILL.md</code> appears in both declared maps. The ignored <code>.skill-rails/semantic-diff.json</code> is not part of the current package inventory.
 
-Thus the pilot contains 59 physical files. The deleted standalone runtime-state files have no replacement files; <code>fixtures/scenarios.json</code> and <code>real-state/*</code> are the live evidence surfaces.
+Thus the pilot contains 60 physical files. The deleted standalone runtime-state files have no replacement files; <code>fixtures/scenarios.json</code> and <code>real-state/*</code> are the live evidence surfaces.
 
 ## 6. Verification receipts
 
@@ -61,15 +61,15 @@ All commands run from the repository root.
 
 ### Root full lint
 
-    node scripts/lint.mjs --skill fixtures/next-core-single-skill-pilot/skill --full --json
+    node skills/skill-rails/scripts/lint.mjs --skill fixtures/next-core-single-skill-pilot/skill --full --json
 
 Receipt: exit 0; L0 through L18 pass with no diagnostics.
 
 ### Formal clean build
 
-    node scripts/build.mjs --skill fixtures/next-core-single-skill-pilot/skill --repeats 50 --json
+    node skills/skill-rails/scripts/build.mjs --skill fixtures/next-core-single-skill-pilot/skill --repeats 50 --json
 
-Receipt: exit 0; 20/20 mutations killed, 10/10 scenarios passed for 50 deterministic repeats with no mismatch, predicate performance passed the 50 ms limit, and 256/256 format round trips passed with CRLF rejected. The canonical build identifier is <code>sha256:b0bfffa83c9c4510f46a89936be40c41c4e874ab15eb7bcd7684096e73f082a3</code>, with <code>built_at: null</code>.
+Receipt: exit 0; 20/20 mutations killed, 10/10 scenarios passed for 50 deterministic repeats with no mismatch, predicate performance passed the 50 ms limit, and 256/256 format round trips passed with CRLF rejected. The canonical build identifier is <code>sha256:d2855deb87b5b1b4cbcba467975cbfcc87c7661e7072ffc6478e13b85f49ca1c</code>, with <code>built_at: null</code>.
 
 ### Embedded lint and focused real-state e2e
 
@@ -92,13 +92,23 @@ Disposable <code>git clone --no-local</code> checkouts with <code>core.autocrlf=
 
 The deployed product baseline is <code>126be23</code>. It keeps the stage/guard artifact projection, exact-Decision evidence admission, skipped-judgment isolation, and final-gate fixture coverage, then projects the first L15 golden <code>expect</code> into both <code>Decision.format.example</code> and the owning effect's <code>format_example</code>. The evaluator clones the effect for the Decision and never mutates the spec; missing or unreadable fixtures fall back to the prior synthesized example. Decision and Trace schemas, runtime/validator versions, pilot spec, fixtures, and domain behavior are unchanged.
 
-### Current repository verification
+The current worktree unites the optional public stage <code>targetPath</code>/<code>--target</code> collector input and trace-to-resume continuity with the released single-owner observation preparation contract. A target-bearing <code>decision_emitted</code> event carries the value outside the Decision and CLI resume quotes it into the next stage command; target-less event data and commands remain unchanged. Every lane still normalizes raw <code>"UNKNOWN"</code> to the reserved version-5 sentinel, and fixture preparation plus L5 remain owned by <code>observations.mjs</code> with declared-read gating. The canonical rebuild updates the generated loader and embedded runtime projection while leaving the pilot spec, fixtures, schemas, and domain behavior unchanged. The union records <code>RUNTIME_VERSION</code> 0.3.1 and <code>VALIDATOR_VERSION</code> 0.4.1; fresh-agent use of the target surface remains <code>UNPROVEN</code> outside the upstream API/CLI regression.
+
+### Prior deployed repository verification
 
     npm run verify
 
-Receipt: the full <code>npm run verify</code> passed. Vendor and lint passed; repository tests passed 60/60, including golden-format effect projection without spec mutation, evaluator-observed skipped-NEXT coverage, false-claim rejection, exact-Decision purity, simple-lint helper-target discharge, exact-Decision API/CLI tamper rejection, selected stage/guard projection, package-attribute collision, and explicit ownership-transfer coverage; the eval clean control was valid; the fixture probe reported 10 total cases and 3 divergences; seeded defects were detected 5/5; all 8 required runs were present; and the empirical gate passed.
+Receipt: at deployed baseline <code>126be23</code>, the full <code>npm run verify</code> passed. Vendor and lint passed; repository tests passed 60/60, including golden-format effect projection without spec mutation, evaluator-observed skipped-NEXT coverage, false-claim rejection, exact-Decision purity, simple-lint helper-target discharge, exact-Decision API/CLI tamper rejection, selected stage/guard projection, package-attribute collision, and explicit ownership-transfer coverage; the eval clean control was valid; the fixture probe reported 10 total cases and 3 divergences; seeded defects were detected 5/5; all 8 required runs were present; and the empirical gate passed.
 
-### Landing readiness
+### Current bounded target verification
+
+    node --test --test-name-pattern "public stage target" tests/integration.test.mjs
+    node --test tests/runtime.test.mjs tests/integration.test.mjs
+    npm run lint
+
+Receipt: focused reconciled regressions 4/4 and runtime plus integration 42/42 pass (26 integration + 16 runtime top-level tests); the regression covers normalized target delivery, all Decision-emission outcome paths, same-target resume, byte-shaped target absence, Windows junction rejection, unified fixture lanes, L5 read gating, and guard-pending trace order; creator lint passes. The canonical build records mutation 20/20, scenario 10/10, deterministic repeat 50 with 0 mismatches, format round-trip 256/256, manifest 15 content + 38 generated = 53, and build ID <code>sha256:d2855deb87b5b1b4cbcba467975cbfcc87c7661e7072ffc6478e13b85f49ca1c</code>; embedded lint is L0 through L18 and real-state e2e is 2/2. The single release-boundary <code>npm run verify</code> is recorded in the implementation-verification document rather than this bounded mechanics receipt; a fresh-agent target/resume flow, the Devflow empirical scenario, and non-Windows symlink coverage remain unrun and <code>UNPROVEN</code>.
+
+### Prior landing readiness
 
 Receipt: Git baseline <code>126be23</code> is on <code>origin/main</code>. The official project-local installer produced the same 249 paths, the installed creator self-lint and embedded pilot L0–L18 passed, and all 54 sealed pilot files were byte-identical to Git blobs. A fresh Luna Max consumer used those exact generated bytes without source inspection, found <code>format_example</code> on the WRITE effect, and reached <code>evidence / matching-pass / DONE</code> plus the final report.
 
@@ -106,7 +116,7 @@ Receipt: Git baseline <code>126be23</code> is on <code>origin/main</code>. The o
 
     node -e "const fs=require('fs'),p='fixtures/next-core-single-skill-pilot/skill/'; const b=f=>fs.readFileSync(p+f); const m=f=>({bytes:b(f).length,lines:(b(f).toString('utf8').match(/\n/g)||[]).length}); const files=[]; const walk=d=>{for(const e of fs.readdirSync(d,{withFileTypes:true})){const x=d+'/'+e.name;e.isDirectory()?walk(x):files.push(x)}}; walk(p.slice(0,-1)); console.log(JSON.stringify({spec:m('spec.mjs'),collector:m('collectors/index.mjs'),skill:m('SKILL.md'),verify_read_set:b('SKILL.md').length+b('references/canon.md').length+b('references/verify.md').length,work_read_set:b('SKILL.md').length+b('references/canon.md').length+b('references/work.md').length,package_bytes:files.reduce((n,f)=>n+fs.readFileSync(f).length,0),package_files:files.length},null,2));"
 
-Measured on 2026-08-29: <code>spec.mjs</code> is 7,224 bytes and 67 lines; the collector is 5,999 bytes and 121 lines; <code>SKILL.md</code> is 2,168 bytes and 18 lines; the verify read set is 8,417 bytes; the work read set is 5,972 bytes; and the 54-file skill package is 494,852 bytes.
+Measured on 2026-08-31: <code>spec.mjs</code> is 7,224 bytes and 67 lines; the collector is 5,999 bytes and 121 lines; <code>SKILL.md</code> is 3,455 bytes and 20 lines; the verify read set is 9,704 bytes; the work read set is 7,259 bytes; and the 55-file skill package is 499,886 bytes.
 
 ## 7. What remains UNPROVEN
 

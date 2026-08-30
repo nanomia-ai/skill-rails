@@ -7,6 +7,19 @@ export function isPortableRelativePath(value) {
   return value.split("/").every((segment) => segment && segment !== "." && segment !== "..");
 }
 
+export async function normalizeProjectTarget(root, value, options = {}) {
+  const code = options.code ?? "SR_STAGE_TARGET";
+  if (typeof value !== "string" || value.length === 0 || value.includes("\0") || isAbsolute(value) || value.includes("\\") || value.includes(":")) {
+    fail(code, `Stage target must be a portable project-relative path: ${value}`, { pointer: value });
+  }
+  const segments = value.split("/");
+  if (segments.includes("..")) fail(code, `Stage target may not contain parent traversal: ${value}`, { pointer: value });
+  const normalized = segments.filter((segment) => segment && segment !== ".").join("/");
+  if (!normalized) fail(code, `Stage target must identify a path below the project root: ${value}`, { pointer: value });
+  await resolveInside(root, normalized, { code });
+  return normalized;
+}
+
 export async function resolveInside(root, local, options = {}) {
   if (!isPortableRelativePath(local)) fail(options.code ?? "SR_PATH", `Path must be a portable package-relative path: ${local}`, { pointer: local });
   const lexicalRoot = resolve(root);

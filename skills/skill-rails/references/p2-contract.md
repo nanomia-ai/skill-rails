@@ -14,7 +14,7 @@ The current P2 wire/spec lineage remains `SPEC.version = "5"` for compatibility.
 
 ## Canonical ownership
 
-`spec.mjs` exclusively owns observable conditions, guards, stage order, decision tables, effect order, exact formats, ownership, and completion evidence. `body.md` owns judgment criteria and reasons. Templates own output shape. Collectors observe and normalize but never decide policy.
+`spec.mjs` exclusively owns observable conditions, guards, stage order, decision tables, effect order, exact formats, ownership, and completion evidence. `body.md` owns judgment criteria and reasons. Templates own output shape. Collectors observe and normalize but never decide policy. A stage caller may supply one optional project-relative file target through API `targetPath` or CLI `--target`; after runtime normalization and containment validation, collectors and `snapshotBasis` receive it as `ctx.targetPath`. It is neither a judged input nor a decided domain value, and it reaches a Decision only through declared collector observations.
 
 ## Closed exports
 
@@ -56,7 +56,7 @@ Resolve `<generated-skill>` to the generated P2 package containing `scripts/skil
 
 ```text
 node <generated-skill>/scripts/skill-rails/run.mjs enter --skill <generated-skill>
-node <generated-skill>/scripts/skill-rails/run.mjs stage --skill <generated-skill> --project <project> [--trace-dir <external-state-dir> --run-id <id>] [--judged field=value] [--decided field=value]
+node <generated-skill>/scripts/skill-rails/run.mjs stage --skill <generated-skill> --project <project> [--target <project-relative-path>] [--trace-dir <external-state-dir> --run-id <id>] [--judged field=value] [--decided field=value]
 node <generated-skill>/scripts/skill-rails/run.mjs simulate --skill <generated-skill> --fixture <fixture>
 node <generated-skill>/scripts/skill-rails/run.mjs render --skill <generated-skill>
 node <generated-skill>/scripts/skill-rails/run.mjs role --skill <generated-skill> --role <id>
@@ -68,3 +68,5 @@ node <generated-skill>/scripts/skill-rails/run.mjs resume --skill <generated-ski
 ```
 
 Unsupported flags or input sources fail closed. Do not infer missing values or reconstruct a Decision from prose after a CLI or validation failure.
+
+`--target` is optional and only valid on `stage`. Supply it when the current task or role has already selected one file target that the package's collectors need; do not search for or infer one. The API spelling is `targetPath`. The runtime accepts a non-empty portable relative path, removes only empty and `.` segments, rejects absolute paths, backslashes, drive-like colons, and every `..` segment, then checks lexical and realpath containment below `projectRoot`. It does not prove that the target exists, is a regular file, or has valid or fresh contents; collectors own those observations. When tracing is enabled, `decision_emitted.data.targetPath` records that normalized value and `resume` carries it into the next stage command; without a target, the trace data and command retain their previous shape. This is trace continuity, not a Decision field or a requirement to keep the same target for later stages. Packages that do not require a selected target omit the input and retain the previous collector context.

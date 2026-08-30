@@ -66,6 +66,8 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.match(p2Skill, /never skip, reorder, or substitute for the Decision/);
   assert.match(p2Skill, /Decision body, `stage_artifacts`, and ordered effects/);
   assert.match(p2Skill, /do not infer replacement paths from collector or authoring files/);
+  assert.match(p2Skill, /current task or role already identifies one project-relative file target/);
+  assert.match(p2Skill, /add `--target "<path>"`; never infer a target, and omit the option/);
   assert.match(p2Skill, /artifact_verified --data '\{"reference":"<proof\.reference>"\}'/);
   assert.match(p2Skill, /matching proof reference from the current Decision/);
   assert.doesNotMatch(p2Skill, /BLOCK: consumer guidance missing/);
@@ -104,6 +106,7 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   const deferred = await stageSkill({ skillRoot: outputs.p2, projectRoot: ROOT, decided: { "authoring.readiness": "ready" } });
   assert.equal(deferred.decision.status, "BLOCK");
   assert.equal(deferred.decision.guard.id, "authoring-deferred");
+  assert.equal((await stageSkill({ skillRoot: outputs.p2, decided: { "authoring.readiness": "ready" } })).decision.guard.id, "authoring-deferred");
   const scaffoldSpecPath = join(outputs.p2, "spec.mjs");
   const scaffoldSpec = await readFile(scaffoldSpecPath, "utf8");
   await writeTextAtomic(scaffoldSpecPath, scaffoldSpec.replace(/export const DEFERRED = \[[\s\S]*?\];\s*$/, "export const DEFERRED = [];\n"));
@@ -465,6 +468,81 @@ test("P2 missing guard inputs cannot earn coverage through a fixture-only execut
   await assert.rejects(runFixtureSuite(root, { repeats: 1 }), /Fixture guard-missing claims coverage it did not execute: guard:input-present/);
 });
 
+test("fixture materialization covers read-block guards and preserves mode-specific coverage claims", async (t) => {
+  const base = await makeTestDir("fixture-unknown-coverage");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "valid");
+  await prepareUnknownReadPackage(root);
+  const built = await buildP2(root, { repeats: 1 });
+  assert.equal(built.fixtures.passed, 12);
+
+  const fixturesPath = join(root, "fixtures", "scenarios.json");
+  const fixtures = await readJson(fixturesPath);
+  const runtimeDir = join(root, "scripts", "skill-rails");
+  const missing = fixtures.find((fixture) => fixture.id === "missing-card-target");
+  const simulated = await simulateSkill({ skillRoot: root, fixture: missing, runtimeDir });
+  assert.equal(simulated.decision.status, "BLOCK");
+  assert.equal(simulated.decision.guard.id, "card-target-required");
+  assert.deepEqual(simulated.decision.needs.map(({ field }) => field), ["card.target"]);
+  assert.deepEqual(simulated.decision.snapshot.unknowns, [{ field: "card.target", reason: "fixture-missing", details: "card.target" }]);
+
+  const literal = fixtures.find((fixture) => fixture.id === "missing-card-target-literal");
+  const literalSimulated = await simulateSkill({ skillRoot: root, fixture: literal, runtimeDir });
+  assert.deepEqual(
+    { status: literalSimulated.decision.status, guard: literalSimulated.decision.guard.id, needs: literalSimulated.decision.needs.map(({ field }) => field) },
+    { status: simulated.decision.status, guard: simulated.decision.guard.id, needs: simulated.decision.needs.map(({ field }) => field) }
+  );
+  assert.deepEqual(literalSimulated.decision.snapshot.unknowns, [{ field: "card.target", reason: "unknown", details: null }]);
+
+  const observedEvents = [];
+  const observed = await simulateSkill({ skillRoot: root, fixture: missing, runtimeDir, evaluationObserver: (event) => observedEvents.push(event) });
+  assert.deepEqual(observed.decision, simulated.decision);
+  assert.deepEqual(observedEvents, [{ type: "guard_matched", data: { guard: "card-target-required", then: "BLOCK", pending_reads: ["card.target"] } }]);
+
+  const falseClaim = join(base, "false-claim");
+  await copyTree(root, falseClaim);
+  const falseFixtures = await readJson(join(falseClaim, "fixtures", "scenarios.json"));
+  falseFixtures.find((fixture) => fixture.id === "done").cover.push("guard:card-target-required");
+  await writeJsonAtomic(join(falseClaim, "fixtures", "scenarios.json"), falseFixtures);
+  await assert.rejects(runFixtureSuite(falseClaim, { repeats: 1 }), /Fixture done claims coverage it did not execute: guard:card-target-required/);
+
+  const pending = join(base, "pending-guard");
+  await copyTree(root, pending);
+  const pendingFixtures = await readJson(join(pending, "fixtures", "scenarios.json"));
+  const pendingReadOnly = pendingFixtures.find((fixture) => fixture.id === "read-only");
+  delete pendingReadOnly.s["session.readOnly"];
+  delete pendingReadOnly.expect.stage;
+  pendingReadOnly.cover = ["guard-pending:read-only-session"];
+  await writeJsonAtomic(join(pending, "fixtures", "scenarios.json"), pendingFixtures);
+  const pendingValidation = await validateFull(pending);
+  assert.equal(pendingValidation.ok, true, JSON.stringify(pendingValidation.diagnostics));
+  const pendingResult = await runFixtureSuite(pending, { repeats: 1 });
+  assert.equal(pendingResult.passed, 12);
+  const pendingDecision = await simulateSkill({ skillRoot: pending, fixture: pendingReadOnly, runtimeDir: join(pending, "scripts", "skill-rails") });
+  assert.deepEqual(pendingDecision.decision.needs.map(({ field }) => field), ["session.readOnly"]);
+
+  const pendingFalseClaim = join(base, "pending-false-claim");
+  await copyTree(pending, pendingFalseClaim);
+  const pendingFalseFixtures = await readJson(join(pendingFalseClaim, "fixtures", "scenarios.json"));
+  pendingFalseFixtures.find((fixture) => fixture.id === "read-only").cover = ["guard:read-only-session"];
+  await writeJsonAtomic(join(pendingFalseClaim, "fixtures", "scenarios.json"), pendingFalseFixtures);
+  await assert.rejects(runFixtureSuite(pendingFalseClaim, { repeats: 1 }), /Fixture read-only claims coverage it did not execute: guard:read-only-session/);
+
+  const matchedFalseClaim = join(base, "matched-false-claim");
+  await copyTree(root, matchedFalseClaim);
+  const matchedFalseFixtures = await readJson(join(matchedFalseClaim, "fixtures", "scenarios.json"));
+  matchedFalseFixtures.find((fixture) => fixture.id === "read-only").cover = ["guard-pending:read-only-session"];
+  await writeJsonAtomic(join(matchedFalseClaim, "fixtures", "scenarios.json"), matchedFalseFixtures);
+  await assert.rejects(runFixtureSuite(matchedFalseClaim, { repeats: 1 }), /Fixture read-only claims coverage it did not execute: guard-pending:read-only-session/);
+
+  const knownFalseClaim = join(base, "known-false-claim");
+  await copyTree(root, knownFalseClaim);
+  const knownFalseFixtures = await readJson(join(knownFalseClaim, "fixtures", "scenarios.json"));
+  knownFalseFixtures.find((fixture) => fixture.id === "signal-open").cover.push("guard:read-only-session");
+  await writeJsonAtomic(join(knownFalseClaim, "fixtures", "scenarios.json"), knownFalseFixtures);
+  await assert.rejects(runFixtureSuite(knownFalseClaim, { repeats: 1 }), /Fixture signal-open claims coverage it did not execute: guard:read-only-session/);
+});
+
 test("P2 build fuzzes exact formats across structured values", async (t) => {
   const base = await makeTestDir("format-fuzz");
   t.after(() => removeTestDir(base));
@@ -493,6 +571,37 @@ test("table precedence and format completeness have independent golden witnesses
   await writeFile(specPath, original.replace(', "detail-json": "json"', ""), "utf8");
   validation = await validateFull(root);
   assert.ok(validation.diagnostics.some((item) => item.code === "L15" && /Golden values/.test(item.message)));
+});
+
+test("L5 exclusive-table checks use normalized fixture UNKNOWN values", async (t) => {
+  const base = await makeTestDir("fixture-unknown-table");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  await copyTree(join(ROOT, "evals", "g0_5", "b-v5-clean"), root);
+  const specPath = join(root, "spec.mjs");
+  const source = await readFile(specPath, "utf8");
+  const updated = source
+    .replace("review: { exclusive: false, rows:", "review: { exclusive: true, rows:")
+    .replace('{ state: "open", reads: ["review.lastVerdict", "review.lastTarget"],', '{ state: "open", reads: ["review.lastVerdict", "review.lastTarget", "review.ordinal"],')
+    .replace(
+      'when: s => s.review.lastVerdict === "finding" && s.review.lastTarget === "code" },',
+      'when: s => s.review.lastVerdict === "finding" && s.review.lastTarget === "code" && s.review.ordinal < 3 },'
+    );
+  assert.notEqual(updated, source);
+  await writeTextAtomic(specPath, updated);
+  const scenarios = await readJson(join(root, "fixtures", "scenarios.json"));
+  const sourceFixture = scenarios.find((fixture) => fixture.id === "unclassified");
+  scenarios.push({
+    id: "unknown-table-value",
+    s: { ...sourceFixture.s, "review.lastVerdict": "UNKNOWN" },
+    expect: { stage: "review", row: null, status: "BLOCK" },
+    cover: []
+  });
+  await writeJsonAtomic(join(root, "fixtures", "scenarios.json"), scenarios);
+  await buildP2(root, { repeats: 1 });
+  const validation = await validateFull(root);
+  assert.equal(validation.ok, true, JSON.stringify(validation.diagnostics));
+  assert.equal(validation.diagnostics.some((item) => item.code === "L5"), false, JSON.stringify(validation.diagnostics));
 });
 
 test("non-ASCII package paths remain read-only during runtime evaluation", async (t) => {
@@ -691,7 +800,7 @@ test("snapshot changes during collection fail closed as stale", async (t) => {
   await writeTextAtomic(specPath, spec);
   await writeTextAtomic(join(root, "collectors", "index.mjs"), 'import { readFile, writeFile } from "node:fs/promises";\nimport { join } from "node:path";\nexport const collectors = { "evidence-release/probe.value": async (ctx) => { await writeFile(join(ctx.projectRoot, "collector.started"), "yes", "utf8"); await new Promise((resolve) => setTimeout(resolve, 80)); return "yes"; } };\nexport const snapshotBasis = async (ctx) => ({ watched: await readFile(join(ctx.projectRoot, "watched.txt"), "utf8") });\n');
   await buildP2(root, { repeats: 2 });
-  const stagedPromise = stageSkill({ skillRoot: root, projectRoot: project, decided: { "authoring.readiness": "ready" }, traceDir, runId: "stale-run" });
+  const stagedPromise = stageSkill({ skillRoot: root, projectRoot: project, targetPath: "./watched.txt", decided: { "authoring.readiness": "ready" }, traceDir, runId: "stale-run" });
   const collectorStarted = join(project, "collector.started");
   for (let attempt = 0; attempt < 100 && !(await exists(collectorStarted)); attempt += 1) await new Promise((resolve) => setTimeout(resolve, 10));
   assert.equal(await exists(collectorStarted), true);
@@ -700,7 +809,119 @@ test("snapshot changes during collection fail closed as stale", async (t) => {
   assert.equal(staged.decision.snapshot.status, "stale");
   assert.equal(staged.decision.status, "BLOCK");
   assert.equal(staged.decision.reinvoke, "recompute");
-  assert.ok((await readTrace(join(traceDir, "stale-run.jsonl"))).some((event) => event.type === "snapshot_stale"));
+  const staleEvents = await readTrace(join(traceDir, "stale-run.jsonl"));
+  assert.ok(staleEvents.some((event) => event.type === "snapshot_stale"));
+  assert.equal(staleEvents.findLast((event) => event.type === "decision_emitted").data.targetPath, "watched.txt");
+});
+
+test("public stage target is normalized, collector-owned, optional, and containment-safe across API and CLI", async (t) => {
+  const base = await makeTestDir("stage-target");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const project = join(base, "project");
+  const outside = join(base, "outside");
+  await Promise.all([mkdir(join(project, "cards"), { recursive: true }), mkdir(outside, { recursive: true })]);
+  await writeFile(join(project, "cards", "task.md"), "selected task\n", "utf8");
+  await writeFile(join(project, "cards", "task-two.md"), "second selected task\n", "utf8");
+  await writeFile(join(outside, "task.md"), "outside task\n", "utf8");
+
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 1 }) });
+  const deferredTraceDir = join(base, "deferred-traces");
+  const deferredTarget = await stageSkill({ skillRoot: root, projectRoot: project, targetPath: "cards//./task.md", traceDir: deferredTraceDir, runId: "deferred-target" });
+  assert.equal(deferredTarget.decision.guard.id, "authoring-deferred");
+  assert.equal((await readTrace(deferredTarget.tracePath)).findLast((event) => event.type === "decision_emitted").data.targetPath, "cards/task.md");
+  await completeGeneratedP2ForRuntimeTest(root);
+  const specPath = join(root, "spec.mjs");
+  const originalSpec = await readFile(specPath, "utf8");
+  const targetSpec = originalSpec
+    .replace(
+      '"authoring.readiness": { decided: true, domain: ["ready", "needs-design", "complete"] }',
+      '"authoring.readiness": { decided: true, domain: ["ready", "needs-design", "complete"] },\n  "input.target": { collector: "evidence-release/input.target", domain: "path|NONE" }'
+    )
+    .replace('reads: ["authoring.readiness"]', 'reads: ["authoring.readiness", "input.target"]')
+    .replace('done: s => s.authoring.readiness === "complete"', 'done: s => s.authoring.readiness === "complete" && s.input.target === "NONE"')
+    .replace('"needs-design": ["BLOCK"]', '"needs-design": ["BLOCK"],\n    complete: ["DONE"]');
+  assert.notEqual(targetSpec, originalSpec);
+  await writeTextAtomic(specPath, targetSpec);
+  await writeTextAtomic(join(root, "collectors", "index.mjs"), `import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+
+export const collectors = Object.freeze({
+  "evidence-release/input.target": async (ctx) => Object.hasOwn(ctx, "targetPath") ? ctx.targetPath : "NONE"
+});
+
+export const snapshotBasis = async (ctx) => Object.hasOwn(ctx, "targetPath")
+  ? { targetPath: ctx.targetPath, content: await readFile(join(ctx.projectRoot, ...ctx.targetPath.split("/")), "utf8") }
+  : { legacyContext: true };
+`);
+  const scenariosPath = join(root, "fixtures", "scenarios.json");
+  const scenarios = await readJson(scenariosPath);
+  for (const scenario of scenarios) scenario.s = { ...(scenario.s ?? {}), "input.target": "NONE" };
+  const completeScenario = scenarios.find((scenario) => scenario.id === "complete");
+  completeScenario.s["input.target"] = "cards/task.md";
+  completeScenario.expect = { stage: "operate", status: "DONE", effects: ["DONE"] };
+  completeScenario.cover = ["branch:operate/complete"];
+  await writeJsonAtomic(scenariosPath, scenarios);
+  await buildP2(root, { repeats: 1 });
+
+  const decided = { "authoring.readiness": "ready" };
+  const stageCli = ["stage", "--skill", root, "--runtime-dir", join(root, "scripts", "skill-rails"), "--project", project];
+  const apiTarget = await stageSkill({ skillRoot: root, projectRoot: project, targetPath: "cards//./task.md", decided });
+  assert.equal(apiTarget.decision.facts.find((item) => item.field === "input.target").value, "cards/task.md");
+
+  const cliTargetIo = captureIo();
+  const cliTargetStatus = await runtimeMain([...stageCli, "--target", "cards/./task.md", "--decided", "authoring.readiness=ready", "--json"], cliTargetIo);
+  assert.equal(cliTargetStatus, 0, JSON.stringify(cliTargetIo.errors));
+  const cliTarget = JSON.parse(cliTargetIo.logs.at(-1));
+  assert.deepEqual(cliTarget.decision, apiTarget.decision);
+  assert.deepEqual(cliTargetIo.errors, []);
+
+  const apiAbsent = await stageSkill({ skillRoot: root, projectRoot: project, decided });
+  assert.equal(apiAbsent.decision.facts.find((item) => item.field === "input.target").value, "NONE");
+  assert.notEqual(apiAbsent.decision.snapshot.fingerprint, apiTarget.decision.snapshot.fingerprint);
+  const cliAbsentIo = captureIo();
+  assert.equal(await runtimeMain([...stageCli, "--decided", "authoring.readiness=ready", "--json"], cliAbsentIo), 0);
+  assert.deepEqual(JSON.parse(cliAbsentIo.logs.at(-1)).decision, apiAbsent.decision);
+
+  const traceDir = join(base, "traces");
+  const tracedTarget = await stageSkill({ skillRoot: root, projectRoot: project, targetPath: "cards//./task-two.md", decided, traceDir, runId: "target-bearing" });
+  const targetEmission = (await readTrace(tracedTarget.tracePath)).findLast((event) => event.type === "decision_emitted");
+  assert.equal(targetEmission.data.targetPath, "cards/task-two.md");
+  const targetResumeIo = captureIo();
+  assert.equal(await runtimeMain(["resume", "--skill", root, "--runtime-dir", join(root, "scripts", "skill-rails"), "--trace", tracedTarget.tracePath, "--project", project, "--json"], targetResumeIo), 0);
+  const targetResume = JSON.parse(targetResumeIo.logs.at(-1));
+  assert.equal(targetResume.next_command.endsWith(' --target "cards/task-two.md"'), true);
+
+  const tracedAbsent = await stageSkill({ skillRoot: root, projectRoot: project, decided, traceDir, runId: "target-absent" });
+  const absentEmission = (await readTrace(tracedAbsent.tracePath)).findLast((event) => event.type === "decision_emitted");
+  assert.equal(Object.hasOwn(absentEmission.data, "targetPath"), false);
+  assert.equal(JSON.stringify(absentEmission.data), JSON.stringify({ status: tracedAbsent.decision.status, stage: tracedAbsent.decision.stage, row: tracedAbsent.decision.row, decision: tracedAbsent.decision }));
+  const absentResumeIo = captureIo();
+  assert.equal(await runtimeMain(["resume", "--skill", root, "--runtime-dir", join(root, "scripts", "skill-rails"), "--trace", tracedAbsent.tracePath, "--project", project, "--json"], absentResumeIo), 0);
+  assert.equal(JSON.parse(absentResumeIo.logs.at(-1)).next_command.includes(" --target "), false);
+
+  const invalidTargets = [join(project, "cards", "task.md"), "cards/../task.md", 42];
+  for (const targetPath of invalidTargets) {
+    await assert.rejects(stageSkill({ skillRoot: root, projectRoot: project, targetPath, decided }), (error) => error.code === "SR_STAGE_TARGET");
+    if (typeof targetPath === "string") {
+      const io = captureIo();
+      assert.equal(await runtimeMain([...stageCli, "--target", targetPath, "--decided", "authoring.readiness=ready", "--json"], io), 1);
+      assert.equal(JSON.parse(io.errors.at(-1)).diagnostic.code, "SR_STAGE_TARGET");
+    }
+  }
+
+  try {
+    await symlink(outside, join(project, "outside-link"), process.platform === "win32" ? "junction" : "dir");
+    await assert.rejects(stageSkill({ skillRoot: root, projectRoot: project, targetPath: "outside-link/task.md", decided }), (error) => error.code === "SR_STAGE_TARGET");
+    const io = captureIo();
+    assert.equal(await runtimeMain([...stageCli, "--target", "outside-link/task.md", "--decided", "authoring.readiness=ready", "--json"], io), 1);
+    assert.equal(JSON.parse(io.errors.at(-1)).diagnostic.code, "SR_STAGE_TARGET");
+    t.diagnostic(`${process.platform === "win32" ? "junction" : "symlink"} target escape was rejected by API and CLI`);
+  } catch (error) {
+    if (!["EPERM", "EACCES", "UNKNOWN"].includes(error.code)) throw error;
+    t.diagnostic(`target link creation unavailable: ${error.code}`);
+  }
 });
 
 test("non-git snapshot fallback hashes nested same-size content changes", async (t) => {
@@ -780,10 +1001,12 @@ test("trace records only predicates actually evaluated and orders projection bef
   });
   assert.equal(staged.decision.status, "BLOCK");
   assert.equal(staged.decision.guard.id, "missing-input");
+  assert.deepEqual(staged.decision.needs.map(({ field }) => field), ["guard.missing"]);
   const events = (await readTrace(join(traceDir, "trace-order.jsonl"))).filter((event) => event.decision_id === staged.decision.decision_id);
   assert.deepEqual(events.filter((event) => event.type === "guard_evaluated").map((event) => event.data.guard), ["known-false"]);
-  assert.equal(events.some((event) => event.type === "guard_matched"), false);
+  assert.deepEqual(events.filter((event) => event.type === "guard_matched").map((event) => event.data), [{ guard: "missing-input", then: "BLOCK", pending_reads: ["guard.missing"] }]);
   const types = events.map((event) => event.type);
+  assert.ok(types.indexOf("guard_matched") < types.indexOf("review_required"));
   assert.ok(types.indexOf("review_required") < types.indexOf("decision_emitted"));
   assert.ok(types.indexOf("decision_emitted") < types.indexOf("guide_rendered"));
 });
@@ -792,6 +1015,12 @@ async function treeHashes(root) {
   const output = {};
   for (const path of await listFiles(root, { exclude: [".skill-rails"] })) output[path.slice(root.length + 1).replace(/\\/g, "/")] = await hashFile(path);
   return output;
+}
+
+function captureIo() {
+  const logs = [];
+  const errors = [];
+  return { logs, errors, log(value) { logs.push(value); }, error(value) { errors.push(value); } };
 }
 
 async function prepareSkippedNextPackage(root) {
@@ -812,6 +1041,42 @@ async function prepareSkippedNextPackage(root) {
   const scenarios = await readJson(scenariosPath);
   for (const fixture of scenarios) fixture.decided = { ...(fixture.decided ?? {}), "route.mode": "skip" };
   scenarios[0].cover.unshift("stage:preflight", "branch:preflight/skip");
+  await writeJsonAtomic(scenariosPath, scenarios);
+}
+
+async function prepareUnknownReadPackage(root) {
+  await copyTree(join(ROOT, "evals", "g0_5", "b-v5-clean"), root);
+  const specPath = join(root, "spec.mjs");
+  const source = await readFile(specPath, "utf8");
+  const updated = source
+    .replace("export const OBSERVATIONS = {", 'export const OBSERVATIONS = {\n  "card.target": { decided: true, domain: "path" },')
+    .replace("export const GUARDS = [", 'export const GUARDS = [\n  { id: "card-target-required", reads: ["card.target"], when: s => !s.card.target, then: "BLOCK", body: "guard: card-target-required" },');
+  assert.notEqual(updated, source);
+  await writeTextAtomic(specPath, updated);
+
+  const bodyPath = join(root, "body.md");
+  const body = await readFile(bodyPath, "utf8");
+  await writeTextAtomic(bodyPath, body.replace("## guard: read-only-session", "## guard: card-target-required\n\nBlock until the selected card target is observed.\n\n## guard: read-only-session"));
+
+  const scenariosPath = join(root, "fixtures", "scenarios.json");
+  const scenarios = await readJson(scenariosPath);
+  for (const fixture of scenarios) fixture.decided = { ...(fixture.decided ?? {}), "card.target": "cards/task.md" };
+  const missingDecided = { ...scenarios[0].decided };
+  delete missingDecided["card.target"];
+  scenarios.push({
+    id: "missing-card-target",
+    s: { ...scenarios[0].s },
+    decided: missingDecided,
+    expect: { status: "BLOCK", guard: "card-target-required" },
+    cover: ["guard-pending:card-target-required"]
+  });
+  scenarios.push({
+    id: "missing-card-target-literal",
+    s: { ...scenarios[0].s },
+    decided: { ...scenarios[0].decided, "card.target": "UNKNOWN" },
+    expect: { status: "BLOCK", guard: "card-target-required" },
+    cover: ["guard-pending:card-target-required"]
+  });
   await writeJsonAtomic(scenariosPath, scenarios);
 }
 
