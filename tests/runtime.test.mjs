@@ -46,6 +46,10 @@ test("named, list, object, NONE, and UNKNOWN domains fail closed", () => {
   assert.equal(validateDomainValue("list:[a|b]", ["a", "b"]).ok, true);
   assert.equal(validateDomainValue({ id: "card-number", state: ["open", "done"] }, { id: "00.1", state: "open" }).ok, true);
   assert.equal(validateDomainValue({ id: "card-number" }, { id: "00.1", extra: "x" }).ok, false);
+  assert.equal(validateDomainValue("path", "cards/task with spaces.md").ok, true);
+  for (const value of ["cards/task\r.md", "cards/task\n.md", "cards/task;draft.md", " cards/task.md", "cards/task.md ", ".", "cards/../task.md"]) {
+    assert.equal(validateDomainValue("path", value).ok, false);
+  }
   assert.equal(validateDomainValue("path", "../escape").ok, false);
   assert.equal(validateDomainValue("integer", unknown).unknown, true);
 });

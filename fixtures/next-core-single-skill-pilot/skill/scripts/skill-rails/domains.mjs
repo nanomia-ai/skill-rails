@@ -3,7 +3,7 @@ import { fail } from "./diagnostics.mjs";
 const HEX40 = /^[0-9a-f]{40}$/;
 const CARD_NUMBER = /^\d{2}(?:\.\d+)+$/;
 const CARD_LIST = /^\d{2}(?:\.\d+)+(?:\+\d{2}(?:\.\d+)+)*$/;
-const PATH_VALUE = /^(?![./]*$)(?!.*(?:^|\/)\.\.(?:\/|$))[^\r\n;\s]+$/;
+const PATH_VALUE = /^(?![./]*$)(?!.*(?:^|\/)\.\.(?:\/|$))(?!\s)(?!.*\s$)(?:[^\r\n;\s]| )+$/;
 const TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/;
 
 export const NAMED_DOMAINS = Object.freeze([

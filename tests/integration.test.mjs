@@ -822,7 +822,7 @@ test("public stage target is normalized, collector-owned, optional, and containm
   const outside = join(base, "outside");
   await Promise.all([mkdir(join(project, "cards"), { recursive: true }), mkdir(outside, { recursive: true })]);
   await writeFile(join(project, "cards", "task.md"), "selected task\n", "utf8");
-  await writeFile(join(project, "cards", "task-two.md"), "second selected task\n", "utf8");
+  await writeFile(join(project, "cards", "task two.md"), "second selected task\n", "utf8");
   await writeFile(join(outside, "task.md"), "outside task\n", "utf8");
 
   const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
@@ -885,13 +885,13 @@ export const snapshotBasis = async (ctx) => Object.hasOwn(ctx, "targetPath")
   assert.deepEqual(JSON.parse(cliAbsentIo.logs.at(-1)).decision, apiAbsent.decision);
 
   const traceDir = join(base, "traces");
-  const tracedTarget = await stageSkill({ skillRoot: root, projectRoot: project, targetPath: "cards//./task-two.md", decided, traceDir, runId: "target-bearing" });
+  const tracedTarget = await stageSkill({ skillRoot: root, projectRoot: project, targetPath: "cards//./task two.md", decided, traceDir, runId: "target-bearing" });
   const targetEmission = (await readTrace(tracedTarget.tracePath)).findLast((event) => event.type === "decision_emitted");
-  assert.equal(targetEmission.data.targetPath, "cards/task-two.md");
+  assert.equal(targetEmission.data.targetPath, "cards/task two.md");
   const targetResumeIo = captureIo();
   assert.equal(await runtimeMain(["resume", "--skill", root, "--runtime-dir", join(root, "scripts", "skill-rails"), "--trace", tracedTarget.tracePath, "--project", project, "--json"], targetResumeIo), 0);
   const targetResume = JSON.parse(targetResumeIo.logs.at(-1));
-  assert.equal(targetResume.next_command.endsWith(' --target "cards/task-two.md"'), true);
+  assert.equal(targetResume.next_command.endsWith(' --target "cards/task two.md"'), true);
 
   const tracedAbsent = await stageSkill({ skillRoot: root, projectRoot: project, decided, traceDir, runId: "target-absent" });
   const absentEmission = (await readTrace(tracedAbsent.tracePath)).findLast((event) => event.type === "decision_emitted");
