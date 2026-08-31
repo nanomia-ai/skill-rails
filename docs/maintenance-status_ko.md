@@ -8,7 +8,7 @@
 
 ---
 
-## 0. 현재 완료 지점: v0.1.6 공식 배포와 v0.1.7 release candidate 경계
+## 0. 현재 완료 지점: v0.1.7 공식 배포와 installation evidence
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -24,7 +24,7 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 
 - branch: `jmp-develop/v017-target-lane-union`
 - Package source version: 0.1.7. Mechanics union commit은 `d03050f` checkpoint와 released observation correction `f269f29`의 S1/S2 판정을 기록한다.
-- 현재 공식 배포와 전역 canonical install은 여전히 `v0.1.6`이다. `v0.1.7` tag·GitHub Release·공식 설치 receipt는 없고, 이 source candidate를 설치 evidence로 승격하지 않는다.
+- GitHub workflow run `33343504702`가 success로 완료됐고 `v0.1.7` GitHub Release가 published 상태다. 공식 GitHub source의 전역 canonical install도 Codex·Claude Code·Gemini CLI 대상으로 성공했다.
 - P2 runtime/validator는 union byte 계보로 `0.3.1`/`0.4.1`이다. `0.3.0`/`0.4.0`은 landed downstream projection에 쓰인 소진 번호라 재사용하지 않았다.
 - `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 바뀌지 않았다.
 
@@ -60,8 +60,9 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - P2 observation 교정의 targeted runtime·integration 39/39가 pass했다. Canonical pilot은 공식 repair-generated 경로에서 build ID `sha256:1a901e5e01b8680dcfc76140681a170aaf8a22750826bfc04c95ae0238b45736`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했다. Full verify 뒤 Fable/Sol 최종 audit도 MUST-fix 없이 PASS했다.
 - Release 뒤 `skills` 1.5.23으로 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`를 실행했다. Installer는 skill 하나만 발견했고 release package와 설치본은 모두 62 files, `SKILL.md` 1개였다. Path와 CRLF를 제외한 content 차이는 0, installed self lint와 임시 P0 생성·full lint는 pass했고 임시 산출물은 제거했다.
 - Installer security summary는 Gen Safe, Socket 1 alert, Snyk Low Risk를 표시했다. 이는 외부 scanner signal이며 설치·실행 실패가 아니지만, 현재 alert의 상세 원인과 최신 재평가 상태는 이번 제품 receipt로 해소하거나 Pass로 승격하지 않는다.
-- v0.1.7 mechanics candidate의 focused reconciled integration regression 4/4, runtime+integration 42/42, self lint가 pass했다. Canonical pilot은 worktree builder로 재생성되어 build ID `sha256:d2855deb87b5b1b4cbcba467975cbfcc87c7661e7072ffc6478e13b85f49ca1c`, runtime/validator `0.3.1`/`0.4.1`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했고 embedded lint와 real-state e2e 2/2도 pass했다.
+- v0.1.7 release 경계의 focused reconciled integration regression 4/4, runtime+integration 42/42, self lint가 pass했다. Canonical pilot은 worktree builder로 재생성되어 build ID `sha256:d2855deb87b5b1b4cbcba467975cbfcc87c7661e7072ffc6478e13b85f49ca1c`, runtime/validator `0.3.1`/`0.4.1`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했고 embedded lint와 real-state e2e 2/2도 pass했다.
 - Release-boundary staged tree에서 `npm run verify`를 정확히 한 번 실행해 vendor check, self lint, repository test 70/70과 frozen G0.5 eval이 모두 pass했다.
+- Release 뒤 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`가 성공했다. Release source와 installed canonical package의 `git diff --no-index --ignore-cr-at-eol`은 exit 0, 설치본 `scripts/lint.mjs --self`는 pass였고 설치본 fingerprint는 runtime `0.3.1`, validator `0.4.1`, kernel `6`이다.
 
 ---
 
@@ -76,12 +77,12 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - shared source에서 여러 P2 `spec.mjs`/`body.md`로 자동 projection하거나 freshness를 증명하는 workspace mechanism은 구현하지 않았고 `UNPROVEN`이다.
 - 저장소 밖 version-5 package가 문서화되지 않은 raw UNKNOWN 내부 표현이나 `fixture.s`의 잘못된 source lane에 의존하는 수량은 `UNPROVEN`이다. Exact raw 문자열 `"UNKNOWN"`을 known application data로 쓰는 것은 version 5에서 지원하지 않으며, 이를 바꾸려면 별도 versioned boundary가 필요하다.
 - Fresh agent가 optional `--target`을 올바른 경우에만 공급하고 saved trace에서 resume continuity를 실제로 따르는 행동은 `UNPROVEN`이다.
-- v0.1.7 설치본 bytes·creator 실행과 downstream Devflow 아홉 package의 uniform rebuild는 설치 전이므로 `UNPROVEN`이다.
+- v0.1.7 설치본 creator의 새 package 생성·실행과 downstream Devflow 아홉 package의 uniform rebuild는 `UNPROVEN`이다.
 
 ---
 
 ## 5. 정확한 다음 단계
 
-1. v0.1.7 candidate는 mechanics union, package preparation, release-boundary documentation의 세 coherent commit으로 보존한다. Owner가 별도로 배포를 승인하기 전에는 이 tree를 공식 release나 install로 부르지 않는다.
-2. 사용자의 별도 지시 없이는 tag·push·publish·global install을 하지 않는다. 설치 전에는 installation evidence를 만들거나 주장하지 않는다.
-3. 설치가 별도로 완료된 뒤에만 Devflow 아홉 P2 package를 installed v0.1.7 builder로 한 commit에서 rebuild한다. 현재 repository 밖 Devflow/JGNote/sample은 수정하지 않는다.
+1. v0.1.7 release와 global installation receipt는 완료됐다. 이 evidence를 위해 tag·push·publish·global install이나 full verify를 반복하지 않는다.
+2. 다음 별도 작업은 Devflow 아홉 P2 package를 installed v0.1.7 builder로 한 commit에서 rebuild하는 것이다.
+3. 현재 docs-only 작업에서는 repository 밖 Devflow/JGNote/sample을 수정하지 않는다.
