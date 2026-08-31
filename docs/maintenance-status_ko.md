@@ -8,7 +8,7 @@
 
 ---
 
-## 0. 현재 완료 지점: v0.1.7 공식 배포와 installation evidence
+## 0. 현재 완료 지점: v0.1.7 공식 배포와 v0.1.8 release-prep candidate
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -20,13 +20,16 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 
 후속 Devflow 실측은 current task가 이미 선택한 exact file을 public P2 stage에 전달할 typed input이 없다는 경계를 드러냈다. 보존 checkpoint `d03050f`의 optional `targetPath`/`--target`, containment, collector·snapshot 전달, trace·resume 연속성과 read-block guard의 `pending_reads`/`guard-pending:` evidence를 released `f269f29` observation owner 위에 합성했다. 두 true semantic conflict는 released v0.1.6 쪽으로 판정해 raw `"UNKNOWN"`은 모든 lane에서 예약 sentinel로 유지하고, fixture materialization과 L5 `checkReads`는 `observations.mjs`가 계속 소유한다. 새 byte 계보는 runtime `0.3.1`, validator `0.4.1`, kernel `6`이며 package source candidate는 `0.1.7`이다.
 
+Released `v0.1.7` 위에서 두 실사용 흐름이 같은 원인의 서로 다른 증상을 드러냈다. 공개 `path` domain 정규식이 내부 공백을 포함한 정당한 project-relative 선택(`cards/task two.md`)을 관찰 단계에서부터 거부했고, 생성 loader의 `record --type artifact_verified ... --artifact <path>` 예시는 값을 quote하지 않아 그런 경로가 shell에서 한 token으로 살아남지 못했다. Mechanics fix commit `4cd6289`는 `scripts/runtime/domains.mjs`의 `PATH_VALUE`가 선행/후행 공백·CR·LF·`;`·단독 `.`/`./`·`..` traversal은 그대로 거부하면서 내부 U+0020 하나만 허용하도록 넓혔고, `scripts/lib/generator.mjs`의 loader 예시를 `--artifact "<path>"`로 quote했다. `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision/Trace schema, 14 closed exports, effect authority는 바뀌지 않았고 runtime/validator는 `0.3.2`/`0.4.2`로 patch 상승했다. Package source version은 npm의 표준 version 절차로 이 chore commit에서 `0.1.8`로 올렸다. 이 candidate는 fix와 이 chore commit으로 candidate branch에 committed release-prep 상태이며, tag, push, GitHub Release, 전역 설치, fresh-agent 검증은 아직 거치지 않았다. Release-boundary `npm run verify`는 다음 docs 경계 commit에서 정확히 한 번 실행한 결과를 기록할 예정이며, 아직 이 chore commit의 성공 claim이 아니다.
+
 ## 1. 저장소 기준선
 
-- branch: `jmp-develop/v017-target-lane-union`
-- Package source version: 0.1.7. Mechanics union commit은 `d03050f` checkpoint와 released observation correction `f269f29`의 S1/S2 판정을 기록한다.
+- branch: `jmp-develop/phase4-p2-v018-integration`
+- 공식 배포 package version: `0.1.7`. Mechanics union commit은 `d03050f` checkpoint와 released observation correction `f269f29`의 S1/S2 판정을 기록한다.
 - GitHub workflow run `33343504702`가 success로 완료됐고 `v0.1.7` GitHub Release가 published 상태다. 공식 GitHub source의 전역 canonical install도 Codex·Claude Code·Gemini CLI 대상으로 성공했다.
-- P2 runtime/validator는 union byte 계보로 `0.3.1`/`0.4.1`이다. `0.3.0`/`0.4.0`은 landed downstream projection에 쓰인 소진 번호라 재사용하지 않았다.
-- `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 바뀌지 않았다.
+- Candidate branch에 committed된 0.1.8 source candidate는 package version `0.1.8`이다. Interior-space path domain 확장과 quoted 생성 `--artifact` 예시를 담고 있으며 아직 tag, push, release, 설치 중 어느 것도 거치지 않았다.
+- `v0.1.7` 공식 배포의 P2 runtime/validator는 union byte 계보로 `0.3.1`/`0.4.1`이다. `0.1.8` source candidate는 domain·loader patch로 `0.3.2`/`0.4.2`를 기록한다. `0.3.0`/`0.4.0`은 landed downstream projection에 쓰인 소진 번호라 재사용하지 않았다.
+- `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 두 candidate 모두에서 바뀌지 않았다.
 
 ---
 
@@ -41,6 +44,7 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - `fixture.s`/`judged`/`decided` source lane, explicit presence, object-valued observation, version-5 raw `"UNKNOWN"` 예약어를 validator와 회귀 증거로 고정했다.
 - Optional public `targetPath`/`--target`을 portable project-relative path로 정규화하고 lexical·realpath containment 뒤 collector와 custom `snapshotBasis`에만 전달한다. Traced `decision_emitted.data.targetPath`와 CLI `resume`은 normalized target을 연속 투영하며 target이 없을 때 기존 shape를 유지한다.
 - Unknown read로 guard가 멈출 때 evaluator는 `guard_matched.pending_reads`를 내고 build coverage는 `guard-pending:<id>`로 구분한다. L14는 실제 predicate match와 pending-read block을 각각 대응하는 token으로만 인정한다.
+- (0.1.8 후보, 미배포) 공개 `path` domain이 내부 U+0020 공백 하나를 허용하도록 넓어졌고, 생성 loader의 `--artifact <path>` 예시가 `--artifact "<path>"`로 quote됐다.
 
 ---
 
@@ -78,11 +82,13 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 - 저장소 밖 version-5 package가 문서화되지 않은 raw UNKNOWN 내부 표현이나 `fixture.s`의 잘못된 source lane에 의존하는 수량은 `UNPROVEN`이다. Exact raw 문자열 `"UNKNOWN"`을 known application data로 쓰는 것은 version 5에서 지원하지 않으며, 이를 바꾸려면 별도 versioned boundary가 필요하다.
 - Fresh agent가 optional `--target`을 올바른 경우에만 공급하고 saved trace에서 resume continuity를 실제로 따르는 행동은 `UNPROVEN`이다.
 - v0.1.7 설치본 creator의 새 package 생성·실행과 downstream Devflow 아홉 package의 uniform rebuild는 `UNPROVEN`이다.
+- 0.1.8 source candidate(interior-space path domain, quoted `--artifact`)는 tag, push, GitHub Release, 전역 설치, fresh-agent 소비 중 어느 것도 거치지 않았다.
 
 ---
 
 ## 5. 정확한 다음 단계
 
 1. v0.1.7 release와 global installation receipt는 완료됐다. 이 evidence를 위해 tag·push·publish·global install이나 full verify를 반복하지 않는다.
-2. 다음 별도 작업은 Devflow 아홉 P2 package를 installed v0.1.7 builder로 한 commit에서 rebuild하는 것이다.
-3. 현재 docs-only 작업에서는 repository 밖 Devflow/JGNote/sample을 수정하지 않는다.
+2. `0.1.8` candidate는 fix와 이 chore commit으로 candidate branch에 committed release-prep 상태다. 다음 docs 경계 commit에서 release-boundary verify를 기록한다. Owner가 명시적으로 지시하기 전에는 tag, push, publish, global install을 하지 않는다.
+3. 다음 별도 작업은 Devflow 아홉 P2 package를 installed v0.1.7 builder로 한 commit에서 rebuild하는 것이다. 0.1.8이 공식 배포된 뒤에는 그 builder로 다시 정렬한다.
+4. 현재 docs-only/release-prep 작업에서는 repository 밖 Devflow/JGNote/sample을 수정하지 않는다.
