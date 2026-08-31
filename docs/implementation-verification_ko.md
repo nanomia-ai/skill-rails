@@ -450,6 +450,16 @@ Unknown read로 guard가 중단될 때 evaluator는 기존 BLOCK Decision·needs
 
 회귀는 omitted와 raw `"UNKNOWN"` decided input이 같은 BLOCK·needs로 수렴하고 `pending_reads`가 있는 observer/trace에서도 Decision이 변하지 않는지 확인한다. Pending token을 actual-match fixture에 붙이거나 actual token을 read-block fixture에 붙이는 양방향 false claim은 거부된다. 이 교정은 fixture materialization의 두 번째 owner를 만들지 않으며 released 6.14절의 observation preparation과 L5 `checkReads`를 그대로 소비한다.
 
+### 6.17 Interior-space path domain과 quoted CLI artifact path (v0.1.8 후보, 미배포)
+
+두 실사용 흐름이 같은 근본 원인의 서로 다른 증상을 드러냈다. 공개 `path` domain 정규식은 내부 공백을 포함한 모든 공백을 거부해 `cards/task two.md`처럼 정당한 공백 포함 project-relative 선택 경로를 관찰 단계에서부터 막았고, 생성 loader의 `record --type artifact_verified ... --artifact <path>` 예시는 값을 quote하지 않아 그 경로에 공백이 있으면 shell에서 한 token으로 살아남지 못했다.
+
+교정은 `scripts/runtime/domains.mjs`의 `PATH_VALUE`를 선행/후행 공백, CR, LF, `;`, 단독 `.`/`./`, `..` traversal segment는 그대로 거부하면서 내부 U+0020 하나만 허용하도록 넓혔고, `scripts/lib/generator.mjs`가 만드는 thin-loader 본문의 `--artifact <path>` 예시를 `--artifact "<path>"`로 quote했다. 두 위치 모두 canonical source이며 canonical pilot은 그 source에서 다시 build했다. 이 변경은 domain 정규식과 loader 예시 문구에 한정되고, `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision schema `skill-rails/decision/2`, Trace schema, 14 closed exports, effect authority 경계는 바뀌지 않았다. `RUNTIME_VERSION`은 `0.3.1`에서 `0.3.2`로, `VALIDATOR_VERSION`은 `0.4.1`에서 `0.4.2`로 patch 상승했다.
+
+Targeted regression `node --test --test-name-pattern "named, list, object, NONE, and UNKNOWN domains fail closed" tests/runtime.test.mjs`가 1/1 pass했고, 내부 공백 경로 하나를 수락하면서 후행 공백·CR·LF·`;`·단독 `.`·`..` traversal은 여전히 거부함을 확인했다. 기존 `tests/integration.test.mjs`의 public-stage-target 회귀는 selection을 `cards/task-two.md`에서 `cards/task two.md`로 바꿔 normalized `targetPath`, traced `decision_emitted.data.targetPath`, quoted CLI `resume --target "cards/task two.md"`이 같은 값으로 끝까지 연결됨을 다시 확인했다. Canonical pilot rebuild는 generated file을 손으로 고치지 않고 공식 경로로 다시 만들었으며 root lint L0–L18 pass, mutation 20/20, scenario 10/10·50회 반복 불일치 0, format 256/256, build ID `sha256:c1492ff7217f9fe54f9b15b9012bfcea4f69948f2a2663408dcb2ef232420a01`을 기록했다. 이 후보 tree에서 실행한 `npm run verify`는 vendor check, self lint, repository test 70/70, frozen G0.5 eval을 모두 통과했다. 독립 Sol/Opus/Fable 교차 검토는 domain 확장과 quoting 수정 모두에 MUST-fix 없이 PASS했다.
+
+이 후보는 fix, chore prepare, docs release-boundary 세 개의 coherent local commit으로 candidate branch에 committed release-prep 상태이며, 아직 tag, push, GitHub Release, 전역 설치, fresh-agent 검증 중 어느 것도 거치지 않았다. 이 절의 receipt를 v0.1.8 공식 배포 증거로 인용하지 않는다.
+
 ---
 
 
@@ -526,6 +536,7 @@ Version-5 기준선의 18개 공개 위치는 현재 typed Decision에서 다음
 | live collection, simulate, scenario expectation, L5가 observation source를 서로 다르게 정규화 | 한 `observations.mjs` preparation owner가 collector/`s`/`judged`/`decided`의 presence·binding·reserved UNKNOWN·domain·flat/nested/unknown receipt를 계산 | 누락값이 predicate를 실행하거나 coverage를 얻는 false proof를 제거하고 version-5 raw sentinel 호환을 보존함; source-lane·live/simulate parity·known/false coverage regression으로 rollback을 막음 |
 | public stage 호출자가 task/role이 이미 선택한 exact project file을 전달할 typed input이 없음 | optional API `targetPath` / CLI `--target`을 runtime이 normalized `ctx.targetPath`로 collector와 snapshot basis에 전달하고 traced `decision_emitted.data`에서 resume command로 연속 투영 | judged/decided, argv 재해석, target 추론, parallel Decision field나 package opt-in 없이 기존 observation→snapshot→Decision 경로를 보존함; target-absent context·trace data·resume command와 Decision schema는 그대로이며 API/CLI 정상·거부·physical containment·trace/resume regression으로 rollback을 막음 |
 | exact format 예시가 `Decision.format.example`에만 있고 실행 effect와 떨어져 있음 | format을 소유한 effect에 같은 정본 값의 `format_example`을 투영 | spec·fixture를 두 번째 정본으로 복제하지 않고 실제 WRITE 소비 위치에서 정확한 형식을 찾게 함; targeted runtime, canonical build와 installed fresh Luna receipt로 제한 검증 |
+| 공개 `path` domain이 내부 공백을 가진 정당한 project-relative 선택을 거부하고, 생성 loader의 `--artifact <path>` 예시가 quote되지 않아 공백 포함 경로에서 shell token이 깨짐 (v0.1.8 후보, 미배포) | `PATH_VALUE`가 선행/후행 공백·CR·LF·`;`·단독 `.`/`./`·`..` traversal은 그대로 거부하며 내부 U+0020 하나만 허용; 생성 loader 예시를 `--artifact "<path>"`로 quote | 두 canonical source(`domains.mjs`, `generator.mjs`)만 고치고 domain 문법이나 evidence authority를 넓히지 않음; 1/1 targeted regression과 `cards/task two.md` end-to-end 회귀로 rollback을 막음 |
 
 ### 7.3 의도적으로 제외한 capability
 
@@ -622,5 +633,6 @@ P2 version-5 호환 의미를 바꾸는 수정은 이 원장에 다음을 함께
 - Fresh consumer가 skipped judgment branch, tampered Decision rejection, evidence REPORT record/align을 한 run에서 끝까지 연결한 chained coherence
 - public lane의 harness-trusted effect observation과 verifier truthfulness
 - final-gate correction byte를 사용한 fresh P2 skipped-NEXT consumer behavior
+- 미배포 v0.1.8 후보(interior-space path domain, quoted `--artifact`)의 tag·push·release·설치·fresh-agent 소비
 
 이 항목들은 숨은 미완성 code marker가 아니라 별도 empirical scope다. 지원을 주장하려면 해당 범위를 직접 실행한 fresh evidence를 추가한다.

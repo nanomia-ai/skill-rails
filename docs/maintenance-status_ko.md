@@ -20,7 +20,7 @@ v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않�
 
 후속 Devflow 실측은 current task가 이미 선택한 exact file을 public P2 stage에 전달할 typed input이 없다는 경계를 드러냈다. 보존 checkpoint `d03050f`의 optional `targetPath`/`--target`, containment, collector·snapshot 전달, trace·resume 연속성과 read-block guard의 `pending_reads`/`guard-pending:` evidence를 released `f269f29` observation owner 위에 합성했다. 두 true semantic conflict는 released v0.1.6 쪽으로 판정해 raw `"UNKNOWN"`은 모든 lane에서 예약 sentinel로 유지하고, fixture materialization과 L5 `checkReads`는 `observations.mjs`가 계속 소유한다. 새 byte 계보는 runtime `0.3.1`, validator `0.4.1`, kernel `6`이며 package source candidate는 `0.1.7`이다.
 
-Released `v0.1.7` 위에서 두 실사용 흐름이 같은 원인의 서로 다른 증상을 드러냈다. 공개 `path` domain 정규식이 내부 공백을 포함한 정당한 project-relative 선택(`cards/task two.md`)을 관찰 단계에서부터 거부했고, 생성 loader의 `record --type artifact_verified ... --artifact <path>` 예시는 값을 quote하지 않아 그런 경로가 shell에서 한 token으로 살아남지 못했다. Mechanics fix commit `4cd6289`는 `scripts/runtime/domains.mjs`의 `PATH_VALUE`가 선행/후행 공백·CR·LF·`;`·단독 `.`/`./`·`..` traversal은 그대로 거부하면서 내부 U+0020 하나만 허용하도록 넓혔고, `scripts/lib/generator.mjs`의 loader 예시를 `--artifact "<path>"`로 quote했다. `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision/Trace schema, 14 closed exports, effect authority는 바뀌지 않았고 runtime/validator는 `0.3.2`/`0.4.2`로 patch 상승했다. Package source version은 npm의 표준 version 절차로 이 chore commit에서 `0.1.8`로 올렸다. 이 candidate는 fix와 이 chore commit으로 candidate branch에 committed release-prep 상태이며, tag, push, GitHub Release, 전역 설치, fresh-agent 검증은 아직 거치지 않았다. Release-boundary `npm run verify`는 다음 docs 경계 commit에서 정확히 한 번 실행한 결과를 기록할 예정이며, 아직 이 chore commit의 성공 claim이 아니다.
+Released `v0.1.7` 위에서 두 실사용 흐름이 같은 원인의 서로 다른 증상을 드러냈다. 공개 `path` domain 정규식이 내부 공백을 포함한 정당한 project-relative 선택(`cards/task two.md`)을 관찰 단계에서부터 거부했고, 생성 loader의 `record --type artifact_verified ... --artifact <path>` 예시는 값을 quote하지 않아 그런 경로가 shell에서 한 token으로 살아남지 못했다. Mechanics fix commit `4cd6289`는 `scripts/runtime/domains.mjs`의 `PATH_VALUE`가 선행/후행 공백·CR·LF·`;`·단독 `.`/`./`·`..` traversal은 그대로 거부하면서 내부 U+0020 하나만 허용하도록 넓혔고, `scripts/lib/generator.mjs`의 loader 예시를 `--artifact "<path>"`로 quote했다. `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision/Trace schema, 14 closed exports, effect authority는 바뀌지 않았고 runtime/validator는 `0.3.2`/`0.4.2`로 patch 상승했다. Package source version은 npm의 표준 version 절차로 `0.1.8`로 올렸다. 이 candidate는 fix, chore prepare, docs release-boundary 세 개의 coherent local commit으로 candidate branch에 committed release-prep 상태이며, tag, push, GitHub Release, 전역 설치, fresh-agent 검증은 아직 거치지 않았다. Release-boundary staged tree에서 `npm run verify`를 정확히 한 번 실행해 vendor check, self lint, repository test 70/70과 frozen G0.5 eval이 모두 pass했다.
 
 ## 1. 저장소 기준선
 
@@ -67,6 +67,7 @@ Released `v0.1.7` 위에서 두 실사용 흐름이 같은 원인의 서로 다�
 - v0.1.7 release 경계의 focused reconciled integration regression 4/4, runtime+integration 42/42, self lint가 pass했다. Canonical pilot은 worktree builder로 재생성되어 build ID `sha256:d2855deb87b5b1b4cbcba467975cbfcc87c7661e7072ffc6478e13b85f49ca1c`, runtime/validator `0.3.1`/`0.4.1`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했고 embedded lint와 real-state e2e 2/2도 pass했다.
 - Release-boundary staged tree에서 `npm run verify`를 정확히 한 번 실행해 vendor check, self lint, repository test 70/70과 frozen G0.5 eval이 모두 pass했다.
 - Release 뒤 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`가 성공했다. Release source와 installed canonical package의 `git diff --no-index --ignore-cr-at-eol`은 exit 0, 설치본 `scripts/lint.mjs --self`는 pass였고 설치본 fingerprint는 runtime `0.3.1`, validator `0.4.1`, kernel `6`이다.
+- (0.1.8 후보, 미배포) Targeted seam regression `node --test --test-name-pattern "named, list, object, NONE, and UNKNOWN domains fail closed" tests/runtime.test.mjs`가 1/1 pass했고, `cards/task two.md` selection을 쓰는 public-stage-target 통합 회귀도 함께 확인했다. Canonical pilot rebuild는 root lint L0–L18, mutation 20/20, scenario 10/10·50회 반복 불일치 0, format 256/256, build ID `sha256:c1492ff7217f9fe54f9b15b9012bfcea4f69948f2a2663408dcb2ef232420a01`을 기록했다. 이 candidate tree의 `npm run verify`는 vendor check, self lint, repository test 70/70, frozen G0.5 eval을 모두 통과했다. 독립 Sol/Opus/Fable 교차 검토는 MUST-fix 없이 PASS했다.
 
 ---
 
@@ -82,13 +83,13 @@ Released `v0.1.7` 위에서 두 실사용 흐름이 같은 원인의 서로 다�
 - 저장소 밖 version-5 package가 문서화되지 않은 raw UNKNOWN 내부 표현이나 `fixture.s`의 잘못된 source lane에 의존하는 수량은 `UNPROVEN`이다. Exact raw 문자열 `"UNKNOWN"`을 known application data로 쓰는 것은 version 5에서 지원하지 않으며, 이를 바꾸려면 별도 versioned boundary가 필요하다.
 - Fresh agent가 optional `--target`을 올바른 경우에만 공급하고 saved trace에서 resume continuity를 실제로 따르는 행동은 `UNPROVEN`이다.
 - v0.1.7 설치본 creator의 새 package 생성·실행과 downstream Devflow 아홉 package의 uniform rebuild는 `UNPROVEN`이다.
-- 0.1.8 source candidate(interior-space path domain, quoted `--artifact`)는 tag, push, GitHub Release, 전역 설치, fresh-agent 소비 중 어느 것도 거치지 않았다.
+- 0.1.8 source candidate(interior-space path domain, quoted `--artifact`)는 tag, push, GitHub Release, 전역 설치, fresh-agent 소비 중 어느 것도 거치지 않았다. 이 절의 release-boundary verify receipt를 공식 `v0.1.8` 배포 증거로 승격하지 않는다.
 
 ---
 
 ## 5. 정확한 다음 단계
 
 1. v0.1.7 release와 global installation receipt는 완료됐다. 이 evidence를 위해 tag·push·publish·global install이나 full verify를 반복하지 않는다.
-2. `0.1.8` candidate는 fix와 이 chore commit으로 candidate branch에 committed release-prep 상태다. 다음 docs 경계 commit에서 release-boundary verify를 기록한다. Owner가 명시적으로 지시하기 전에는 tag, push, publish, global install을 하지 않는다.
+2. `0.1.8` candidate는 fix, chore prepare, docs release-boundary 세 개의 coherent local commit으로 candidate branch에 committed release-prep 상태이며 release-boundary verify가 기록됐다. Owner가 명시적으로 지시하기 전에는 tag, push, publish, global install을 하지 않는다.
 3. 다음 별도 작업은 Devflow 아홉 P2 package를 installed v0.1.7 builder로 한 commit에서 rebuild하는 것이다. 0.1.8이 공식 배포된 뒤에는 그 builder로 다시 정렬한다.
 4. 현재 docs-only/release-prep 작업에서는 repository 밖 Devflow/JGNote/sample을 수정하지 않는다.
