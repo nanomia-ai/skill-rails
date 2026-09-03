@@ -737,6 +737,28 @@ test("changed snapshot groups map to the exact locator spellings an obligation l
   ]);
 });
 
+test("table row locators come from a real snapshot diff, not a hand-built group shape", async () => {
+  // The mapping unit test builds group entries by hand, which would keep passing if `summarizeTable`
+  // changed shape underneath it. This drives the same mapping from a real package's real snapshot so a
+  // change to how tables are indexed fails here instead of silently emptying the report.
+  const pilot = join(ROOT, "fixtures", "next-core-single-skill-pilot", "skill");
+  const before = await snapshotContract(pilot);
+  const tableId = Object.keys(before.tables)[0];
+  assert.ok(tableId, "the pilot fixture must declare a table for this to mean anything");
+  const rowStates = before.tables[tableId].rows.map((row) => row.state);
+  assert.ok(rowStates.length > 1, "the table must have rows");
+
+  const after = JSON.parse(JSON.stringify(before));
+  after.tables[tableId].rows[0].reads = [...after.tables[tableId].rows[0].reads, "synthetic.probe"];
+  const report = semanticDiff(before, after);
+  assert.equal(report.groups.tables.length, 1, "one changed table is one group entry");
+
+  const locators = changedLocators(report.groups);
+  assert.deepEqual([...locators.keys()].sort(), rowStates.map((state) => `spec:TABLES/${tableId}/${state}`).sort(),
+    "a changed table reports every row state, in the spelling the ledger resolver accepts");
+  for (const locator of locators.keys()) assert.equal(locator.split("/").length, 3, "a table locator carries table and row");
+});
+
 test("a maintenance receipt names the projected obligations riding what the transaction changed", async (t) => {
   const base = await makeTestDir("obligation-impact");
   t.after(() => removeTestDir(base));
