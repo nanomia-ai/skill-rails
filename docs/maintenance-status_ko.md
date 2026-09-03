@@ -8,7 +8,7 @@
 
 ---
 
-## 0. 현재 완료 지점: v0.1.9 P2 종단 효과 순서 교정 후보
+## 0. 현재 완료 지점: v0.1.9 P2 종단 효과 순서 교정 배포 완료
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -24,14 +24,14 @@ Released `v0.1.7` 위에서 두 실사용 흐름이 같은 원인의 서로 다�
 
 Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --ff-only`로 `main`에 fast-forward한 뒤 그 commit을 가리키는 annotated tag `v0.1.8`을 만들고 `git push --atomic origin main v0.1.8`로 `main`과 tag를 함께 push했다. GitHub Release `v0.1.8`을 제목 `v0.1.8`, 본문 `Full Changelog: https://github.com/nanomia-ai/skill-rails/compare/v0.1.7...v0.1.8`로 같은 commit에 publish했다. 그 push가 트리거한 GitHub workflow run `33403838640`(`https://github.com/nanomia-ai/skill-rails/actions/runs/33403838640`)이 success로 완료됐다. Release 뒤 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`를 정확히 한 번 실행해 Codex·Gemini CLI 전역 canonical package 설치와 Claude Code symlink가 성공했다. `main`의 `skills/skill-rails`와 설치본 `git diff --no-index --ignore-cr-at-eol`은 exit 0(양쪽 62 files)이었고, 설치본 `scripts/lint.mjs --self`는 pass, 설치본 fingerprint는 runtime `0.3.2`, validator `0.4.2`, kernel `6`으로 candidate가 기록한 값과 일치했다. Installer security summary는 Gen Safe, Socket 1 alert, Snyk Low Risk를 표시했다.
 
-v0.1.9 후보는 Devflow 실용성 감사에서 확인된 생성 어댑터의 종단 해석 충돌만 고친다. 기존 문장은 `ASK`·`WAIT`·`BLOCK`을 진단과 같은 선행 정지 조건으로 읽히게 했지만 evaluator는 이들을 효과 배열의 마지막 종단으로 계산한다. 생성기와 P2 contract는 이제 진단·오래된 snapshot만 실행 전에 멈추고, 유효한 Decision의 모든 효과를 배열 순서대로 종단까지 수행한다고 한 해석으로 모인다. Runtime, validator, kernel, Decision/Trace schema와 effect grammar는 그대로이며 fresh-agent 실사용 행동은 아직 `UNPROVEN`이다.
+v0.1.9는 Devflow 실용성 감사에서 확인된 생성 어댑터의 종단 해석 충돌만 고친다. 기존 문장은 `ASK`·`WAIT`·`BLOCK`을 진단과 같은 선행 정지 조건으로 읽히게 했지만 evaluator는 이들을 효과 배열의 마지막 종단으로 계산한다. 생성기와 P2 contract는 이제 진단·오래된 snapshot만 실행 전에 멈추고, 유효한 Decision의 모든 효과를 배열 순서대로 종단까지 수행한다고 한 해석으로 모인다. Runtime, validator, kernel, Decision/Trace schema와 effect grammar는 그대로다. Commit `63147c2c83533ca9bcb69ff4e4a719217ee4d844`, annotated tag와 GitHub Release `v0.1.9`, atomic push, workflow run `33719014072` success, Codex·Claude Code 전역 설치와 newline-normalized source hash 일치까지 확인했다. Fresh-agent 실사용 행동은 아직 `UNPROVEN`이다.
 
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 공식 배포 package version: `0.1.8`; 현재 source candidate는 `0.1.9`. Mechanics fix commit은 `4cd6289`(interior-space path domain, quoted 생성 `--artifact` 예시)를 기록한다.
-- GitHub workflow run `33403838640`이 success로 완료됐고(`https://github.com/nanomia-ai/skill-rails/actions/runs/33403838640`) `v0.1.8` GitHub Release가 published 상태다(`https://github.com/nanomia-ai/skill-rails/releases/tag/v0.1.8`, Full Changelog `v0.1.7...v0.1.8`). 공식 GitHub source의 전역 canonical install도 Codex·Claude Code·Gemini CLI 대상으로 성공했다.
-- `main`/`origin/main`과 annotated tag `v0.1.8`은 모두 commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 가리킨다.
+- 공식 배포 package version: `0.1.9`. 이전 mechanics fix commit은 `4cd6289`(interior-space path domain, quoted 생성 `--artifact` 예시)를 기록한다.
+- GitHub workflow run `33719014072`가 success로 완료됐고 `v0.1.9` GitHub Release가 published 상태다. 공식 GitHub source의 전역 canonical install도 Codex·Claude Code 대상으로 성공했다.
+- `main`/`origin/main`과 annotated tag `v0.1.9`은 모두 commit `63147c2c83533ca9bcb69ff4e4a719217ee4d844`를 가리킨다.
 - `v0.1.7` 공식 배포의 P2 runtime/validator는 union byte 계보로 `0.3.1`/`0.4.1`이다. `v0.1.8`은 domain·loader patch로 `0.3.2`/`0.4.2`를 기록하며 설치본 fingerprint로 재확인했다. `0.3.0`/`0.4.0`은 landed downstream projection에 쓰인 소진 번호라 재사용하지 않았다.
 - `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 `v0.1.7`과 `v0.1.8` 모두에서 바뀌지 않았다.
 
@@ -70,6 +70,7 @@ v0.1.9 후보는 Devflow 실용성 감사에서 확인된 생성 어댑터의 �
 - Installer security summary는 Gen Safe, Socket 1 alert, Snyk Low Risk를 표시했다. 이는 외부 scanner signal이며 설치·실행 실패가 아니지만, 현재 alert의 상세 원인과 최신 재평가 상태는 이번 제품 receipt로 해소하거나 Pass로 승격하지 않는다.
 - v0.1.7 release 경계의 focused reconciled integration regression 4/4, runtime+integration 42/42, self lint가 pass했다. Canonical pilot은 worktree builder로 재생성되어 build ID `sha256:d2855deb87b5b1b4cbcba467975cbfcc87c7661e7072ffc6478e13b85f49ca1c`, runtime/validator `0.3.1`/`0.4.1`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256을 기록했고 embedded lint와 real-state e2e 2/2도 pass했다.
 - Release-boundary staged tree에서 `npm run verify`를 정확히 한 번 실행해 vendor check, self lint, repository test 70/70과 frozen G0.5 eval이 모두 pass했다.
+- v0.1.9의 `main`/tag/GitHub Release는 commit `63147c2`에 일치하고 workflow run `33719014072`가 success다. 공식 installer는 skill 하나를 Codex canonical package에 설치하고 Claude Code를 같은 경로로 symlink했다. Source와 설치본의 `SKILL.md`, generator, P2 contract는 newline-normalized SHA-256이 모두 일치한다.
 - Release 뒤 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`가 성공했다. Release source와 installed canonical package의 `git diff --no-index --ignore-cr-at-eol`은 exit 0, 설치본 `scripts/lint.mjs --self`는 pass였고 설치본 fingerprint는 runtime `0.3.1`, validator `0.4.1`, kernel `6`이다.
 - Targeted seam regression `node --test --test-name-pattern "named, list, object, NONE, and UNKNOWN domains fail closed" tests/runtime.test.mjs`가 1/1 pass했고, `cards/task two.md` selection을 쓰는 public-stage-target 통합 회귀도 함께 확인했다. Canonical pilot rebuild는 root lint L0–L18, mutation 20/20, scenario 10/10·50회 반복 불일치 0, format 256/256, build ID `sha256:c1492ff7217f9fe54f9b15b9012bfcea4f69948f2a2663408dcb2ef232420a01`을 기록했다. 이 release-boundary tree의 `npm run verify`는 vendor check, self lint, repository test 70/70, frozen G0.5 eval을 모두 통과했다. 독립 Sol/Opus/Fable 교차 검토는 MUST-fix 없이 PASS했다.
 - `main`/`origin/main`을 `git merge --ff-only`로 `58c8dc0`에 fast-forward하고 annotated tag `v0.1.8`을 만들어 `git push --atomic origin main v0.1.8`로 함께 push했다. GitHub Release `v0.1.8`을 published했고, 트리거된 workflow run `33403838640`이 success로 끝났다. Release 뒤 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`를 한 번 실행해 Codex·Gemini CLI 전역 설치와 Claude Code symlink가 성공했다. `main`의 `skills/skill-rails`(62 files)와 설치본(62 files)의 `git diff --no-index --ignore-cr-at-eol`은 exit 0, 설치본 `scripts/lint.mjs --self`는 pass, 설치본 fingerprint는 runtime `0.3.2`/validator `0.4.2`/kernel `6`이다.
@@ -95,5 +96,5 @@ v0.1.9 후보는 Devflow 실용성 감사에서 확인된 생성 어댑터의 �
 ## 5. 정확한 다음 단계
 
 1. v0.1.7과 v0.1.8 release, tag, GitHub Release, global installation receipt는 모두 완료됐다. 이 evidence를 위해 tag·push·publish·global install이나 full verify를 반복하지 않는다.
-2. 다음 별도 작업은 Devflow 아홉 P2 package를 installed v0.1.8 builder로 한 commit에서 rebuild하는 것이다.
-3. 현재 docs-only 작업에서는 repository 밖 Devflow/JGNote/sample을 수정하지 않는다.
+2. Devflow 아홉 P2 package의 v0.1.9 builder rebuild와 정적 감사는 downstream 저장소에서 완료됐고, 그 저장소의 배포·설치 receipt가 남아 있다.
+3. 다음 검증은 fresh consumer가 prefix 효과를 실제로 순서대로 수행하는지에 한정하며, 구조 검사를 행동 증거로 승격하지 않는다.

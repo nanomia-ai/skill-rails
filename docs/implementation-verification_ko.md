@@ -81,6 +81,8 @@ Devflow 아홉 P2 패키지의 실용성 감사에서 생성 `SKILL.md`의 3항�
 
 v0.1.9는 runtime, schema, effect grammar를 바꾸지 않는다. 생성기 문장과 P2 contract를 정렬하여 진단·오래된 snapshot만 실행 전에 멈추고, 유효한 Decision은 배열 순서대로 종단까지 소비하며 마지막 status가 앞 효과를 버리지 못한다고 명시한다. 통합 회귀는 새 문장과 옛 선행 정지 목록의 부재를 검사하고, canonical pilot은 builder로 다시 생성한다. Fresh Codex·Claude의 실제 종단 소비 행동은 이 릴리스의 구조·논리 증거로 승격하지 않고 `UNPROVEN`으로 둔다.
 
+Release-boundary commit `63147c2c83533ca9bcb69ff4e4a719217ee4d844`은 `npm run verify`의 vendor check, self lint, repository test 70/70과 frozen G0.5 eval을 통과한 바이트다. Annotated tag와 GitHub Release `v0.1.9`를 같은 commit에 만들고 `main`과 tag를 atomic push했으며, workflow run `33719014072`가 success로 끝났다. 공식 GitHub source를 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes`로 설치해 Codex canonical package와 Claude Code symlink를 갱신했다. Source와 설치본의 `SKILL.md`, generator, P2 contract는 newline 정규화 뒤 SHA-256이 각각 일치한다. Fresh consumer의 실제 효과 소비 행동은 실행하지 않았으므로 계속 `UNPROVEN`이다.
+
 ## 1. 현재 결정적 검증
 
 Package 0.1.5의 설치 product bytes는 `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`에서 `origin/main`에 들어갔고 위 0.3절의 full verify, local installer와 GitHub-source global installer smoke를 통과했다. `v0.1.5` annotated tag와 GitHub Release는 이 receipt를 포함한 evidence commit을 기준으로 배포한다. P2 behavior contract는 바뀌지 않았으며 이 release의 새 주장은 distribution boundary에 한정된다.
