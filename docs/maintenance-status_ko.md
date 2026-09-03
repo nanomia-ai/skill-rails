@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-08-31 KST
+최종 갱신: 2026-09-04 KST
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 완료 지점: v0.1.9 P2 종단 효과 순서 교정 배포 완료
+## 0. 현재 위치: 배포된 것은 v0.1.9, `main`에 배포하지 않은 결함 수정 후보가 쌓여 있다
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -25,6 +25,8 @@ Released `v0.1.7` 위에서 두 실사용 흐름이 같은 원인의 서로 다�
 Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --ff-only`로 `main`에 fast-forward한 뒤 그 commit을 가리키는 annotated tag `v0.1.8`을 만들고 `git push --atomic origin main v0.1.8`로 `main`과 tag를 함께 push했다. GitHub Release `v0.1.8`을 제목 `v0.1.8`, 본문 `Full Changelog: https://github.com/nanomia-ai/skill-rails/compare/v0.1.7...v0.1.8`로 같은 commit에 publish했다. 그 push가 트리거한 GitHub workflow run `33403838640`(`https://github.com/nanomia-ai/skill-rails/actions/runs/33403838640`)이 success로 완료됐다. Release 뒤 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`를 정확히 한 번 실행해 Codex·Gemini CLI 전역 canonical package 설치와 Claude Code symlink가 성공했다. `main`의 `skills/skill-rails`와 설치본 `git diff --no-index --ignore-cr-at-eol`은 exit 0(양쪽 62 files)이었고, 설치본 `scripts/lint.mjs --self`는 pass, 설치본 fingerprint는 runtime `0.3.2`, validator `0.4.2`, kernel `6`으로 candidate가 기록한 값과 일치했다. Installer security summary는 Gen Safe, Socket 1 alert, Snyk Low Risk를 표시했다.
 
 v0.1.9는 Devflow 실용성 감사에서 확인된 생성 어댑터의 종단 해석 충돌만 고친다. 기존 문장은 `ASK`·`WAIT`·`BLOCK`을 진단과 같은 선행 정지 조건으로 읽히게 했지만 evaluator는 이들을 효과 배열의 마지막 종단으로 계산한다. 생성기와 P2 contract는 이제 진단·오래된 snapshot만 실행 전에 멈추고, 유효한 Decision의 모든 효과를 배열 순서대로 종단까지 수행한다고 한 해석으로 모인다. Runtime, validator, kernel, Decision/Trace schema와 effect grammar는 그대로다. Commit `63147c2c83533ca9bcb69ff4e4a719217ee4d844`, annotated tag와 GitHub Release `v0.1.9`, atomic push, workflow run `33719014072` success, Codex·Claude Code 전역 설치와 newline-normalized source hash 일치까지 확인했다. Fresh-agent 실사용 행동은 아직 `UNPROVEN`이다.
+
+v0.1.9 이후 `main`에 push하지 않은 후보가 쌓여 있다. 내용은 migrate 기본 intent의 절대경로 이식성, `spec:ROLES/<id>`가 `TypeError`로 빌드를 죽이던 것, `references`/`templates`가 정규 파일일 때 유지보수가 `ENOTDIR`로 죽던 것, 원장 locator의 후행 세그먼트가 조용히 무시돼 오타가 부모로 해석되던 것, 그리고 소비 저장소가 올린 유일한 upstream 요구인 런타임 상태의 관찰 프로젝트 오염이다. 전부 결함 수정이며, 중간 후보(tag `v0.2.0`)가 함께 넣었던 범용성 축소 네 곳은 되돌렸다. v0.1.9 대비 새 거부는 셋뿐이고(`READ_FIRST.path` 실재, 원장 locator 세그먼트 수, trace 경계) 소비 코퍼스 실측 거부는 0건이다. 후보 fingerprint는 validator `0.6.1`, runtime `0.4.0`, kernel `6`, package version `0.3.0`이다. 후보 tree에서 `npm run verify` 76/76과 소비 저장소 9개 읽기 전용 진단 0건을 확인했다. Tag·push·GitHub Release·전역 설치는 하지 않았다. 각 변경의 근거와 실측은 [구현·검증 기록](implementation-verification_ko.md) 6.20–6.22가 소유한다.
 
 ## 1. 저장소 기준선
 
@@ -95,6 +97,7 @@ v0.1.9는 Devflow 실용성 감사에서 확인된 생성 어댑터의 종단 �
 
 ## 5. 정확한 다음 단계
 
-1. v0.1.7과 v0.1.8 release, tag, GitHub Release, global installation receipt는 모두 완료됐다. 이 evidence를 위해 tag·push·publish·global install이나 full verify를 반복하지 않는다.
-2. Devflow 아홉 P2 package의 v0.1.9 builder rebuild와 정적 감사는 downstream 저장소에서 완료됐고, 그 저장소의 배포·설치 receipt가 남아 있다.
-3. 다음 검증은 fresh consumer가 prefix 효과를 실제로 순서대로 수행하는지에 한정하며, 구조 검사를 행동 증거로 승격하지 않는다.
+1. 남은 것은 배포다. 소비 저장소 작업이 끝난 뒤 [업그레이드 확인 목록](upgrade-from-v0.1.9_ko.md) 절차대로 전체 P2 package를 한 번에 재빌드해 한 커밋으로 닫는다. `validator_hash`·`validator_version`·`runtime_hash`·`runtime_version`이 `.generated.json`에 봉인되고 `verifyManifest`가 무결성 필드로 비교하므로 부분 재빌드는 코호트 검사에서 실패한다. 재빌드 전에 프로젝트 안을 가리키는 trace 디렉터리 설정이 없는지 확인한다.
+2. v0.1.7과 v0.1.8 release, tag, GitHub Release, global installation receipt는 모두 완료됐다. 이 evidence를 위해 tag·push·publish·global install이나 full verify를 반복하지 않는다.
+3. Devflow 아홉 P2 package의 v0.1.9 builder rebuild와 정적 감사는 downstream 저장소에서 완료됐고, 그 저장소의 배포·설치 receipt가 남아 있다.
+4. 다음 검증은 fresh consumer가 prefix 효과를 실제로 순서대로 수행하는지, 그리고 프로젝트 안을 가리키던 trace를 옮긴 뒤 정상 동작하는지에 한정하며, 구조 검사를 행동 증거로 승격하지 않는다.
