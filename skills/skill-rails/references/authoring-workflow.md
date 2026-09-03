@@ -48,6 +48,8 @@ For P2, a shared file or helper is consumed domain input or implementation, not 
 
 For P0/P1, record that durable path and heading in `external_dependencies` so the generated guidance exposes the dependency. For P2, declare an external project input or context path once in `ARTIFACTS`, use a `project.*` or `external.*` writer, and name only the stages or guards that consume it as `readers`; the current Decision then supplies that declaration through `stage_artifacts`. `ARTIFACTS` selects a file path, not a heading, and proves neither that the file exists nor that its contents are valid or fresh. Keep the selected file small enough for its consumer, and project approved behavior or judgment into `spec.mjs` or `body.md` at its canonical owner.
 
+A declared file path reaches only two places: inside the target package, or inside the consuming project. A sibling package of the same distribution is neither, so a suite's shared rulebook cannot be declared in `ARTIFACTS`, `READ_FIRST`, or an effect `path`. Until that changes, a suite states the shared document in `why:` prose using a `<skill-root>/../<sibling>/<path>` spelling, and the owning repository's own check enforces that every consumer carries it. Skill Rails neither resolves that spelling nor proves the document exists, is reachable in the installed layout, or is current.
+
 This is an authoring boundary, not a workspace policy engine: Skill Rails does not validate an entire suite, propagate a shared edit across packages, or prove that an external dependency is current. Until repository-owned checks or fresh-consumer evidence observe those effects, report them as `unproven` rather than widening the core grammar.
 
 ## Fresh-consumer closure
@@ -122,7 +124,7 @@ Pass the actual update as `--change <change.json>`. The file has one envelope, `
 | --- | --- |
 | canonical intent | `{ "type": "update-intent", "patch": { "<intent-field>": <value> } }` |
 | existing P2 body section | `{ "type": "replace-body-section", "id": "stage: <id>", "content": "Judgment: ...\\n\\nWhy: ..." }` (add `"language": "ko"` for `body_ko.md`) |
-| reference or template resource | `{ "type": "replace-resource", "path": "references/<file>.md", "content": "..." }` |
+| reference or template resource | `{ "type": "replace-resource", "path": "references/<file>.md" \| "templates/<file>.md", "content": "..." }` |
 | registered whole P2 artifact | `{ "type": "replace-artifact", "kind": "spec|collector|reference", "path": "<canonical-path>", "profile": "p2", "expected_hash": "sha256:<current-hash>", "content": "..." }` |
 
 Use only operations whose owner the change actually affects. After a change, review the emitted semantic diff as well as the line diff.

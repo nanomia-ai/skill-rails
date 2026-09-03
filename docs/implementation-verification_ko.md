@@ -473,6 +473,28 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 
 ## 7. P2 version-5 보존 및 변경 원장
 
+### 7.-1 2026-09-04 생성 시작점·소비 파일 정직성 보정 (validator 0.5.0)
+
+`SPEC.version`은 `"5"`로 유지한다. 문법·closed export·Decision/trace schema는 바꾸지 않았고, 검증 범위와 생성 scaffold 모양만 좁혔다.
+
+| 변경 | 이전 | 이후 | 근거 |
+| --- | --- | --- | --- |
+| migrate 기본 `intent.problem` | 저작 호스트 절대경로를 문장에 포함 | 이식 가능한 문장. 출처는 `ledger.migration.source_root`가 단독 보존 | 생성물이 `SKILL.md`의 portable file-based package 주장을 어겼다 |
+| 추론된 P2 migration `problem` atom | `projected` (검토 면제) | `review-required` | 기계 추론값에 승인 크레딧을 주지 않는다. `writeMigrationLedger`가 `MIGRATION_PROBLEM_SCAFFOLD`와의 값 일치로 판정하므로 CLI·라이브러리 양쪽에서 성립한다. 명시적 `--intent`는 종전대로 `projected`. P0/P1은 제외한다 — 그 프로필의 투영은 매 유지보수마다 재생성·소유권 검사되고, 강등된 intent atom은 `SR_LEDGER_DISPOSITION`으로 무효가 된다 |
+| P2 생성 scaffold | `references/purpose.md`를 body와 바이트 동일하게 생성하고 `READ_FIRST`가 둘을 쌍으로 소비 | 파일을 생성하지 않고 `READ_FIRST = [{ body: "why: purpose" }]`. reference는 필요할 때 저자가 추가 | 한 intent 필드를 두 owner에 복제해 유지보수가 갈라졌다 |
+| P2 `problem` projection locator | `body:why: purpose` + `file:references/purpose.md` | `body:why: purpose` 단독 | 위 변경의 정합 |
+| `READ_FIRST[].path` | 철자만 검사 | L7에서 패키지 내부 실제 정규 파일 확인 | build가 `L-full:pass`를 봉인하는데 최초 `enter`가 실패할 수 있었다 |
+| `READ` 효과의 `path` | 어디서도 미검증 | L12에서 동일 검사(stage·role). **`READ`에만** 적용한다 | runtime `guide`가 이미 모델 지시로 렌더한다. 다른 동사의 `path`는 v5에서 예약된 의미가 없었으므로 지금 예약하면 기존 통과 패키지를 깨뜨린다 |
+| role `effects` | 금지 동사만 검사 | `validateEffectReferences` 적용 | stage와 동일 기준 |
+| semantic diff `references` | `READ_FIRST[].path`만 해시 | `references/**`·`templates/**` 전체 해시 | 그 밖의 `replace-resource` 변경이 `any_changed:false`로 보고됐다 |
+| `ORDERS` | 필수 export, 소비자 0, 계약은 spec이 효과 순서를 소유한다고 서술 | 제거하지 않고 `p2-contract.md`에 예약·미집행임을 명시 | 제거는 SPEC v6이며 소비 저장소의 명명된 시퀀스 의미 확인이 선행되어야 한다 |
+
+기존 패키지 영향: 강제 내용 수정 0. `VALIDATOR_VERSION 0.4.2 → 0.5.0`과 validator 바이트 변경으로 `validator_hash`가 바뀌고 `runtime_hash`는 바뀌지 않는다. 재빌드한 패키지는 D4 때문에 생성 `SKILL.md`도 함께 바뀐다. 코호트 해시 일치를 자체 불변식으로 요구하는 소비 저장소(devflow가 그렇다)는 채택 시 전 패키지를 한 커밋에서 재빌드해야 한다. 형제 패키지 공유 문서 선언 채널은 여전히 없으며 그 한계를 `authoring-workflow.md`에 명시했다.
+
+`semantic-diff`의 `references` 그룹은 이제 선언 여부와 무관하게 `references/**`·`templates/**`의 모든 정규 파일을 담는다. 선언된 파일 템플릿은 `template_content`와 이 그룹에 함께 나타난다. 이는 receipt 형식 변경이 아니라 관측 범위 확대다.
+
+검증: `vendor:check` 통과, self lint 통과, `node --test tests/*.test.mjs` 70/70 통과, `eval --suite-root .` 통과. 실물 확인은 신규 migrate 패키지에서 소비 표면 절대경로 0건, 추론 problem `review-required`, `references/purpose.md` 미생성, 없는 `READ_FIRST` 경로 L7 차단, 없는 효과 `path` L12 차단, 패키지 밖 경로 L7 차단, READ_FIRST 밖 reference 수정이 `any_changed:true`·`groups.references` 기록으로 관측됐다. 소비 저장소 코호트 재빌드와 fresh-agent 행동 측정은 `unproven`.
+
 ### 7.0 Version-5 Decision 위치 보존
 
 Version-5 기준선의 18개 공개 위치는 현재 typed Decision에서 다음과 같이 보존한다.

@@ -1,4 +1,4 @@
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, stat } from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -8,7 +8,7 @@ import { isOpenDomain, isValidDomainDeclaration } from "./domains.mjs";
 import { hashFile, sha256 } from "./hash.mjs";
 import { loadBody, parseBody, resolveBodySection, validateBodyKinds } from "./body.mjs";
 import { extractInlineTemplates, resolveTemplate, validateTemplateDeclaration } from "./templates.mjs";
-import { isPortableRelativePath } from "./path-policy.mjs";
+import { isPortableRelativePath, resolveInside } from "./path-policy.mjs";
 import { loadScenarioFixtures, validateScenarioExpectations } from "./scenario-checks.mjs";
 import { validateFormatFixtures } from "./format-checks.mjs";
 import { validateAuthoringLedger } from "./authoring-ledger.mjs";
@@ -184,7 +184,26 @@ export async function validateFull(skillRoot, options = {}) {
 
   for (const [index, item] of (spec.READ_FIRST ?? []).entries()) {
     check("L7", Boolean(item && typeof item.body === "string"), `READ_FIRST.${index}.body`, "READ_FIRST requires a body reference.");
-    if (item?.path) check("L7", isPortableRelativePath(item.path), `READ_FIRST.${index}.path`, "READ_FIRST paths must be portable and remain inside the skill package.");
+    if (item?.path) await checkPackageFile(skillRoot, item.path, `READ_FIRST.${index}.path`, "L7", check);
+  }
+
+  // A READ path names package guidance the runtime hands the model, so build must prove it exists.
+  // Without this, build seals L-full:pass while the first enter or the first selected branch fails.
+  // Only READ is checked: other verbs never had a closed `path` meaning, and reserving one now would
+  // fail version-5 packages that already pass.
+  for (const [index, stage] of (spec.STAGES ?? []).entries()) {
+    for (const [branch, plan] of plansForStage(stage)) {
+      for (const [effectIndex, effect] of (plan ?? []).entries()) {
+        if (!isReadPath(effect)) continue;
+        await checkPackageFile(skillRoot, effect[1].path, `STAGES.${index}.${branch}.${effectIndex}.path`, "L12", check);
+      }
+    }
+  }
+  for (const [id, role] of Object.entries(spec.ROLES ?? {})) {
+    for (const [effectIndex, effect] of (role.effects ?? []).entries()) {
+      if (!isReadPath(effect)) continue;
+      await checkPackageFile(skillRoot, effect[1].path, `ROLES.${id}.effects.${effectIndex}.path`, "L12", check);
+    }
   }
 
   for (const [index, stage] of (spec.STAGES ?? []).entries()) {
@@ -201,6 +220,7 @@ export async function validateFull(skillRoot, options = {}) {
   for (const [id, role] of Object.entries(spec.ROLES ?? {})) {
     check("L12", /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id), `ROLES.${id}`, "Role id must be kebab-case.");
     check("L12", (role.effects ?? []).every((effect) => !["WRITE", "COMMIT", "DISPATCH"].includes(Array.isArray(effect) ? effect[0] : effect)), `ROLES.${id}.effects`, "Clean-context roles may not own state-changing effects.");
+    validateEffectReferences(role.effects, `ROLES.${id}.effects`, spec, check);
     check("L7", typeof role.body === "string" && role.body.length > 0, `ROLES.${id}.body`, "Role requires a body reference.");
     if (role.returns) check("L12", Boolean(spec.TEMPLATES?.[role.returns]), `ROLES.${id}.returns`, "Role returns must reference a declared template.");
   }
@@ -250,6 +270,29 @@ function validatePlan(plan, pointer, diagnostics) {
 }
 
 function validTerminal(value) { return TERMINALS.includes(value) || /^ROUTE:[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value); }
+
+function isReadPath(effect) {
+  return Array.isArray(effect) && effect[0] === "READ" && effect[1]?.path !== undefined;
+}
+
+async function checkPackageFile(skillRoot, local, pointer, code, check) {
+  if (!isPortableRelativePath(local)) {
+    check(code, false, pointer, `Declared path must be portable and remain inside the skill package: ${local}`);
+    return;
+  }
+  let target;
+  try { target = await resolveInside(skillRoot, local, { code }); }
+  catch (error) {
+    check(code, false, pointer, `Declared path does not resolve inside the skill package: ${error.message}`);
+    return;
+  }
+  try {
+    check(code, (await stat(target)).isFile(), pointer, `Declared path must be a regular file: ${local}`);
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+    check(code, false, pointer, `Declared path does not exist in the skill package: ${local}`);
+  }
+}
 
 function validateEffectReferences(plan, pointer, spec, check) {
   for (const [index, effect] of (plan ?? []).entries()) {

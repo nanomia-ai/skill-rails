@@ -1,10 +1,10 @@
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
+import { listFiles } from "./io.mjs";
 import { validateFast, importVerifiedSource } from "../runtime/validator.mjs";
 import { sha256 } from "../runtime/hash.mjs";
 import { loadBody } from "../runtime/body.mjs";
 import { resolveTemplate } from "../runtime/templates.mjs";
-import { resolveInside } from "../runtime/path-policy.mjs";
 
 export async function snapshotContract(skillRoot) {
   const root = resolve(skillRoot);
@@ -14,8 +14,15 @@ export async function snapshotContract(skillRoot) {
   const bodyDocument = await loadBody(root);
   const templateContent = {};
   for (const [id, declaration] of Object.entries(spec.TEMPLATES ?? {})) templateContent[id] = sha256(await resolveTemplate(root, id, declaration, bodyDocument.markdown));
+  // Hash every maintainable resource, not only READ_FIRST paths: `replace-resource` may change any
+  // file under these roots, and a receipt that omits them reports a real change as any_changed:false.
   const references = {};
-  for (const item of spec.READ_FIRST ?? []) if (item.path) references[item.path] = sha256(await readFile(await resolveInside(root, item.path, { code: "L7" }), "utf8"));
+  for (const dir of ["references", "templates"]) {
+    let files = [];
+    try { files = await listFiles(join(root, dir)); }
+    catch (error) { if (error?.code !== "ENOENT") throw error; }
+    for (const file of files.sort()) references[relative(root, file).replace(/\\/g, "/")] = sha256(await readFile(file, "utf8"));
+  }
   return {
     spec_hash: sha256(fast.source),
     observations: objectIndex(spec.OBSERVATIONS, (value) => value),

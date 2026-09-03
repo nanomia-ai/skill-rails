@@ -68,7 +68,8 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.match(p2Skill, /processing every effect in order through the final terminal/);
   assert.match(p2Skill, /ASK, WAIT, BLOCK, DONE, and ROUTE stop only when reached after all preceding effects/);
   assert.doesNotMatch(p2Skill, /Stop on a diagnostic, stale snapshot, BLOCK, ASK, or WAIT/);
-  assert.match(p2Skill, /do not infer replacement paths from collector or authoring files/);
+  assert.match(p2Skill, /Do not infer replacement paths from collector or authoring files/);
+  assert.match(p2Skill, /a `READ` effect's `path` argument names package guidance and resolves from `<skill-root>`/);
   assert.match(p2Skill, /current task or role already identifies one project-relative file target/);
   assert.match(p2Skill, /add `--target "<path>"`; never infer a target, and omit the option/);
   assert.match(p2Skill, /artifact_verified --data '\{"reference":"<proof\.reference>"\}'/);
@@ -962,7 +963,7 @@ test("template and READ_FIRST paths fail closed on traversal and junction escape
     const externalLink = join(generated, "references", "external");
     await symlink(outside, externalLink, "junction");
     const specPath = join(generated, "spec.mjs");
-    const source = (await readFile(specPath, "utf8")).replace('path: "references/purpose.md"', 'path: "references/external/secret.md"');
+    const source = (await readFile(specPath, "utf8")).replace('{ body: "why: purpose" }', '{ body: "why: purpose", path: "references/external/secret.md" }');
     await writeFile(specPath, source, "utf8");
     await assert.rejects(buildP2(generated, { repeats: 2 }), (error) => error.code === "SR_PACKAGE_SYMLINK");
   } catch (error) {

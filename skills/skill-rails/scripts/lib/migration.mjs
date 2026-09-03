@@ -43,6 +43,10 @@ export async function inspectProseSkill(sourceRoot) {
   return { root, files, atoms };
 }
 
+// The exact purpose text `inferMigrationIntent` produces. It is a machine guess, so the ledger
+// recognizes it by value and withholds projection credit on every caller, not only the migrate CLI.
+export const MIGRATION_PROBLEM_SCAFFOLD = "Preserve the behavior of the migrated prose source without silently changing its obligations. Replace this migration scaffold with the skill's own purpose; the exact source location stays in the obligation ledger.";
+
 export async function inferMigrationIntent(sourceRoot, inspection) {
   const skillPath = join(resolve(sourceRoot), "SKILL.md");
   let name = basename(resolve(sourceRoot)).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "migrated-skill";
@@ -55,7 +59,7 @@ export async function inferMigrationIntent(sourceRoot, inspection) {
   const text = inspection.atoms.map((item) => item.original_text).join("\n");
   const stateful = /\b(?:if|when|unless|stage|guard|must not|before|after|until|evidence|verify)\b|(?:경우|단계|검증|증거|완료 전|금지)/i.test(text);
   return {
-    name, description, problem: `Preserve the behavior of the prose source at ${resolve(sourceRoot)} without silently changing its obligations.`,
+    name, description, problem: MIGRATION_PROBLEM_SCAFFOLD,
     use_cases: [], near_misses: [], inputs: [], outputs: [], irreversible_boundaries: [],
     state_dependent_behaviors: stateful ? ["Source contains candidate conditional, ordered, or evidence-bound behavior requiring review."] : [],
     exact_formats: [], external_dependencies: [], completion_evidence: [], judgment_points: ["Every source atom remains review-required until explicitly disposed."], deterministic_helpers: []
@@ -66,6 +70,18 @@ export async function writeMigrationLedger(targetRoot, inspection) {
   const root = resolve(targetRoot);
   const path = join(root, ".skill-rails", "obligation-ledger.json");
   const ledger = await readJson(path);
+  // Keep an inferred P2 purpose review-required so the existing DEFERRED/ledger gate makes the author
+  // replace the scaffold before release. An explicit --intent supplies its own text and stays projected.
+  // P0/P1 are excluded: their projections are regenerated and ownership-checked every maintenance, and
+  // a demoted intent atom is invalid there (`simple-lint.mjs` SR_LEDGER_DISPOSITION).
+  if (ledger.profile === "p2") {
+    for (const atom of ledger.atoms ?? []) {
+      if (atom.source !== "intent.problem" || atom.text !== MIGRATION_PROBLEM_SCAFFOLD) continue;
+      atom.disposition = "review-required";
+      atom.targets = [];
+      atom.evidence = [];
+    }
+  }
   const migrationAtoms = inspection.atoms.map((atom) => ({
     id: `migration-${atom.id.toLowerCase()}`,
     source: `migration:${atom.source_path}:${atom.source_span}`,

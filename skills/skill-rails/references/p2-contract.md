@@ -24,6 +24,8 @@ Every P2 spec exports exactly these names, including empty values:
 
 All predicates declare `reads`. The validator derives state reads from the AST and requires exact agreement.
 
+`ORDERS` is reserved in the version-5 lineage and is not enforced: no runtime or validator rule consumes it. Effect order is owned by each stage's effect plan. Record a sequence there if it must hold; an `ORDERS` entry earns no enforcement credit.
+
 ## Observation values
 
 - `KNOWN(value)`: a domain-valid value was observed.
@@ -41,6 +43,8 @@ For the version-5 lineage, the exact raw string `"UNKNOWN"` is a reserved compat
 Evaluate guards in array order. ASK, BLOCK, and `ROUTE:<target-id>` stop; RESTRICT accumulates forbidden effect verbs and continues. Evaluate stages in order and select the first whose `done` is not true. A stage owns either a `record` or `reentry`. Every effect plan ends in exactly one of NEXT, ASK, WAIT, BLOCK, DONE, or `ROUTE:<target-id>`.
 
 Within a selected effect plan, effects are consumed in array order and a terminal stops the plan only when reached; a terminal final status never discards prefix effects.
+
+A `READ` effect's `path` argument selects package guidance and resolves against `<skill-root>`; an `artifact` argument resolves against `<project>` through its `ARTIFACTS` declaration. Build validates every `READ_FIRST` path and every `READ` effect `path` as a portable package-relative spelling that exists as a regular file inside the package; neither form may leave the package, and a sibling package is not addressable from either. Other verbs have no reserved `path` meaning.
 
 The runtime calculates and validates effect plans; it does not claim to intercept model tool calls. Without trusted harness evidence, execution adherence remains checked or unproven, never enforced.
 

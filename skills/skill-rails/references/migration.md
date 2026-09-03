@@ -18,6 +18,8 @@ Append migration atoms to the canonical `.skill-rails/obligation-ledger.json` be
 
 One source atom may map to multiple targets. Every target must map back to a source atom or an explicit new approval receipt.
 
+Without `--intent`, migration infers the brief and writes a fixed portable scaffold sentence as `intent.problem`; the source location is kept only in the ledger's `migration.source_root`, never in the skill's own runtime text. For P2 that inferred purpose stays `review-required`, so the generated `DEFERRED` gate holds until the author replaces it with the skill's real purpose. Supplying `--intent` means the purpose is the user's own and stays projected. P0 and P1 keep the scaffold projected because their projections are regenerated and ownership-checked at every maintenance; replace that sentence there as ordinary authoring.
+
 ## Classification
 
 Use: judgment/body, observation/collector, guard, stage/done/evidence, table row, format, template, example, order, ownership, artifact, role, declaration, deferred, duplicate, obsolete, or ambiguous/review-required.

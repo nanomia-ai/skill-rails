@@ -341,12 +341,16 @@ test("P2 typed-artifact maintenance preflights closed canonical paths and preser
   t.after(() => removeTestDir(base));
   const root = join(base, "skill");
   const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
-  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 1 }) });
+  // References are authored, not generated; seal one before the build so the reference kind has a target.
+  await generatePackage({ intent, output: root, finalize: async (stage) => {
+    await writeFile(join(stage, "references", "context.md"), "# Context\n\nAuthored reference under maintenance.\n", "utf8");
+    return buildP2(stage, { repeats: 1 });
+  } });
 
   const paths = {
     spec: join(root, "spec.mjs"),
     collector: join(root, "collectors", "index.mjs"),
-    reference: join(root, "references", "purpose.md")
+    reference: join(root, "references", "context.md")
   };
   const before = Object.fromEntries(await Promise.all(Object.entries(paths).map(async ([kind, path]) => [kind, await readFile(path, "utf8")])));
   const after = {
@@ -359,7 +363,7 @@ test("P2 typed-artifact maintenance preflights closed canonical paths and preser
     operations: [
       { type: "replace-artifact", kind: "spec", path: "spec.mjs", profile: "p2", expected_hash: sha256(before.spec), content: after.spec },
       { type: "replace-artifact", kind: "collector", path: "collectors/index.mjs", profile: "p2", expected_hash: sha256(before.collector), content: after.collector },
-      { type: "replace-artifact", kind: "reference", path: "references/purpose.md", profile: "p2", expected_hash: sha256(before.reference), content: after.reference }
+      { type: "replace-artifact", kind: "reference", path: "references/context.md", profile: "p2", expected_hash: sha256(before.reference), content: after.reference }
     ]
   };
   const publicChangePath = join(base, "typed-artifact-change.json");
@@ -370,7 +374,7 @@ test("P2 typed-artifact maintenance preflights closed canonical paths and preser
   assert.deepEqual(report.artifact_receipts.map(({ kind, path }) => ({ kind, path })), [
     { kind: "spec", path: "spec.mjs" },
     { kind: "collector", path: "collectors/index.mjs" },
-    { kind: "reference", path: "references/purpose.md" }
+    { kind: "reference", path: "references/context.md" }
   ]);
   assert.equal(report.artifact_receipts.every((item) => item.before_hash !== item.after_hash), true);
   assert.deepEqual(report.source_changes, { behavior_source: true, observation_source: true, context: true });
@@ -395,20 +399,20 @@ test("P2 typed-artifact maintenance preflights closed canonical paths and preser
 
   await t.test("captured backups, canonical aliases, and unsupported reparse entries fail recoverably", async (t) => {
     await assert.rejects(maintainPackage(root, { operations: [{
-      type: "replace-artifact", kind: "reference", path: "references/./purpose.md", profile: "p2",
+      type: "replace-artifact", kind: "reference", path: "references/./context.md", profile: "p2",
       expected_hash: sha256(current.reference), content: current.reference
     }] }, { repeats: 1 }), /canonical portable spelling/);
     await assert.rejects(maintainPackage(root, { operations: [{
-      type: "replace-artifact", kind: "reference", path: "references\\purpose.md", profile: "p2",
+      type: "replace-artifact", kind: "reference", path: "references\\context.md", profile: "p2",
       expected_hash: sha256(current.reference), content: current.reference
     }] }, { repeats: 1 }), /portable package-relative path/);
     await assert.rejects(maintainPackage(root, { operations: [{
-      type: "replace-artifact", kind: "reference", path: "references/../references/purpose.md", profile: "p2",
+      type: "replace-artifact", kind: "reference", path: "references/../references/context.md", profile: "p2",
       expected_hash: sha256(current.reference), content: current.reference
     }] }, { repeats: 1 }), /canonical portable spelling/);
     if (process.platform === "win32") await assert.rejects(maintainPackage(root, { operations: [
-      { type: "replace-artifact", kind: "reference", path: "references/purpose.md", profile: "p2", expected_hash: sha256(current.reference), content: current.reference },
-      { type: "replace-artifact", kind: "reference", path: "references/PURPOSE.md", profile: "p2", expected_hash: sha256(current.reference), content: current.reference }
+      { type: "replace-artifact", kind: "reference", path: "references/context.md", profile: "p2", expected_hash: sha256(current.reference), content: current.reference },
+      { type: "replace-artifact", kind: "reference", path: "references/CONTEXT.md", profile: "p2", expected_hash: sha256(current.reference), content: current.reference }
     ] }, { repeats: 1 }), /canonical physical spelling|physical file only once/);
 
     const atomicRoot = join(base, "captured-backup-obstruction");
@@ -461,7 +465,7 @@ test("P2 typed-artifact maintenance preflights closed canonical paths and preser
       try {
         const beforeUnsupported = await readFile(paths.reference, "utf8");
         await assert.rejects(maintainPackage(root, { operations: [{
-          type: "replace-artifact", kind: "reference", path: "references/purpose.md", profile: "p2",
+          type: "replace-artifact", kind: "reference", path: "references/context.md", profile: "p2",
           expected_hash: sha256(beforeUnsupported), content: beforeUnsupported
         }] }, { repeats: 1 }), /Unsupported package entry references\/purpose-link\.md: symbolic link or junction/);
         assert.equal(await readFile(paths.reference, "utf8"), beforeUnsupported);
@@ -473,7 +477,7 @@ test("P2 typed-artifact maintenance preflights closed canonical paths and preser
 
   const beforeLaterFailure = await treeFingerprint(root);
   await assert.rejects(maintainPackage(root, { operations: [
-    { type: "replace-artifact", kind: "reference", path: "references/purpose.md", profile: "p2", expected_hash: sha256(current.reference), content: `${current.reference}\nnot-installed\n` },
+    { type: "replace-artifact", kind: "reference", path: "references/context.md", profile: "p2", expected_hash: sha256(current.reference), content: `${current.reference}\nnot-installed\n` },
     { type: "replace-artifact", kind: "collector", path: "collectors/index.mjs", profile: "p2", expected_hash: `sha256:${"0".repeat(64)}`, content: current.collector }
   ] }, { repeats: 1 }), /current expected_hash/);
   assert.equal(await treeFingerprint(root), beforeLaterFailure);
@@ -486,7 +490,7 @@ test("P2 typed-artifact maintenance preflights closed canonical paths and preser
 
   const referenceBeforeConflict = await readFile(paths.reference, "utf8");
   await assert.rejects(maintainPackage(root, {
-    operations: [{ type: "replace-artifact", kind: "reference", path: "references/purpose.md", profile: "p2", expected_hash: sha256(referenceBeforeConflict), content: `${referenceBeforeConflict}\ntransaction candidate\n` }]
+    operations: [{ type: "replace-artifact", kind: "reference", path: "references/context.md", profile: "p2", expected_hash: sha256(referenceBeforeConflict), content: `${referenceBeforeConflict}\ntransaction candidate\n` }]
   }, {
     repeats: 1,
     beforeInstall: async () => writeFile(join(root, "concurrent-owner.txt"), "preserve concurrent owner\n", "utf8")
@@ -583,6 +587,115 @@ test("P0 and P1 maintenance regenerates intent projections without replacing aut
     operations: [{ type: "update-intent", patch: { deterministic_helpers: ["a newly required helper"] } }]
   }), /SR_PROFILE_CHANGE/);
   assert.equal(await readFile(join(autoP0, ".skill-rails", "intent.json"), "utf8"), beforeIntent);
+});
+
+test("P2 generation seeds one portable purpose owner and withholds credit for an inferred purpose", async (t) => {
+  const base = await makeTestDir("purpose-owner");
+  t.after(() => removeTestDir(base));
+
+  const root = join(base, "generated");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root });
+  assert.equal(await exists(join(root, "references", "purpose.md")), false, "generation must not seed a twin of the body purpose");
+  const spec = await readFile(join(root, "spec.mjs"), "utf8");
+  assert.match(spec, /export const READ_FIRST = \[\{ body: "why: purpose" \}\];/);
+  const ledger = await readJson(join(root, ".skill-rails", "obligation-ledger.json"));
+  const authored = ledger.atoms.find((atom) => atom.source === "intent.problem");
+  assert.deepEqual(authored.targets, ["body:why: purpose"], "an authored purpose projects into one owner");
+
+  // The library path, not only the migrate CLI, must withhold credit for a machine-inferred purpose.
+  const source = join(base, "prose");
+  await mkdir(source, { recursive: true });
+  // Deliberately free of conditional wording so the auto profile lands on P0.
+  await writeFile(join(source, "SKILL.md"), "---\nname: inferred-source\ndescription: Use inferred-source to keep public writing plain and direct.\n---\n\n# Inferred\n\nPrefer plain words over jargon. Keep sentences short. Name the subject first.\n", "utf8");
+  const inspection = await inspectProseSkill(source);
+  const inferred = await inferMigrationIntent(source, inspection);
+  assert.doesNotMatch(inferred.problem, /[A-Za-z]:\\|\//, "an inferred purpose carries no host path");
+
+  const migrated = join(base, "migrated");
+  await generatePackage({ intent: { ...inferred, state_dependent_behaviors: ["Tagging is blocked until the suite passes."] }, output: migrated, requestedProfile: "p2", finalize: (stage) => writeMigrationLedger(stage, inspection) });
+  const migratedLedger = await readJson(join(migrated, ".skill-rails", "obligation-ledger.json"));
+  const inferredAtom = migratedLedger.atoms.find((atom) => atom.source === "intent.problem");
+  assert.equal(inferredAtom.disposition, "review-required", "an inferred P2 purpose is a guess, not an approved projection");
+  assert.equal(typeof migratedLedger.migration.source_root, "string", "provenance stays in the ledger");
+
+  // P0/P1 regenerate and ownership-check their projections, so a demoted intent atom is invalid there.
+  const simple = join(base, "simple");
+  await generatePackage({ intent: inferred, output: simple, finalize: (stage) => writeMigrationLedger(stage, inspection) });
+  const simpleLedger = await readJson(join(simple, ".skill-rails", "obligation-ledger.json"));
+  assert.equal(simpleLedger.profile, "p0", "a purely judgmental source infers a simple profile");
+  assert.equal(simpleLedger.atoms.find((atom) => atom.source === "intent.problem").disposition, "projected");
+  assert.equal((await lintSimpleSkill(simple)).ok, true, "an inferred simple migration must not ship lint-invalid");
+});
+
+test("build verifies every declared package file the runtime tells the model to read", async (t) => {
+  const base = await makeTestDir("declared-file-checks");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 1 }) });
+  const specPath = join(root, "spec.mjs");
+  const bodyPath = join(root, "body.md");
+  const original = await readFile(specPath, "utf8");
+  const originalBody = await readFile(bodyPath, "utf8");
+  assert.deepEqual((await validateFull(root)).diagnostics, [], "the generated package is clean before mutation");
+
+  const diagnose = async (spec, body = originalBody) => {
+    await writeFile(specPath, spec, "utf8");
+    await writeFile(bodyPath, body, "utf8");
+    const result = await validateFull(root);
+    await writeFile(specPath, original, "utf8");
+    await writeFile(bodyPath, originalBody, "utf8");
+    return result.diagnostics;
+  };
+  const READ_FIRST_LINE = 'export const READ_FIRST = [{ body: "why: purpose" }];';
+  const READY_PLAN = 'ready: [["REPORT", { template: "result" }], "DONE"]';
+  const withRole = (effects) => original.replace("export const ROLES = {};",
+    `export const ROLES = { checker: { body: "role: checker", effects: ${effects} } };`);
+  const roleBody = `${originalBody}\n## role: checker\n\nThe checker reports what the evidence already shows.\n`;
+
+  const missingReadFirst = await diagnose(original.replace(READ_FIRST_LINE,
+    'export const READ_FIRST = [{ body: "why: purpose", path: "references/absent.md" }];'));
+  assert.equal(missingReadFirst.some((item) => item.code === "L7" && item.pointer === "READ_FIRST.0.path"), true, "a missing READ_FIRST file fails the build, not the first enter");
+
+  const escaping = await diagnose(original.replace(READ_FIRST_LINE,
+    'export const READ_FIRST = [{ body: "why: purpose", path: "../outside.md" }];'));
+  assert.equal(escaping.some((item) => item.code === "L7" && /portable/.test(item.message)), true, "a READ_FIRST path may not leave the package");
+
+  const missingStagePath = await diagnose(original.replace(READY_PLAN,
+    'ready: [["READ", { path: "references/absent.md" }], ["REPORT", { template: "result" }], "DONE"]'));
+  assert.equal(missingStagePath.some((item) => item.code === "L12" && item.pointer.startsWith("STAGES.0.ready")), true, "a stage effect may not name a file the package does not carry");
+
+  const missingRolePath = await diagnose(withRole('[["READ", { path: "references/absent.md" }]]'), roleBody);
+  assert.equal(missingRolePath.some((item) => item.code === "L12" && item.pointer.startsWith("ROLES.checker.effects")), true, "role effects are held to the stage standard");
+
+  const undeclaredRoleTemplate = await diagnose(withRole('[["REPORT", { template: "absent" }]]'), roleBody);
+  assert.equal(undeclaredRoleTemplate.some((item) => item.code === "L12" && /unknown template|must be declared/.test(item.message)), true, "role effect references are validated like stage effects");
+
+  // Only READ reserves `path`. Other verbs never had a closed meaning for it in version 5, so
+  // reserving one now would fail packages that already pass.
+  const nonReadPath = await diagnose(original.replace(READY_PLAN,
+    'ready: [["RUN", { path: "tools/project-local-runner" }], ["REPORT", { template: "result" }], "DONE"]'));
+  assert.deepEqual(nonReadPath.filter((item) => item.pointer.endsWith(".path")), [], "a non-READ path argument keeps its version-5 freedom");
+});
+
+test("maintenance receipts report every maintainable resource change, not only READ_FIRST files", async (t) => {
+  const base = await makeTestDir("receipt-coverage");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  // A reference no READ_FIRST entry names: the surface a receipt used to report as unchanged.
+  await generatePackage({ intent, output: root, finalize: async (stage) => {
+    await writeFile(join(stage, "references", "notes.md"), "# Notes\n\nOriginal guidance.\n", "utf8");
+    return buildP2(stage, { repeats: 1 });
+  } });
+
+  const before = await snapshotContract(root);
+  await writeFile(join(root, "references", "notes.md"), "# Notes\n\nRewritten guidance.\n", "utf8");
+  const report = semanticDiff(before, await snapshotContract(root));
+  assert.equal(report.any_changed, true, "a real content change may never be reported as no change");
+  assert.equal(report.source_changes.context, true);
+  assert.deepEqual(report.groups.references.map((item) => ({ id: item.id, change: item.change })), [{ id: "references/notes.md", change: "modified" }]);
 });
 
 async function treeFingerprint(root) {

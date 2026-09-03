@@ -72,7 +72,7 @@ function atom(field, source, text, profile, index, options = {}) {
 function projectedLocators(field, profile, index, projection = null) {
   if (profile === "p2") {
     if (field === "description") return { targets: ["file:SKILL.md", "file:agents/openai.yaml"], evidence: ["file:agents/openai.yaml"] };
-    return { targets: ["body:why: purpose", "file:references/purpose.md"], evidence: ["body:why: purpose"] };
+    return { targets: ["body:why: purpose"], evidence: ["body:why: purpose"] };
   }
   if (field === "description") return { targets: ["file:SKILL.md", "file:agents/openai.yaml"], evidence: ["file:SKILL.md"] };
   if (projection?.kind === "topic-when") return { targets: ["file:references/guidance-index.md"], evidence: ["file:references/guidance-index.md"] };
