@@ -40,6 +40,8 @@ For the version-5 lineage, the exact raw string `"UNKNOWN"` is a reserved compat
 
 Evaluate guards in array order. ASK, BLOCK, and `ROUTE:<target-id>` stop; RESTRICT accumulates forbidden effect verbs and continues. Evaluate stages in order and select the first whose `done` is not true. A stage owns either a `record` or `reentry`. Every effect plan ends in exactly one of NEXT, ASK, WAIT, BLOCK, DONE, or `ROUTE:<target-id>`.
 
+Within a selected effect plan, effects are consumed in array order and a terminal stops the plan only when reached; a terminal final status never discards prefix effects.
+
 The runtime calculates and validates effect plans; it does not claim to intercept model tool calls. Without trusted harness evidence, execution adherence remains checked or unproven, never enforced.
 
 ## Body and templates

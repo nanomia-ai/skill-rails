@@ -8,7 +8,7 @@
 
 ---
 
-## 0. 현재 완료 지점: v0.1.8 공식 배포와 installation evidence
+## 0. 현재 완료 지점: v0.1.9 P2 종단 효과 순서 교정 후보
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -24,10 +24,12 @@ Released `v0.1.7` 위에서 두 실사용 흐름이 같은 원인의 서로 다�
 
 Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --ff-only`로 `main`에 fast-forward한 뒤 그 commit을 가리키는 annotated tag `v0.1.8`을 만들고 `git push --atomic origin main v0.1.8`로 `main`과 tag를 함께 push했다. GitHub Release `v0.1.8`을 제목 `v0.1.8`, 본문 `Full Changelog: https://github.com/nanomia-ai/skill-rails/compare/v0.1.7...v0.1.8`로 같은 commit에 publish했다. 그 push가 트리거한 GitHub workflow run `33403838640`(`https://github.com/nanomia-ai/skill-rails/actions/runs/33403838640`)이 success로 완료됐다. Release 뒤 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`를 정확히 한 번 실행해 Codex·Gemini CLI 전역 canonical package 설치와 Claude Code symlink가 성공했다. `main`의 `skills/skill-rails`와 설치본 `git diff --no-index --ignore-cr-at-eol`은 exit 0(양쪽 62 files)이었고, 설치본 `scripts/lint.mjs --self`는 pass, 설치본 fingerprint는 runtime `0.3.2`, validator `0.4.2`, kernel `6`으로 candidate가 기록한 값과 일치했다. Installer security summary는 Gen Safe, Socket 1 alert, Snyk Low Risk를 표시했다.
 
+v0.1.9 후보는 Devflow 실용성 감사에서 확인된 생성 어댑터의 종단 해석 충돌만 고친다. 기존 문장은 `ASK`·`WAIT`·`BLOCK`을 진단과 같은 선행 정지 조건으로 읽히게 했지만 evaluator는 이들을 효과 배열의 마지막 종단으로 계산한다. 생성기와 P2 contract는 이제 진단·오래된 snapshot만 실행 전에 멈추고, 유효한 Decision의 모든 효과를 배열 순서대로 종단까지 수행한다고 한 해석으로 모인다. Runtime, validator, kernel, Decision/Trace schema와 effect grammar는 그대로이며 fresh-agent 실사용 행동은 아직 `UNPROVEN`이다.
+
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 공식 배포 package version: `0.1.8`. Mechanics fix commit은 `4cd6289`(interior-space path domain, quoted 생성 `--artifact` 예시)를 기록한다.
+- 공식 배포 package version: `0.1.8`; 현재 source candidate는 `0.1.9`. Mechanics fix commit은 `4cd6289`(interior-space path domain, quoted 생성 `--artifact` 예시)를 기록한다.
 - GitHub workflow run `33403838640`이 success로 완료됐고(`https://github.com/nanomia-ai/skill-rails/actions/runs/33403838640`) `v0.1.8` GitHub Release가 published 상태다(`https://github.com/nanomia-ai/skill-rails/releases/tag/v0.1.8`, Full Changelog `v0.1.7...v0.1.8`). 공식 GitHub source의 전역 canonical install도 Codex·Claude Code·Gemini CLI 대상으로 성공했다.
 - `main`/`origin/main`과 annotated tag `v0.1.8`은 모두 commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 가리킨다.
 - `v0.1.7` 공식 배포의 P2 runtime/validator는 union byte 계보로 `0.3.1`/`0.4.1`이다. `v0.1.8`은 domain·loader patch로 `0.3.2`/`0.4.2`를 기록하며 설치본 fingerprint로 재확인했다. `0.3.0`/`0.4.0`은 landed downstream projection에 쓰인 소진 번호라 재사용하지 않았다.

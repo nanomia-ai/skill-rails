@@ -75,6 +75,12 @@ Focused reconciled integration regression 4/4, runtime+integration 42/42와 self
 
 GitHub workflow run `33343504702`가 success로 완료됐고 `v0.1.7` GitHub Release가 published 상태다. Release 뒤 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code gemini-cli --yes`로 Codex·Claude Code·Gemini CLI 전역 설치가 성공했다. Release source와 installed canonical package의 `git diff --no-index --ignore-cr-at-eol`은 exit 0이었고, 설치본 `scripts/lint.mjs --self`가 pass했다. 설치본 fingerprint는 runtime `0.3.1`, validator `0.4.1`, kernel `6`이다. Fresh-agent target/resume 소비, downstream Devflow 아홉 package rebuild, non-Windows symlink branch는 `UNPROVEN`이다.
 
+### 0.6 v0.1.9 P2 종단 효과 순서 교정
+
+Devflow 아홉 P2 패키지의 실용성 감사에서 생성 `SKILL.md`의 3항이 `ASK`·`WAIT`·`BLOCK`을 진단과 같은 선행 정지 조건으로 열거하는 반면, evaluator는 효과 배열의 마지막 종단으로 status를 계산하고 모든 앞 효과에 증거를 요구한다는 충돌을 확인했다. 이 문면은 `[REPORT, ASK]`, `[WRITE, COMMIT, WAIT]`, `[REPORT, BLOCK]`을 status만 보고 효과 전에 멈추게 할 수 있다.
+
+v0.1.9는 runtime, schema, effect grammar를 바꾸지 않는다. 생성기 문장과 P2 contract를 정렬하여 진단·오래된 snapshot만 실행 전에 멈추고, 유효한 Decision은 배열 순서대로 종단까지 소비하며 마지막 status가 앞 효과를 버리지 못한다고 명시한다. 통합 회귀는 새 문장과 옛 선행 정지 목록의 부재를 검사하고, canonical pilot은 builder로 다시 생성한다. Fresh Codex·Claude의 실제 종단 소비 행동은 이 릴리스의 구조·논리 증거로 승격하지 않고 `UNPROVEN`으로 둔다.
+
 ## 1. 현재 결정적 검증
 
 Package 0.1.5의 설치 product bytes는 `1560bc3c3738fda85bbdd745836f7abbaebe3c2b`에서 `origin/main`에 들어갔고 위 0.3절의 full verify, local installer와 GitHub-source global installer smoke를 통과했다. `v0.1.5` annotated tag와 GitHub Release는 이 receipt를 포함한 evidence commit을 기준으로 배포한다. P2 behavior contract는 바뀌지 않았으며 이 release의 새 주장은 distribution boundary에 한정된다.

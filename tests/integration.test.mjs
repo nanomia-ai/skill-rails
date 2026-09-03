@@ -65,6 +65,9 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.match(p2Skill, /Use judgment only within domain work that the current Decision leaves open/);
   assert.match(p2Skill, /never skip, reorder, or substitute for the Decision/);
   assert.match(p2Skill, /Decision body, `stage_artifacts`, and ordered effects/);
+  assert.match(p2Skill, /processing every effect in order through the final terminal/);
+  assert.match(p2Skill, /ASK, WAIT, BLOCK, DONE, and ROUTE stop only when reached after all preceding effects/);
+  assert.doesNotMatch(p2Skill, /Stop on a diagnostic, stale snapshot, BLOCK, ASK, or WAIT/);
   assert.match(p2Skill, /do not infer replacement paths from collector or authoring files/);
   assert.match(p2Skill, /current task or role already identifies one project-relative file target/);
   assert.match(p2Skill, /add `--target "<path>"`; never infer a target, and omit the option/);
