@@ -471,6 +471,27 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 ---
 
 
+### 6.18 형제 패키지 공유 문서 선언 채널: 시제품 검증 후 미채택
+
+6.13이 남긴 `UNPROVEN` 중 하나 — 한 배포물의 여러 package가 공유하는 규약집을 선언할 채널이 없다는 것 — 을 실제로 열어 설계·구현·행동 측정까지 진행한 뒤 **제품에 넣지 않기로 결정**했다. 코드 변경은 없다. `SPEC.version`, `RUNTIME_VERSION`, `VALIDATOR_VERSION`, `KERNEL_VERSION`, closed export, Decision/trace schema는 모두 그대로다.
+
+빈틈의 크기를 먼저 실측했다. Devflow 소비 package 8개(`adopt, arch, design, direct, product, resume, verify, work`)가 형제 규약집을 가리키는 문장은 **바이트 동일한 한 문장**이고 8개 모두 `## why: purpose` 안에 있다. 그 문장을 바꾸려면 `replace-body-section` 8회와 재빌드가 필요하고, 8장이 동일한지는 소비 저장소가 자기 테스트(`repository-invariants.test.js`의 shared-policy 단언)로 보증한다. 소비 저장소를 읽기만 했고 수정하지 않았다.
+
+설계 후보는 둘이었고 코드 관측으로 갈렸다. 미니 P2 package에 다섯 변종을 넣어 `lint.mjs`를 실행한 결과, `READ_FIRST` 항목의 **최상위 미지 키는 오늘 통과**하고(`sibling: "legacy-metadata"` → 진단 0), **객체형 `path`는 오늘 거부되며**(`isPortableRelativePath`가 비문자열에서 false → L7), **두 항목이 같은 `body` 참조를 공유하면 섹션 순서 불일치로 실패**한다(L7 `Body section order mismatch`). 따라서 최상위 `sibling` 키를 예약하는 안은 오늘 유효한 spec을 새로 거부하는 **허용 집합 축소**이고, `path`를 문자열 | `{ local?, sibling: { skill, path } }` 합타입으로 넓히는 안은 오늘 거부되는 형태만 받아들이는 **순수 확대**다. 후자를 시제품으로 구현했다. 새 export도 새 L-코드도 만들지 않고 기존 L7 아래에 두었으며, 형제는 철자만 검사하고 존재·내용·freshness는 증명하지 않는다.
+
+시제품의 봉인 성질을 실행으로 확인했다. validator는 파일 접근 **전에** 분류하므로 형제를 열지 않는다. 형제를 선언하지 않은 package의 `enter_hash`는 새 runtime으로 재빌드해도 변경 전과 바이트 동일하다(미사용 시 키를 주입하지 않는다). 같은 package를 서로 다른 두 절대 경로에 설치해도 `enter_hash`가 같다 — 해석된 절대 경로나 존재 여부를 `sections`에 넣지 않기 때문이며, 넣었다면 봉인 종속을 형제 바이트 대신 형제 환경으로 바꿔 넣는 것이 된다. 형제 파일의 바이트를 완전히 바꿔도 package manifest의 content map과 `enter_hash` 어느 쪽도 변하지 않는다. `computeFingerprints`가 package root 바깥을 열거하지 않기 때문이다.
+
+그러나 채택 판정은 구조가 아니라 행동이 가른다는 기준을 결과 **전에** 고정했고(채택 = B ≥ 4/5 이고 B − A ≥ 2, 미채택 = B ≤ 3/5 또는 B − A ≤ 1 또는 **A = 5/5**), 중립 미니 스위트에서 격리된 fresh consumer 5개를 돌린 결과 **현행 산문 포인터가 5/5**였다. 판별 사실은 형제 문서에만 있는 trial별 난수 토큰이고 채점은 산출물 파일 관측이다. 선언 채널 arm도 소비자에 도달했으나 A가 천장이므로 `B − A ≥ 2`가 원리상 불가능해 판정에 쓰이지 않는다. "픽스처가 실제보다 쉬웠다"는 반론은 실측으로 성립하지 않았다 — 픽스처의 `READ_FIRST` 인라인 표면은 6,940바이트로 소비 package 8개 중 6개보다 크고, 8개 모두 첫 body 섹션이 `why: purpose`라 포인터 위치도 같다. 상세는 `docs/evidence/proof-04-sibling-pointer-behavior_ko.md`.
+
+행동 이득이 0인 상태에서 남는 것은 유지보수 이득뿐이고, 실측하면 그 크기는 작다. 채택해도 소비자마다 선언 항목은 그대로 남고 중앙화되는 것은 명령 문장 한 줄이며, 소비 저장소가 그 문장을 바꾼 횟수는 도입 1회다. 대가는 영구적이다 — 문법 변종 하나, 런타임 분기 둘, 문서 네 곳, 그리고 모든 미래 domain에 대한 호환성 의무. 결과를 본 뒤 유지보수의 가중치를 올려 채택하면 사전 규칙을 사후 변경하는 것이므로 하지 않았다. 두 독립 교차검토(Fable xhigh, Sol xhigh)가 설계 단계에서 배치를 갈랐고 결과 해석 단계에서는 미채택에 합의했다.
+
+남긴 것은 `authoring-workflow.md`의 기존 한계 문단에 붙인 한 문장 — 포인터를 package의 **첫** `READ_FIRST` `why:` 섹션에 두라는 실증된 관례와, 그보다 뒤 배치·더 큰 표면·더 약한 모델·압축된 컨텍스트는 `UNPROVEN`이라는 경계 — 그리고 증거 카드다. 재개 조건은 실제 소비자에서 산문 포인터 미이행이 한 번이라도 관측될 때, 첫 섹션이 아닌 배치·더 약한 모델·Codex에서 실패가 측정될 때, 또는 형제 규약집을 쓰는 두 번째 suite가 생겨 이 관례가 한 소비 저장소의 특성이 아님이 확인될 때다.
+
+계속 `UNPROVEN`인 것: 다른 host(Codex)와 더 약한 모델의 같은 관측, arch·verify 규모(9.5–11KB) 표면에서의 성공률, 컨텍스트 압축 이후의 포인터 이행, 준수 지시 없는 순수 domain 요청에서의 이행, 그리고 여러 package에 걸친 공유 규칙 변경이 장기간 국소적으로 유지되는지.
+
+---
+
+
 ## 7. P2 version-5 보존 및 변경 원장
 
 ### 7.-1 2026-09-04 생성 시작점·소비 파일 정직성 보정 (validator 0.5.0)
