@@ -1,6 +1,6 @@
 # v0.1.9에서 올라오기 — 소비 저장소용 확인 목록
 
-대상: `v0.1.9`(validator `0.4.2`, runtime `0.3.2`)로 만들어진 P2 패키지를 가진 저장소. 현재 published 최신인 `v0.2.0`(validator `0.5.0`, runtime `0.3.2`)으로 만든 저장소도 절차는 같고, 그 판이 새로 거부하던 두 형식과 죽게 만들던 한 경우는 §4가 되돌린다.
+대상: `v0.1.9`(validator `0.4.2`, runtime `0.3.2`)로 만들어진 P2 패키지를 가진 저장소. 현재 published 최신인 `v0.2.0`(validator `0.5.0`, runtime `0.3.2`)으로 만든 저장소도 절차는 같고, 그 판이 새로 거부하던 두 형식과 죽게 만들던 한 경우는 §4가 되돌리거나 고친다.
 도착: 제품 `0.3.0`(validator `0.6.1`, runtime `0.4.0`).
 
 `SPEC.version`은 계속 `"5"`이고 `KERNEL_VERSION`은 계속 `"6"`이다. 문법, 14개 closed export, Decision·trace schema, effect authority 경계는 바뀌지 않았다. **spec·body·원장을 손으로 고칠 일은 없다.**
@@ -42,7 +42,7 @@ trace 문장은 런타임이 실제로 강제하는 내용이 바뀐 것이고, 
 
 ## 4. 이번 판에서 **넓어진** 것 — 새로 쓸 수 있게 된 형식
 
-아래 넷 중 셋 — effect의 `path`, role의 effect 인자, 자원 루트 — 은 published `v0.2.0`(validator `0.5.0`)이 새로 거부하거나 죽게 만든 것을 되돌린 것이고, role을 착지점으로 지목하는 것 하나만 `v0.1.9`부터 있던 결함을 고친 것이다. `v0.1.9`에서 `v0.2.0`을 건너뛰고 바로 오는 경우에도 그대로 유효하다. 모두 v5가 원래 허용하던 것이다.
+아래 넷 중 셋 — effect의 `path`, role의 effect 인자, 자원 루트 — 은 published `v0.2.0`(validator `0.5.0`)이 새로 거부하거나 죽게 만든 것을 되돌리거나 고친 것이고, role을 착지점으로 지목하는 것 하나만 `v0.1.9`부터 있던 결함이다. `v0.1.9`에서 `v0.2.0`을 건너뛰고 바로 오는 경우에도 그대로 유효하다. 모두 v5가 원래 허용하던 것이다.
 
 - **effect의 `path`는 자유 인자다.** 어떤 동사에서도 패키지 파일일 필요가 없다. `["READ", { artifact: "originSource", path: "origin.sourcePath" }]`처럼 `path`로 경로를 담은 관측 필드를 가리켜도 되고, 안내 파일을 가리켜도 된다. 효과 인자는 런타임이 해석하는 명령이 아니라 모델에게 그대로 렌더링되는 지시문이다.
 - **role의 effect 인자는 전역 `ARTIFACTS`로 검증되지 않는다.** role은 독립 명령으로 렌더되고 `renderRole`이 `inputs`·`reads`·`effects`를 그대로 직렬화하며 artifact를 투영하지 않으므로, role 효과의 `artifact`/`template`/`format`은 패키지에 선언돼 있지 않아도 된다. 해석되는 것은 `returns` 템플릿뿐이고 그것은 계속 검증된다.
