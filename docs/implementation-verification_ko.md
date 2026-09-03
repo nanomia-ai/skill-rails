@@ -510,7 +510,7 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 
 ### 6.20 v0.1.9 기준 전수 재검사: 범용성을 좁힌 네 곳의 복구 (validator 0.6.0)
 
-"무엇이 좁아졌는가"라는 기준으로 v0.1.9 이후 변경을 전수 재검사했다. 거부할 수 있는 코드는 여덟 파일뿐이고(`ast-policy`·`domains`·`simple-lint`·`path-policy`·build/lint/eval/mutation은 v0.1.9 이후 무변경), 각 동작을 하나씩 판정한 결과 **허용 집합을 줄인 네 곳**을 찾아 되돌렸다. 조사는 논리 검토가 먼저 수렴시켰고 기계 확인은 마지막에 붙였다.
+"무엇이 좁아졌는가"라는 기준으로 v0.1.9 이후 변경을 전수 재검사했다. 아래 네 복구 중 (1)과 (2)는 published `v0.2.0`이 새로 거부하게 만든 것을 되돌리는 것이고, (3)과 (4)는 v0.1.9에도 있던 결함이다 — `authoring-ledger.mjs`와 `maintenance.mjs`는 `v0.2.0`이 건드리지 않았다. 거부할 수 있는 코드는 여덟 파일뿐이고(`ast-policy`·`domains`·`simple-lint`·`path-policy`·build/lint/eval/mutation은 v0.1.9 이후 무변경), 각 동작을 하나씩 판정한 결과 **허용 집합을 줄인 네 곳**을 찾아 되돌렸다. 조사는 논리 검토가 먼저 수렴시켰고 기계 확인은 마지막에 붙였다.
 
 **(1) effect의 `path`에 패키지 파일 의미를 소급 부여했다.** v0.1.9는 이 인자를 검증하지 않았고 계약 문서도 언급하지 않았으며, 런타임은 `renderGuide`가 모든 효과 인자를 `key=value`로 그대로 직렬화해 모델에게 넘길 뿐이었다. 즉 effect는 **모델에게 주는 지시문**이지 런타임이 해석하는 명령이 아니고, `path`는 그 지시문의 자유로운 일부였다. 6.-1이 그 인자에 "패키지 안내 파일"이라는 의미를 부여하면서 동시에 강제해, `["READ", { path: "the ticket named in the request" }]` 같은 v5 유효 명세를 거부하게 됐다. 실제 피해도 확인됐다 — 소비 저장소가 작성 중이던 `["READ", { artifact: "originSource", path: "origin.sourcePath" }]`(여기서 `path`는 경로를 담은 관측 필드 이름)가 진단 2건으로 거부됐다. 검사를 제거했다. 커밋된 소비 저장소의 `READ` 효과 13개는 모두 실재하는 안내 파일을 가리키므로 잃는 보호가 없고, 생성 bootstrap과 `p2-contract.md`에서 그 예약 문장도 함께 걷어냈다.
 
@@ -556,7 +556,7 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 
 버전. `RUNTIME_VERSION`은 `0.3.2`에서 `0.4.0`이다. 소진 번호로 기록된 `0.3.0`/`0.4.0`은 각각 runtime과 validator의 것이므로(0.5절) runtime `0.4.0`은 미사용 번호다. 6.21이 patch이고 이 절이 minor인 기준은 이렇다 — 거부 대상이 결함 그 자체이면 patch, 이전에 동작하던 구성이면 minor. 6.21이 거부하는 후행 세그먼트 locator는 아무것도 가리키지 않는 원장 항목이다. 런타임은 locator를 읽지 않으므로 그런 원장을 가진 v0.1.9 패키지도 빌드되고 실행됐고, 따라서 '쓸 수 없던 형태'는 아니다. 6.22가 거부하는 것은 실제로 동작하던 배치다. `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision/trace schema, closed export, effect authority 경계는 그대로다.
 
-검증. 회귀는 lexical 거부, 정션 대상 거부, 패키지 경계 유지, 프로젝트 없는 호출자의 종전 계약, `align --project`가 옵션 검증을 통과한다는 것을 고정한다. 두 독립 교차검토(Fable xhigh, Sol xhigh)를 신선한 컨텍스트로 돌렸고 **판정이 갈렸다** — 양쪽 다 규칙이 신고된 결함보다 넓다는 데 동의했으나, 한쪽은 요구자가 그 형태를 지정했으므로 수용(비차단), 다른 쪽은 호환성 규칙 위반으로 차단이라고 판정했다. 위 원문과 기계화 불가 판정, 실측 호출자 0건으로 판정하고 사용자가 유지를 결정했다. 두 검토가 확정으로 일치한 지적(align 죽은 코드, 모순 주석, 계약 과장, 제품 문서의 옛 경계)은 전부 이 변경에 포함했다.
+검증. 회귀는 lexical 거부, 정션 대상 거부, 패키지 경계 유지, 프로젝트 없는 호출자의 종전 계약, `align --project`가 옵션 검증을 통과한다는 것을 고정한다. 두 독립 교차검토(Fable xhigh, Sol xhigh)를 신선한 컨텍스트로 돌렸고 **판정이 갈렸다** — 양쪽 다 규칙이 신고된 결함보다 넓다는 데 동의했으나, 한쪽은 요구자가 그 형태를 지정했으므로 수용(비차단), 다른 쪽은 호환성 규칙 위반으로 차단이라고 판정했다. 위 원문과 불변식 불가 판정, 실측 호출자 0건으로 판정하고 사용자가 유지를 결정했다. 두 검토가 확정으로 일치한 지적(align 죽은 코드, 모순 주석, 계약 과장, 제품 문서의 옛 경계)은 전부 이 변경에 포함했다.
 
 계속 `UNPROVEN`인 것: 프로젝트 안을 가리키던 trace 설정이 실제 소비 저장소에 얼마나 있었는지, 옮긴 뒤의 동작, 진행 중 run의 실제 이전, non-Windows POSIX symlink 분기, 그리고 CLI `align`·`resume` 경유의 프로젝트 거부(단위 경계로만 덮여 있다).
 
@@ -585,6 +585,8 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 `semantic-diff`의 `references` 그룹은 이제 선언 여부와 무관하게 `references/**`·`templates/**`의 모든 정규 파일을 담는다. 선언된 파일 템플릿은 `template_content`와 이 그룹에 함께 나타난다. 이는 receipt 형식 변경이 아니라 관측 범위 확대다.
 
 검증: `vendor:check` 통과, self lint 통과, `node --test tests/*.test.mjs` 70/70 통과, `eval --suite-root .` 통과. 실물 확인은 신규 migrate 패키지에서 소비 표면 절대경로 0건, 추론 problem `review-required`, `references/purpose.md` 미생성, 없는 `READ_FIRST` 경로 L7 차단, 없는 효과 `path` L12 차단, 패키지 밖 경로 L7 차단, READ_FIRST 밖 reference 수정이 `any_changed:true`·`groups.references` 기록으로 관측됐다. 소비 저장소 코호트 재빌드와 fresh-agent 행동 측정은 `unproven`.
+
+이 절의 바이트는 배포됐다. Commit `e7a4f98af413fa948cfbc05d1c3f30e978b7521a`가 `origin/main`이고 annotated tag `v0.2.0`이 같은 commit을 가리키며, GitHub Release `v0.2.0`은 2026-09-03T16:25:38Z에 published 상태다(draft·prerelease 아님, 현재 Latest). 그 판의 fingerprint는 validator `0.5.0`, runtime `0.3.2`, kernel `6`, package version `0.2.0`이다. 위 표가 도입한 세 축소 중 `READ` 효과의 `path` 검사와 role effect의 전역 참조 검증 둘은 **released 바이트에 들어간 채 나갔고** 6.20이 되돌렸다. 세 번째인 `READ_FIRST[].path` 실재 확인만 정당한 것으로 남았다. 즉 6.20은 후보의 실수를 고친 것이 아니라 **배포된 판의 호환성 후퇴를 복구한 것**이며, 그 복구는 아직 배포되지 않았다.
 
 ### 7.0 Version-5 Decision 위치 보존
 
