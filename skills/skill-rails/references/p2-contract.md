@@ -44,7 +44,7 @@ Evaluate guards in array order. ASK, BLOCK, and `ROUTE:<target-id>` stop; RESTRI
 
 Within a selected effect plan, effects are consumed in array order and a terminal stops the plan only when reached; a terminal final status never discards prefix effects.
 
-A `READ` effect's `path` argument selects package guidance and resolves against `<skill-root>`; an `artifact` argument resolves against `<project>` through its `ARTIFACTS` declaration. Build validates every `READ_FIRST` path and every `READ` effect `path` as a portable package-relative spelling that exists as a regular file inside the package; neither form may leave the package, and a sibling package is not addressable from either. Other verbs have no reserved `path` meaning.
+A `READ` effect that carries only a `path` selects package guidance and resolves against `<skill-root>`; an `artifact` argument resolves against `<project>` through its `ARTIFACTS` declaration, and a `READ` naming an `artifact` leaves any accompanying `path` to that declaration rather than to the package. Build validates every `READ_FIRST` path and every artifact-free `READ` effect `path` as a portable package-relative spelling that exists as a regular file inside the package; neither form may leave the package, and a sibling package is not addressable from either. Other verbs have no reserved `path` meaning.
 
 The runtime calculates and validates effect plans; it does not claim to intercept model tool calls. Without trusted harness evidence, execution adherence remains checked or unproven, never enforced.
 

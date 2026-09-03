@@ -672,6 +672,12 @@ test("build verifies every declared package file the runtime tells the model to 
   const undeclaredRoleTemplate = await diagnose(withRole('[["REPORT", { template: "absent" }]]'), roleBody);
   assert.equal(undeclaredRoleTemplate.some((item) => item.code === "L12" && /unknown template|must be declared/.test(item.message)), true, "role effect references are validated like stage effects");
 
+  // A READ that also names an artifact leaves resolution to that declaration, so its `path` is an
+  // argument about resolving the artifact, not a package file. Version 5 left that form open.
+  const artifactRead = await diagnose(original.replace(READY_PLAN,
+    'ready: [["READ", { artifact: "result", path: "origin.sourcePath" }], ["REPORT", { template: "result" }], "DONE"]'));
+  assert.deepEqual(artifactRead.filter((item) => item.code === "L12" && item.pointer.endsWith(".path")), [], "an artifact-resolved READ keeps its version-5 freedom for path");
+
   // Only READ reserves `path`. Other verbs never had a closed meaning for it in version 5, so
   // reserving one now would fail packages that already pass.
   const nonReadPath = await diagnose(original.replace(READY_PLAN,
@@ -696,6 +702,41 @@ test("maintenance receipts report every maintainable resource change, not only R
   assert.equal(report.any_changed, true, "a real content change may never be reported as no change");
   assert.equal(report.source_changes.context, true);
   assert.deepEqual(report.groups.references.map((item) => ({ id: item.id, change: item.change })), [{ id: "references/notes.md", change: "modified" }]);
+});
+
+test("a role is a resolvable landing place, not a crash", async (t) => {
+  const base = await makeTestDir("role-locator");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 1 }) });
+
+  const specPath = join(root, "spec.mjs");
+  const bodyPath = join(root, "body.md");
+  const spec = await readFile(specPath, "utf8");
+  const body = await readFile(bodyPath, "utf8");
+  await writeFile(specPath, spec.replace("export const ROLES = {};",
+    'export const ROLES = { checker: { body: "role: checker", effects: [["REPORT", { template: "result" }]] } };'), "utf8");
+  await writeFile(bodyPath, body + "\n## role: checker\n\nThe checker reports what the evidence already shows.\n", "utf8");
+
+  const ledgerPath = join(root, ".skill-rails", "obligation-ledger.json");
+  const ledger = await readJson(ledgerPath);
+  const atom = ledger.atoms.find((item) => item.id === "problem-001");
+  // Naming a declared role as the place an obligation landed used to throw instead of resolving,
+  // which made every role an unusable target rather than a checked one.
+  atom.targets = ["spec:ROLES/checker"];
+  atom.evidence = ["spec:ROLES/checker"];
+  await writeFile(ledgerPath, JSON.stringify(ledger, null, 2) + "\n", "utf8");
+
+  const resolved = await validateFull(root);
+  assert.deepEqual(resolved.diagnostics.filter((item) => item.code === "L16"), [], "a declared role resolves as a landing place");
+
+  atom.targets = ["spec:ROLES/absent"];
+  atom.evidence = ["spec:ROLES/absent"];
+  await writeFile(ledgerPath, JSON.stringify(ledger, null, 2) + "\n", "utf8");
+  const missing = await validateFull(root);
+  assert.equal(missing.diagnostics.some((item) => item.code === "L16" && /does not resolve/.test(item.message)), true,
+    "an undeclared role is reported as an unresolved locator, not accepted and not a crash");
 });
 
 test("changed snapshot groups map to the exact locator spellings an obligation ledger can carry", () => {

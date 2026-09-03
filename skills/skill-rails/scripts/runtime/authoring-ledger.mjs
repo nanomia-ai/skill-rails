@@ -51,9 +51,12 @@ async function locatorExists(locator, context) {
 
 function specLocatorExists(spec, path) {
   const [group, first, second] = path.split("/");
-  if (["GUARDS", "STAGES", "ROLES", "DEFERRED"].includes(group)) return (spec[group] ?? []).some((item) => item.id === first);
+  // `ROLES` is an object keyed by role id, not an array of entries. Resolving it with the array branch
+  // threw a TypeError instead of answering, which made a role an unusable landing place: an author who
+  // named one lost the build rather than the atom. It belongs with the other keyed groups.
+  if (["GUARDS", "STAGES", "DEFERRED"].includes(group)) return (spec[group] ?? []).some((item) => item.id === first);
   if (group === "TABLES") return Boolean(spec.TABLES?.[first]?.rows?.some((item) => item.state === second));
-  if (["OBSERVATIONS", "FORMATS", "TEMPLATES", "ARTIFACTS", "DECLARATIONS"].includes(group)) return Object.hasOwn(spec[group] ?? {}, first);
+  if (["OBSERVATIONS", "FORMATS", "TEMPLATES", "ARTIFACTS", "DECLARATIONS", "ROLES"].includes(group)) return Object.hasOwn(spec[group] ?? {}, first);
   return false;
 }
 

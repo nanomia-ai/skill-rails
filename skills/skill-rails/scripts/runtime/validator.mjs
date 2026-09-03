@@ -272,7 +272,10 @@ function validatePlan(plan, pointer, diagnostics) {
 function validTerminal(value) { return TERMINALS.includes(value) || /^ROUTE:[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value); }
 
 function isReadPath(effect) {
-  return Array.isArray(effect) && effect[0] === "READ" && effect[1]?.path !== undefined;
+  // Only the guidance form reserves `path`. When a READ also names an `artifact`, that artifact already
+  // resolves the target against the project, so `path` is an argument about resolving it, not a package
+  // file. Version 5 left the combined form open, and closing it here would reject packages that pass.
+  return Array.isArray(effect) && effect[0] === "READ" && effect[1]?.path !== undefined && effect[1]?.artifact === undefined;
 }
 
 async function checkPackageFile(skillRoot, local, pointer, code, check) {
