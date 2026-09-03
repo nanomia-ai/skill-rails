@@ -69,7 +69,9 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.match(p2Skill, /ASK, WAIT, BLOCK, DONE, and ROUTE stop only when reached after all preceding effects/);
   assert.doesNotMatch(p2Skill, /Stop on a diagnostic, stale snapshot, BLOCK, ASK, or WAIT/);
   assert.match(p2Skill, /Do not infer replacement paths from collector or authoring files/);
-  assert.match(p2Skill, /a `READ` effect's `path` argument names package guidance and resolves from `<skill-root>`/);
+  // The bootstrap must not claim a package meaning for an effect argument: the runtime renders those
+  // verbatim, and version 5 lets a spec use `path` for whatever its own instruction means.
+  assert.doesNotMatch(p2Skill, /`READ` effect's `path`/, "the bootstrap may not reserve an effect argument version 5 left open");
   assert.match(p2Skill, /current task or role already identifies one project-relative file target/);
   assert.match(p2Skill, /add `--target "<path>"`; never infer a target, and omit the option/);
   assert.match(p2Skill, /artifact_verified --data '\{"reference":"<proof\.reference>"\}'/);

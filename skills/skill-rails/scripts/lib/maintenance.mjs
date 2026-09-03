@@ -3,7 +3,7 @@ import { join, relative, resolve } from "node:path";
 import { copyTree, createDirectoryAtomic, exists, isInside, listFiles, readJson, writeJsonAtomic, writeTextAtomic } from "./io.mjs";
 import { parseBody } from "../runtime/body.mjs";
 import { hashFile, sha256 } from "../runtime/hash.mjs";
-import { changedLocators, semanticDiff, snapshotContract } from "./semantic-diff.mjs";
+import { semanticDiff, snapshotContract } from "./semantic-diff.mjs";
 import { mergeObligationLedger } from "./obligations.mjs";
 import { INTENT_ARRAYS, selectProfile, validateIntent } from "./profiles.mjs";
 import { assertSimpleProjectionOwnership, createEvalCases, writeSimplePackage } from "./generator.mjs";
@@ -32,7 +32,6 @@ export async function maintainPackage(skillRoot, change, options = {}) {
     report.change_id = change.id ?? null;
     report.intent = change.intent ?? null;
     report.impact = impactSummary(report);
-    report.impact.obligation_locators = await obligationImpact(stage, report.groups, artifactReceipts);
     await writeJsonAtomic(join(stage, ".skill-rails", "semantic-diff.json"), report);
     const { buildP2 } = await import("./build-core.mjs");
     await buildP2(stage, { allowGeneratedEdits: Boolean(options.repairGenerated), repeats: options.repeats ?? 200 });
@@ -195,40 +194,6 @@ async function updateIntent(root, operation) {
   const ledger = await readJson(ledgerPath);
   await writeJsonAtomic(ledgerPath, mergeObligationLedger(ledger, intent, profile, changed));
 }
-
-// The ledger says where each requirement landed; L16 only ever checks that the place still resolves.
-// This reports which of those places this transaction disturbed, so the author sees the blast radius
-// while making the edit. It asserts nothing about whether the requirement is still satisfied there:
-// that judgment stays with the author, and a report is not an approval. Ordering is by code unit, not
-// by locale, because the receipt is a committed artifact and must not depend on the host it was made on.
-async function obligationImpact(root, groups, artifactReceipts) {
-  const locators = changedLocators(groups, artifactReceipts);
-  if (locators.size === 0) return [];
-  const path = join(root, ".skill-rails", "obligation-ledger.json");
-  let ledger;
-  try { ledger = JSON.parse(await readFile(path, "utf8")); }
-  catch (error) {
-    if (error.code === "ENOENT") return [];
-    throw new Error(`Obligation ledger cannot be read for the maintenance receipt: ${path}: ${error.message}`);
-  }
-  const affected = new Map();
-  for (const atom of ledger.atoms ?? []) {
-    if (atom.disposition !== "projected") continue;
-    const channels = new Map();
-    for (const [channel, list] of [["target", atom.targets ?? []], ["evidence", atom.evidence ?? []]]) {
-      for (const locator of list) if (locators.has(locator)) channels.set(locator, [...new Set([...(channels.get(locator) ?? []), channel])]);
-    }
-    for (const [locator, kinds] of channels) {
-      if (!affected.has(locator)) affected.set(locator, []);
-      affected.get(locator).push({ id: atom.id, channel: kinds.sort().join("+") });
-    }
-  }
-  return [...affected.entries()]
-    .sort(([a], [b]) => compareCodeUnits(a, b))
-    .map(([locator, atoms]) => ({ locator, change: locators.get(locator), atom_count: atoms.length, atoms: atoms.sort((a, b) => compareCodeUnits(a.id, b.id)) }));
-}
-
-function compareCodeUnits(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
 
 function impactSummary(report) {
   const counts = {};

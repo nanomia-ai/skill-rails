@@ -492,47 +492,41 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 ---
 
 
-### 6.19 의무 원장이 주장하는 착지점을 편집 시점에 드러내는 영수증
+### 6.19 의무 원장의 재검증 부재: 조사 결과와 출하하지 않기로 한 판단
 
-`authoring-ledger.mjs:31-34`의 L16은 `projected` atom의 `targets`/`evidence` locator가 **해석되는지만** 확인한다. 그 자리가 실제로 그 의무를 담고 있는지는 그때도, 그 뒤로도 확인되지 않는다. 이 절은 그 빈틈을 **게이트가 아니라 보고**로 좁힌 변경과, 그렇게 결정한 근거를 기록한다.
+`authoring-ledger.mjs`의 L16은 `projected` atom의 `targets`/`evidence` locator가 **해석되는지만** 확인한다. 그 자리가 실제로 그 의무를 담고 있는지는 그때도 그 뒤로도 확인되지 않는다. 이 결함을 조사했고, **후보 진단을 구현해 실측까지 한 뒤 출하하지 않기로 했다.** 코드는 남기지 않고 조사 결과만 남긴다.
 
-먼저 실측했다(소비 저장소 9개, 읽기 전용). atom **2,117개**, 그중 `projected` **2,100개**. 그런데 이들이 가리키는 distinct (패키지, locator) 쌍은 **395개**뿐이라 locator 단위가 atom 단위보다 약 5배 작다. `projected` 중 **1,073개**는 evidence가 산문 locator(`file:`/`body:`)뿐이고 실행되는 것이 뒷받침하지 않는다(`principles` 840/845, `verify` 157/170, `design` 56/58; 나머지 6개 패키지는 거의 전부 `fixture:`/`spec:`로 뒷받침된다). 집중도는 극단적이다 — `principles/references/planning-evidence-policy.md`는 **284바이트인데 62개 atom**의 착지점으로 선언돼 있고, `references/knowledge-evidence-policy.md`는 551바이트에 64개, `references/shared-authoring-policy.md`는 317바이트에 58개다. `resume`의 `fixture:exceptions` 하나에 **198개**가 매달려 있는데, 이것이 "승인 이후 bytes 불변"을 atom 단위로 요구하면 fixture 한 번 편집에 209개 중 198개가 무효가 되는 이유다. atom 단위 신선도는 이 수치에서 이미 배제된다.
+실측(소비 저장소 9개, 읽기 전용). atom **2,117개**, 그중 `projected` **2,100개**. 이들이 가리키는 distinct (패키지, locator) 쌍은 **395개**뿐이라 locator 단위가 atom 단위보다 약 5배 작다. `projected` 중 **1,073개**는 evidence가 산문 locator(`file:`/`body:`)뿐이다. fan-in이 극단적이다 — `references/planning-evidence-policy.md`는 284바이트에 **62개 atom**, `knowledge-evidence-policy.md`는 551바이트에 64개, `shared-authoring-policy.md`는 317바이트에 58개, `knowledge/baseline-contract.md`는 76개, `resume`의 `fixture:exceptions` 하나에 **198개**가 매달려 있다. 이 마지막 값이 "승인 이후 bytes 불변"을 atom 단위로 요구하면 fixture 한 번 편집에 209개 중 198개가 무효가 되는 이유이며, atom 단위 신선도는 이 수치에서 이미 배제된다.
 
-드리프트가 실제로 일어나는지도 git으로 대조했다. 각 `file:` locator의 마지막 커밋을 그 패키지 원장의 마지막 커밋과 비교하면, file evidence를 가진 atom **1,146개 중 31개**가 원장이 마지막으로 쓰인 뒤 변경된 파일에 매달려 있다(9개 중 6개 패키지). 이 31개는 **일회성 git 감사 결과이며 이번 코드가 소급 계산한 값이 아니다.** 소비 저장소가 활발히 개발 중이고 원장 커밋이 대부분 최근이라 관측 창이 짧으므로 하한이다. 표본을 열어 성격을 확인한 결과 대부분은 한 줄 변경(개명·문구)이었고, 28개 atom이 매달린 `verify/references/failure-routing.md`도 개명 커밋의 한 줄 변경이었다.
+드리프트가 실제로 일어나는지도 git으로 대조했다. 각 `file:` locator의 마지막 커밋을 그 패키지 원장의 마지막 커밋과 비교하면, file evidence를 가진 atom 1,146개 중 **31개**가 원장이 마지막으로 쓰인 뒤 변경된 파일에 매달려 있었다. 이는 일회성 감사 결과이고 관측 창이 짧아 하한이다. 표본을 열어 보니 대부분 한 줄 변경(개명·문구)이었다.
 
-**locator 승인표는 채택하지 않았다.** 추가형 스키마로 `approvals: { locator: { hash, approved_at } }`를 두고 L16이 불일치를 막게 하면 게이트는 생긴다. 그러나 해시가 묶는 것은 bytes이고 원장이 주장하는 것은 의미다. `principles/references/knowledge/baseline-contract.md`에는 **76개 atom**이 매달려 있는데, 한 줄 개명 뒤 그 자리를 한 번의 재승인으로 통과시키는 것은 검토가 아니라 도장이다. 그러면 `AGENTS.md:15`가 금지하는 것 — 크레딧이 실제로 관측된 authority를 넘는 것 — 을 지금보다 **더 큰 규모로** 재생산한다. 현재 L16의 "파일이 있다"는 약하지만 정직하고, 승인표는 "저자가 이 자리를 확인했다"로 읽히면서 실제 관측은 한 키 입력뿐이다. 실측 드리프트가 대부분 한 줄 개명이라는 사실이 이 위험을 이론이 아니라 예상되는 일상으로 만든다. 두 독립 교차검토가 같은 결론에 도달했다.
+**locator 승인표는 기각했다.** 해시가 묶는 것은 bytes이고 원장이 주장하는 것은 의미다. 76개 atom이 매달린 자리를 한 줄 개명 뒤 한 번의 재승인으로 통과시키는 것은 검토가 아니라 도장이며, `AGENTS.md:15`가 금지하는 것 — 크레딧이 실제로 관측된 authority를 넘는 것 — 을 지금보다 큰 규모로 재생산한다. 현재 L16의 "파일이 있다"는 약하지만 정직하다.
 
-**채택한 것은 트랜잭션 시점의 교차참조 하나다.** `snapshotContract`는 이미 `body`(섹션 ref→hash), `references`(파일→hash), spec 그룹별 id 인덱스를 만들고 `semanticDiff`가 변경 id를 `groups`로 낸다. 그 그룹 키를 원장 locator 철자(`body:<ref>`, `file:<path>`, `spec:<GROUP>/<id>`)로 옮기는 순수 함수 `changedLocators`를 `semantic-diff.mjs`에 두고, `maintenance.mjs`가 staged 원장을 읽어 그 자리를 인용하는 `projected` atom을 `report.impact.obligation_locators`로 낸다. 새 truth source도 새 상태 파일도 없다. 세 지점은 단순 대응이 아니다. 표는 통째로 인덱싱되지만 행 단위로 인용되므로(`authoring-ledger.mjs:55`가 `TABLES/<table>/<state>`를 요구, devflow 인용 122건) 변경된 표는 양쪽 행 state 전부로 펼친다 — 형제 행 과보고는 정직하지만, 표 이름만으로 정확 일치를 시도하면 **한 건도 보고되지 않는다**. 템플릿은 선언이 바뀌든 렌더된 내용이 바뀌든 같은 id로 인용되므로 `template_content`도 `spec:TEMPLATES/<id>`로 옮긴다(인용 107건). 등록 artifact 교체는 collector에 해당하는 snapshot 그룹이 없어 receipt만이 이동 기록이므로 변경된 receipt의 path를 `file:<path>`로 합류시킨다(인용 13건). 반대로 `ROLES`는 매핑하지 않는다 — 현행 resolver가 `ROLES`를 배열로 취급해 role locator에서 TypeError로 죽으므로(실행 확인), 매핑하면 존재하지 않는 지원을 광고하게 된다. 이 선재 결함은 validator 해시에 들어 있어 고치면 소비자 재빌드를 강제하므로 이번 범위에서 제외하고 경계만 기록한다. 정렬은 locale이 아니라 code unit으로 한다: 영수증은 소비자가 커밋하는 산출물이라 만든 호스트에 따라 순서가 달라져서는 안 된다. atom이 같은 locator를 target과 evidence 양쪽에서 인용하면 **한 번만** 나열되고 두 channel은 보존된다. `review-required` atom은 크레딧을 주장한 적이 없으므로 제외한다. 원장은 읽기만 하고 절대 쓰지 않는다.
+**보고 전용 후보도 출하하지 않는다.** 트랜잭션이 바꾼 locator를 원장과 조인해 영수증에 싣는 형태를 구현하고 소비 저장소의 커밋된 영수증 56개로 재생해 6개 커밋·69 locator·914건 atom 보고가 나오는 것까지 확인했다. 그러나 채택 기준을 통과하지 못했다. ①읽는 소비자가 관측되지 않았고 사람이 행동을 바꾼다는 증거가 없다. ②그 정보는 새 정보가 아니라 이미 영수증에 있는 `groups`와 패키지 안 원장을 조인한 것이라 저자가 grep 한 번으로 얻을 수 있다. ③표 전행 전개·template content 합류·artifact receipt 보충·fixture/eval 제외라는 예외 네 개를 가진 매핑이 영구 유지 표면으로 남는다. 6.18에서 산문 포인터가 이미 충분하다는 이유로 구조적 이득만으로는 채택하지 않은 것과 같은 기준이다. 근본 원인(의미 재검증 부재)은 어느 후보도 고치지 못하며 — 비교할 "옳은 bytes"가 없으므로 해시로는 원리상 불가능하다 — 그 판정은 fresh review의 몫으로 남는다.
 
-효과를 소비 저장소의 **자기 이력으로 재생**해 확인했다. 최근 30개 커밋의 커밋된 `.skill-rails/semantic-diff.json` 영수증 56개를 그 시점 원장과 조인하면, 실제 `changedLocators`를 그대로 불러 이 보고는 **6개 커밋에서 69개의 변경 locator와 914건의 atom 보고**를 냈을 것이다 — `principles/file:references/policy-index.md`, `design/file:references/ownership.md`, `principles/file:templates/canonical-journal-progress-grammar.md`, `work/spec:STAGES/*`, 그리고 최초 마이그레이션 커밋 `dedf24a`의 `work/body:stage: review-reduction`을 포함한다. 즉 실측된 드리프트 커밋 전부에서 편집 시점에 울렸을 것이다. 이 수치는 경계 2 교차검증이 잡은 결함 덕분이다. 최초 구현은 표를 `spec:TABLES/<table>`로만 매핑해 정확 일치가 성립하지 않았고, 같은 재생에서 252건만 냈다. 두 검토자가 독립적으로 같은 무보고를 지적했고, 표 전개·`template_content`·artifact receipt를 더한 뒤 914건이 됐다.
-
-**주장하지 않는 것을 분명히 한다.** 이 보고는 **전향적**이다. 위 31건은 git 감사로 얻은 사실이고 이 코드가 찾아낸 것이 아니다. 처음부터 target이 의무를 담지 않았던 거짓 크레딧은 이 변경도, 승인표도 검출하지 못한다 — 비교할 "옳은 bytes"가 존재하지 않으므로 해시로는 원리상 불가능하고, 그 판정은 fresh review의 몫이다. 1,073건의 산문 전용 크레딧은 이 변경 뒤에도 정확히 같은 근거 위에 있다. `fixture:`와 `eval:` locator는 어떤 유지보수 연산으로도 도달할 수 없어 트랜잭션이 바꿀 수 없으므로 의도적으로 제외했고, 가장 뜨거운 `resume/fixture:exceptions`(198개)가 그 제외 집합에 있다는 사실도 함께 기록한다. 그 경로를 덮으려면 트랜잭션 사이에 지속되는 기준선 파일이 필요한데, 사전 고정 기준이 요구하지 않는 크기라 넣지 않았다.
-
-**호환성.** 원장 스키마·disposition·L16·spec export·`SPEC.version`은 그대로다. 새 L-코드도 mutation fixture도 없다. 변경은 creator lib 두 파일뿐이고 패키지 런타임 디렉터리에 복사되지 않으므로, 같은 패키지를 이 변경 전후로 다시 빌드해 `.generated.json`을 비교한 결과 `runtime_hash`·`validator_hash`·`dsl_hash`·`content_hash`·`spec_hash`가 모두 동일했다. **소비자 강제 재빌드 0, 강제 원장 수정 0, 강제 마이그레이션 연산 0**이며, 다음 정상 트랜잭션부터 영수증에 자동으로 나타난다. P0/P1은 `maintainSimplePackage`가 이 경로 이전에 반환하므로 영향이 없고, 그 프로필의 intent 투영은 이미 `assertSimpleProjectionOwnership`이 매 유지보수마다 바이트 비교한다. 후보 tree에서 `npm run verify`는 74/74로 통과했다.
-
-계속 `UNPROVEN`인 것: 저자가 이 보고를 실제로 읽고 행동을 바꾸는지, 손편집+`build.mjs` 경로에서 발생하는 드리프트, `fixture:`/`eval:` 착지점의 신선도, 그리고 산문 전용 크레딧 1,073건의 의미 일치 여부.
+다시 열 조건: 실제 저자가 이 조인 없이 놓친 누락이 관측될 때, 또는 fan-out이 낮은 원장에서 신선도 검사가 의미 있게 통과할 수 있음이 보일 때.
 
 ---
 
+### 6.20 v0.1.9 기준 전수 재검사: 범용성을 좁힌 네 곳의 복구 (validator 0.6.0)
 
-### 6.20 v0.1.9 이후 전수 재검사에서 드러난 두 건의 범용성 축소 복구 (validator 0.5.1)
+"무엇이 좁아졌는가"라는 기준으로 v0.1.9 이후 변경을 전수 재검사했다. 거부할 수 있는 코드는 여덟 파일뿐이고(`ast-policy`·`domains`·`simple-lint`·`path-policy`·build/lint/eval/mutation은 v0.1.9 이후 무변경), 각 동작을 하나씩 판정한 결과 **허용 집합을 줄인 네 곳**을 찾아 되돌렸다. 조사는 논리 검토가 먼저 수렴시켰고 기계 확인은 마지막에 붙였다.
 
-v0.1.9 이후의 변경을 "무엇이 좁아졌는가"라는 기준으로 전수 재검사한 결과, **허용 집합을 줄인 지점 두 곳**을 찾아 되돌렸다. 둘 다 넓히는 방향이며, 오늘 유효한 어떤 패키지도 새로 거부하지 않는다.
+**(1) effect의 `path`에 패키지 파일 의미를 소급 부여했다.** v0.1.9는 이 인자를 검증하지 않았고 계약 문서도 언급하지 않았으며, 런타임은 `renderGuide`가 모든 효과 인자를 `key=value`로 그대로 직렬화해 모델에게 넘길 뿐이었다. 즉 effect는 **모델에게 주는 지시문**이지 런타임이 해석하는 명령이 아니고, `path`는 그 지시문의 자유로운 일부였다. 6.-1이 그 인자에 "패키지 안내 파일"이라는 의미를 부여하면서 동시에 강제해, `["READ", { path: "the ticket named in the request" }]` 같은 v5 유효 명세를 거부하게 됐다. 실제 피해도 확인됐다 — 소비 저장소가 작성 중이던 `["READ", { artifact: "originSource", path: "origin.sourcePath" }]`(여기서 `path`는 경로를 담은 관측 필드 이름)가 진단 2건으로 거부됐다. 검사를 제거했다. 커밋된 소비 저장소의 `READ` 효과 13개는 모두 실재하는 안내 파일을 가리키므로 잃는 보호가 없고, 생성 bootstrap과 `p2-contract.md`에서 그 예약 문장도 함께 걷어냈다.
 
-**(1) role은 착지점이 될 수 없었다 — 진단이 아니라 크래시였다.** `authoring-ledger.mjs`의 `specLocatorExists`는 `GUARDS/STAGES/ROLES/DEFERRED`를 한 배열 분기로 묶어 `.some`을 호출했다. 그런데 `ROLES`는 배열이 아니라 id로 키가 잡힌 객체다. 따라서 원장이 `spec:ROLES/<id>`를 착지점으로 지목하는 순간 `TypeError: (spec[group] ?? []).some is not a function`으로 죽었다(실행 확인). 해석기 자신이 `ROLES`를 지원 대상으로 열거하고 있었으므로 이것은 미지원이 아니라 결함이고, 저자는 role을 착지점으로 적는 순간 진단 대신 빌드를 잃었다. `ROLES`를 다른 키 기반 그룹과 같은 분기로 옮겨 해결했다. 소비 저장소 영향은 0이다 — `spec:ROLES/` 인용 0건(실측). 다만 `arch`는 비어 있지 않은 `ROLES`를 선언하고 있어, 이 결함은 그 저장소가 role을 착지점으로 쓰지 못하게 조용히 막고 있었다.
+**(2) role effect를 전역 `ARTIFACTS` 네임스페이스로 검증했다.** v0.1.9의 role 검증은 id·금지 효과·body·`returns`만 확인했고, role은 자기 `inputs`를 가지며 `renderRole`이 그것을 그대로 직렬화하는 독립 명령이다(`api.mjs:166`). 6.-1이 stage용 참조 검증을 role에 확장해, `inputs: ["brief"]`를 갖고 `[["READ", { artifact: "brief" }]]`를 쓰는 v5 유효 role이 "미선언 artifact"로 거부된다. 그 확장을 제거했다. role artifact 네임스페이스를 통합하려면 먼저 새 계약에서 의미와 투영을 정의해야 한다.
 
-**(2) `READ` 효과의 `path`는 version 5에서 자유로운 인자였다.** 6.17 이전 어디에도 `READ`의 `path`에 대한 검증이 없었고 `p2-contract.md`도 그 인자를 언급하지 않았다(v0.1.9 트리 확인). 런타임 역시 특별 취급하지 않았다 — `renderGuide`가 모든 효과 인자를 `key=value`로 일반 렌더링할 뿐이다(v0.1.9 `guide.mjs` 확인). 6.-1의 변경은 그 인자에 "패키지 안내 파일"이라는 의미를 **부여하면서 동시에 강제**했고, 그 결과 다른 용법을 쓰는 패키지는 빌드가 거부된다. 이는 허용 집합 축소다.
+**(3) role은 착지점이 될 수 없었다 — 진단이 아니라 크래시.** `specLocatorExists`가 `GUARDS/STAGES/ROLES/DEFERRED`를 한 배열 분기로 묶어 `.some`을 불렀는데 `ROLES`는 id로 키가 잡힌 객체다. 원장이 `spec:ROLES/<id>`를 지목하는 순간 `TypeError`로 죽었다(실행 확인). 해석기 자신이 `ROLES`를 지원 목록에 넣고 있었으므로 미지원이 아니라 결함이고, 저자는 role을 착지점으로 적는 순간 진단 대신 빌드를 잃었다. 키 기반 분기로 옮겼다. 소비 저장소는 `spec:ROLES/` 인용 0건이지만 `arch`가 비어 있지 않은 role을 선언하고 있어, 이 결함이 그 사용을 조용히 막고 있었다.
 
-실측: 소비 저장소의 커밋된 9개 spec에는 `path`를 가진 `READ` 효과가 13개 있고 **전부 `artifact` 없는 안내 형식**이라 그 검사를 통과한다. 그러나 같은 저장소가 작업 중인(미커밋) 트리에는 `["READ", { artifact: "originSource", path: "origin.sourcePath" }]` 형식이 등장했고, 여기서 `path`는 파일 경로가 아니라 그 경로를 담은 관측 필드 이름이며 `ARTIFACTS.originSource.path`의 `<origin.sourcePath>` 자리표시자와 짝을 이룬다. 일관된 용법인데 새 검사가 이를 거부해 진단 2건이 발생했다(실행 확인).
+**(4) 유지보수 스냅샷이 자원 루트를 무조건 순회했다.** `snapshotContract`가 `references`/`templates`에 `listFiles`를 호출하며 `ENOENT`만 흡수한다. v5는 그 이름의 **일반 파일**을 금지하지 않으므로 그런 패키지에서 `ENOTDIR`로 죽어 연산 적용 전에 유지보수가 실패한다. 디렉터리가 아니면 자원 없음으로 처리하도록 고쳤다.
 
-검사를 없애지 않고 **발동 범위를 좁혔다**: `artifact` 없이 `path`만 가진 안내 형식에만 패키지 파일 규칙을 적용한다. `artifact`가 있으면 그 선언이 이미 대상을 프로젝트 기준으로 해석하므로 `path`는 그 해석에 관한 인자이지 패키지 파일이 아니다. 이는 6.-1이 스스로 적은 계약 문장(둘은 대안 관계)에 충실하고, 실측된 13개 안내 용법의 보호 가치는 그대로 유지한다. 좁힌 뒤 소비 저장소는 커밋 트리와 작업 중 트리 모두에서 진단 0건이다.
+정당하다고 판정해 유지한 것: `READ_FIRST.path`의 정규 파일 확인. v0.1.9의 `enterSkill`도 그 파일을 읽고 `SR_READ_FIRST`로 하드 실패했으므로(실행 확인), 이 검사가 줄이는 것은 애초에 진입할 수 없는 패키지뿐이다. 마이그레이션의 추론 `problem`을 `review-required`로 두는 것과 생성 scaffold 변경도 유지한다 — 전자는 `DEFERRED`가 비어 있는 동안만 게이트로 작용하고 기존 원장은 `mergeObligationLedger`가 보존하며, 후자는 새 패키지에만 적용된다.
 
-`VALIDATOR_VERSION`은 `0.5.0`에서 `0.5.1`로 patch 상승했다. `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, closed export, Decision/trace schema, effect authority 경계는 그대로다. 두 변경 모두 이전에 거부되거나 죽던 입력을 받아들이게 하는 방향이므로, 오늘 통과하는 패키지의 판정은 바뀌지 않는다. `npm run verify`는 77/77로 통과했다.
+`VALIDATOR_VERSION`은 v0.1.9의 `0.4.2`에서 `0.6.0`이 됐다. `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, closed export, Decision/trace schema, effect authority 경계는 그대로다. 순변화는 검사 하나 추가(READ_FIRST 실재)와 축소 네 곳 복구이므로, v0.1.9가 받아들이던 패키지 중 새로 거부되는 것은 `enter`가 이미 실패시키던 형태뿐이다. 후보 tree에서 `npm run verify` 74/74 통과, 소비 저장소 9개는 커밋 트리와 작업 중 트리 모두 진단 0건, 실제 소비 패키지 복사본에 대한 유지보수 트랜잭션도 성공했다.
 
-이 절과 함께 6.19의 수치 두 곳을 정정했다. `284바이트/124개`, `152개 atom`으로 적었던 값은 atom 수가 아니라 **인용 수**였다 — 같은 atom이 한 자리를 `targets`와 `evidence` 양쪽에서 인용하면 두 번 세어진 값이다. 실제 atom 수는 각각 62, 64, 58, 76이다. `distinct (패키지, locator) 395`와 `resume/fixture:exceptions 198`은 양쪽 계산이 같아 정정 불필요이며, 이 정정은 locator 단위가 atom 단위보다 약 5배 작다는 6.19의 결론을 바꾸지 않는다.
+한 가지 정정: 6.19가 한때 기록했던 "284바이트에 124개 atom", "152개 atom" 등은 atom 수가 아니라 **인용 수**였다(같은 atom이 한 자리를 `targets`와 `evidence` 양쪽에서 가리키면 두 번 세어진다). 위 본문의 값이 실제 atom 수다. 또 "`validator_version`을 비교하는 코드가 없다"는 진술도 틀렸다 — `manifest.mjs`의 `verifyManifest`가 `validator_version`과 `runtime_version`을 무결성 mismatch 필드에 포함한다. 따라서 이 값들은 라벨이 아니라 패키지 무결성 검사의 일부이며, 제품 버전으로 통합하자는 제안은 근거가 약해져 보류한다.
 
 ---
-
 
 ## 7. P2 version-5 보존 및 변경 원장
 

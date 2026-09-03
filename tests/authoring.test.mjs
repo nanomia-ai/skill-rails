@@ -8,7 +8,7 @@ import { generatePackage } from "../skills/skill-rails/scripts/lib/generator.mjs
 import { buildP2 } from "../skills/skill-rails/scripts/lib/build-core.mjs";
 import { inspectProseSkill, inferMigrationIntent, writeMigrationLedger } from "../skills/skill-rails/scripts/lib/migration.mjs";
 import { maintainPackage } from "../skills/skill-rails/scripts/lib/maintenance.mjs";
-import { changedLocators, semanticDiff, snapshotContract } from "../skills/skill-rails/scripts/lib/semantic-diff.mjs";
+import { semanticDiff, snapshotContract } from "../skills/skill-rails/scripts/lib/semantic-diff.mjs";
 import { lintSimpleSkill } from "../skills/skill-rails/scripts/lib/simple-lint.mjs";
 import { createDirectoryAtomic, exists, listFiles, readJson } from "../skills/skill-rails/scripts/lib/io.mjs";
 import { hashFile, sha256 } from "../skills/skill-rails/scripts/runtime/hash.mjs";
@@ -662,27 +662,21 @@ test("build verifies every declared package file the runtime tells the model to 
     'export const READ_FIRST = [{ body: "why: purpose", path: "../outside.md" }];'));
   assert.equal(escaping.some((item) => item.code === "L7" && /portable/.test(item.message)), true, "a READ_FIRST path may not leave the package");
 
-  const missingStagePath = await diagnose(original.replace(READY_PLAN,
-    'ready: [["READ", { path: "references/absent.md" }], ["REPORT", { template: "result" }], "DONE"]'));
-  assert.equal(missingStagePath.some((item) => item.code === "L12" && item.pointer.startsWith("STAGES.0.ready")), true, "a stage effect may not name a file the package does not carry");
+  // An effect argument is rendered into the model's instruction verbatim, so no verb reserves `path`
+  // as a package file. Requiring one rejected specs version 5 accepts, on every verb including READ.
+  for (const plan of [
+    'ready: [["READ", { path: "the ticket named in the request" }], ["REPORT", { template: "result" }], "DONE"]',
+    'ready: [["READ", { artifact: "result", path: "origin.sourcePath" }], ["REPORT", { template: "result" }], "DONE"]',
+    'ready: [["RUN", { path: "tools/project-local-runner" }], ["REPORT", { template: "result" }], "DONE"]'
+  ]) {
+    const diagnostics = await diagnose(original.replace(READY_PLAN, plan));
+    assert.deepEqual(diagnostics.filter((item) => item.pointer.endsWith(".path")), [], `an effect path argument keeps its version-5 freedom: ${plan}`);
+  }
 
-  const missingRolePath = await diagnose(withRole('[["READ", { path: "references/absent.md" }]]'), roleBody);
-  assert.equal(missingRolePath.some((item) => item.code === "L12" && item.pointer.startsWith("ROLES.checker.effects")), true, "role effects are held to the stage standard");
-
-  const undeclaredRoleTemplate = await diagnose(withRole('[["REPORT", { template: "absent" }]]'), roleBody);
-  assert.equal(undeclaredRoleTemplate.some((item) => item.code === "L12" && /unknown template|must be declared/.test(item.message)), true, "role effect references are validated like stage effects");
-
-  // A READ that also names an artifact leaves resolution to that declaration, so its `path` is an
-  // argument about resolving the artifact, not a package file. Version 5 left that form open.
-  const artifactRead = await diagnose(original.replace(READY_PLAN,
-    'ready: [["READ", { artifact: "result", path: "origin.sourcePath" }], ["REPORT", { template: "result" }], "DONE"]'));
-  assert.deepEqual(artifactRead.filter((item) => item.code === "L12" && item.pointer.endsWith(".path")), [], "an artifact-resolved READ keeps its version-5 freedom for path");
-
-  // Only READ reserves `path`. Other verbs never had a closed meaning for it in version 5, so
-  // reserving one now would fail packages that already pass.
-  const nonReadPath = await diagnose(original.replace(READY_PLAN,
-    'ready: [["RUN", { path: "tools/project-local-runner" }], ["REPORT", { template: "result" }], "DONE"]'));
-  assert.deepEqual(nonReadPath.filter((item) => item.pointer.endsWith(".path")), [], "a non-READ path argument keeps its version-5 freedom");
+  // A role names its own inputs and is rendered standalone, so its effect arguments are not resolved
+  // against this package's ARTIFACTS namespace.
+  const roleInput = await diagnose(withRole('[["READ", { artifact: "brief" }]]'), roleBody);
+  assert.deepEqual(roleInput.filter((item) => item.pointer.startsWith("ROLES.checker.effects")), [], "a role effect may name its own input");
 });
 
 test("maintenance receipts report every maintainable resource change, not only READ_FIRST files", async (t) => {
@@ -737,123 +731,6 @@ test("a role is a resolvable landing place, not a crash", async (t) => {
   const missing = await validateFull(root);
   assert.equal(missing.diagnostics.some((item) => item.code === "L16" && /does not resolve/.test(item.message)), true,
     "an undeclared role is reported as an unresolved locator, not accepted and not a crash");
-});
-
-test("changed snapshot groups map to the exact locator spellings an obligation ledger can carry", () => {
-  // A table is indexed whole but cited per row. Matching `spec:TABLES/<table>` against a ledger that can
-  // only hold `spec:TABLES/<table>/<state>` reports nothing at all, so a changed table expands to every
-  // row state on either side.
-  const tables = changedLocators({ tables: [{ id: "routing", change: "modified", before: { rows: [{ state: "ready" }, { state: "held" }] }, after: { rows: [{ state: "ready" }, { state: "blocked" }] } }] });
-  assert.deepEqual([...tables.keys()].sort(), ["spec:TABLES/routing/blocked", "spec:TABLES/routing/held", "spec:TABLES/routing/ready"]);
-
-  // A template is cited by id whether its declaration or its resolved content moved.
-  assert.deepEqual([...changedLocators({ template_content: [{ id: "result", change: "modified" }] }).keys()], ["spec:TEMPLATES/result"]);
-  const both = changedLocators({ templates: [{ id: "result", change: "added" }], template_content: [{ id: "result", change: "modified" }] });
-  assert.deepEqual([...both.entries()], [["spec:TEMPLATES/result", "modified"]], "one place reached through two groups stays one locator");
-
-  // A registered whole-file replacement is the only record that a collector moved: no group indexes it.
-  const receipts = changedLocators({}, [
-    { path: "collectors/index.mjs", before_hash: "sha256:a", after_hash: "sha256:b" },
-    { path: "references/kept.md", before_hash: "sha256:c", after_hash: "sha256:c" }
-  ]);
-  assert.deepEqual([...receipts.keys()], ["file:collectors/index.mjs"], "an unchanged artifact receipt is not a changed locator");
-
-  // `ROLES` is not mapped: the shipped resolver treats it as an array and cannot resolve a role locator,
-  // so emitting one would advertise support that does not exist.
-  assert.deepEqual([...changedLocators({ roles: [{ id: "checker", change: "modified" }], ownership: [{ id: "cards/**", change: "modified" }] }).keys()], []);
-
-  assert.deepEqual([...changedLocators({
-    body: [{ id: "why: purpose", change: "modified" }],
-    references: [{ id: "references/notes.md", change: "added" }],
-    stages: [{ id: "operate", change: "modified" }],
-    observations: [{ id: "release.readiness", change: "modified" }],
-    declarations: [{ id: "profile", change: "modified" }],
-    guards: [{ id: "publish", change: "removed" }],
-    artifacts: [{ id: "note", change: "modified" }],
-    formats: [{ id: "card", change: "modified" }],
-    deferred: [{ id: "scaffold", change: "removed" }]
-  }).keys()].sort(), [
-    "body:why: purpose", "file:references/notes.md", "spec:ARTIFACTS/note", "spec:DECLARATIONS/profile", "spec:DEFERRED/scaffold",
-    "spec:FORMATS/card", "spec:GUARDS/publish", "spec:OBSERVATIONS/release.readiness", "spec:STAGES/operate"
-  ]);
-});
-
-test("table row locators come from a real snapshot diff, not a hand-built group shape", async () => {
-  // The mapping unit test builds group entries by hand, which would keep passing if `summarizeTable`
-  // changed shape underneath it. This drives the same mapping from a real package's real snapshot so a
-  // change to how tables are indexed fails here instead of silently emptying the report.
-  const pilot = join(ROOT, "fixtures", "next-core-single-skill-pilot", "skill");
-  const before = await snapshotContract(pilot);
-  const tableId = Object.keys(before.tables)[0];
-  assert.ok(tableId, "the pilot fixture must declare a table for this to mean anything");
-  const rowStates = before.tables[tableId].rows.map((row) => row.state);
-  assert.ok(rowStates.length > 1, "the table must have rows");
-
-  const after = JSON.parse(JSON.stringify(before));
-  after.tables[tableId].rows[0].reads = [...after.tables[tableId].rows[0].reads, "synthetic.probe"];
-  const report = semanticDiff(before, after);
-  assert.equal(report.groups.tables.length, 1, "one changed table is one group entry");
-
-  const locators = changedLocators(report.groups);
-  assert.deepEqual([...locators.keys()].sort(), rowStates.map((state) => `spec:TABLES/${tableId}/${state}`).sort(),
-    "a changed table reports every row state, in the spelling the ledger resolver accepts");
-  for (const locator of locators.keys()) assert.equal(locator.split("/").length, 3, "a table locator carries table and row");
-});
-
-test("a maintenance receipt names the projected obligations riding what the transaction changed", async (t) => {
-  const base = await makeTestDir("obligation-impact");
-  t.after(() => removeTestDir(base));
-  const root = join(base, "skill");
-  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
-  await generatePackage({ intent, output: root, finalize: async (stage) => {
-    await writeFile(join(stage, "references", "notes.md"), "# Notes\n\nOriginal guidance.\n", "utf8");
-    return buildP2(stage, { repeats: 1 });
-  } });
-
-  const ledgerPath = join(root, ".skill-rails", "obligation-ledger.json");
-  const ledger = await readJson(ledgerPath);
-  const bodyAtom = ledger.atoms.find((atom) => atom.id === "problem-001");
-  assert.equal(bodyAtom.disposition, "projected", "the generated problem atom is the projected case this reports on");
-  // One atom cites the same place as both target and evidence and also cites a file; another stays
-  // review-required. A report that counted rows instead of atoms would double the first, and one that
-  // ignored disposition would leak the second.
-  bodyAtom.targets = ["body:why: purpose", "file:references/notes.md"];
-  bodyAtom.evidence = ["body:why: purpose"];
-  const pending = ledger.atoms.find((atom) => atom.disposition === "review-required");
-  if (pending) { pending.targets = ["body:why: purpose"]; pending.evidence = ["file:references/notes.md"]; }
-  await writeFile(ledgerPath, JSON.stringify(ledger, null, 2) + "\n", "utf8");
-
-  const report = await maintainPackage(root, {
-    id: "obligation-impact-probe",
-    operations: [{ type: "replace-resource", path: "references/notes.md", content: "# Notes\n\nRewritten guidance.\n" }]
-  }, { repeats: 1 });
-
-  assert.deepEqual(report.impact.obligation_locators, [{
-    locator: "file:references/notes.md",
-    change: "modified",
-    atom_count: 1,
-    atoms: [{ id: "problem-001", channel: "target" }]
-  }], "only the changed locator is reported, and only for projected obligations");
-
-  // The report is an observation, not an approval: nothing about the ledger changes because of it.
-  assert.deepEqual(await readJson(ledgerPath), ledger, "reporting impact may not rewrite the ledger it reads");
-
-  const second = await maintainPackage(root, {
-    id: "obligation-impact-probe-2",
-    operations: [{ type: "replace-body-section", id: "why: purpose", content: "Rewritten purpose that still states the same problem." }]
-  }, { repeats: 1 });
-  assert.deepEqual(second.impact.obligation_locators, [{
-    locator: "body:why: purpose",
-    change: "modified",
-    atom_count: 1,
-    atoms: [{ id: "problem-001", channel: "evidence+target" }]
-  }], "an atom citing one place through both channels is listed once and keeps both channels");
-
-  const third = await maintainPackage(root, {
-    id: "obligation-impact-probe-3",
-    operations: [{ type: "replace-resource", path: "references/notes.md", content: "# Notes\n\nRewritten guidance again.\n" }]
-  }, { repeats: 1 });
-  assert.equal(third.impact.obligation_locators.every((item) => item.locator !== "body:why: purpose"), true, "a locator this transaction did not change is not reported");
 });
 
 async function treeFingerprint(root) {

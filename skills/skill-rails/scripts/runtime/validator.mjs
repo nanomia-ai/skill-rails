@@ -187,24 +187,10 @@ export async function validateFull(skillRoot, options = {}) {
     if (item?.path) await checkPackageFile(skillRoot, item.path, `READ_FIRST.${index}.path`, "L7", check);
   }
 
-  // A READ path names package guidance the runtime hands the model, so build must prove it exists.
-  // Without this, build seals L-full:pass while the first enter or the first selected branch fails.
-  // Only READ is checked: other verbs never had a closed `path` meaning, and reserving one now would
-  // fail version-5 packages that already pass.
-  for (const [index, stage] of (spec.STAGES ?? []).entries()) {
-    for (const [branch, plan] of plansForStage(stage)) {
-      for (const [effectIndex, effect] of (plan ?? []).entries()) {
-        if (!isReadPath(effect)) continue;
-        await checkPackageFile(skillRoot, effect[1].path, `STAGES.${index}.${branch}.${effectIndex}.path`, "L12", check);
-      }
-    }
-  }
-  for (const [id, role] of Object.entries(spec.ROLES ?? {})) {
-    for (const [effectIndex, effect] of (role.effects ?? []).entries()) {
-      if (!isReadPath(effect)) continue;
-      await checkPackageFile(skillRoot, effect[1].path, `ROLES.${id}.effects.${effectIndex}.path`, "L12", check);
-    }
-  }
+  // An effect argument is text the runtime renders into the model's instruction, not a path the runtime
+  // opens: `renderGuide` serializes every argument verbatim. Version 5 therefore left `path` free on
+  // every verb, and a build that required it to be a package file would reject specs that already pass.
+  // `READ_FIRST` is the opposite case and is still checked, because `enter` really does read that file.
 
   for (const [index, stage] of (spec.STAGES ?? []).entries()) {
     for (const [, plan] of plansForStage(stage)) {
@@ -220,7 +206,9 @@ export async function validateFull(skillRoot, options = {}) {
   for (const [id, role] of Object.entries(spec.ROLES ?? {})) {
     check("L12", /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id), `ROLES.${id}`, "Role id must be kebab-case.");
     check("L12", (role.effects ?? []).every((effect) => !["WRITE", "COMMIT", "DISPATCH"].includes(Array.isArray(effect) ? effect[0] : effect)), `ROLES.${id}.effects`, "Clean-context roles may not own state-changing effects.");
-    validateEffectReferences(role.effects, `ROLES.${id}.effects`, spec, check);
+    // A role names its own `inputs` and is rendered as a standalone command, so its effect arguments
+    // are not resolved against this package's `ARTIFACTS`; holding them to the stage namespace rejected
+    // roles that version 5 accepts.
     check("L7", typeof role.body === "string" && role.body.length > 0, `ROLES.${id}.body`, "Role requires a body reference.");
     if (role.returns) check("L12", Boolean(spec.TEMPLATES?.[role.returns]), `ROLES.${id}.returns`, "Role returns must reference a declared template.");
   }
@@ -270,13 +258,6 @@ function validatePlan(plan, pointer, diagnostics) {
 }
 
 function validTerminal(value) { return TERMINALS.includes(value) || /^ROUTE:[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value); }
-
-function isReadPath(effect) {
-  // Only the guidance form reserves `path`. When a READ also names an `artifact`, that artifact already
-  // resolves the target against the project, so `path` is an argument about resolving it, not a package
-  // file. Version 5 left the combined form open, and closing it here would reject packages that pass.
-  return Array.isArray(effect) && effect[0] === "READ" && effect[1]?.path !== undefined && effect[1]?.artifact === undefined;
-}
 
 async function checkPackageFile(skillRoot, local, pointer, code, check) {
   if (!isPortableRelativePath(local)) {
