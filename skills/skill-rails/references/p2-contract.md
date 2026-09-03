@@ -73,7 +73,7 @@ node <generated-skill>/scripts/skill-rails/run.mjs align --skill <generated-skil
 node <generated-skill>/scripts/skill-rails/run.mjs resume --skill <generated-skill> --trace <trace.jsonl> --project <project>
 ```
 
-`<external-state-dir>` is external to two things, not one. The runtime refuses a trace directory inside the installed package and inside the observed project, including through a symlink or junction, so a run never leaves state in the repository it is reading. A caller that supplies no project keeps the package-only guarantee.
+`<external-state-dir>` is external to two things, not one. The runtime always refuses a trace directory inside the installed package, and refuses one inside the observed project — including through a symlink or junction — on every command it is given a project. `stage` always has one; `record`, `align` and `resume` accept `--project` and check it when supplied. A caller that supplies none keeps the package-only guarantee, so choose a directory outside both rather than relying on the check to catch it.
 
 Unsupported flags or input sources fail closed. Do not infer missing values or reconstruct a Decision from prose after a CLI or validation failure.
 

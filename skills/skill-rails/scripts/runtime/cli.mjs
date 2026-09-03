@@ -67,7 +67,7 @@ export async function main(argv = process.argv.slice(2), io = console) {
         } else if (!["effect_claimed", "receipt_recorded", "proof_recorded"].includes(parsed.type)) {
           fail("SR_EVIDENCE_TYPE", "The agent-facing record command accepts only claims and receipts; observed effects require a trusted harness.");
         }
-        const value = await recordEvidence({ skillRoot, traceDir, runId, decision, type: parsed.type, data, artifactPath, expectedArtifactPath });
+        const value = await recordEvidence({ skillRoot, traceDir, runId, decision, type: parsed.type, data, artifactPath, expectedArtifactPath, projectRoot: parsed.project ? resolve(parsed.project) : null });
         emit(value, parsed.json, io, JSON.stringify);
         return 0;
       }
@@ -157,7 +157,7 @@ function validateCommandArgs(command, parsed) {
     role: { positions: 3, options: ["role"] },
     lint: { positions: 2, options: ["fast", "full"] },
     record: { positions: 2, options: ["decision", "trace-dir", "run-id", "type", "authority", "data", "artifact", "project"] },
-    align: { positions: 2, options: ["decision", "trace"] },
+    align: { positions: 2, options: ["decision", "trace", "project"] },
     resume: { positions: 2, options: ["trace", "project"] }
   };
   const declaration = commands[command];

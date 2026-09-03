@@ -265,6 +265,10 @@ test("runtime CLI rejects ambiguous booleans and command-inappropriate options b
   assert.match(errors.pop(), /not valid for enter/);
   assert.equal(await runtimeMain(["lint", "--fast", "--fast"], io), 1);
   assert.match(errors.pop(), /Duplicate option/);
+  // align reads --project to keep run state out of the observed project, so refusing the option
+  // there would leave that check unreachable rather than enforced.
+  assert.equal(await runtimeMain(["align", "--decision", "absent.json", "--project", "."], io), 1);
+  assert.doesNotMatch(errors.pop(), /not valid for align/);
 });
 
 test("verified import rejects spec bytes changed after L-fast", async (t) => {

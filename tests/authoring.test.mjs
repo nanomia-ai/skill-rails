@@ -732,6 +732,16 @@ test("runtime state may not land inside the observed project", async (t) => {
   await assertExternalStateDir(skill, join(base, "outside"), project);
   // Callers that do not know a project keep the previous contract exactly.
   await assertExternalStateDir(skill, join(project, ".traces"));
+
+  // A lexical check alone is a check a junction walks around, and the junction is the shape a
+  // consumer actually produces when a scratch path is linked back into the repository.
+  const linked = join(base, "linked-traces");
+  await mkdir(join(project, ".traces"), { recursive: true });
+  await symlink(join(project, ".traces"), linked, "junction");
+  await assert.rejects(
+    assertExternalStateDir(skill, linked, project),
+    (error) => error.code === "SR_STATE_INSIDE_PROJECT",
+    "a junction into the observed project is refused on its target, not its name");
 });
 
 test("a role is a resolvable landing place, not a crash", async (t) => {
@@ -746,7 +756,9 @@ test("a role is a resolvable landing place, not a crash", async (t) => {
   const spec = await readFile(specPath, "utf8");
   const body = await readFile(bodyPath, "utf8");
   await writeFile(specPath, spec.replace("export const ROLES = {};",
-    'export const ROLES = { checker: { body: "role: checker", effects: [["REPORT", { template: "result" }]] } };'), "utf8");
+    'export const ROLES = { checker: { body: "role: checker", effects: [["REPORT", { template: "result" }]] } };')
+    .replace("export const TABLES = {};",
+      'export const TABLES = { evidence: { exclusive: true, rows: [{ state: "only", reads: [], when: () => true }] } };'), "utf8");
   await writeFile(bodyPath, body + "\n## role: checker\n\nThe checker reports what the evidence already shows.\n", "utf8");
 
   const ledgerPath = join(root, ".skill-rails", "obligation-ledger.json");
@@ -776,6 +788,19 @@ test("a role is a resolvable landing place, not a crash", async (t) => {
   const trailing = await validateFull(root);
   assert.equal(trailing.diagnostics.some((item) => item.code === "L16" && /does not resolve/.test(item.message)), true,
     "a trailing segment does not resolve to the thing it was appended to");
+
+  // A table row is the one locator that legitimately carries three segments, and it is the shape a
+  // real ledger cites most: getting its arity wrong rejects every table citation rather than a typo.
+  const unresolved = async (locator) => {
+    atom.targets = [locator];
+    atom.evidence = [locator];
+    await writeFile(ledgerPath, JSON.stringify(ledger, null, 2) + "\n", "utf8");
+    const result = await validateFull(root);
+    return result.diagnostics.some((item) => item.code === "L16" && item.message.endsWith(locator));
+  };
+  assert.equal(await unresolved("spec:TABLES/evidence/only"), false, "a declared table row resolves");
+  assert.equal(await unresolved("spec:TABLES/evidence"), true, "a table names more than one row, so it is not a landing place");
+  assert.equal(await unresolved("spec:TABLES/evidence/only/typo"), true, "a trailing segment on a table row does not resolve either");
 });
 
 async function treeFingerprint(root) {

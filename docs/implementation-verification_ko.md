@@ -522,9 +522,43 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 
 정당하다고 판정해 유지한 것: `READ_FIRST.path`의 정규 파일 확인. v0.1.9의 `enterSkill`도 그 파일을 읽고 `SR_READ_FIRST`로 하드 실패했으므로(실행 확인), 이 검사가 줄이는 것은 애초에 진입할 수 없는 패키지뿐이다. 마이그레이션의 추론 `problem`을 `review-required`로 두는 것과 생성 scaffold 변경도 유지한다 — 전자는 `DEFERRED`가 비어 있는 동안만 게이트로 작용하고 기존 원장은 `mergeObligationLedger`가 보존하며, 후자는 새 패키지에만 적용된다.
 
-`VALIDATOR_VERSION`은 v0.1.9의 `0.4.2`에서 `0.6.0`이 됐다. `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, closed export, Decision/trace schema, effect authority 경계는 그대로다. 순변화는 검사 하나 추가(READ_FIRST 실재)와 축소 네 곳 복구이므로, v0.1.9가 받아들이던 패키지 중 새로 거부되는 것은 `enter`가 이미 실패시키던 형태뿐이다. 후보 tree에서 `npm run verify` 74/74 통과, 소비 저장소 9개는 커밋 트리와 작업 중 트리 모두 진단 0건, 실제 소비 패키지 복사본에 대한 유지보수 트랜잭션도 성공했다.
+`VALIDATOR_VERSION`은 v0.1.9의 `0.4.2`에서 `0.6.0`이 됐다. `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, closed export, Decision/trace schema, effect authority 경계는 그대로다. 순변화는 검사 하나 추가(READ_FIRST 실재)와 축소 네 곳 복구이므로, v0.1.9가 받아들이던 패키지 중 새로 거부되는 것은 `enter`가 이미 실패시키던 형태뿐이다. 이는 이 절의 delta 기준이며, 6.21과 6.22가 각각 새 거부를 하나씩 더한다. 후보 tree에서 `npm run verify` 74/74 통과, 소비 저장소 9개는 커밋 트리와 작업 중 트리 모두 진단 0건, 실제 소비 패키지 복사본에 대한 유지보수 트랜잭션도 성공했다.
 
 한 가지 정정: 6.19가 한때 기록했던 "284바이트에 124개 atom", "152개 atom" 등은 atom 수가 아니라 **인용 수**였다(같은 atom이 한 자리를 `targets`와 `evidence` 양쪽에서 가리키면 두 번 세어진다). 위 본문의 값이 실제 atom 수다. 또 "`validator_version`을 비교하는 코드가 없다"는 진술도 틀렸다 — `manifest.mjs`의 `verifyManifest`가 `validator_version`과 `runtime_version`을 무결성 mismatch 필드에 포함한다. 따라서 이 값들은 라벨이 아니라 패키지 무결성 검사의 일부이며, 제품 버전으로 통합하자는 제안은 근거가 약해져 보류한다.
+
+---
+
+### 6.21 원장 locator의 주소 정확성과 role 근거 정정 (validator 0.6.1)
+
+`specLocatorExists`는 `spec:` 뒤를 `/`로 나눈 뒤 앞 두 세그먼트만 읽고 나머지를 버렸다. `spec:ROLES/checker/typo`는 `spec:ROLES/checker`로 해석돼 오타 난 원장이 얻지 않은 크레딧을 유지했다. 미해결 locator를 보고하라고 존재하는 L16이 바로 그 자리에서 무력했다. 세그먼트 수를 그룹별로 고정했다 — 표의 행은 셋(`TABLES/<표>/<상태>`), 나머지 그룹은 둘. 이 검사는 `spec:` 분기 안에만 있고 `file:`·`body:`·`fixture:`·`eval:`은 접두사에서 먼저 갈라지므로, 슬래시가 든 경로나 공백·추가 콜론이 든 body 참조는 애초에 분할 대상이 아니다.
+
+새 거부이므로 커밋 전에 실 코퍼스로 실측했다. 소비 저장소 9개 패키지, atom 2,117개, `projected` atom이 인용하는 locator 5,307건(`file:` 2,921 / `spec:` 1,047 / `fixture:` 976 / `body:` 361 / `eval:` 2). `spec:` 인용 1,047건 중 `TABLES` 122건은 전부 3세그먼트, 나머지 925건은 전부 2세그먼트여서 **새로 거부되는 것은 0건**이다. 서로 다른 `spec:` locator 문자열은 174개이고 그중 `TABLES`가 23개다 — 1,047은 인용 수이지 locator 수도 atom 수도 아니다. 같은 값을 코디네이터와 두 독립 교차검토가 각각 따로 측정해 일치했다.
+
+함께 정정한 것은 6.20(2)가 남긴 근거 기록이다. role effect 참조 검증을 제거한 이유를 "role이 자기 `inputs` 네임스페이스를 쓴다"로 적었으나 계약에 그런 네임스페이스 정의가 없다. 실제 근거는 "build는 런타임이 해석하는 참조만 닫는다"이다 — stage 효과의 `artifact`/`template`/`format`은 Decision으로 투영되므로 선언을 요구하고, role은 artifact를 투영하지 않는 독립 명령으로 렌더되므로 `returns` 템플릿만 해석된다. `p2-contract.md`의 과일반화(어떤 동사도 인자 의미를 예약하지 않는다), `authoring-workflow.md`가 효과 `path`를 선언 자리로 열거하던 것, 그리고 투영된 크레딧이 "locator가 해석된다"만 뜻한다는 한계가 유지보수 문단에 없던 것도 같이 고쳤다. version-5 변경표는 철회된 두 검사를 취소선으로 표시한다.
+
+회귀는 후행 세그먼트와 `TABLES`의 3세그먼트 분기를 각각 고정한다. 후자는 처음 빠져 있었고, `TABLES` arity를 3에서 4로 바꾼 변이가 `npm run verify`의 lint·test 76/76·eval을 그대로 통과하는 것을 실행으로 확인한 뒤 추가했다. 파일럿 픽스처 원장이 `spec:TABLES/evidence/<state>` 5건을 `projected`로 인용하지만 파일럿 원장 검증은 `verify` 경로에 없어 그 인용이 커버리지가 되지 못한다. `VALIDATOR_VERSION`은 `0.6.0`에서 `0.6.1`이다.
+
+---
+
+### 6.22 런타임 상태가 관찰 대상 프로젝트를 오염시키던 경계 (runtime 0.4.0)
+
+소비 저장소가 올린 유일한 upstream 요구다. 원문(`devflow/docs/design-backlog.md`, 2026-09-03 기록)은 생성 안내가 "설치된 스킬 바깥"이라고만 말해서 그대로 따른 소비자가 project-local `.devflow-traces/adopt`를 골랐고 나중 Git snapshot이 그 미추적 상태를 관측했다고 적은 뒤, **경로 예외나 설명 지시를 추가하지 말고 `assertExternalStateDir`와 생성 adapter가 설치 패키지와 관찰 프로젝트 **양쪽** 바깥을 요구하도록 upstream에서 한 번에 고치라**고 지정한다. 그 원문이 이 절의 범위를 정한다.
+
+규칙은 한쪽만 지키고 있었다. `assertExternalStateDir`는 스킬 루트와 상태 디렉터리만 받아 설치 패키지 안은 거부할 수 있었고 읽고 있는 저장소 안은 거부할 방법이 없었다. 이제 관찰 프로젝트를 세 번째 인자로 받아 lexical과 `canonicalPath` 양쪽에서 `SR_STATE_INSIDE_PROJECT`로 거부한다. 프로젝트를 아는 호출이 그것을 넘긴다 — API의 `stage`(두 진입점 모두), CLI의 `record`·`align`·`resume`. 프로젝트를 모르는 호출자는 이전 패키지 전용 보장을 그대로 유지한다. 생성 bootstrap과 `p2-contract.md`도 같은 문장으로 맞췄다.
+
+**이것은 의도적 축소이고, 신고된 결함의 메커니즘보다 넓다.** 프로젝트 안이면서 snapshot에 보이지 않는 위치(`.skill-rails/`는 filesystem basis가 명시 제외하고, git basis는 `--ignored` 없이 소비자 `.gitignore`에 의존한다)도 함께 거부된다. 그 좁은 형태는 기계화할 수 없다 — 가드 시점에 그 패키지가 쓸 `snapshotBasis`도 그 프로젝트의 `.gitignore`도 알 수 없고, 그것을 추정하는 순간 요구자가 명시적으로 거부한 경로별 예외가 된다. 요구자가 넓은 불변식을 지정했고, 이 트리·픽스처·소비 저장소 전체에서 프로젝트 내부 trace를 쓰는 호출자는 실측 0건이므로(소비 저장소가 `--project`와 `--trace-dir`를 함께 넘기는 테스트 3곳은 모두 OS tmpdir의 형제 디렉터리) 넓은 형태로 채택한다. 잃는 것은 "프로젝트 안이지만 snapshot이 못 보는 자리에 trace를 두는" 구성이며, 필요해지면 그때 명시적 opt-out을 여는 것이 예외 경로를 지금 만드는 것보다 낫다.
+
+정정 하나. 이 커밋이 옮긴 두 테스트가 "결함을 시연하고 있었다"는 서술은 사실이 아니다. 둘 다 `ROOT/.skill-rails/test-runs` 아래에 trace를 썼고 그 디렉터리는 gitignore이면서 filesystem basis에서도 제외되므로 어느 snapshot에도 보이지 않았다. 두 테스트는 새 규칙이 거부하게 된 넓은 부류의 실례였을 뿐이다.
+
+같은 변경에서 닫은 세 가지. `align`은 본문에서 `--project`를 읽으면서 옵션 허용 목록에는 없어 `Option --project is not valid for align.`으로 먼저 실패했다 — 그 검사는 도달할 수 없는 죽은 식이었다(실행 확인). 허용 목록에 넣어 `record`·`resume`과 같아졌고, 옵션을 새로 받는 것이므로 v5 형태를 새로 거부하지 않는다. CLI의 `record`는 프로젝트를 알면서 `recordEvidence`에 넘기지 않아 API 자체 가드가 그 경로에서 죽어 있었다. 그리고 `api.mjs`의 "Trace storage may intentionally live under the project."는 새 규칙과 정면으로 모순되는, 코드 안에 남은 옛 계약 문장이었다. `p2-contract.md`의 "a run never leaves state"도 조건부 검사가 주지 않는 무조건 보장을 주장했으므로 실제 조건을 적도록 고쳤다.
+
+알려진 한계. `canonicalPath`는 실재하는 경로만 realpath로 접고 실패하면 가장 가까운 실재 부모에서 어휘적으로 복원한다. 따라서 대상이 아직 만들어지지 않은 링크는 lexical 검사만 받는다(실행 확인 — 대상이 없는 정션은 거부되지 않고, 대상을 만들면 거부된다). 이는 a1c050f가 만든 성질이 아니라 패키지 경계 검사도 함께 가진 기존 성질이며, 트레이스 디렉터리가 아직 없을 때도 검사할 수 있게 하려고 둔 폴백이다. `recordHarnessEvidence`는 프로젝트를 받을 자리가 없어 계속 패키지 경계만 검사한다 — 신뢰 하니스 전용 경로이고 제품 코드에 호출자가 없어 인자를 늘리지 않았다.
+
+버전. `RUNTIME_VERSION`은 `0.3.2`에서 `0.4.0`이다. 소진 번호로 기록된 `0.3.0`/`0.4.0`은 각각 runtime과 validator의 것이므로(0.5절) runtime `0.4.0`은 미사용 번호다. 6.21이 patch이고 이 절이 minor인 기준은 이렇다 — 애초에 쓸 수 없던 형태만 걷어내는 새 거부는 patch, 이전에 실제로 쓸 수 있던 구성을 없애는 새 거부는 minor. `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, Decision/trace schema, closed export, effect authority 경계는 그대로다.
+
+검증. 회귀는 lexical 거부, 정션 대상 거부, 패키지 경계 유지, 프로젝트 없는 호출자의 종전 계약, `align --project`가 옵션 검증을 통과한다는 것을 고정한다. 두 독립 교차검토(Fable xhigh, Sol xhigh)를 신선한 컨텍스트로 돌렸고 **판정이 갈렸다** — 양쪽 다 규칙이 신고된 결함보다 넓다는 데 동의했으나, 한쪽은 요구자가 그 형태를 지정했으므로 수용(비차단), 다른 쪽은 호환성 규칙 위반으로 차단이라고 판정했다. 위 원문과 기계화 불가 판정, 실측 호출자 0건으로 판정하고 사용자가 유지를 결정했다. 두 검토가 확정으로 일치한 지적(align 죽은 코드, 모순 주석, 계약 과장, 제품 문서의 옛 경계)은 전부 이 변경에 포함했다.
+
+계속 `UNPROVEN`인 것: 프로젝트 안을 가리키던 trace 설정이 실제 소비 저장소에 얼마나 있었는지, 옮긴 뒤의 동작, 진행 중 run의 실제 이전, non-Windows POSIX symlink 분기, 그리고 CLI `align`·`resume` 경유의 프로젝트 거부(단위 경계로만 덮여 있다).
 
 ---
 
