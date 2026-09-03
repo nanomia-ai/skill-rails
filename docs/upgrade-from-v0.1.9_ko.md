@@ -37,7 +37,7 @@
 이전 판(`0.2.0`, validator `0.5.0`)을 건너뛰고 오는 경우에도 아래는 그대로 유효하다. 모두 v5가 원래 허용하던 것을 되돌린 것이다.
 
 - **effect의 `path`는 자유 인자다.** 어떤 동사에서도 패키지 파일일 필요가 없다. `["READ", { artifact: "originSource", path: "origin.sourcePath" }]`처럼 `path`로 경로를 담은 관측 필드를 가리켜도 되고, 안내 파일을 가리켜도 된다. 효과 인자는 런타임이 해석하는 명령이 아니라 모델에게 그대로 렌더링되는 지시문이다.
-- **role의 effect는 role 자신의 `inputs` 네임스페이스를 쓴다.** `inputs: ["brief"]`인 role이 `[["READ", { artifact: "brief" }]]`를 써도 된다. 패키지의 전역 `ARTIFACTS`에 선언할 필요가 없다.
+- **role의 effect 인자는 전역 `ARTIFACTS`로 검증되지 않는다.** role은 독립 명령으로 렌더되고 `renderRole`이 `inputs`·`reads`·`effects`를 그대로 직렬화하며 artifact를 투영하지 않으므로, role 효과의 `artifact`/`template`/`format`은 패키지에 선언돼 있지 않아도 된다. 해석되는 것은 `returns` 템플릿뿐이고 그것은 계속 검증된다.
 - **role을 의무의 착지점으로 지목할 수 있다.** 원장에서 `spec:ROLES/<id>`가 정상 해석된다. 이전에는 `TypeError`로 빌드가 죽었다.
 - **`references`/`templates`가 디렉터리가 아니어도 유지보수가 죽지 않는다.**
 

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdir, readFile, symlink, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, symlink, unlink, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
@@ -698,6 +698,20 @@ test("maintenance receipts report every maintainable resource change, not only R
   assert.deepEqual(report.groups.references.map((item) => ({ id: item.id, change: item.change })), [{ id: "references/notes.md", change: "modified" }]);
 });
 
+test("a resource root that is a regular file is no resources, not a crash", async (t) => {
+  const base = await makeTestDir("resource-root-file");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 1 }) });
+  // Version 5 does not reserve these names for directories. Traversing them blindly turned a legal
+  // package shape into an ENOTDIR failure before any maintenance operation could run.
+  await rm(join(root, "references"), { recursive: true, force: true });
+  await writeFile(join(root, "references"), "not a directory\n", "utf8");
+  const snapshot = await snapshotContract(root);
+  assert.deepEqual(Object.keys(snapshot.references).filter((key) => key.startsWith("references")), [], "a non-directory resource root contributes no resources");
+});
+
 test("a role is a resolvable landing place, not a crash", async (t) => {
   const base = await makeTestDir("role-locator");
   t.after(() => removeTestDir(base));
@@ -731,6 +745,15 @@ test("a role is a resolvable landing place, not a crash", async (t) => {
   const missing = await validateFull(root);
   assert.equal(missing.diagnostics.some((item) => item.code === "L16" && /does not resolve/.test(item.message)), true,
     "an undeclared role is reported as an unresolved locator, not accepted and not a crash");
+
+  // A locator addresses one thing. A trailing segment used to be ignored, so a mistyped locator
+  // resolved as though it named its parent and the atom kept credit it had not earned.
+  atom.targets = ["spec:ROLES/checker/typo"];
+  atom.evidence = ["spec:ROLES/checker/typo"];
+  await writeFile(ledgerPath, JSON.stringify(ledger, null, 2) + "\n", "utf8");
+  const trailing = await validateFull(root);
+  assert.equal(trailing.diagnostics.some((item) => item.code === "L16" && /does not resolve/.test(item.message)), true,
+    "a trailing segment does not resolve to the thing it was appended to");
 });
 
 async function treeFingerprint(root) {

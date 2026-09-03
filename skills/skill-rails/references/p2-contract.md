@@ -44,7 +44,7 @@ Evaluate guards in array order. ASK, BLOCK, and `ROUTE:<target-id>` stop; RESTRI
 
 Within a selected effect plan, effects are consumed in array order and a terminal stops the plan only when reached; a terminal final status never discards prefix effects.
 
-An `artifact` argument resolves against `<project>` through its `ARTIFACTS` declaration. Build validates every `READ_FIRST` path as a portable package-relative spelling that exists as a regular file inside the package, because `enter` reads it; a sibling package is not addressable from it. Effect arguments are rendered into the model's instruction verbatim, so no verb reserves a `path` meaning and build does not require one to name a package file.
+An `artifact` argument resolves against `<project>` through its `ARTIFACTS` declaration. Build validates every `READ_FIRST` path as a portable package-relative spelling that exists as a regular file inside the package, because `enter` reads it; a sibling package is not addressable from it. Build closes only the references the runtime actually resolves. A stage effect's `artifact`, `template`, `format`, and `role` are projected into the Decision, so they must be declared; every other effect argument, `path` included, is rendered into the model's instruction verbatim and reserves no meaning, so build does not require one to name a package file. A role is rendered as a standalone command that projects no artifacts, so only its `returns` template is resolved and checked.
 
 The runtime calculates and validates effect plans; it does not claim to intercept model tool calls. Without trusted harness evidence, execution adherence remains checked or unproven, never enforced.
 

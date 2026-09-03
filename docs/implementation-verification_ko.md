@@ -514,7 +514,7 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 
 **(1) effect의 `path`에 패키지 파일 의미를 소급 부여했다.** v0.1.9는 이 인자를 검증하지 않았고 계약 문서도 언급하지 않았으며, 런타임은 `renderGuide`가 모든 효과 인자를 `key=value`로 그대로 직렬화해 모델에게 넘길 뿐이었다. 즉 effect는 **모델에게 주는 지시문**이지 런타임이 해석하는 명령이 아니고, `path`는 그 지시문의 자유로운 일부였다. 6.-1이 그 인자에 "패키지 안내 파일"이라는 의미를 부여하면서 동시에 강제해, `["READ", { path: "the ticket named in the request" }]` 같은 v5 유효 명세를 거부하게 됐다. 실제 피해도 확인됐다 — 소비 저장소가 작성 중이던 `["READ", { artifact: "originSource", path: "origin.sourcePath" }]`(여기서 `path`는 경로를 담은 관측 필드 이름)가 진단 2건으로 거부됐다. 검사를 제거했다. 커밋된 소비 저장소의 `READ` 효과 13개는 모두 실재하는 안내 파일을 가리키므로 잃는 보호가 없고, 생성 bootstrap과 `p2-contract.md`에서 그 예약 문장도 함께 걷어냈다.
 
-**(2) role effect를 전역 `ARTIFACTS` 네임스페이스로 검증했다.** v0.1.9의 role 검증은 id·금지 효과·body·`returns`만 확인했고, role은 자기 `inputs`를 가지며 `renderRole`이 그것을 그대로 직렬화하는 독립 명령이다(`api.mjs:166`). 6.-1이 stage용 참조 검증을 role에 확장해, `inputs: ["brief"]`를 갖고 `[["READ", { artifact: "brief" }]]`를 쓰는 v5 유효 role이 "미선언 artifact"로 거부된다. 그 확장을 제거했다. role artifact 네임스페이스를 통합하려면 먼저 새 계약에서 의미와 투영을 정의해야 한다.
+**(2) role effect를 전역 `ARTIFACTS` 네임스페이스로 검증했다.** 기준은 "런타임이 실제로 해석하는 참조만 build가 닫는다"이다. stage 효과의 `artifact`·`template`·`format`은 Decision으로 투영되므로(`evaluator.mjs`의 `projectStageArtifacts`는 `stage.*`/`guard.*` reader만 투영한다) 선언을 요구하는 것이 맞다. 그러나 `renderRole`(`api.mjs:156-173`)은 `inputs`·`reads`·`effects`·`judgments`를 그대로 직렬화하고 project root도 받지 않으며 `ARTIFACTS`를 전혀 투영하지 않는다. 해석되는 것은 `returns` 템플릿뿐이고 그것은 계속 검증된다(`validator.mjs`). 즉 role 효과의 `artifact`/`template`/`format`은 어디서도 해석되지 않으므로, 전역 선언을 강제해도 role에게 아무 경로가 전달되지 않은 채 v0.1.9가 받아들이던 role만 거부됐다. 그 확장을 제거했다. 오타를 잡는다는 원래 목적은 현 계약에서 기계화할 수 없어 의도적으로 포기한 것이며, 복원하려면 role-local 입력 네임스페이스와 그 투영을 새 계약에서 먼저 정의해야 한다. (초기 커밋 메시지와 업그레이드 문서는 이 근거를 "role이 자기 `inputs` 네임스페이스를 쓴다"로 적었으나, 계약에 그런 네임스페이스 정의가 없으므로 위 서술이 정확하다.)
 
 **(3) role은 착지점이 될 수 없었다 — 진단이 아니라 크래시.** `specLocatorExists`가 `GUARDS/STAGES/ROLES/DEFERRED`를 한 배열 분기로 묶어 `.some`을 불렀는데 `ROLES`는 id로 키가 잡힌 객체다. 원장이 `spec:ROLES/<id>`를 지목하는 순간 `TypeError`로 죽었다(실행 확인). 해석기 자신이 `ROLES`를 지원 목록에 넣고 있었으므로 미지원이 아니라 결함이고, 저자는 role을 착지점으로 적는 순간 진단 대신 빌드를 잃었다. 키 기반 분기로 옮겼다. 소비 저장소는 `spec:ROLES/` 인용 0건이지만 `arch`가 비어 있지 않은 role을 선언하고 있어, 이 결함이 그 사용을 조용히 막고 있었다.
 
@@ -541,8 +541,8 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 | P2 생성 scaffold | `references/purpose.md`를 body와 바이트 동일하게 생성하고 `READ_FIRST`가 둘을 쌍으로 소비 | 파일을 생성하지 않고 `READ_FIRST = [{ body: "why: purpose" }]`. reference는 필요할 때 저자가 추가 | 한 intent 필드를 두 owner에 복제해 유지보수가 갈라졌다 |
 | P2 `problem` projection locator | `body:why: purpose` + `file:references/purpose.md` | `body:why: purpose` 단독 | 위 변경의 정합 |
 | `READ_FIRST[].path` | 철자만 검사 | L7에서 패키지 내부 실제 정규 파일 확인 | build가 `L-full:pass`를 봉인하는데 최초 `enter`가 실패할 수 있었다 |
-| `READ` 효과의 `path` | 어디서도 미검증 | L12에서 동일 검사(stage·role). **`READ`에만** 적용한다 | runtime `guide`가 이미 모델 지시로 렌더한다. 다른 동사의 `path`는 v5에서 예약된 의미가 없었으므로 지금 예약하면 기존 통과 패키지를 깨뜨린다 |
-| role `effects` | 금지 동사만 검사 | `validateEffectReferences` 적용 | stage와 동일 기준 |
+| `READ` 효과의 `path` | 어디서도 미검증 | ~~L12에서 동일 검사~~ **6.20(1)에서 철회.** 현재: 미검증 | 효과 인자는 `renderGuide`가 그대로 직렬화해 모델에게 주는 지시문이지 런타임이 여는 경로가 아니다. v5는 모든 동사에서 `path`를 자유롭게 두었다 |
+| role `effects` | 금지 동사만 검사 | ~~`validateEffectReferences` 적용~~ **6.20(2)에서 철회.** 현재: `returns`만 검증 | `renderRole`이 효과 인자를 해석하지 않고 `ARTIFACTS`를 투영하지 않으므로 전역 선언을 요구해도 role에게 전달되는 것이 없다 |
 | semantic diff `references` | `READ_FIRST[].path`만 해시 | `references/**`·`templates/**` 전체 해시 | 그 밖의 `replace-resource` 변경이 `any_changed:false`로 보고됐다 |
 | `ORDERS` | 필수 export, 소비자 0, 계약은 spec이 효과 순서를 소유한다고 서술 | 제거하지 않고 `p2-contract.md`에 예약·미집행임을 명시 | 제거는 SPEC v6이며 소비 저장소의 명명된 시퀀스 의미 확인이 선행되어야 한다 |
 

@@ -50,7 +50,11 @@ async function locatorExists(locator, context) {
 }
 
 function specLocatorExists(spec, path) {
-  const [group, first, second] = path.split("/");
+  const segments = path.split("/");
+  const [group, first, second] = segments;
+  // A locator addresses exactly one thing. Without this, a trailing segment was silently ignored and a
+  // mistyped locator resolved as though it named its parent.
+  if (segments.length !== (group === "TABLES" ? 3 : 2)) return false;
   // `ROLES` is an object keyed by role id, not an array of entries. Resolving it with the array branch
   // threw a TypeError instead of answering, which made a role an unusable landing place: an author who
   // named one lost the build rather than the atom. It belongs with the other keyed groups.
