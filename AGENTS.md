@@ -39,6 +39,7 @@ Skill Rails helps an AI create and maintain one standalone skill without keeping
 - `docs/skill-rails_ko.md` — current product purpose, architecture, and stable design boundaries; read when changing product behavior or owning abstractions
 - `docs/implementation-verification_ko.md` — exact implementation scope, support evidence, unproven boundaries, and P2 compatibility ledger; read for verification claims or P2 contract changes
 - `docs/authoring-lessons_ko.md` — detailed experience for high-cost core choices, nonconvergence recovery, and successor comprehension
+- `docs/upgrade-from-v0.1.9_ko.md` — what a consumer built by v0.1.9 must check and rebuild to move to the current version; read when planning or performing that upgrade
 
 Do not read all project documents by default. For repository resumption or current-state work, start from the maintenance status and load another maintainer document only when the task requires its authority. For skill-user work, follow `skills/skill-rails/SKILL.md` without preloading maintainer docs.
 
