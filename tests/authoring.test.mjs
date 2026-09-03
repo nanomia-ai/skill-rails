@@ -8,7 +8,7 @@ import { generatePackage } from "../skills/skill-rails/scripts/lib/generator.mjs
 import { buildP2 } from "../skills/skill-rails/scripts/lib/build-core.mjs";
 import { inspectProseSkill, inferMigrationIntent, writeMigrationLedger } from "../skills/skill-rails/scripts/lib/migration.mjs";
 import { maintainPackage } from "../skills/skill-rails/scripts/lib/maintenance.mjs";
-import { semanticDiff, snapshotContract } from "../skills/skill-rails/scripts/lib/semantic-diff.mjs";
+import { changedLocators, semanticDiff, snapshotContract } from "../skills/skill-rails/scripts/lib/semantic-diff.mjs";
 import { lintSimpleSkill } from "../skills/skill-rails/scripts/lib/simple-lint.mjs";
 import { createDirectoryAtomic, exists, listFiles, readJson } from "../skills/skill-rails/scripts/lib/io.mjs";
 import { hashFile, sha256 } from "../skills/skill-rails/scripts/runtime/hash.mjs";
@@ -696,6 +696,101 @@ test("maintenance receipts report every maintainable resource change, not only R
   assert.equal(report.any_changed, true, "a real content change may never be reported as no change");
   assert.equal(report.source_changes.context, true);
   assert.deepEqual(report.groups.references.map((item) => ({ id: item.id, change: item.change })), [{ id: "references/notes.md", change: "modified" }]);
+});
+
+test("changed snapshot groups map to the exact locator spellings an obligation ledger can carry", () => {
+  // A table is indexed whole but cited per row. Matching `spec:TABLES/<table>` against a ledger that can
+  // only hold `spec:TABLES/<table>/<state>` reports nothing at all, so a changed table expands to every
+  // row state on either side.
+  const tables = changedLocators({ tables: [{ id: "routing", change: "modified", before: { rows: [{ state: "ready" }, { state: "held" }] }, after: { rows: [{ state: "ready" }, { state: "blocked" }] } }] });
+  assert.deepEqual([...tables.keys()].sort(), ["spec:TABLES/routing/blocked", "spec:TABLES/routing/held", "spec:TABLES/routing/ready"]);
+
+  // A template is cited by id whether its declaration or its resolved content moved.
+  assert.deepEqual([...changedLocators({ template_content: [{ id: "result", change: "modified" }] }).keys()], ["spec:TEMPLATES/result"]);
+  const both = changedLocators({ templates: [{ id: "result", change: "added" }], template_content: [{ id: "result", change: "modified" }] });
+  assert.deepEqual([...both.entries()], [["spec:TEMPLATES/result", "modified"]], "one place reached through two groups stays one locator");
+
+  // A registered whole-file replacement is the only record that a collector moved: no group indexes it.
+  const receipts = changedLocators({}, [
+    { path: "collectors/index.mjs", before_hash: "sha256:a", after_hash: "sha256:b" },
+    { path: "references/kept.md", before_hash: "sha256:c", after_hash: "sha256:c" }
+  ]);
+  assert.deepEqual([...receipts.keys()], ["file:collectors/index.mjs"], "an unchanged artifact receipt is not a changed locator");
+
+  // `ROLES` is not mapped: the shipped resolver treats it as an array and cannot resolve a role locator,
+  // so emitting one would advertise support that does not exist.
+  assert.deepEqual([...changedLocators({ roles: [{ id: "checker", change: "modified" }], ownership: [{ id: "cards/**", change: "modified" }] }).keys()], []);
+
+  assert.deepEqual([...changedLocators({
+    body: [{ id: "why: purpose", change: "modified" }],
+    references: [{ id: "references/notes.md", change: "added" }],
+    stages: [{ id: "operate", change: "modified" }],
+    observations: [{ id: "release.readiness", change: "modified" }],
+    declarations: [{ id: "profile", change: "modified" }],
+    guards: [{ id: "publish", change: "removed" }],
+    artifacts: [{ id: "note", change: "modified" }],
+    formats: [{ id: "card", change: "modified" }],
+    deferred: [{ id: "scaffold", change: "removed" }]
+  }).keys()].sort(), [
+    "body:why: purpose", "file:references/notes.md", "spec:ARTIFACTS/note", "spec:DECLARATIONS/profile", "spec:DEFERRED/scaffold",
+    "spec:FORMATS/card", "spec:GUARDS/publish", "spec:OBSERVATIONS/release.readiness", "spec:STAGES/operate"
+  ]);
+});
+
+test("a maintenance receipt names the projected obligations riding what the transaction changed", async (t) => {
+  const base = await makeTestDir("obligation-impact");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => {
+    await writeFile(join(stage, "references", "notes.md"), "# Notes\n\nOriginal guidance.\n", "utf8");
+    return buildP2(stage, { repeats: 1 });
+  } });
+
+  const ledgerPath = join(root, ".skill-rails", "obligation-ledger.json");
+  const ledger = await readJson(ledgerPath);
+  const bodyAtom = ledger.atoms.find((atom) => atom.id === "problem-001");
+  assert.equal(bodyAtom.disposition, "projected", "the generated problem atom is the projected case this reports on");
+  // One atom cites the same place as both target and evidence and also cites a file; another stays
+  // review-required. A report that counted rows instead of atoms would double the first, and one that
+  // ignored disposition would leak the second.
+  bodyAtom.targets = ["body:why: purpose", "file:references/notes.md"];
+  bodyAtom.evidence = ["body:why: purpose"];
+  const pending = ledger.atoms.find((atom) => atom.disposition === "review-required");
+  if (pending) { pending.targets = ["body:why: purpose"]; pending.evidence = ["file:references/notes.md"]; }
+  await writeFile(ledgerPath, JSON.stringify(ledger, null, 2) + "\n", "utf8");
+
+  const report = await maintainPackage(root, {
+    id: "obligation-impact-probe",
+    operations: [{ type: "replace-resource", path: "references/notes.md", content: "# Notes\n\nRewritten guidance.\n" }]
+  }, { repeats: 1 });
+
+  assert.deepEqual(report.impact.obligation_locators, [{
+    locator: "file:references/notes.md",
+    change: "modified",
+    atom_count: 1,
+    atoms: [{ id: "problem-001", channel: "target" }]
+  }], "only the changed locator is reported, and only for projected obligations");
+
+  // The report is an observation, not an approval: nothing about the ledger changes because of it.
+  assert.deepEqual(await readJson(ledgerPath), ledger, "reporting impact may not rewrite the ledger it reads");
+
+  const second = await maintainPackage(root, {
+    id: "obligation-impact-probe-2",
+    operations: [{ type: "replace-body-section", id: "why: purpose", content: "Rewritten purpose that still states the same problem." }]
+  }, { repeats: 1 });
+  assert.deepEqual(second.impact.obligation_locators, [{
+    locator: "body:why: purpose",
+    change: "modified",
+    atom_count: 1,
+    atoms: [{ id: "problem-001", channel: "evidence+target" }]
+  }], "an atom citing one place through both channels is listed once and keeps both channels");
+
+  const third = await maintainPackage(root, {
+    id: "obligation-impact-probe-3",
+    operations: [{ type: "replace-resource", path: "references/notes.md", content: "# Notes\n\nRewritten guidance again.\n" }]
+  }, { repeats: 1 });
+  assert.equal(third.impact.obligation_locators.every((item) => item.locator !== "body:why: purpose"), true, "a locator this transaction did not change is not reported");
 });
 
 async function treeFingerprint(root) {

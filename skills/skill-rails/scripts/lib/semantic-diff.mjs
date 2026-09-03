@@ -56,6 +56,45 @@ export function semanticDiff(before, after, options = {}) {
   };
 }
 
+// An obligation ledger names where a requirement landed with `body:<ref>`, `file:<path>` and
+// `spec:<GROUP>/<id>`, so the places a transaction disturbed are a mapping over the groups the snapshot
+// already indexes, not a new source of truth. Three groups need care. A table is indexed whole but cited
+// per row, so a changed table expands to every row state on either side: over-reporting a sibling row is
+// honest, while an exact match on the table alone would report nothing at all. A template is cited by id
+// whether its declaration or its resolved content moved. `ROLES` is left out because the shipped resolver
+// treats it as an array and cannot resolve a role locator at all; mapping to it would advertise support
+// that does not exist. `fixture:` and `eval:` are absent because no maintenance operation reaches them.
+const LOCATOR_SPEC_GROUP = Object.freeze({
+  observations: "OBSERVATIONS", formats: "FORMATS", templates: "TEMPLATES", artifacts: "ARTIFACTS",
+  declarations: "DECLARATIONS", guards: "GUARDS", stages: "STAGES", deferred: "DEFERRED"
+});
+
+export function changedLocators(groups = {}, artifactReceipts = []) {
+  const locators = new Map();
+  const note = (locator, change) => {
+    if (!locators.has(locator)) locators.set(locator, change);
+    else if (locators.get(locator) !== change) locators.set(locator, "modified");
+  };
+  for (const [group, changes] of Object.entries(groups)) {
+    for (const item of changes ?? []) {
+      if (group === "body") note(`body:${item.id}`, item.change);
+      else if (group === "references") note(`file:${item.id}`, item.change);
+      else if (group === "template_content") note(`spec:TEMPLATES/${item.id}`, item.change);
+      else if (group === "tables") for (const state of tableRowStates(item)) note(`spec:TABLES/${item.id}/${state}`, item.change);
+      else if (LOCATOR_SPEC_GROUP[group]) note(`spec:${LOCATOR_SPEC_GROUP[group]}/${item.id}`, item.change);
+    }
+  }
+  // A registered whole-file replacement is a real change to a place an obligation can name, and the
+  // snapshot has no group for a collector, so the receipt is the only record that it moved.
+  for (const receipt of artifactReceipts) if (receipt?.path && receipt.before_hash !== receipt.after_hash) note(`file:${receipt.path}`, "modified");
+  return locators;
+}
+
+function tableRowStates(item) {
+  const rows = [...(item.before?.rows ?? []), ...(item.after?.rows ?? [])];
+  return [...new Set(rows.map((row) => row.state).filter((state) => typeof state === "string"))].sort();
+}
+
 function index(items = [], project) { return Object.fromEntries(items.map((item, index) => [item.id ?? `index-${index}`, project(item)])); }
 function objectIndex(value = {}, project) { return Object.fromEntries(Object.entries(value).map(([id, item]) => [id, project(item)])); }
 function summarizeGuard(value) { return { reads: value.reads, then: value.then, forbids: value.forbids ?? [], body: value.body, unless: value.unless?.id ?? null }; }
