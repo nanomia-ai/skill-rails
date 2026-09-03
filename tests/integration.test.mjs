@@ -774,7 +774,9 @@ test("trace state stays external and alignment distinguishes observed evidence",
     if (!["EPERM", "EACCES", "UNKNOWN"].includes(error.code)) throw error;
   }
 
-  const staged = await stageSkill({ skillRoot: root, projectRoot: ROOT, decided: { "authoring.readiness": "ready" }, traceDir, runId: "run-1" });
+  const project = join(base, "project");
+  await mkdir(project, { recursive: true });
+  const staged = await stageSkill({ skillRoot: root, projectRoot: project, decided: { "authoring.readiness": "ready" }, traceDir, runId: "run-1" });
   const tracePath = join(traceDir, "run-1.jsonl");
   const decisionPath = join(base, "decision.json");
   await writeFile(decisionPath, JSON.stringify(staged.decision), "utf8");
@@ -1001,8 +1003,10 @@ test("trace records only predicates actually evaluated and orders projection bef
   );
   await writeFile(fixturesPath, JSON.stringify(fixtures, null, 2), "utf8");
   await buildP2(root, { repeats: 2 });
+  const project = join(base, "project");
+  await mkdir(project, { recursive: true });
   const staged = await stageSkill({
-    skillRoot: root, projectRoot: base, traceDir, runId: "trace-order",
+    skillRoot: root, projectRoot: project, traceDir, runId: "trace-order",
     decided: { "authoring.readiness": "ready", "guard.known": "no" }
   });
   assert.equal(staged.decision.status, "BLOCK");

@@ -73,6 +73,8 @@ node <generated-skill>/scripts/skill-rails/run.mjs align --skill <generated-skil
 node <generated-skill>/scripts/skill-rails/run.mjs resume --skill <generated-skill> --trace <trace.jsonl> --project <project>
 ```
 
+`<external-state-dir>` is external to two things, not one. The runtime refuses a trace directory inside the installed package and inside the observed project, including through a symlink or junction, so a run never leaves state in the repository it is reading. A caller that supplies no project keeps the package-only guarantee.
+
 Unsupported flags or input sources fail closed. Do not infer missing values or reconstruct a Decision from prose after a CLI or validation failure.
 
 `--target` is optional and only valid on `stage`. Supply it when the current task or role has already selected one file target that the package's collectors need; do not search for or infer one. The API spelling is `targetPath`. The runtime accepts a non-empty portable relative path, removes only empty and `.` segments, rejects absolute paths, backslashes, drive-like colons, and every `..` segment, then checks lexical and realpath containment below `projectRoot`. It does not prove that the target exists, is a regular file, or has valid or fresh contents; collectors own those observations. When tracing is enabled, `decision_emitted.data.targetPath` records that normalized value and `resume` carries it into the next stage command; without a target, the trace data and command retain their previous shape. This is trace continuity, not a Decision field or a requirement to keep the same target for later stages. Packages that do not require a selected target omit the input and retain the previous collector context.

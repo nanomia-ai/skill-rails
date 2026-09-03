@@ -52,7 +52,7 @@ export async function stageSkill(options) {
   const normalized = { ...options };
   let release = null;
   if (normalized.traceDir) {
-    await assertExternalStateDir(normalized.skillRoot, normalized.traceDir);
+    await assertExternalStateDir(normalized.skillRoot, normalized.traceDir, normalized.projectRoot ?? null);
     normalized.runId ??= randomUUID();
     release = await acquireTraceRunLease(normalized.traceDir, normalized.runId);
   }
@@ -68,7 +68,7 @@ async function stageSkillOnce({ skillRoot, projectRoot, targetPath = null, judge
   const loaded = await loadBuiltSkill(root, { runtimeDir: runtimeDir ?? await inferRuntimeDir(root) });
   let effectiveRunId = runId;
   if (traceDir) {
-    await assertExternalStateDir(root, traceDir);
+    await assertExternalStateDir(root, traceDir, projectRoot ?? null);
   }
   const tracePath = traceDir ? join(resolve(traceDir), `${effectiveRunId}.jsonl`) : null;
   if ((loaded.spec.DEFERRED ?? []).length > 0) {

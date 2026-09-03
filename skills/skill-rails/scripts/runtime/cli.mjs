@@ -49,7 +49,7 @@ export async function main(argv = process.argv.slice(2), io = console) {
         const runId = parsed["run-id"] ?? document.run_id ?? null;
         if (!traceDir || !runId || !parsed.type) throw new Error("record requires trace location, run id, and --type; a stage-result decision file may provide the first two.");
         if (parsed.authority) fail("SR_EVIDENCE_AUTHORITY", "The agent-facing record command cannot assign evidence authority.");
-        await assertExternalStateDir(skillRoot, traceDir);
+        await assertExternalStateDir(skillRoot, traceDir, parsed.project ? resolve(parsed.project) : null);
         const tracePath = join(resolve(traceDir), `${runId}.jsonl`);
         const events = await readTrace(tracePath);
         const emitted = events.find((event) => event.type === "decision_emitted" && event.authority === "runtime_observed" && event.decision_id === decision.decision_id && stableStringify(event.data?.decision) === stableStringify(decision));
@@ -76,7 +76,7 @@ export async function main(argv = process.argv.slice(2), io = console) {
         const decision = document.decision ?? document;
         const tracePath = parsed.trace ?? document.trace_path;
         if (!tracePath) throw new Error("align requires --trace or a stage-result decision file containing trace_path.");
-        await assertExternalStateDir(skillRoot, dirname(resolve(tracePath)));
+        await assertExternalStateDir(skillRoot, dirname(resolve(tracePath)), parsed.project ? resolve(parsed.project) : null);
         const events = await readTrace(resolve(tracePath));
         const report = alignDecision(decision, events);
         emit(report, true, io, JSON.stringify);
@@ -84,7 +84,7 @@ export async function main(argv = process.argv.slice(2), io = console) {
       }
       case "resume": {
         const tracePath = resolve(parsed.trace);
-        await assertExternalStateDir(skillRoot, dirname(tracePath));
+        await assertExternalStateDir(skillRoot, dirname(tracePath), parsed.project ? resolve(parsed.project) : null);
         const events = await readTrace(tracePath);
         const lastEvent = [...events].reverse().find((event) => event.type === "decision_emitted");
         const last = lastEvent?.data?.decision;

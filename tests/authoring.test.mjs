@@ -10,6 +10,7 @@ import { inspectProseSkill, inferMigrationIntent, writeMigrationLedger } from ".
 import { maintainPackage } from "../skills/skill-rails/scripts/lib/maintenance.mjs";
 import { semanticDiff, snapshotContract } from "../skills/skill-rails/scripts/lib/semantic-diff.mjs";
 import { lintSimpleSkill } from "../skills/skill-rails/scripts/lib/simple-lint.mjs";
+import { assertExternalStateDir } from "../skills/skill-rails/scripts/runtime/trace-core.mjs";
 import { createDirectoryAtomic, exists, listFiles, readJson } from "../skills/skill-rails/scripts/lib/io.mjs";
 import { hashFile, sha256 } from "../skills/skill-rails/scripts/runtime/hash.mjs";
 import { parseArgs } from "../skills/skill-rails/scripts/lib/args.mjs";
@@ -710,6 +711,27 @@ test("a resource root that is a regular file is no resources, not a crash", asyn
   await writeFile(join(root, "references"), "not a directory\n", "utf8");
   const snapshot = await snapshotContract(root);
   assert.deepEqual(Object.keys(snapshot.references).filter((key) => key.startsWith("references")), [], "a non-directory resource root contributes no resources");
+});
+
+test("runtime state may not land inside the observed project", async (t) => {
+  const base = await makeTestDir("external-state");
+  t.after(() => removeTestDir(base));
+  const skill = join(base, "skill");
+  const project = join(base, "project");
+  await mkdir(project, { recursive: true });
+  // The rule protected the installed package and left the project unguarded, so a consumer following
+  // "outside the installed skill" literally dropped untracked run state into the repository it observed.
+  await assert.rejects(
+    assertExternalStateDir(skill, join(project, ".traces"), project),
+    (error) => error.code === "SR_STATE_INSIDE_PROJECT",
+    "a trace directory inside the observed project is refused");
+  await assert.rejects(
+    assertExternalStateDir(skill, join(skill, ".traces"), project),
+    (error) => error.code === "SR_STATE_INSIDE_SKILL",
+    "the installed package stays protected");
+  await assertExternalStateDir(skill, join(base, "outside"), project);
+  // Callers that do not know a project keep the previous contract exactly.
+  await assertExternalStateDir(skill, join(project, ".traces"));
 });
 
 test("a role is a resolvable landing place, not a crash", async (t) => {
