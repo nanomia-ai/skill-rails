@@ -522,7 +522,7 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 
 정당하다고 판정해 유지한 것: `READ_FIRST.path`의 정규 파일 확인. v0.1.9의 `enterSkill`도 그 파일을 읽고 `SR_READ_FIRST`로 하드 실패했으므로(실행 확인), 이 검사가 줄이는 것은 애초에 진입할 수 없는 패키지뿐이다. 마이그레이션의 추론 `problem`을 `review-required`로 두는 것과 생성 scaffold 변경도 유지한다 — 전자는 `DEFERRED`가 비어 있는 동안만 게이트로 작용하고 기존 원장은 `mergeObligationLedger`가 보존하며, 후자는 새 패키지에만 적용된다.
 
-`VALIDATOR_VERSION`은 v0.1.9의 `0.4.2`에서 `0.6.0`이 됐다. `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, closed export, Decision/trace schema, effect authority 경계는 그대로다. 순변화는 검사 하나 추가(READ_FIRST 실재)와 축소 네 곳 복구이므로, v0.1.9가 받아들이던 패키지 중 새로 거부되는 것은 `enter`가 이미 실패시키던 형태뿐이다. 이는 이 절의 delta 기준이며, 6.21과 6.22가 각각 새 거부를 하나씩 더한다. 후보 tree에서 `npm run verify` 74/74 통과, 소비 저장소 9개는 커밋 트리와 작업 중 트리 모두 진단 0건, 실제 소비 패키지 복사본에 대한 유지보수 트랜잭션도 성공했다.
+`VALIDATOR_VERSION`은 v0.1.9의 `0.4.2`에서 `0.6.0`이 됐다. `SPEC.version = "5"`, `KERNEL_VERSION = "6"`, closed export, Decision/trace schema, effect authority 경계는 그대로다. 순변화는 검사 하나 추가(READ_FIRST 실재)와 축소 네 곳 복구이므로, v0.1.9가 받아들이던 패키지 중 새로 거부되는 것은 `enter`가 이미 실패시키던 형태뿐이다. 이는 이 절의 delta 기준이며, 6.21이 새 거부를 하나 더한다. 6.22는 거부를 더하지 않고 철회한다. 후보 tree에서 `npm run verify` 74/74 통과, 소비 저장소 9개는 커밋 트리와 작업 중 트리 모두 진단 0건, 실제 소비 패키지 복사본에 대한 유지보수 트랜잭션도 성공했다.
 
 한 가지 정정: 6.19가 한때 기록했던 "284바이트에 124개 atom", "152개 atom" 등은 atom 수가 아니라 **인용 수**였다(같은 atom이 한 자리를 `targets`와 `evidence` 양쪽에서 가리키면 두 번 세어진다). 위 본문의 값이 실제 atom 수다. 또 "`validator_version`을 비교하는 코드가 없다"는 진술도 틀렸다 — `manifest.mjs`의 `verifyManifest`가 `validator_version`과 `runtime_version`을 무결성 mismatch 필드에 포함한다. 따라서 이 값들은 라벨이 아니라 패키지 무결성 검사의 일부이며, 제품 버전으로 통합하자는 제안은 근거가 약해져 보류한다.
 
@@ -550,7 +550,7 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 
 1. **호환성.** v0.1.9가 받던 배치를 새로 거부한다. 잃는 것은 오염되는 자리만이 아니다 — `.skill-rails/`처럼 filesystem basis가 제외하고 gitignore가 가리는, **어느 snapshot도 보지 못하는 자리**까지 함께 거부된다. 그 자리는 신고된 결함이 아니라 정당한 구성이다.
 2. **구조.** 위임하지 말았어야 할 결정을 위임해 놓고 단속하는 모양이다. 지시문을 완성하면 잘못 갈 경로 자체가 없어지므로, 벽은 그 뒤에 남는 표면일 뿐이다.
-3. **선례.** 6.18이 같은 종류의 질문을 이미 실측으로 판정했다 — 산문 지시가 신선 소비자 5/5에 도달했고, 행동 이득이 0인 기계는 영구 표면 값을 하지 못한다고 기록했다. 여기 지시문은 6.18의 포인터보다 강한 자리, 즉 매 실행이 읽는 bootstrap 첫 문단에 있다.
+3. **유추.** 6.18이 같은 *부류*의 질문을 실측으로 판정했다 — 형제 문서를 가리키는 산문 포인터가 신선 소비자 5/5에 도달했고, 행동 이득이 0인 기계는 영구 표면 값을 하지 못한다고 기록했다. 다만 옮겨 오는 것은 판정 규칙이지 측정값이 아니다. 이 지시문 자체의 냉시작 이행은 측정하지 않았고 아래 `UNPROVEN`에 남긴다. 결정을 실제로 지탱하는 것은 근거 1이며, 이 항목은 그것을 보강할 뿐이다.
 
 철회 범위는 `assertExternalStateDir`의 세 번째 인자와 두 검사, `recordEvidence`의 `projectRoot`, `api.mjs`·`cli.mjs`가 실어 나르던 인자, 그리고 그 검사에 닿기 위해서만 열었던 `align --project` 옵션이다. 남는 강제는 설치 패키지 경계 하나이고 v0.1.9와 동일하다. `SR_STATE_INSIDE_PROJECT`는 어디에도 남지 않는다. 회귀는 설치 패키지 경계가 lexical과 junction 양쪽에서 거부되는 것과 **프로젝트 내부 배치가 거부되지 않는 것**을 함께 고정한다. 후자가 이번에 지키기로 한 호환성이다.
 

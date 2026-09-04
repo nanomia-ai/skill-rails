@@ -120,6 +120,18 @@ test("simple profiles expose a precise shared dependency on the cold-user path",
   assert.match(generated, /Respect every boundary, state-dependent rule, exact format, and external dependency shown above/);
 });
 
+test("the generated loader tells a run to keep its state out of what it observes", async (t) => {
+  const base = await makeTestDir("bootstrap-state-boundary");
+  t.after(() => removeTestDir(base));
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  const output = join(base, "skill");
+  await generatePackage({ intent, output, finalize: async (stage) => buildP2(stage, { repeats: 1 }) });
+  // This sentence is the fix for runtime state landing inside the observed project; the runtime
+  // does not enforce that boundary, so losing the sentence would lose the guarantee silently.
+  const generated = await readFile(join(output, "SKILL.md"), "utf8");
+  assert.match(generated, /outside both the installed skill and the repository or directory tree that contains that project/);
+});
+
 test("portable creator commands use only package-local runtime dependencies", async (t) => {
   const base = await makeTestDir("thin-dependency-boundary");
   t.after(() => removeTestDir(base));

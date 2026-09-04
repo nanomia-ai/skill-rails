@@ -73,7 +73,7 @@ node <generated-skill>/scripts/skill-rails/run.mjs align --skill <generated-skil
 node <generated-skill>/scripts/skill-rails/run.mjs resume --skill <generated-skill> --trace <trace.jsonl> --project <project>
 ```
 
-`<external-state-dir>` is external to two things, not one: put it outside the installed package and outside the project being observed. Runtime state inside the observed project leaves untracked files that the project's own snapshot then reads as its own state, so a run would change what it is measuring. The runtime refuses a directory inside the installed package, including through a symlink or junction. It does not police the project boundary — that one is yours to honor, and the generated loader already resolves `<trace-dir>` outside both.
+`<external-state-dir>` is external to two things, not one: put it outside the installed package and outside the repository or directory tree that contains the project being observed — the default Git basis runs `git status` over the whole working tree, so a sibling of the project inside the same repository is still observed. Runtime state inside the observed project leaves untracked files that the project's own snapshot then reads as its own state, so a run would change what it is measuring. The runtime refuses a directory inside the installed package, including through a symlink or junction. It does not police the project boundary — that one is yours to honor, and the generated loader already resolves `<trace-dir>` outside both.
 
 Unsupported flags or input sources fail closed. Do not infer missing values or reconstruct a Decision from prose after a CLI or validation failure.
 
