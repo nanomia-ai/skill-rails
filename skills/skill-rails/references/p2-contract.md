@@ -14,7 +14,7 @@ The current P2 wire/spec lineage remains `SPEC.version = "5"` for compatibility.
 
 ## Canonical ownership
 
-`spec.mjs` exclusively owns observable conditions, guards, stage order, decision tables, effect order, exact formats, ownership, and completion evidence. `body.md` owns judgment criteria and reasons. Templates own output shape. Collectors observe and normalize but never decide policy. A stage caller may supply one optional project-relative file target through API `targetPath` or CLI `--target`; after runtime normalization and containment validation, collectors and `snapshotBasis` receive it as `ctx.targetPath`. It is neither a judged input nor a decided domain value, and it reaches a Decision only through declared collector observations.
+`spec.mjs` exclusively owns observable conditions, guards, stage order, decision tables, effect order, ownership, and completion evidence. It owns an exact format only where `FORMATS` can express it: `line` and `progressLine` build one machine-readable line, `<timestamp> <head>: field: value; field: value`, and those get golden fixtures, round-trip and fuzz checks. Any other exact shape — multiline, tabular, or repeated items — belongs to a template, which is checked for structure but carries no field grammar. Do not read this as a promise that every exact format can live in `spec.mjs`. `body.md` owns judgment criteria and reasons. Templates own output shape. Collectors observe and normalize but never decide policy. A stage caller may supply one optional project-relative file target through API `targetPath` or CLI `--target`; after runtime normalization and containment validation, collectors and `snapshotBasis` receive it as `ctx.targetPath`. It is neither a judged input nor a decided domain value, and it reaches a Decision only through declared collector observations.
 
 ## Closed exports
 
@@ -50,7 +50,7 @@ The runtime calculates and validates effect plans; it does not claim to intercep
 
 ## Body and templates
 
-Body level-two headings are only `guard:`, `stage:`, `role:`, or `why:`. Do not duplicate procedure, branch conditions, effect order, exact formats, or quantities in body prose. A stage section contains `Judgment:` and `Why:`. Templates show the exact shape and use typed placeholders: `line`, `block`, `list`, or `generated`.
+Body level-two headings are only `guard:`, `stage:`, `role:`, or `why:`. Do not duplicate procedure, branch conditions, effect order, exact formats, or quantities in body prose. A stage section contains `Judgment:` and `Why:`. Templates show the exact shape and declare each placeholder as `line`, `block`, `list`, or `generated`. Those kinds are declaration labels: the build checks that the declared set matches the placeholders in the text and that each kind is a known word, and nothing more. The runtime hands the template to the model and never fills it, so no kind is enforced on the produced output and `list` carries no item grammar. State an item's shape inside the template itself.
 
 ## Validation levels
 

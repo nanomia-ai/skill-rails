@@ -97,11 +97,15 @@ test("related-skill guidance keeps profiles local and P2 behavior at its canonic
   assert.match(entry, /never make one generated skill invoke another/);
   assert.match(workflow, /For P0\/P1, record that durable path and heading in `external_dependencies`/);
   assert.match(workflow, /For P2, a shared file or helper is consumed domain input or implementation, not a second behavior source/);
-  assert.match(workflow, /observable conditions, guards, stages, tables, exact formats, ordered effects, ownership, and completion evidence stay in `spec\.mjs`/);
+  assert.match(workflow, /observable conditions, guards, stages, tables, ordered effects, ownership, and completion evidence stay in `spec\.mjs`, as do the exact formats `FORMATS` can express/);
   assert.match(workflow, /judgment criteria and their framing stay in `body\.md`/);
   assert.match(workflow, /Naming a shared dependency grants it no behavior, judgment, freshness, or evidence authority/);
   assert.match(workflow, /proves neither that the file exists nor that its contents are valid or fresh/);
-  assert.match(contract, /`spec\.mjs` exclusively owns observable conditions, guards, stage order, decision tables, effect order, exact formats, ownership, and completion evidence/);
+  assert.match(contract, /`spec\.mjs` exclusively owns observable conditions, guards, stage order, decision tables, effect order, ownership, and completion evidence/);
+  // The contract may not promise an exact-format home it cannot provide: FORMATS builds one
+  // machine line, and any other exact shape lives in a template with no field grammar.
+  assert.match(contract, /It owns an exact format only where `FORMATS` can express it/);
+  assert.match(contract, /no kind is enforced on the produced output and `list` carries no item grammar/);
   assert.match(contract, /`body\.md` owns judgment criteria and reasons/);
   assert.match(contract, /A declaration proves neither that the path currently exists nor that its contents are valid or fresh/);
   assert.match(workflow, /does not validate an entire suite, propagate a shared edit across packages/);
