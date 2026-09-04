@@ -1,9 +1,13 @@
 # v0.1.9에서 올라오기 — 소비 저장소용 확인 목록
 
-대상: `v0.1.9`(validator `0.4.2`, runtime `0.3.2`)로 만들어진 P2 패키지를 가진 저장소. 현재 published 최신인 `v0.2.0`(validator `0.5.0`, runtime `0.3.2`)으로 만든 저장소도 절차는 같고, 그 판이 새로 거부하던 두 형식과 죽게 만들던 한 경우는 §4가 되돌리거나 고친다.
-도착: 제품 `0.3.0`(validator `0.6.1`, runtime `0.3.3`).
+대상: `v0.1.9`(validator `0.4.2`, runtime `0.3.2`)로 만들어진 P2 패키지를 가진 저장소. `v0.2.0`(validator `0.5.0`, runtime `0.3.2`)으로 만든 저장소도 절차는 같고, 그 판이 새로 거부하던 두 형식과 죽게 만들던 한 경우는 §4가 되돌리거나 고친다.
+도착: 현재 published 제품 `0.3.1`(validator `0.6.1`, runtime `0.3.3`).
 
 `SPEC.version`은 계속 `"5"`이고 `KERNEL_VERSION`은 계속 `"6"`이다. 문법, 14개 closed export, Decision·trace schema, effect authority 경계는 바뀌지 않았다. **spec·body·원장을 손으로 고칠 일은 없다.**
+
+## 0. 이미 v0.3.0을 쓰는 경우
+
+Skill Rails 설치만 `v0.3.1`로 갱신한다. 이 patch는 저작 판단 안내와 creator-side eval caveat만 바꾸며 runtime·validator·generator·schema와 생성 package byte는 바꾸지 않는다. 따라서 기존 P0/P1/P2 package, ledger, manifest를 변환하거나 재빌드할 필요가 없고 아래 §1–§5의 재빌드 절차도 적용하지 않는다. 별도 downstream semantic audit가 fan-in 같은 의미 휴리스틱을 hard failure로 삼았다면 그 검사는 해당 저장소가 별도로 교정할 대상이지 Skill Rails package migration이 아니다.
 
 ## 1. 재빌드에서 강제되는 것 — 한 가지뿐
 

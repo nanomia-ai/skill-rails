@@ -573,6 +573,8 @@ Devflow v0.23.5의 자체 semantic audit가 Principles의 동일 atom 내 target
 
 검증은 관련 authoring 2건과 통합 1건, self lint를 먼저 통과한 뒤 `npm run verify`의 vendor check·self lint·repository test 77/77·frozen G0.5 eval까지 통과했다. 구현 후 fresh Claude Fable xhigh가 같은 tree에서 Devflow 수치와 두 package의 validator 진단 0, 유효/깨진 fan-in의 상반 판정, 생성 byte·version-5 불변을 독립 재현했고 MUST-fix 없이 PASS했다. 그 검토가 찾은 유지보수 snapshot의 낡은 두 주장은 현재 사실로 교체한 뒤 같은 세션의 후속 감사에서 남은 MUST/SHOULD 0건을 확인했다.
 
+이 보정은 package source `0.3.1` patch로 배포했다. Release-boundary commit `c0f366d1703413fa611ec8ba7f96eef93677ca46`과 annotated tag `v0.3.1`을 atomic push했고 workflow run `33886342982`가 version 일치와 같은 전체 검증을 통과해 GitHub Release를 만들었다. 공식 NPX 명령으로 Codex universal package와 Claude Code symlink를 갱신했으며 release source와 설치본 diff는 0, 설치본 self lint는 pass다. Runtime·validator·generator·schema와 생성 package byte가 그대로이므로 `v0.3.0`으로 만든 P0/P1/P2 package와 원장은 재빌드하거나 변환하지 않는다.
+
 계속 `UNPROVEN`: fresh author가 새 route를 실제 분기점에서 따르는지, 긴 세션과 압축 뒤에도 목적·검사 전제 재판정을 유지하는지, caveat 문구가 `ok: true`의 과대해석을 줄이는지. 구조와 실행 위반은 약화하지 않았다. JSON/schema, locator, manifest hash, parser grammar, 결정론적 transition, 열린 `review-required`, 실제 자료 소실·잘못된 write·잘못된 stage 전이를 재현하는 검사는 계속 hard wall이다.
 
 ---

@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-04 KST (v0.3.1 patch release 후보)
+최종 갱신: 2026-09-04 KST (v0.3.1 배포 후)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: v0.3.0 배포 완료, v0.3.1 patch release 후보
+## 0. 현재 위치: v0.3.1 배포 완료
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -28,11 +28,13 @@ v0.1.9는 Devflow 실용성 감사에서 확인된 생성 어댑터의 종단 �
 
 v0.1.9 다음 판 `v0.2.0`(commit `e7a4f98`, validator `0.5.0`, runtime `0.3.2`, package `0.2.0`)은 2026-09-03T16:25:38Z에 push·tag·GitHub Release까지 published 상태였다. 그 판은 migrate 이식성과 `READ_FIRST.path` 실재 검사를 담았지만 범용성 축소 둘과 유지보수 크래시 하나를 함께 배포했고, 지금 후보가 그것을 되돌리고 고친다(6.20). 내용은 그 축소 둘의 복구, `spec:ROLES/<id>`가 `TypeError`로 빌드를 죽이던 것, `references`/`templates`가 정규 파일일 때 유지보수가 `ENOTDIR`로 죽던 것, 원장 locator의 후행 세그먼트가 조용히 무시돼 오타가 부모로 해석되던 것, 그리고 소비 저장소가 올린 유일한 upstream 요구인 런타임 상태의 관찰 프로젝트 오염이다. 전부 결함 수정이거나 배포된 축소의 복구다. v0.1.9 대비 새 거부는 둘뿐이고(`READ_FIRST.path` 실재, 원장 locator 세그먼트 수) 소비 코퍼스 실측 거부는 0건이다. trace 경계는 강제가 아니라 생성 지시문으로 닫았다(6.22). 후보 fingerprint는 validator `0.6.1`, runtime `0.3.3`, kernel `6`, package version `0.3.0`이다. 후보 tree에서 `npm run verify` 77/77과 소비 저장소 9개 읽기 전용 진단 0건을 확인했다. 이 후보는 `v0.3.0`으로 배포했다 — commit `6d20469`, annotated tag `v0.3.0`, GitHub Release published 2026-09-04T08:33Z, workflow run `33854213718` success. 전역 설치는 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes`로 한 번 실행해 Codex universal과 Claude Code symlink가 성공했고, 설치본과 `skills/skill-rails`의 `git diff --no-index --ignore-cr-at-eol`는 exit 0, 설치본 self lint pass, fingerprint validator `0.6.1`/runtime `0.3.3`/kernel `6`으로 일치했다. 태그를 한 번 다시 만들었다 — 첫 태그가 `package-lock.json`이 `0.2.0`으로 남은 커밋을 가리켜 release workflow의 버전 일치 검사에서 실패했고(run `33853979457`), lock을 고친 `6d20469`로 옮겨 재발행했다. `npm run verify`는 lock 버전을 검사하지 않는다. 각 변경의 근거와 실측은 [구현·검증 기록](implementation-verification_ko.md) 6.20–6.22와 7.-1이 소유한다.
 
+`v0.3.1`은 실패 검사를 제품의 정답지로 만들지 않게 하는 저작 분기 안내, `projected`의 provenance 한계, eval 성공 caveat와 A–D 회귀만 보정한 patch다(6.23). Runtime·validator·generator·schema·생성 package byte는 바뀌지 않았다. Release-boundary commit `c0f366d1703413fa611ec8ba7f96eef93677ca46`, annotated tag와 GitHub Release `v0.3.1`, atomic push, workflow run `33886342982` success를 확인했다. 공식 NPX 설치는 Codex universal package와 Claude Code symlink를 갱신했고 release source와 설치본 diff 0, 설치본 self lint pass를 기록했다.
+
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 공식 배포 package version은 `0.3.0`(2026-09-04T08:33Z published, 현재 Latest)이고 annotated tag는 commit `6d20469`를 가리킨다. release workflow run `33854213718`과 공식 source 전역 설치가 성공했다.
-- `v0.3.1` 후보는 release 기록 commit `493bec1` 위의 후속 보정이며 package와 lock version을 함께 `0.3.1`로 올렸다. 이 snapshot 시점에는 후보의 commit·tag·GitHub Release·공식 설치 receipt가 아직 없다.
+- 공식 배포 package version은 `0.3.1`(2026-09-04T14:54:05Z published, 현재 Latest)이고 annotated tag는 commit `c0f366d`를 가리킨다. release workflow run `33886342982`와 공식 source 전역 설치가 성공했다.
+- 현재 `main`은 `v0.3.1` release commit 위에 이 release·installation receipt만 기록한다. Package와 lock version은 모두 `0.3.1`이다.
 - 현재 fingerprint는 runtime `0.3.3`, validator `0.6.1`, kernel `6`이다. 이번 후속 보정은 runtime·validator·generator·schema byte를 바꾸지 않는다.
 - `SPEC.version = "5"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 그대로다.
 
@@ -57,6 +59,7 @@ v0.1.9 다음 판 `v0.2.0`(commit `e7a4f98`, validator `0.5.0`, runtime `0.3.2`,
 
 - 이번 후속 보정의 관련 authoring 2건과 통합 1건, self lint가 pass했다. A–D의 허용·거부가 같은 기존 흐름 안에서 갈린다.
 - 현재 tree의 `npm run verify`: vendor check, self lint, repository test 77/77, frozen G0.5 eval pass.
+- `v0.3.1` release workflow와 공식 NPX 설치가 성공했고, release source와 설치본 diff 0 및 설치본 self lint pass를 확인했다.
 - 구현 후 fresh Claude Fable xhigh 독립 감사와 교정 후 같은 세션의 closure audit가 모두 PASS했고 남은 MUST/SHOULD는 0건이다. Fresh-author 장기 이행은 행동 증거로 승격하지 않는다.
 - Markdown local link scan: 47 files, 53 local links, missing 0.
 - Local official-installer smoke: 1 skill discovered; installed 61 files; `SKILL.md` 1; forbidden repository-only file 0; source/install missing·extra·different 0; installed creator P1 generation과 lint pass.
@@ -96,8 +99,8 @@ v0.1.9 다음 판 `v0.2.0`(commit `e7a4f98`, validator `0.5.0`, runtime `0.3.2`,
 
 ## 5. 정확한 다음 단계
 
-1. 현재 후속 보정은 full verify와 독립 fresh-agent 감사를 통과했고 `0.3.1` patch release가 승인됐다. package와 lock version 일치 및 release-boundary verify를 확인한 뒤 commit·annotated tag·atomic push·GitHub workflow·공식 NPX 설치를 순서대로 닫는다.
-2. 이 변경은 생성 package byte를 바꾸지 않으므로 Devflow 아홉 P2 package를 다시 빌드할 이유가 없다.
+1. `v0.3.1` commit·tag·GitHub Release·workflow·공식 NPX 설치 receipt는 완료됐다. 이 evidence를 위해 release나 설치를 반복하지 않는다.
+2. `v0.3.0`에서 바뀐 것은 설치 creator의 저작 안내와 eval caveat뿐이다. 생성 package byte가 같으므로 Devflow 아홉 P2 package를 포함한 기존 P0/P1/P2 package와 원장을 다시 빌드하거나 변환하지 않는다.
 3. 새 route가 실제 저자의 두 번째 무효 수리를 멈추게 하는지, 긴 세션·압축 뒤에도 같은 판단을 유지하는지는 fresh author 행동 증거가 생길 때까지 `UNPROVEN`이다.
 4. 깨진 locator 중복이 같은 L16 진단을 여러 번 내는 현상은 다음 validator byte 변경 때 함께 고칠 후보로 남긴다. 유효 package 판정은 이미 같고 이번 사건의 원인도 아니므로 이것만을 위해 validator hash와 소비 코호트를 바꾸지 않는다.
 5. 기존의 prefix 효과 순차 수행과 외부 trace 위치에 대한 fresh consumer 검증도 여전히 남아 있으며, 구조 검사를 그 행동 증거로 승격하지 않는다.
