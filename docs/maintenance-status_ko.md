@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-04 KST
+최종 갱신: 2026-09-04 KST (v0.3.0 배포 후)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: published 최신은 v0.2.0, 그 위에 배포하지 않은 호환성 복구 후보가 쌓여 있다
+## 0. 현재 위치: v0.3.0 배포 완료
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -26,12 +26,12 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 
 v0.1.9는 Devflow 실용성 감사에서 확인된 생성 어댑터의 종단 해석 충돌만 고친다. 기존 문장은 `ASK`·`WAIT`·`BLOCK`을 진단과 같은 선행 정지 조건으로 읽히게 했지만 evaluator는 이들을 효과 배열의 마지막 종단으로 계산한다. 생성기와 P2 contract는 이제 진단·오래된 snapshot만 실행 전에 멈추고, 유효한 Decision의 모든 효과를 배열 순서대로 종단까지 수행한다고 한 해석으로 모인다. Runtime, validator, kernel, Decision/Trace schema와 effect grammar는 그대로다. Commit `63147c2c83533ca9bcb69ff4e4a719217ee4d844`, annotated tag와 GitHub Release `v0.1.9`, atomic push, workflow run `33719014072` success, Codex·Claude Code 전역 설치와 newline-normalized source hash 일치까지 확인했다. Fresh-agent 실사용 행동은 아직 `UNPROVEN`이다.
 
-v0.1.9 다음 판 `v0.2.0`(commit `e7a4f98`, validator `0.5.0`, runtime `0.3.2`, package `0.2.0`)은 2026-09-03T16:25:38Z에 push·tag·GitHub Release까지 published 상태이며 `origin/main`이 그 commit이다. 그 판은 migrate 이식성과 `READ_FIRST.path` 실재 검사를 담았지만 범용성 축소 둘과 유지보수 크래시 하나를 함께 배포했고, 지금 후보가 그것을 되돌리고 고친다(6.20). `v0.2.0` 이후의 커밋은 push하지 않았다. 내용은 그 축소 둘의 복구, `spec:ROLES/<id>`가 `TypeError`로 빌드를 죽이던 것, `references`/`templates`가 정규 파일일 때 유지보수가 `ENOTDIR`로 죽던 것, 원장 locator의 후행 세그먼트가 조용히 무시돼 오타가 부모로 해석되던 것, 그리고 소비 저장소가 올린 유일한 upstream 요구인 런타임 상태의 관찰 프로젝트 오염이다. 전부 결함 수정이거나 배포된 축소의 복구다. v0.1.9 대비 새 거부는 둘뿐이고(`READ_FIRST.path` 실재, 원장 locator 세그먼트 수) 소비 코퍼스 실측 거부는 0건이다. trace 경계는 강제가 아니라 생성 지시문으로 닫았다(6.22). 후보 fingerprint는 validator `0.6.1`, runtime `0.3.3`, kernel `6`, package version `0.3.0`이다. 후보 tree에서 `npm run verify` 77/77과 소비 저장소 9개 읽기 전용 진단 0건을 확인했다. Tag·push·GitHub Release·전역 설치는 하지 않았다. 각 변경의 근거와 실측은 [구현·검증 기록](implementation-verification_ko.md) 6.20–6.22와 7.-1이 소유한다.
+v0.1.9 다음 판 `v0.2.0`(commit `e7a4f98`, validator `0.5.0`, runtime `0.3.2`, package `0.2.0`)은 2026-09-03T16:25:38Z에 push·tag·GitHub Release까지 published 상태이며 `origin/main`이 그 commit이다. 그 판은 migrate 이식성과 `READ_FIRST.path` 실재 검사를 담았지만 범용성 축소 둘과 유지보수 크래시 하나를 함께 배포했고, 지금 후보가 그것을 되돌리고 고친다(6.20). `v0.2.0` 이후의 커밋은 push하지 않았다. 내용은 그 축소 둘의 복구, `spec:ROLES/<id>`가 `TypeError`로 빌드를 죽이던 것, `references`/`templates`가 정규 파일일 때 유지보수가 `ENOTDIR`로 죽던 것, 원장 locator의 후행 세그먼트가 조용히 무시돼 오타가 부모로 해석되던 것, 그리고 소비 저장소가 올린 유일한 upstream 요구인 런타임 상태의 관찰 프로젝트 오염이다. 전부 결함 수정이거나 배포된 축소의 복구다. v0.1.9 대비 새 거부는 둘뿐이고(`READ_FIRST.path` 실재, 원장 locator 세그먼트 수) 소비 코퍼스 실측 거부는 0건이다. trace 경계는 강제가 아니라 생성 지시문으로 닫았다(6.22). 후보 fingerprint는 validator `0.6.1`, runtime `0.3.3`, kernel `6`, package version `0.3.0`이다. 후보 tree에서 `npm run verify` 77/77과 소비 저장소 9개 읽기 전용 진단 0건을 확인했다. 이 후보는 `v0.3.0`으로 배포했다 — commit `6d20469`, annotated tag `v0.3.0`, GitHub Release published 2026-09-04T08:33Z, workflow run `33854213718` success. 전역 설치는 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes`로 한 번 실행해 Codex universal과 Claude Code symlink가 성공했고, 설치본과 `skills/skill-rails`의 `git diff --no-index --ignore-cr-at-eol`는 exit 0, 설치본 self lint pass, fingerprint validator `0.6.1`/runtime `0.3.3`/kernel `6`으로 일치했다. 태그를 한 번 다시 만들었다 — 첫 태그가 `package-lock.json`이 `0.2.0`으로 남은 커밋을 가리켜 release workflow의 버전 일치 검사에서 실패했고(run `33853979457`), lock을 고친 `6d20469`로 옮겨 재발행했다. `npm run verify`는 lock 버전을 검사하지 않는다. 각 변경의 근거와 실측은 [구현·검증 기록](implementation-verification_ko.md) 6.20–6.22와 7.-1이 소유한다.
 
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 공식 배포 package version: `0.2.0`(2026-09-03T16:25:38Z published, 현재 Latest). 그 직전은 `0.1.9`다. 이전 mechanics fix commit은 `4cd6289`(interior-space path domain, quoted 생성 `--artifact` 예시)를 기록한다.
+- 공식 배포 package version: `0.3.0`(2026-09-04T08:33Z published, 현재 Latest). 그 직전은 `0.2.0`이다. 이전 mechanics fix commit은 `4cd6289`(interior-space path domain, quoted 생성 `--artifact` 예시)를 기록한다.
 - GitHub workflow run `33719014072`가 success로 완료됐고 `v0.1.9` GitHub Release가 published 상태다. 공식 GitHub source의 전역 canonical install도 Codex·Claude Code 대상으로 성공했다.
 - annotated tag `v0.1.9`은 commit `63147c2c83533ca9bcb69ff4e4a719217ee4d844`를, `v0.2.0`은 `e7a4f98af413fa948cfbc05d1c3f30e978b7521a`를 가리키고 `origin/main`도 `e7a4f98`이다. 로컬 `main`은 그보다 앞선 미배포 후보이며 태그가 없다(§0).
 - `v0.1.7` 공식 배포의 P2 runtime/validator는 union byte 계보로 `0.3.1`/`0.4.1`이다. `v0.1.8`은 domain·loader patch로 `0.3.2`/`0.4.2`를 기록하며 설치본 fingerprint로 재확인했다. `0.3.0`/`0.4.0`은 landed downstream projection에 쓰인 소진 번호라 재사용하지 않았다.
