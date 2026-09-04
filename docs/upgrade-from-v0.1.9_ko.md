@@ -9,7 +9,7 @@
 
 **9개(또는 전체) 패키지를 한 번에 재빌드하고 한 커밋으로 닫아야 한다.**
 
-`validator_hash`·`validator_version`과 이번에는 `runtime_hash`·`runtime_version`까지 바뀌므로, 한 패키지만 `maintain`이나 `build`를 돌리면 그 패키지만 새 값이 되고 나머지는 옛 값으로 남는다. 두 값은 `.generated.json`에 봉인되고 `verifyManifest`가 무결성 필드로 비교하므로, 코호트 동일성을 검사하는 저장소라면 그 시점에 실패한다.
+`validator_hash`·`validator_version`과 이번에는 `runtime_hash`·`runtime_version`까지 바뀌므로, 한 패키지만 `maintain`이나 `build`를 돌리면 그 패키지만 새 값이 되고 나머지는 옛 값으로 남는다. 네 값 모두 `.generated.json`에 봉인되고 `verifyManifest`가 무결성 필드로 비교하므로, 코호트 동일성을 검사하는 저장소라면 그 시점에 실패한다.
 
 그래서 설치 시점은 **진행 중인 트랜잭션이 없고 전체를 한 번에 닫을 수 있을 때**여야 한다.
 
