@@ -50,7 +50,7 @@ The runtime calculates and validates effect plans; it does not claim to intercep
 
 ## Body and templates
 
-Body level-two headings are only `guard:`, `stage:`, `role:`, or `why:`. Do not duplicate procedure, branch conditions, effect order, exact formats, or quantities in body prose. A stage section contains `Judgment:` and `Why:`. Templates show the exact shape and declare each placeholder as `line`, `block`, `list`, or `generated`. Those kinds are declaration labels: the build checks that the declared set matches the placeholders in the text and that each kind is a known word, and nothing more. The runtime hands the template to the model and never fills it, so no kind is enforced on the produced output and `list` carries no item grammar. State an item's shape inside the template itself.
+Body level-two headings are only `guard:`, `stage:`, `role:`, or `why:`. Do not duplicate procedure, branch conditions, effect order, exact formats, or quantities in body prose. A stage section contains `Judgment:` and `Why:`. Templates show the exact shape and declare each placeholder as `line`, `block`, `list`, or `generated`. Those kinds are declaration labels: the build checks that the declared set matches the placeholders in the text and that each kind is a known word, and nothing more — and a template declared `example: true` skips even that. The runtime hands the template to the model and never fills it, so no kind is enforced on the produced output and `list` carries no item grammar. State an item's shape inside the template itself.
 
 ## Validation levels
 
