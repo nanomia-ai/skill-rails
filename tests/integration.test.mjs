@@ -120,7 +120,23 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.ok(premature.diagnostics.some((item) => item.code === "L16" && /review-required/.test(item.message)));
   await writeTextAtomic(scaffoldSpecPath, scaffoldSpec);
   await completeGeneratedP2ForRuntimeTest(outputs.p2);
+  const fanInLedgerPath = join(outputs.p2, ".skill-rails", "obligation-ledger.json");
+  const fanInLedger = await readJson(fanInLedgerPath);
+  const projected = fanInLedger.atoms.find((atom) => atom.disposition === "projected");
+  // This is a counterexample, not a threshold: one legal stage may serve many independent obligations.
+  for (let index = 0; index < 60; index += 1) fanInLedger.atoms.push({
+    ...projected, id: `fan-in-${index}`, source: `regression:fan-in:${index}`,
+    text: `Independent requirement ${index}.`, targets: ["spec:STAGES/operate"], evidence: ["fixture:ready"]
+  });
+  await writeJsonAtomic(fanInLedgerPath, fanInLedger);
   await buildP2(outputs.p2, { repeats: 1 });
+  const p2Eval = spawnSync(process.execPath,
+    [join(SKILL_ROOT, "scripts", "eval.mjs"), "--skill", outputs.p2, "--repeats", "1"],
+    { cwd: ROOT, encoding: "utf8", windowsHide: true });
+  assert.equal(p2Eval.status, 0);
+  const p2EvalReport = JSON.parse(p2Eval.stdout);
+  assert.equal(p2EvalReport.release_readiness, "deterministic-fixtures-passed");
+  assert.match(p2EvalReport.caveat, /remain unproven until forward runs/);
   const unknown = await stageSkill({ skillRoot: outputs.p2, projectRoot: ROOT });
   assert.deepEqual(unknown.decision.needs.map((item) => item.field), ["authoring.readiness"]);
   const ready = await stageSkill({ skillRoot: outputs.p2, projectRoot: ROOT, decided: { "authoring.readiness": "ready" } });
@@ -130,6 +146,11 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   const decisionSchema = await readJson(join(outputs.p2, "schemas", "decision.schema.json"));
   const validateDecision = new Ajv2020({ strict: true, allErrors: true, validateFormats: false, allowUnionTypes: true }).compile(decisionSchema);
   for (const decision of [deferred.decision, unknown.decision, ready.decision]) assert.equal(validateDecision(decision), true, JSON.stringify(validateDecision.errors));
+  const scenariosPath = join(outputs.p2, "fixtures", "scenarios.json");
+  const scenarios = await readJson(scenariosPath);
+  scenarios.find((fixture) => fixture.id === "ready").expect.status = "BLOCK";
+  await writeJsonAtomic(scenariosPath, scenarios);
+  await assert.rejects(runFixtureSuite(outputs.p2, { repeats: 1 }), /Fixture ready: expected status=BLOCK, got DONE/);
 });
 
 test("pilot stage-artifact fixtures fail when one stage reader association is removed", async (t) => {

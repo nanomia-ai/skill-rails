@@ -563,6 +563,20 @@ Release-prep commit `58c8dc01bbfd70f846c3a41a57ab9fc84050c52a`를 `git merge --f
 계속 `UNPROVEN`: 완성된 지시문이 다른 host·더 약한 모델·압축된 컨텍스트에서도 이행되는지, 그리고 소비 저장소가 프로젝트 안을 가리키던 설정을 실제로 옮기는지.
 ---
 
+### 6.23 실패 검사를 제품의 정답지로 만드는 경로 차단
+
+Devflow v0.23.5의 자체 semantic audit가 Principles의 동일 atom 내 target 중복을 raw occurrence로 세어 22건으로 보고했지만 unique atom→target edge는 19개였고, Adopt의 한 합법 stage에는 77개 atom이 모여 있었다. 전자는 집계 오탐이고 후자는 검토할 provenance debt를 드러냈지만, 어느 쪽도 현재 runtime 실패를 증명하지 않았다. Skill Rails v0.3.0은 두 package를 거부하지 않았으며 fan-in 임계값을 요구하지도 않았다. hard failure는 downstream 검사가 독자적으로 만든 것이고, Devflow DD-100은 이후 unique edge와 occurrence를 분리하고 이런 의미 휴리스틱을 advisory로 돌렸다.
+
+직접 원인은 아니어도 오용하기 쉬운 표면은 있었다. `projected`와 eval의 `ok`가 실제 보장보다 강하게 읽힐 수 있었고, fixture를 바탕으로 제품을 다시 고치는 분기점에는 6.19와 Authoring judgment의 기존 경고로 가는 짧은 route가 없었다. 이번 보정은 그 분기점에 owner route 하나를 두고, 새 hard gate에는 소유된 결정론적 계약·현재 byte의 구체적 실패·참 결함/모양이 다른 유효 구현의 대조 증거를 요구한다. `projected`는 locator resolution/provenance만 기록하며 semantic adequacy와 behavior는 보장하지 않는다고 같은 owner 문단에서 분명히 했고, P2 eval은 성공한 deterministic fixture와 여전히 `unproven`인 fresh-agent 행동을 한 caveat에서 함께 말한다.
+
+새 validator, 경고 등급, ledger field, fan-in 기계는 추가하지 않았다. `runtime/*`, generator, schema, version-5 Decision/Trace와 생성 package byte도 바뀌지 않는다. 유효한 중복 locator가 구조 오류가 아님(A)과 많은 독립 atom이 한 stage에 착지해도 build/eval/runtime이 통과함(B)은 기존 테스트 흐름 안에 넣었다. 의미가 같은 body 교체가 구조 갱신 없이 통과하는 C는 기존 회귀가 계속 소유하고, 깨진 locator·남은 `review-required`·fixture-visible transition mismatch는 확실히 실패하는 D를 함께 확인한다. 깨진 locator의 중복 occurrence가 같은 L16 진단을 여러 번 내는 현상은 유효 package 판정을 바꾸지 않고 이번 사건 원인도 아니므로, validator byte가 다른 이유로 바뀌는 다음 시점까지 미뤘다.
+
+검증은 관련 authoring 2건과 통합 1건, self lint를 먼저 통과한 뒤 `npm run verify`의 vendor check·self lint·repository test 77/77·frozen G0.5 eval까지 통과했다. 구현 후 fresh Claude Fable xhigh가 같은 tree에서 Devflow 수치와 두 package의 validator 진단 0, 유효/깨진 fan-in의 상반 판정, 생성 byte·version-5 불변을 독립 재현했고 MUST-fix 없이 PASS했다. 그 검토가 찾은 유지보수 snapshot의 낡은 두 주장은 현재 사실로 교체한 뒤 같은 세션의 후속 감사에서 남은 MUST/SHOULD 0건을 확인했다.
+
+계속 `UNPROVEN`: fresh author가 새 route를 실제 분기점에서 따르는지, 긴 세션과 압축 뒤에도 목적·검사 전제 재판정을 유지하는지, caveat 문구가 `ok: true`의 과대해석을 줄이는지. 구조와 실행 위반은 약화하지 않았다. JSON/schema, locator, manifest hash, parser grammar, 결정론적 transition, 열린 `review-required`, 실제 자료 소실·잘못된 write·잘못된 stage 전이를 재현하는 검사는 계속 hard wall이다.
+
+---
+
 ## 7. P2 version-5 보존 및 변경 원장
 
 ### 7.-1 2026-09-04 생성 시작점·소비 파일 정직성 보정 (validator 0.5.0)

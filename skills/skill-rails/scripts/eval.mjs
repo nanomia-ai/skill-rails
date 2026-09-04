@@ -37,7 +37,7 @@ async function evaluateSkill(root, repeats) {
     schema: "skill-rails/eval-report/1", ok: deferred === 0, target: root,
     structural: { ok: true, checks: validation.checks }, behavior,
     release_readiness: deferred === 0 ? "deterministic-fixtures-passed" : "review-required",
-    caveat: deferred === 0 ? "Model trigger, long-session drift, and task-output evaluation still require forward runs." : `${deferred} DEFERRED item(s) remain; structural validity is not semantic completion.`
+    caveat: deferred === 0 ? "Deterministic fixtures passed. Fresh-agent trigger, long-session drift, and task-output quality remain unproven until forward runs." : `${deferred} DEFERRED item(s) remain; structural validity is not semantic completion.`
   };
 }
 

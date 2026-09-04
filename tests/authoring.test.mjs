@@ -775,12 +775,13 @@ test("a role is a resolvable landing place, not a crash", async (t) => {
   const atom = ledger.atoms.find((item) => item.id === "problem-001");
   // Naming a declared role as the place an obligation landed used to throw instead of resolving,
   // which made every role an unusable target rather than a checked one.
-  atom.targets = ["spec:ROLES/checker"];
+  atom.targets = ["spec:ROLES/checker", "spec:ROLES/checker"];
   atom.evidence = ["spec:ROLES/checker"];
   await writeFile(ledgerPath, JSON.stringify(ledger, null, 2) + "\n", "utf8");
 
   const resolved = await validateFull(root);
-  assert.deepEqual(resolved.diagnostics.filter((item) => item.code === "L16"), [], "a declared role resolves as a landing place");
+  assert.deepEqual(resolved.diagnostics.filter((item) => item.code === "L16"), [],
+    "a declared role resolves as a landing place, and a repeated valid locator is not a structural error");
 
   atom.targets = ["spec:ROLES/absent"];
   atom.evidence = ["spec:ROLES/absent"];
