@@ -361,7 +361,7 @@ align
 
 ### 10.6 설치 package 밖의 state
 
-Trace와 lock은 skill root 밖에서, 그리고 관찰 대상 프로젝트 밖에서 호출자가 `--trace-dir`로 명시한 state directory에 기록한다. 프로젝트 경계는 호출이 프로젝트를 넘길 때 검사한다. 자동 state-root 선택은 구현하지 않았다. `stage`는 trace 없이도 계산할 수 있지만, `record`, `align`, `resume`은 외부 trace 위치와 run identity가 필요하다. 설치된 skill은 read-only여도 실행 가능하다. trace append는 원자적 lock directory로 직렬화하며, stale lock과 경로 이탈을 fail-closed로 처리한다.
+Trace와 lock은 skill root 밖에서, 그리고 관찰 대상 프로젝트 밖에서 호출자가 `--trace-dir`로 명시한 state directory에 기록한다. 두 경계 중 런타임이 강제하는 것은 skill root뿐이고, 프로젝트 경계는 생성 지시문이 호출자에게 지시한다 — 강제하면 v5가 받던 배치를 거부하게 된다. 자동 state-root 선택은 구현하지 않았다. `stage`는 trace 없이도 계산할 수 있지만, `record`, `align`, `resume`은 외부 trace 위치와 run identity가 필요하다. 설치된 skill은 read-only여도 실행 가능하다. trace append는 원자적 lock directory로 직렬화하며, stale lock과 경로 이탈을 fail-closed로 처리한다.
 
 ---
 

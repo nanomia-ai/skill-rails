@@ -73,7 +73,7 @@ node <generated-skill>/scripts/skill-rails/run.mjs align --skill <generated-skil
 node <generated-skill>/scripts/skill-rails/run.mjs resume --skill <generated-skill> --trace <trace.jsonl> --project <project>
 ```
 
-`<external-state-dir>` is external to two things, not one. The runtime always refuses a trace directory inside the installed package, and refuses one inside the observed project — including through a symlink or junction — on every command it is given a project. `stage` always has one; `record`, `align` and `resume` accept `--project` and check it when supplied. A caller that supplies none keeps the package-only guarantee, so choose a directory outside both rather than relying on the check to catch it.
+`<external-state-dir>` is external to two things, not one: put it outside the installed package and outside the project being observed. Runtime state inside the observed project leaves untracked files that the project's own snapshot then reads as its own state, so a run would change what it is measuring. The runtime refuses a directory inside the installed package, including through a symlink or junction. It does not police the project boundary — that one is yours to honor, and the generated loader already resolves `<trace-dir>` outside both.
 
 Unsupported flags or input sources fail closed. Do not infer missing values or reconstruct a Decision from prose after a CLI or validation failure.
 

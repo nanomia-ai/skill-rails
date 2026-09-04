@@ -713,35 +713,28 @@ test("a resource root that is a regular file is no resources, not a crash", asyn
   assert.deepEqual(Object.keys(snapshot.references).filter((key) => key.startsWith("references")), [], "a non-directory resource root contributes no resources");
 });
 
-test("runtime state may not land inside the observed project", async (t) => {
+test("runtime state stays out of the installed package, and no other placement is refused", async (t) => {
   const base = await makeTestDir("external-state");
   t.after(() => removeTestDir(base));
   const skill = join(base, "skill");
   const project = join(base, "project");
+  await mkdir(join(skill, "inner"), { recursive: true });
   await mkdir(project, { recursive: true });
-  // The rule protected the installed package and left the project unguarded, so a consumer following
-  // "outside the installed skill" literally dropped untracked run state into the repository it observed.
   await assert.rejects(
-    assertExternalStateDir(skill, join(project, ".traces"), project),
-    (error) => error.code === "SR_STATE_INSIDE_PROJECT",
-    "a trace directory inside the observed project is refused");
-  await assert.rejects(
-    assertExternalStateDir(skill, join(skill, ".traces"), project),
+    assertExternalStateDir(skill, join(skill, ".traces")),
     (error) => error.code === "SR_STATE_INSIDE_SKILL",
-    "the installed package stays protected");
-  await assertExternalStateDir(skill, join(base, "outside"), project);
-  // Callers that do not know a project keep the previous contract exactly.
-  await assertExternalStateDir(skill, join(project, ".traces"));
-
-  // A lexical check alone is a check a junction walks around, and the junction is the shape a
-  // consumer actually produces when a scratch path is linked back into the repository.
+    "a trace directory inside the installed package is refused");
+  // A junction is the shape a lexical check alone walks past.
   const linked = join(base, "linked-traces");
-  await mkdir(join(project, ".traces"), { recursive: true });
-  await symlink(join(project, ".traces"), linked, "junction");
+  await symlink(join(skill, "inner"), linked, "junction");
   await assert.rejects(
-    assertExternalStateDir(skill, linked, project),
-    (error) => error.code === "SR_STATE_INSIDE_PROJECT",
-    "a junction into the observed project is refused on its target, not its name");
+    assertExternalStateDir(skill, linked),
+    (error) => error.code === "SR_STATE_INSIDE_SKILL",
+    "a junction into the installed package is refused on its target, not its name");
+  // Everywhere else is the caller's decision. The generated instruction tells a run to keep its state
+  // outside the observed project; refusing it here would reject a placement version 5 accepted.
+  await assertExternalStateDir(skill, join(project, ".traces"));
+  await assertExternalStateDir(skill, join(base, "outside"));
 });
 
 test("a role is a resolvable landing place, not a crash", async (t) => {

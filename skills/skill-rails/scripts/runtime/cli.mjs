@@ -49,7 +49,7 @@ export async function main(argv = process.argv.slice(2), io = console) {
         const runId = parsed["run-id"] ?? document.run_id ?? null;
         if (!traceDir || !runId || !parsed.type) throw new Error("record requires trace location, run id, and --type; a stage-result decision file may provide the first two.");
         if (parsed.authority) fail("SR_EVIDENCE_AUTHORITY", "The agent-facing record command cannot assign evidence authority.");
-        await assertExternalStateDir(skillRoot, traceDir, parsed.project ? resolve(parsed.project) : null);
+        await assertExternalStateDir(skillRoot, traceDir);
         const tracePath = join(resolve(traceDir), `${runId}.jsonl`);
         const events = await readTrace(tracePath);
         const emitted = events.find((event) => event.type === "decision_emitted" && event.authority === "runtime_observed" && event.decision_id === decision.decision_id && stableStringify(event.data?.decision) === stableStringify(decision));
@@ -67,7 +67,7 @@ export async function main(argv = process.argv.slice(2), io = console) {
         } else if (!["effect_claimed", "receipt_recorded", "proof_recorded"].includes(parsed.type)) {
           fail("SR_EVIDENCE_TYPE", "The agent-facing record command accepts only claims and receipts; observed effects require a trusted harness.");
         }
-        const value = await recordEvidence({ skillRoot, traceDir, runId, decision, type: parsed.type, data, artifactPath, expectedArtifactPath, projectRoot: parsed.project ? resolve(parsed.project) : null });
+        const value = await recordEvidence({ skillRoot, traceDir, runId, decision, type: parsed.type, data, artifactPath, expectedArtifactPath });
         emit(value, parsed.json, io, JSON.stringify);
         return 0;
       }
@@ -76,7 +76,7 @@ export async function main(argv = process.argv.slice(2), io = console) {
         const decision = document.decision ?? document;
         const tracePath = parsed.trace ?? document.trace_path;
         if (!tracePath) throw new Error("align requires --trace or a stage-result decision file containing trace_path.");
-        await assertExternalStateDir(skillRoot, dirname(resolve(tracePath)), parsed.project ? resolve(parsed.project) : null);
+        await assertExternalStateDir(skillRoot, dirname(resolve(tracePath)));
         const events = await readTrace(resolve(tracePath));
         const report = alignDecision(decision, events);
         emit(report, true, io, JSON.stringify);
@@ -84,7 +84,7 @@ export async function main(argv = process.argv.slice(2), io = console) {
       }
       case "resume": {
         const tracePath = resolve(parsed.trace);
-        await assertExternalStateDir(skillRoot, dirname(tracePath), parsed.project ? resolve(parsed.project) : null);
+        await assertExternalStateDir(skillRoot, dirname(tracePath));
         const events = await readTrace(tracePath);
         const lastEvent = [...events].reverse().find((event) => event.type === "decision_emitted");
         const last = lastEvent?.data?.decision;
@@ -157,7 +157,7 @@ function validateCommandArgs(command, parsed) {
     role: { positions: 3, options: ["role"] },
     lint: { positions: 2, options: ["fast", "full"] },
     record: { positions: 2, options: ["decision", "trace-dir", "run-id", "type", "authority", "data", "artifact", "project"] },
-    align: { positions: 2, options: ["decision", "trace", "project"] },
+    align: { positions: 2, options: ["decision", "trace"] },
     resume: { positions: 2, options: ["trace", "project"] }
   };
   const declaration = commands[command];
