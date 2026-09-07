@@ -4,26 +4,33 @@
 
 - Intent brief
 - Authoring judgment
+- Role-separated work
 - Related skill suites
 - Fresh-consumer closure
 - Profile selection
 - Creation order
 - Maintenance
-- Completion boundary
+- Plan and completion boundaries
 
 ## Intent brief
 
-Start from `templates/intent-brief.json`; its keys are the input contract and its requirement arrays intentionally start empty so placeholders cannot become obligations. Record the problem, positive use cases, near-miss triggers, inputs, outputs, irreversible boundaries, state-dependent behavior, exact formats, external dependencies, evidence of completion, judgment points, and deterministic helpers. Ask only when an answer changes a product boundary or an irreversible action.
+Start from `templates/intent-brief.json`; its keys are the input contract and its requirement arrays intentionally start empty so placeholders cannot become obligations. Record the problem, positive use cases, near-miss triggers, inputs, outputs, irreversible boundaries, state-dependent behavior, exact formats, external dependencies, evidence of completion, judgment points, and deterministic helpers. While completing the intent brief, ask only when an answer changes a product boundary or an irreversible action.
+
+Preserve wording the user chose to carry intent, force, a distinction, or a failure consequence. Translation may change the language, but it must not soften that wording into generic best practice, collapse a distinction, or make a different interpretation plausible. When concise wording cannot preserve the meaning, retain the original expression with enough context to interpret it. The obligation ledger can preserve only the text it receives; it cannot recover intent that was already normalized away.
 
 Keep a judgment point as a string when every invocation needs it. When a large P0 or P1 skill has a prose topic that applies only under a distinct condition, record it as `{ "id": "stable-kebab-id", "when": "one-line condition", "points": ["preserved requirement", "another requirement"] }`. The profile does not change: conditional prose routing is orthogonal to P0/P1 mechanics. Do not mechanically split prose by length. Use a topic only when its condition is meaningful, its points form one coherent subject, and the always-loaded entry still contains universal boundaries, state-dependent obligations, exact formats, and stop rules.
 
 ## Authoring judgment
 
-Anchor the design in the user's desired result and the underlying problem the skill exists to solve, then work backward from the first useful result. Mechanize rules that are repeatable and can be checked reliably; keep interpretation, tradeoffs, and value judgment in concise prose with enough context to prevent misunderstanding. Do not optimize for brevity itself.
+Build a skill for a person and an unfamiliar AI to use, not merely for a technically valid experiment. Anchor the design in the user's desired result, why that result matters, the failure that made the work necessary, and the role the skill plays in the larger flow; then work backward from the first useful result. A structurally valid package that leaves a cold AI unable to understand what it is looking at, where to go next, or what good means is not a complete result.
 
-For a high-cost decision, compare the simplest workable alternative and one genuinely independent approach before extending the current design. Use a fresh review when it can challenge the framing, not merely optimize inside it. Treat existing implementations, history, tests, and failures as evidence, not answer keys. Keep each behavior or fact owned by one canonical source; other surfaces should route to or project from that owner instead of becoming parallel truths.
+Prefer the smallest coherent change that reaches the full desired level. Small does not mean passive, local, or lower quality: find the most accurate owning boundary, replace the mistaken premise or wording there, and leave the whole result cleaner than before. Do not accumulate a patchwork of case-specific prohibitions, explanations, validators, and recovery procedures when one natural correction at the owner would solve the class of problem. Mechanize rules that are repeatable and can be checked reliably; keep interpretation, tradeoffs, and value judgment in concise prose with enough background to prevent misunderstanding. Do not optimize for brevity itself.
 
-As evidence changes, improve how the problem is being solved, not only the current implementation; consistency with an earlier plan is not a goal. When work stops bringing the desired result closer, step back from the symptom and re-examine the whole problem: its framing, root cause, owning boundary, and simpler alternatives. Replace the approach when its premise no longer holds; ordinary local fixes need no reframing. In a long session, when the original purpose may be fading, briefly restate the result, why the current approach still serves it, and what evidence would change course — when useful, not on a schedule.
+Give the authoring AI a problem space in which it can judge, not an answer key it can imitate or evade. Supply the purpose, background, relationships, important original wording, observed failure, desired direction, values to preserve, uncertainty, and judgment boundaries. State exact mechanics where they are exact, but do not turn every past failure into another step-by-step route. A safeguard should be a wall encountered on a meaningful drift path, not a detailed manual that replaces normal reasoning.
+
+Before repairing a local symptom, understand the relevant project purpose, common contract, file and state flow, canonical owner, generated projection, and direct consumer. Decide whether the defect belongs to the local skill, a shared owner, a tool, a fixture, a harness, an environment, or an agent-role mismatch. Treat implementations, history, tests, and failures as evidence, not answer keys. Keep each behavior or fact owned by one canonical source; other surfaces should route to or project from that owner instead of becoming parallel truths. A repair must remain natural for the other valid flows that share that owner.
+
+For a high-cost decision, compare the simplest workable alternative and one genuinely independent approach before extending the current design. Use a fresh review when it can challenge the framing, not merely optimize inside it. As evidence changes, improve how the problem is being solved, not only the current implementation; consistency with an earlier plan is not a goal. When work stops bringing the desired result closer, or the same class of correction recurs without new behavior evidence, step back from the symptom and re-examine the framing, root cause, owner, consumer path, and simpler alternatives. Replace the approach when its premise no longer holds; ordinary local fixes need no reframing. In a long session, when the original purpose may be fading, briefly restate the result, why the current approach still serves it, and what evidence would change course—when useful, not on a schedule.
 
 ### Failure cases
 
@@ -32,11 +39,31 @@ These cases preserve causal patterns observed while building and maintaining com
 - Exception rules, explanations, and tests were added around the same premise, but no new evidence showed the user's result improving. The work became larger without converging because the premise was never re-examined.
 - An incomplete fixture or mechanical check was treated as the answer key, and the product was repeatedly changed to satisfy it. The test and implementation amplified the same false premise, so small changes became slower without better behavior.
 - One agent's failure under constrained reasoning or an unsuitable role was generalized into instructions for every agent. Guidance and restrictions grew, other agents became more rigid, and the actual cause remained undiagnosed.
+- A prompt was delivered and the agent said it understood, so work continued without checking the agent's working hypothesis, owner and consumer model, or actual progress. More harness was added around inadequate understanding, and the work entered a longer deadlock instead of becoming safer.
 - A mechanism replaced prose, but its manual, exceptions, and recovery procedure grew larger than the prose it removed. Maintainers spent more context operating the mechanism, so drift and change cost remained instead of disappearing.
 
-Before changing the product to satisfy a failed check, identify which premise broke — product, fixture, harness, or environment — and repair the owning premise rather than making the product fit an invalid check. Before making a new check on authored work a hard gate, tie it to an owned deterministic contract and a concrete failure in current bytes, then test both sides: a real defect must fail and a differently shaped valid implementation must pass. If clearing the same red asks for another change to authored behavior, revisit the check's premise; the surface form or frequency of otherwise valid work is review evidence, not a product failure. After the design has logically converged, verify it with a high-information representative flow that exercises the coupled risks, then with a fresh agent using only the declared consumption set. Record what each check actually observed, and mark every remaining uncertainty `unproven`.
+Before changing the product to satisfy a failed check, identify which premise broke — product, task or input artifact, fixture, check, harness, environment, or agent-role assignment — and repair the owning premise rather than making the product fit an invalid check. Before making a new check on authored work a hard gate, tie it to an owned deterministic contract and a concrete failure in current bytes, then test both sides: a real defect must fail and a differently shaped valid implementation must pass. If clearing the same red asks for another change to authored behavior, revisit the check's premise; the surface form or frequency of otherwise valid work is review evidence, not a product failure. After the design has logically converged, verify it with a high-information representative flow that exercises the coupled risks, then with a fresh agent using only the declared consumption set. Record what each check actually observed, and mark every remaining uncertainty `unproven`.
 
 Generated guidance may carry a short recovery guard, but scope it to choices the target skill leaves to judgment. It must not authorize bypassing exact formats, mechanical rules, the current P2 Decision, evidence requirements, irreversible boundaries, or host permissions; detailed authoring history does not belong in every generated skill.
+
+## Role-separated work
+
+Role separation is a recommended operating pattern for demanding skill work, not a mandatory topology. The user's established pattern and explicit assignments take precedence. An agent that already received a role from the user or its assigning coordinator keeps that role; this default neither promotes it nor authorizes it to reassign itself or other agents. Keep four logical responsibilities understandable even when one agent carries more than one of them:
+
+1. **Coordinator and supervisor (keeps the whole effort aligned):** preserves the original purpose and important wording, proposes the work and role allocation, watches actual state and convergence, resolves conflicts, and changes course or assignment when evidence requires it. When separate agents carry this responsibility, the coordinator owns direction, allocation, and decision gates; the supervisor inspects actual execution and evidence.
+2. **Integrated implementer (the sole writer):** holds the connected implementation context, edits the canonical owners, integrates related changes as one coherent correction, and produces the diff and checks. Do not have another role edit the same owned files concurrently.
+3. **Premise challenger and cross-checker (tries to disprove the approach):** independently tests the problem framing, root cause, owner, consumer path, and check assumptions against source and observed failures before or during implementation. This is a bounded, normally read-only role.
+4. **Final whole-result reviewer (checks the completed result):** reads the original intent, the entire relevant diff and consumption path, and the executed evidence after convergence; it looks for drift, regression, duplication, missing context, and claims that remain unproven. It does not grade from the implementer's conclusion alone.
+
+In a structured orchestration environment, the coordinator, supervisor, and long-running implementer can be distinct agents when the environment can sustain their state and communication; the four responsibilities may be distributed across those persistent agents and bounded reviewers. Outside such an environment, the primary agent keeps the long-running implementation and whole context. Use subagents for bounded read-only premise challenges, source checks, or final review rather than handing the integrated implementation to a short-lived subagent. A fresh, differently suited model may be used to break a persistent evidence conflict, but it is not a standing fifth role or a required step.
+
+### Delegation readiness
+
+A role-separated proposal is incomplete unless it tells the user both what intent-bearing context each agent will receive and how the coordinator or supervisor will observe adequate understanding before trusting the work. Prompt delivery and a claim of understanding are not evidence that an agent is ready for its role. Every assignment must carry the purpose, background, observed failure, important user wording, desired end direction, values and boundaries to preserve, current facts and uncertainty, relevant owner and consumer relationships, and completion condition—not only the conclusion or requested edit. If an agent delegates again, it must propagate the same intent-bearing core instead of reducing it to a one-line task.
+
+Before relying on the work, the coordinator or supervisor checks the agent's actual working hypothesis, the state and evidence it inspected, the owner and consumer path it is acting on, its current output or progress, and what would make it change course. If those are materially missing or the work repeatedly stalls, repair the briefing or reassign the role before adding more rules or harness.
+
+When role-separated work is proposed and the user has neither assigned models nor delegated that choice, offer a simple default allocation in the user's language after defining that readiness boundary. Explain each role in ordinary terms, name the capability needed for it, and ask whether to proceed with that allocation or let the user reassign it. Select by role fit, sufficient reasoning and context capacity, and current state—not by a permanent provider hierarchy. Do not assign a demanding role to a cheaper or faster model when known drift would require more harness and supervision than the saving justifies.
 
 ## Related skill suites
 
@@ -89,8 +116,8 @@ This contract does not create a second migration ledger or a progressive query l
 
 Apply the terminal, observation, guard, stage, table, and effect sequence below to P2. Keep P0/P1 thin by using only the steps their selected profile actually needs.
 
-1. Write the intent brief and evaluation cases.
-2. Atomize obligations and record their source and consequence.
+1. Write the intent brief and evaluation cases, preserving intent-bearing original wording and the failure consequence it explains.
+2. Atomize obligations and record their source and consequence. Before committing to a high-cost design, challenge the problem framing, owner, consumer path, and evaluation premise with the relevant whole-system evidence.
 3. For P2, copy `templates/authoring-card.md` into the work package, complete its observations, judgment inputs, owners, artifacts, terminals, and named consumer consumption sets, then project approved decisions into the canonical spec and obligation ledger. Put each static consumer artifact path in `ARTIFACTS`, bind it to its selected stage or stopping guard with `readers`, and place any required grammar on a mandatory structured or selected guidance surface. The card is an authoring aid, not a behavior source or consumer guidance.
 4. Design ASK, WAIT, ROUTE, BLOCK, and DONE terminals first.
 5. Define observations and domains.
@@ -100,7 +127,7 @@ Apply the terminal, observation, guard, stage, table, and effect sequence below 
 9. Write judgment-only body sections.
 10. Add positive, negative, counterexample, and mutation fixtures.
 11. Generate the thin loader and platform metadata.
-12. Run L-fast, L-structural lint, L-full build, and behavior evaluation.
+12. Run L-fast, L-structural lint, L-full build, and behavior evaluation. Keep informed whole-result counterproof separate from blind fresh-consumer evaluation; each proves a different claim.
 
 Every generated P2 package reserves a package-root `.gitattributes` with exact bytes `* -text\n`. The builder emits its owned runtime and schema text with LF, then records exact raw hashes including `.gitattributes` in `generated_files`; verification never normalizes bytes, and Git checkouts preserve every sealed file instead of applying platform newline conversion. A pre-existing noncanonical file is a collision and is never overwritten or merged; an unowned file with the canonical bytes requires an explicit `--repair-generated` rebuild to transfer ownership. P0 and P1 package shape is unchanged.
 
@@ -111,6 +138,8 @@ When a task or role already selects one project-relative file for a stage, accep
 The obligation ledger is provenance, not a second behavior source. Keep original intent text immutable inside each atom; for P0/P1, universal intent remains visible in the always-loaded `SKILL.md`, while `targets` name the canonical implementing `file:` and `evidence` names its resolving `file:` or `eval:` check (frontmatter description and routed topic text remain checked on their own guidance surfaces). P2 additionally resolves `body:`, `spec:`, and `fixture:` locators. Mark an atom `projected` only after its target and evidence resolve; otherwise leave it `review-required` and keep the P2 `DEFERRED` gate.
 
 ## Maintenance
+
+First confirm that the reported problem exists in the current source, projection, consumer path, execution, or failure scene, then apply the attribution boundary in [Failure cases](#failure-cases) before editing the product. For a substantive change, use the role-separated pattern when the user selects it; otherwise cover the same premise and whole-result checks without claiming that they were independent. Keep one integrated writer in either case.
 
 Address stable IDs, not prose locations. Before a P2 change, query affected predicates, stages, rows, body sections, templates, owners, fixtures, and generated artifacts:
 
@@ -135,8 +164,14 @@ For an intent-backed P0/P1 package, pass `maintain.mjs` a change containing only
 
 For a whole-file P2 replacement, use `replace-artifact` with `profile: "p2"`, the registered `kind` and canonical package-relative `path`, the current `expected_hash`, and string `content`. The closed first-slice registry accepts only `spec` at `spec.mjs`, `collector` at `collectors/index.mjs`, and an existing `reference` below `references/`; it requires one forward-slash spelling with no empty or dot segments and the target's physical case, and it refuses generated files, duplicate physical targets, absent targets, stale hashes, cross-kind paths, symlinks, junctions, and unsupported directory entries before applying any replacement. Maintenance stages and builds the complete regular-file package, renames the original root to a captured backup, verifies that captured backup against the starting fingerprint, and only then installs the stage. Its atomic, recoverable boundary assumes one authorized writer with exclusive ownership of the package root: it detects pre-install identity drift and, on rollback obstruction, leaves the captured backup at the exact path reported by the error instead of deleting it or an occupying target. It neither locks out nor guarantees preservation from an out-of-band process that continues writing after capture; external concurrency is outside the verified boundary, and missing host-ownership evidence is `UNPROVEN`, not success. Cross-platform locking of external processes is host authority and would materially complicate the AI-facing tool. Body-section, intent-patch, template, and resource-creation operations keep their existing semantics and are not widened into arbitrary source replacement.
 
-## Completion boundary
+## Plan and completion boundaries
 
 Replace a status or verification report with its current truth instead of appending a new dated section beside superseded claims, and let every published hash or count name the command that reproduces it.
 
 Creation is structurally complete only when lint and build pass. Behavior is verified only when forward tests provide evidence. A new skill remains an initial release candidate until real use confirms its trigger, adherence, outputs, and maintenance locality.
+
+At two drift-sensitive boundaries—before approving a substantive plan and before declaring its implementation complete—re-read the user's original purpose and the relevant Skill Rails guidance from their canonical paths, then counterprove the whole plan or result against them. At the plan boundary, test whether the proposed owner, scope, and verification still serve the intended result; at the implementation boundary, test the actual diff, consumer path, and evidence.
+
+When role-separated work is selected and an independent reviewer is available, give that reviewer the original purpose and intent-bearing wording, observed failure, confirmed facts and uncertainties, owner and consumer relationships, approved scope, entire relevant diff, and executed evidence. The reviewer challenges both the premise and the result, consolidates blocking findings instead of creating a one-item correction loop, and distinguishes a defect from style preference or another valid form. Otherwise perform the same whole-result audit and report independent counterproof as `unproven`.
+
+Then inspect the final whole as a cold user's working path, not only as files that exist: can an unfamiliar AI understand the purpose and current position, find the required depth, preserve the important boundaries, distinguish facts from uncertainty, and take the next action without conversation-only memory? Confirm that the change landed at the durable owner, did not become a patchwork of special cases or parallel truths, did not damage another valid flow, and remains proportionate to the meaning added. Report the checks actually run and every remaining unknown separately; missing practical evidence is `unproven`, never structural success.

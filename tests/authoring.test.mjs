@@ -60,6 +60,29 @@ test("human-only documentation stays outside installed skill routing", async () 
   assert.equal(await exists(join(SKILL_ROOT, "references", "platform-adapters.md")), false);
 });
 
+test("authoring guidance preserves intent anchors, role structure, and distinct review lanes", async () => {
+  const [workflow, evaluation] = await Promise.all([
+    readFile(join(SKILL_ROOT, "references", "authoring-workflow.md"), "utf8"),
+    readFile(join(SKILL_ROOT, "references", "evaluation.md"), "utf8")
+  ]);
+
+  assert.match(workflow, /technically valid experiment/);
+  assert.match(workflow, /problem space in which it can judge, not an answer key/);
+  assert.match(workflow, /Small does not mean passive, local, or lower quality/);
+
+  const roles = workflow.slice(workflow.indexOf("## Role-separated work"), workflow.indexOf("## Related skill suites"));
+  assert.match(roles, /recommended operating pattern.*not a mandatory topology/);
+  assert.match(roles, /already received a role[\s\S]*keeps that role[\s\S]*neither promotes it nor authorizes it to reassign/);
+  assert.equal([...roles.matchAll(/^\d\. \*\*/gm)].length, 4, "the default remains four understandable work responsibilities");
+  assert.match(roles, /Outside such an environment, the primary agent keeps the long-running implementation and whole context/);
+  assert.match(roles, /### Delegation readiness[\s\S]*Prompt delivery and a claim of understanding are not evidence/);
+
+  assert.match(workflow, /before approving a substantive plan[\s\S]*before declaring its implementation complete[\s\S]*re-read the user's original purpose and the relevant Skill Rails guidance/);
+
+  assert.match(evaluation, /## Review lanes/);
+  assert.match(evaluation, /Do not credit an informed review as evidence that a cold consumer/);
+});
+
 test("the published skill directory excludes repository-only fixtures and nested skills", async () => {
   assert.equal(await exists(join(ROOT, "SKILL.md")), false);
   for (const directory of ["docs", "evals", "fixtures", "tests"]) {

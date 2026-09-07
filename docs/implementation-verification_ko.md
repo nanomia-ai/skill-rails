@@ -577,6 +577,28 @@ Devflow v0.23.5의 자체 semantic audit가 Principles의 동일 atom 내 target
 
 계속 `UNPROVEN`: fresh author가 새 route를 실제 분기점에서 따르는지, 긴 세션과 압축 뒤에도 목적·검사 전제 재판정을 유지하는지, caveat 문구가 `ok: true`의 과대해석을 줄이는지. 구조와 실행 위반은 약화하지 않았다. JSON/schema, locator, manifest hash, parser grammar, 결정론적 transition, 열린 `review-required`, 실제 자료 소실·잘못된 write·잘못된 stage 전이를 재현하는 검사는 계속 hard wall이다.
 
+### 6.24 Skill authoring 운영 하네스의 의도·역할·이해도·반증 경계
+
+이번 보강은 Skill Rails로 하나의 AI skill을 만들거나 유지보수할 때 사용하는 공개 authoring 경로만 바꾼다. 기술적으로 성립하는 실험 결과와 사람·cold AI가 실제로 사용할 수 있는 결과를 구분하고, 최소 수정을 소극적·국소적·낮은 수준의 대응이 아니라 목표 수준에 도달하는 가장 작은 일관된 전체로 정의했다. 사용자가 의도·강도·구별·실패 결과를 담아 선택한 표현은 번역이나 요약 뒤에도 그 의미를 보존하며, 이미 순화되어 입력된 의미는 obligation ledger가 복구할 수 없다고 명시했다. AI에는 답안지가 아니라 목적, 배경, 실패 장면, 관계, 방향과 판단 경계를 제공하고, 국소 증상보다 owner→projection→consumer와 실행 경로의 전체 인과를 먼저 보게 한다.
+
+역할 운영은 강제 topology가 아니라 사용자의 기존 운영과 명시적 배정을 우선하는 권장 패턴이다. 이미 사용자나 상위 coordinator에게 역할을 받은 agent는 그 역할을 유지하며, 기본 패턴은 스스로를 coordinator·검수자로 승격하거나 자신과 다른 agent의 역할을 다시 배정할 권한을 주지 않는다. 네 가지 논리적 책임은 조정·감독, 하나의 통합 구현자, 전제 반증·교차 검수, 최종 전체 검수로 유지한다. 구조화된 orchestration에서는 coordinator·supervisor·장기 implementer를 서로 다른 지속 agent로 둘 수 있고, 그 밖의 환경에서는 primary agent가 장기 구현과 전체 context를 유지하며 subagent는 bounded read-only 반증·검수에 사용한다. 모델 배정이 없고 선택도 위임되지 않았을 때만 사용자 언어로 단순한 기본 배정과 역할의 의미를 설명하고 승인·재배정을 묻는다. 공급자별 고정 서열은 공개 규칙에 넣지 않았다.
+
+역할 배정안은 각 agent가 받을 의도 보존 context와, 그 작업을 신뢰하기 전에 이해도를 어떻게 관찰할지를 함께 말해야 완성된다. 목적, 배경, 실패 장면, 중요한 사용자 표현, 원하는 최종 방향, 보존할 가치·경계, 사실·불확실성, owner·consumer 관계와 완료 조건을 재위임에도 전파한다. prompt 전송이나 “이해했다”는 보고는 준비 증거가 아니며, coordinator 또는 supervisor가 실제 작업 가설, 읽은 상태·증거, owner·consumer 경로, 현재 산출물·진전과 방향을 바꿀 조건을 확인한다. 이것이 부족하거나 작업이 반복 교착되면 규칙과 harness를 더 얹기 전에 briefing을 고치거나 역할을 재배치한다.
+
+검증 입력의 기존 충돌도 분리했다. 계획과 whole-result 반증은 최초 목적·중요 표현·실패·관계·diff·실행 증거를 받는 informed lane이고, trigger·adherence·generated-skill 사용성과 downstream handoff는 선언된 최소 소비 집합만 받는 blind fresh-consumer lane이다. informed review를 cold-consumer 증거로 승격하지 않으며, freshness를 이유로 informed reviewer에게 원인 문맥을 숨기지도 않는다. failed check의 전제 분류에는 product뿐 아니라 task/input artifact, fixture, check, harness, environment와 agent-role assignment가 포함된다.
+
+드리프트가 결과를 바꾸기 쉬운 두 논리적 종료 경계도 기존 completion 흐름 안에서 닫았다. 실질적인 기획을 승인하기 전에는 사용자의 원래 목적과 관련 Skill Rails 정본을 다시 읽고 owner·scope·검증이 목적을 계속 섬기는지 전체 기획을 반증한다. 구현 완료를 선언하기 전에는 같은 기준으로 실제 diff·consumer path·evidence를 반증한다. 이는 모든 작업에 새 stage나 독립 agent를 강제하는 topology가 아니라, 현재 작업 주체가 선택된 운영 형태 안에서 수행하는 두 번의 전체 대조다.
+
+변경 owner는 `skills/skill-rails/references/authoring-workflow.md`와 `evaluation.md`이고, 회귀는 `tests/authoring.test.mjs`가 의도 표현의 세 핵심 anchor, 네 역할 구조와 기존 역할 보존, primary-agent 장기 구현 경계, self-report가 아닌 이해도 경계, 두 종료 경계, 두 review lane의 구조만 고정한다. 처음의 23개 문구 검사는 유효한 다른 산문까지 거부하는 답안지였으므로 독립 검수에서 철회하고 11개 구조·의도 anchor로 줄였다. 새 runtime gate, schema, manifest, generator, generated package, profile 규칙이나 version boundary는 만들지 않았다.
+
+실용 검증에서는 fresh Terra high에게 서로 다른 미공개 유지보수 상황을 주고 task·`SKILL.md`가 route한 공개 reference만 읽게 했다. 처음 두 run은 역할·모델 배정, owner 진단과 informed/blind 검증은 복원했지만 위임 context와 실제 이해 확인을 사용자-facing 계획에 포함하지 못했다. 같은 계열 실패가 두 번 반복되어 문장을 늘리는 대신 그 경계를 `Delegation readiness`로 승격하고 모델 선택보다 앞선 역할 배정의 완료 조건으로 바꿨다. 세 번째 fresh run은 목적·실패·정확한 사용자 표현·경계·사실/불확실성·owner/consumer·완료 조건을 각 reviewer에게 전달하고, 작업 가설·검사 증거·owner/consumer model·결론을 바꿀 조건을 확인한 뒤 결과를 신뢰하겠다고 스스로 계획했다. 이 관찰은 한 모델·한 비오케스트레이션 계획 사례의 `PARTIAL` 행동 증거이며 반복성이나 실제 위임 성공을 증명하지 않는다.
+
+구현 전 Astra xhigh read-only 전제 검수는 공개 두 owner 안의 보강과 evaluation lane 분리를 지지했다. 구현 후 Sol xhigh whole-diff 검수는 역할 권장성, task/input attribution과 회귀 과잉 세 결함을 한 번에 제시했고, 수정 후 두 차례 후속 전체 검수에서 blocker 0과 no-migration compatibility를 판정했다. 현재 product·공개 reference·test byte의 `npm run verify`는 vendor check, self lint, repository test 78/78과 frozen G0.5 eval을 통과했다. `git diff --check`와 표적 authoring 회귀 1/1도 통과했다. 변경한 Markdown 4개를 대상으로 한 local file link scan은 링크 8개, missing 0을 기록했다.
+
+이 공개 authoring 지침 보강은 package source `0.3.2` patch 후보로 묶었다. Package와 lock version만 `0.3.2`로 맞췄고 runtime `0.3.3`, validator `0.6.1`, kernel `6`, `SPEC.version = "5"`와 기존 P0/P1/P2 생성 package byte는 그대로다. 기존 package의 강제 수정·재생성·migration은 0이며, 이 후보 tree는 아직 commit·push·release·install하지 않았다.
+
+계속 `UNPROVEN`: 다른 모델·host에서의 반복성, structured orchestration의 실제 역할 분리, recursive delegation의 두 번째 hop 이후 의미 보존, supervisor가 실제 교착을 탐지해 briefing 또는 역할을 고치는지, 장시간 session·compaction 뒤의 목적 유지, 실제 skill 생성·유지보수 품질과 같은 계열 반복 수정의 감소량. 구조 검사는 이 행동 증거를 대신하지 않는다.
+
 ---
 
 ## 7. P2 version-5 보존 및 변경 원장

@@ -3,6 +3,7 @@
 ## Contents
 
 - Separate targets
+- Review lanes
 - Clean testing
 - Fresh downstream testing
 - Evidence authority
@@ -13,9 +14,15 @@
 
 Evaluate creator usability, generated-skill usability, and task-output quality separately. Do not let one agent/context create, consume, and grade the same artifact.
 
+## Review lanes
+
+Use an informed counterproof lane for planning and whole-result review. Give that reviewer the original purpose and intent-bearing wording, observed failures, current source and consumer relationships, confirmed facts and uncertainty, approved scope, relevant diff, and executed evidence so it can challenge the premise and the result rather than reconstructing a smaller problem from one finding.
+
+Use a blind fresh-consumer lane for trigger, adherence, generated-skill usability, and downstream handoff claims. Give it only the declared consumption set for that claim. Do not credit an informed review as evidence that a cold consumer can understand or use the result, and do not starve an informed reviewer of context in the name of freshness.
+
 ## Clean testing
 
-Use fresh contexts and provide only the raw skill, task, and input artifact. Hide intended fixes, prior failures, and expected answers. Compare with no-skill or old-skill baselines, include trigger near misses and held-out states, and inspect transcripts, tool order, evidence, and outputs.
+For blind fresh-consumer testing, use fresh contexts and provide only the raw skill, task, and declared input artifacts. Hide intended fixes, prior failures, and expected answers. Compare with no-skill or old-skill baselines, include trigger near misses and held-out states, and inspect transcripts, tool order, evidence, and outputs.
 
 P2 scenario/simulate fixtures spell unobserved values as the literal string `"UNKNOWN"` or by omission; every observation lane normalizes that raw spelling to the reserved sentinel before predicates run.
 For guard coverage, a `cover` entry `guard:<id>` is credited only when the guard predicate matched; a guard blocked on an unresolved required read is credited as `guard-pending:<id>`, and guard coverage accepts either token.
