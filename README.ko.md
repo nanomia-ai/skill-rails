@@ -1,8 +1,14 @@
-<h1 align="center">SkillRails</h1>
+<p align="center">
+  <img src="docs/assets/skillrails-wordmark.svg" alt="SkillRails" width="720" />
+</p>
+
+<br />
 
 <p align="center"><strong>AI 에이전트를 통한 Skills 개발 과정에서 발생하는 대부분의 문제를 해결합니다.</strong></p>
 
----
+<p align="center">
+  <img src="docs/assets/readme-rule.svg" alt="" width="100%" height="1" />
+</p>
 
 <p align="right"><a href="README.md">English</a> · 한국어</p>
 
@@ -51,6 +57,7 @@ flowchart LR
 ### 3. 스킬의 모든 부분을 코드화할 수 있는가?
 
 - AI 에이전트는 텍스트를 읽고 능동적으로 판단하는 데 필요한 목적, 배경과 기준을 얻습니다. Skill Rails는 그 판단을 대신하는 것이 아니라, 주요 실행 로직을 담은 스크립트를 AI 에이전트가 사용할 도구로 제공합니다.
+- 정해진 양식으로 만들어야 하는 결과물은 템플릿으로 분리합니다. 템플릿이 출력의 정확한 형태를 소유하고, 기계적으로 확인할 수 있는 부분은 스크립트와 테스트에 연결하므로 AI가 산문에서 매번 양식을 재구성하지 않아도 됩니다.
 - 코드로 확정하기 어려운 판단은 산문으로 남깁니다. 서로 다른 상황에서만 필요한 내용은 `SKILL.md`에서 연결되는 트리로 나누어, AI 에이전트가 현재 작업에 필요한 정보만 읽게 합니다.
 - Skill Rails는 스킬의 복잡도에 따라 P0부터 P2까지 가장 작은 충분한 프로필을 선택합니다. 이 숫자는 품질이나 엄격함의 등급이 아닙니다. P0는 판단 중심, P1은 판단과 스크립트의 결합, P2는 상태에 따라 다음 행동과 필요한 증거를 계산하는 구조입니다. 더 많은 기계화가 실제로 필요할 때만 다음 프로필을 사용합니다.
 

@@ -1,8 +1,14 @@
-<h1 align="center">SkillRails</h1>
+<p align="center">
+  <img src="docs/assets/skillrails-wordmark.svg" alt="SkillRails" width="720" />
+</p>
+
+<br />
 
 <p align="center"><strong>Solves most of the problems that arise when developing Skills with AI agents.</strong></p>
 
----
+<p align="center">
+  <img src="docs/assets/readme-rule.svg" alt="" width="100%" height="1" />
+</p>
 
 <p align="right">English · <a href="README.ko.md">한국어</a></p>
 
@@ -51,6 +57,7 @@ flowchart LR
 ### 3. Can every part of a skill be turned into code?
 
 - AI agents read text to obtain the purpose, background, and criteria needed for active judgment. Skill Rails does not replace that judgment. It gives the AI agent scripts containing the major execution logic as tools it can use.
+- Outputs that must follow a defined form are separated into templates. The template owns the exact output shape, while mechanically checkable parts connect to scripts and tests, so the AI does not have to reconstruct the format from prose on every use.
 - Judgment that cannot honestly be fixed in code remains in prose. Material needed only in different situations is split into a tree linked from `SKILL.md`, so the AI agent reads only the information needed for its current task.
 - Skill Rails selects the smallest sufficient profile from P0 through P2 according to the skill's complexity. These numbers are not quality or rigor grades. P0 is judgment-centered, P1 combines judgment with scripts, and P2 calculates the next action and required evidence from the current state. A higher profile is used only when more mechanization is genuinely necessary.
 
