@@ -161,6 +161,10 @@ Skill Rails is an authoring system for creating and maintaining one skill at a t
 
 The P2 runtime calculates and validates allowed actions, required evidence, and the next Decision from the current state. It does not perform the domain work itself or control the host tool's permissions.
 
+### Human-readable visualization is not implemented yet
+
+Skill Rails can distribute prose across multiple files and move some logic into code, which can make it difficult for people to see at a glance how the skill is currently structured and how it works internally. A human-readable view explaining what the prose and code are each responsible for, and how the current structure and execution flow connect, through concise text and visuals is planned, but it is not implemented yet.
+
 ## Documentation
 
 - [Skill Rails usage procedure](skills/skill-rails/SKILL.md)
