@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-08 KST (`v0.3.2` 릴리스·Codex/Claude Code 설치 완료)
+최종 갱신: 2026-09-08 KST (`v0.3.2` 배포 후 역할 활성화·재위임 경계 보정 검증 완료·원격 미반영)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: authoring 운영 하네스 보강 `v0.3.2` 릴리스·설치 완료
+## 0. 현재 위치: `v0.3.2` 릴리스·설치 완료, 역할 활성화·재위임 경계 후속 보정 검증 완료
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -34,11 +34,13 @@ v0.1.9 다음 판 `v0.2.0`(commit `e7a4f98`, validator `0.5.0`, runtime `0.3.2`,
 
 Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated tag `v0.3.2`와 `main`을 atomic push했다. Workflow run `34146283656`이 version 일치·전체 검증·GitHub Release 생성을 완료했다. 공식 installer 1.5.24로 Codex universal package와 Claude Code junction을 한 번에 갱신했고, source/install 각 62 files, diff 0, 설치본 self lint pass와 runtime `0.3.3`/validator `0.6.1`/kernel `6` 일치를 확인했다.
 
+현재 원격 미반영 후속 보정은 역할별 정체성·권한·행동이 명시적인 자연어 배정에서만 활성화되고, 역할명은 정확한 철자가 아니라 함께 부여된 책임·범위로 네 책임에 대응하도록 authoring owner를 보정한다(구현·검증 기록 6.25). 미배정 agent는 기존 host/task 역할과 공통 안전장치만 유지하며, 모든 dispatch·subagent 호출은 대상 역할과 제한된 범위를 명시한 뒤 기존 의도 보존 context를 전달한다. Runtime·validator·generator·schema·manifest·생성 package·version은 바뀌지 않는다.
+
 ## 1. 저장소 기준선
 
 - branch: `main`
 - 공식 배포 package version은 `0.3.2`(2026-09-07T17:08:18Z published, 현재 Latest)이고 annotated tag는 commit `632bb1f`를 가리킨다. Release workflow run `34146283656`과 공식 source의 Codex·Claude Code 전역 설치가 성공했다.
-- 현재 `main`은 `v0.3.2` release commit 위에 이 release·installation receipt를 기록한다. Working tree의 사용자 소유 untracked `docs/plan/`은 배포와 커밋에서 제외했다. Package와 lock version은 모두 `0.3.2`다.
+- 현재 local `main`은 역할 활성화·재위임 경계 보정 commit을 포함하고 `origin/main`은 `v0.3.2` release·installation receipt commit에 머문다. Working tree에는 사용자 소유 untracked `docs/plan/`만 남기며 package와 lock version은 모두 `0.3.2`다.
 - 현재 fingerprint는 runtime `0.3.3`, validator `0.6.1`, kernel `6`이다. 이번 후속 보정은 runtime·validator·generator·schema byte를 바꾸지 않는다.
 - `SPEC.version = "5"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 그대로다.
 
@@ -61,9 +63,9 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 
 ## 3. 현재 증거
 
-- 현재 authoring 운영 하네스 보강의 표적 회귀 1/1, self lint와 `git diff --check`가 pass했다. 회귀는 의도 표현의 세 anchor, 네 역할 구조와 기존 역할 보존, primary-agent 장기 구현 경계, self-report가 아닌 이해도 경계, 두 종료 경계와 informed/blind lane 구조만 고정하며 실제 역할 적합성은 주장하지 않는다.
-- 현재 product·공개 reference·test byte의 `npm run verify`: vendor check, self lint, repository test 78/78, frozen G0.5 eval pass.
-- 이번에 변경한 Markdown 4개의 local file link scan: 링크 8개, missing 0.
+- 현재 역할 활성화·재위임 경계 보정의 Skill Creator quick validation과 표적 회귀 1/1이 pass했다. 회귀는 명시적 배정 활성화, 자연어 역할명의 책임·범위 대응, 미배정 역할 유지, 호출 시 역할·범위 명시를 기존 authoring 구조 안에서 고정하며 실제 host·model 별칭 해석은 주장하지 않는다.
+- 현재 역할 owner·test byte의 `npm run verify`: vendor check, self lint, repository test 78/78, frozen G0.5 eval pass.
+- 현재 변경한 Markdown 3개의 local file link scan: 링크 8개, missing 0.
 - Fresh Terra high의 첫 두 미공개 계획 사례는 owner 진단·역할·모델 확인·두 검증 lane을 복원했지만 위임 context와 실제 이해도 확인을 사용자-facing 배정안에서 누락했다. 같은 실패가 두 번 반복되어 이를 `Delegation readiness`와 역할 배정의 완료 조건으로 재배치했고, 세 번째 미공개 사례는 전달 context와 실제 이해 확인 방법까지 스스로 계획했다. 한 모델·한 최종 사례의 `PARTIAL` 행동 증거이며 반복성·실제 위임 성공은 아니다.
 - Astra xhigh 구현 전 전제 검수와 Sol xhigh 전체 diff 검수를 사용했다. Sol이 역할 권장성, task/input attribution과 회귀 과잉의 세 blocker를 찾았고, 수정 후 두 차례 후속 검수는 blocker 0과 no-migration compatibility를 판정했다.
 - `v0.3.2` release workflow와 공식 NPX 설치가 성공했다. Release source와 canonical 설치본은 각각 62 files, diff 0이고 설치본 self lint가 pass했다. Codex는 universal package를 직접 사용하고 Claude Code는 같은 package를 가리키는 junction을 사용한다.
@@ -107,8 +109,8 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 
 ## 5. 정확한 다음 단계
 
-1. `v0.3.2` 제품 commit·annotated tag·GitHub Release·workflow와 Codex·Claude Code 공식 설치 receipt는 완료됐다. 같은 evidence를 위해 release나 설치를 반복하지 않는다.
+1. 역할 활성화·재위임 경계 후속 보정은 구현·검증·local commit까지 완료하고 push·release·install은 하지 않았다. 사용자의 명시적 요청 전에는 외부 경계를 넘지 않는다.
 2. Runtime·validator·generator·schema·생성 package byte가 같으므로 Devflow 아홉 P2 package를 포함한 기존 P0/P1/P2 package와 원장을 다시 빌드하거나 변환하지 않는다.
-3. 다음 검토자는 `AGENTS.md`와 이 snapshot을 읽은 뒤 구현·검증 기록 6.24의 실제 변경, 세 번의 fresh probe와 남은 `UNPROVEN`을 확인한다. 구조 pass를 여러 모델·실제 위임·장기 행동의 증거로 승격하지 않는다.
+3. 다음 검토자는 `AGENTS.md`와 이 snapshot을 읽은 뒤 구현·검증 기록 6.24–6.25의 실제 변경, 세 번의 fresh probe와 남은 `UNPROVEN`을 확인한다. 구조 pass를 여러 모델·실제 위임·장기 행동의 증거로 승격하지 않는다.
 4. 깨진 locator 중복이 같은 L16 진단을 여러 번 내는 현상은 다음 validator byte 변경 때 함께 고칠 후보로 남긴다. 유효 package 판정은 이미 같고 이번 사건의 원인도 아니므로 이것만을 위해 validator hash와 소비 코호트를 바꾸지 않는다.
 5. 기존의 prefix 효과 순차 수행과 외부 trace 위치에 대한 fresh consumer 검증도 여전히 남아 있으며, 구조 검사를 그 행동 증거로 승격하지 않는다.

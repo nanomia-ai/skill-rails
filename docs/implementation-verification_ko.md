@@ -601,6 +601,14 @@ Package와 lock version은 `0.3.2`이고 `SPEC.version = "5"`, runtime·validato
 
 계속 `UNPROVEN`: 다른 모델·host에서의 반복성, structured orchestration의 실제 역할 분리, recursive delegation의 두 번째 hop 이후 의미 보존, supervisor가 실제 교착을 탐지해 briefing 또는 역할을 고치는지, 장시간 session·compaction 뒤의 목적 유지, 실제 skill 생성·유지보수 품질과 같은 계열 반복 수정의 감소량. 구조 검사는 이 행동 증거를 대신하지 않는다.
 
+### 6.25 역할 활성화와 재위임 정체성 경계
+
+`v0.3.2` 배포 뒤 역할 예시를 읽은 agent가 명시적 배정 없이 supervisor·reviewer 권한을 자처할 가능성과, dispatch 또는 subagent 호출에 배경은 전달하면서 정작 대상 역할을 명시하지 않을 공백을 확인했다. 기존의 “배정된 역할 유지·자기 승격 금지”만으로는 자연어 역할명과 역할 활성화 조건을 직접 설명하지 못했다.
+
+공개 authoring owner는 역할별 정체성·권한·행동을 사용자 또는 위임 권한이 있는 agent가 그 대상을 해당 역할로 부르거나 배정했을 때만 활성화한다. 정확한 영문 명칭이 아니라 함께 부여된 책임과 범위로 supervisor·overseer·coordinator·worker·implementer·challenger·cross-checker·reviewer 같은 표현을 가장 가까운 네 책임에 대응시킨다. 토론에서 역할을 단순 언급한 것은 배정이 아니며, 미배정 agent는 기존 host/task 역할과 공통 authoring 안전장치만 유지한다. 전체 감독·조정으로 배정된 agent는 첫 결합 책임을 맡되 둘이 분리 배정되면 coordinator는 방향·배정·결정 경계를, supervisor는 실행·증거 감시만 맡는다.
+
+모든 dispatch와 subagent 호출은 대상의 배정 역할과 제한된 범위를 명시한 뒤 기존 의도 보존 context를 전달하며, 그 대상이 다시 위임할 때도 다음 역할·범위와 같은 핵심 배경을 반복한다. 변경 owner는 `authoring-workflow.md`와 그 의미 회귀뿐이며 runtime·validator·generator·schema·manifest·profile·version-5 경계와 기존 생성 package byte는 바뀌지 않는다. Skill Creator quick validation, 표적 authoring 회귀 1/1, `git diff --check`와 `npm run verify`의 vendor check·self lint·repository test 78/78·frozen G0.5 eval이 통과했다. 자연어 별칭과 다단 위임이 실제 host·model에서 같은 범위를 유지하는 행동은 별도 관찰 전까지 `UNPROVEN`이다.
+
 ---
 
 ## 7. P2 version-5 보존 및 변경 원장

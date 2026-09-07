@@ -72,10 +72,11 @@ test("authoring guidance preserves intent anchors, role structure, and distinct 
 
   const roles = workflow.slice(workflow.indexOf("## Role-separated work"), workflow.indexOf("## Related skill suites"));
   assert.match(roles, /recommended operating pattern.*not a mandatory topology/);
-  assert.match(roles, /already received a role[\s\S]*keeps that role[\s\S]*neither promotes it nor authorizes it to reassign/);
+  assert.match(roles, /Role-specific identity, authority, and duties activate only when[\s\S]*not exact wording[\s\S]*An unassigned agent keeps its existing host or task role[\s\S]*An assigned agent keeps its role/);
   assert.equal([...roles.matchAll(/^\d\. \*\*/gm)].length, 4, "the default remains four understandable work responsibilities");
   assert.match(roles, /Outside such an environment, the primary agent keeps the long-running implementation and whole context/);
   assert.match(roles, /### Delegation readiness[\s\S]*Prompt delivery and a claim of understanding are not evidence/);
+  assert.match(roles, /Every dispatch or subagent call must state the recipient's assigned role and bounded scope[\s\S]*If an agent delegates again, it must state the next recipient's role and scope/);
 
   assert.match(workflow, /before approving a substantive plan[\s\S]*before declaring its implementation complete[\s\S]*re-read the user's original purpose and the relevant Skill Rails guidance/);
 
