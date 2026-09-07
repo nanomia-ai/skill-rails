@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-08 KST (authoring 운영 하네스 보강 `v0.3.2` 릴리스 후보)
+최종 갱신: 2026-09-08 KST (`v0.3.2` 릴리스·Codex/Claude Code 설치 완료)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: authoring 운영 하네스 보강 `v0.3.2` 릴리스 후보 검증 완료
+## 0. 현재 위치: authoring 운영 하네스 보강 `v0.3.2` 릴리스·설치 완료
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -30,13 +30,15 @@ v0.1.9 다음 판 `v0.2.0`(commit `e7a4f98`, validator `0.5.0`, runtime `0.3.2`,
 
 `v0.3.1`은 실패 검사를 제품의 정답지로 만들지 않게 하는 저작 분기 안내, `projected`의 provenance 한계, eval 성공 caveat와 A–D 회귀만 보정한 patch다(6.23). Runtime·validator·generator·schema·생성 package byte는 바뀌지 않았다. Release-boundary commit `c0f366d1703413fa611ec8ba7f96eef93677ca46`, annotated tag와 GitHub Release `v0.3.1`, atomic push, workflow run `33886342982` success를 확인했다. 공식 NPX 설치는 Codex universal package와 Claude Code symlink를 갱신했고 release source와 설치본 diff 0, 설치본 self lint pass를 기록했다.
 
-현재 `v0.3.2` 릴리스 후보는 Skill Rails로 skill을 만들거나 유지보수할 때의 공개 authoring 운영 하네스만 보강한다(구현·검증 기록 6.24). 의도 표현 보존, 답안지가 아닌 문제 공간, 가장 작은 일관된 전체, 원인·owner·consumer 진단, 권장 네 역할과 기존 배정 역할의 보존, 환경별 장기 구현 주체, 모델 배정 확인, 재귀 context 전파와 self-report가 아닌 이해도 확인을 `authoring-workflow.md`에 통합했다. 실질적인 기획 승인 전과 구현 완료 선언 전에는 원래 목적과 관련 Skill Rails 정본을 다시 읽고 각각 전체 기획과 실제 결과를 반증한다. `evaluation.md`는 충분한 원문을 받는 informed counterproof와 선언된 소비 집합만 받는 blind fresh-consumer 검증을 분리한다. Package와 lock version만 `0.3.2`로 올렸고 runtime·validator·generator·schema·manifest·생성 package byte는 바뀌지 않았으므로 기존 package의 migration이나 rebuild는 필요 없다.
+`v0.3.2`는 Skill Rails로 skill을 만들거나 유지보수할 때의 공개 authoring 운영 하네스만 보강한다(구현·검증 기록 6.24). 의도 표현 보존, 답안지가 아닌 문제 공간, 가장 작은 일관된 전체, 원인·owner·consumer 진단, 권장 네 역할과 기존 배정 역할의 보존, 환경별 장기 구현 주체, 모델 배정 확인, 재귀 context 전파와 self-report가 아닌 이해도 확인을 `authoring-workflow.md`에 통합했다. 실질적인 기획 승인 전과 구현 완료 선언 전에는 원래 목적과 관련 Skill Rails 정본을 다시 읽고 각각 전체 기획과 실제 결과를 반증한다. `evaluation.md`는 충분한 원문을 받는 informed counterproof와 선언된 소비 집합만 받는 blind fresh-consumer 검증을 분리한다. Package와 lock version만 `0.3.2`로 올렸고 runtime·validator·generator·schema·manifest·생성 package byte는 바뀌지 않았으므로 기존 package의 migration이나 rebuild는 필요 없다.
+
+Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated tag `v0.3.2`와 `main`을 atomic push했다. Workflow run `34146283656`이 version 일치·전체 검증·GitHub Release 생성을 완료했다. 공식 installer 1.5.24로 Codex universal package와 Claude Code junction을 한 번에 갱신했고, source/install 각 62 files, diff 0, 설치본 self lint pass와 runtime `0.3.3`/validator `0.6.1`/kernel `6` 일치를 확인했다.
 
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 공식 배포 package version은 `0.3.1`(2026-09-04T14:54:05Z published, 현재 Latest)이고 annotated tag는 commit `c0f366d`를 가리킨다. release workflow run `33886342982`와 공식 source 전역 설치가 성공했다.
-- 현재 `main` HEAD와 `origin/main`은 `v0.3.1` release 계보에 있고, working tree에는 미커밋 `v0.3.2` authoring 운영 하네스 후보와 사용자가 소유한 untracked `docs/plan/`이 있다. Package와 lock version은 모두 `0.3.2`다.
+- 공식 배포 package version은 `0.3.2`(2026-09-07T17:08:18Z published, 현재 Latest)이고 annotated tag는 commit `632bb1f`를 가리킨다. Release workflow run `34146283656`과 공식 source의 Codex·Claude Code 전역 설치가 성공했다.
+- 현재 `main`은 `v0.3.2` release commit 위에 이 release·installation receipt를 기록한다. Working tree의 사용자 소유 untracked `docs/plan/`은 배포와 커밋에서 제외했다. Package와 lock version은 모두 `0.3.2`다.
 - 현재 fingerprint는 runtime `0.3.3`, validator `0.6.1`, kernel `6`이다. 이번 후속 보정은 runtime·validator·generator·schema byte를 바꾸지 않는다.
 - `SPEC.version = "5"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 그대로다.
 
@@ -64,7 +66,7 @@ v0.1.9 다음 판 `v0.2.0`(commit `e7a4f98`, validator `0.5.0`, runtime `0.3.2`,
 - 이번에 변경한 Markdown 4개의 local file link scan: 링크 8개, missing 0.
 - Fresh Terra high의 첫 두 미공개 계획 사례는 owner 진단·역할·모델 확인·두 검증 lane을 복원했지만 위임 context와 실제 이해도 확인을 사용자-facing 배정안에서 누락했다. 같은 실패가 두 번 반복되어 이를 `Delegation readiness`와 역할 배정의 완료 조건으로 재배치했고, 세 번째 미공개 사례는 전달 context와 실제 이해 확인 방법까지 스스로 계획했다. 한 모델·한 최종 사례의 `PARTIAL` 행동 증거이며 반복성·실제 위임 성공은 아니다.
 - Astra xhigh 구현 전 전제 검수와 Sol xhigh 전체 diff 검수를 사용했다. Sol이 역할 권장성, task/input attribution과 회귀 과잉의 세 blocker를 찾았고, 수정 후 두 차례 후속 검수는 blocker 0과 no-migration compatibility를 판정했다.
-- `v0.3.1` release workflow와 공식 NPX 설치가 성공했고, release source와 설치본 diff 0 및 설치본 self lint pass를 확인했다.
+- `v0.3.2` release workflow와 공식 NPX 설치가 성공했다. Release source와 canonical 설치본은 각각 62 files, diff 0이고 설치본 self lint가 pass했다. Codex는 universal package를 직접 사용하고 Claude Code는 같은 package를 가리키는 junction을 사용한다.
 - 구현 후 fresh Claude Fable xhigh 독립 감사와 교정 후 같은 세션의 closure audit가 모두 PASS했고 남은 MUST/SHOULD는 0건이다. Fresh-author 장기 이행은 행동 증거로 승격하지 않는다.
 - Markdown local link scan: 47 files, 53 local links, missing 0.
 - Local official-installer smoke: 1 skill discovered; installed 61 files; `SKILL.md` 1; forbidden repository-only file 0; source/install missing·extra·different 0; installed creator P1 generation과 lint pass.
@@ -105,7 +107,7 @@ v0.1.9 다음 판 `v0.2.0`(commit `e7a4f98`, validator `0.5.0`, runtime `0.3.2`,
 
 ## 5. 정확한 다음 단계
 
-1. 이번 authoring 운영 하네스 보강은 구현·독립 반증·표적 및 전체 검증까지 끝났지만 아직 commit·push·release·install하지 않았다. 사용자의 명시적 요청 전에는 그 경계를 넘지 않는다.
+1. `v0.3.2` 제품 commit·annotated tag·GitHub Release·workflow와 Codex·Claude Code 공식 설치 receipt는 완료됐다. 같은 evidence를 위해 release나 설치를 반복하지 않는다.
 2. Runtime·validator·generator·schema·생성 package byte가 같으므로 Devflow 아홉 P2 package를 포함한 기존 P0/P1/P2 package와 원장을 다시 빌드하거나 변환하지 않는다.
 3. 다음 검토자는 `AGENTS.md`와 이 snapshot을 읽은 뒤 구현·검증 기록 6.24의 실제 변경, 세 번의 fresh probe와 남은 `UNPROVEN`을 확인한다. 구조 pass를 여러 모델·실제 위임·장기 행동의 증거로 승격하지 않는다.
 4. 깨진 locator 중복이 같은 L16 진단을 여러 번 내는 현상은 다음 validator byte 변경 때 함께 고칠 후보로 남긴다. 유효 package 판정은 이미 같고 이번 사건의 원인도 아니므로 이것만을 위해 validator hash와 소비 코호트를 바꾸지 않는다.
