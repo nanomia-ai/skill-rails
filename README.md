@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/skillrails-wordmark.svg" alt="SkillRails" width="720" />
+  <img src="docs/assets/skillrails-wordmark.svg" alt="SkillRails" width="800" />
 </p>
 
 <br />
