@@ -633,6 +633,12 @@ Devflow Adopt의 cold-agent 실패를 생성 패키지와 동일한 runtime 0.3.
 
 구현 전 결함을 재현하고 설계를 좁힌 동일 Claude Fable high에게 전체 diff와 증거를 다시 전달했다. 같은 세션의 후속 검수는 canonical/pilot byte parity, half-update, 표적 회귀를 재확인하고 correctness blocker 0으로 PASS했다. ASK·WAIT의 resume reason을 `terminal`로 묶는 명명과 stage-result write의 non-atomic 성질은 non-blocking risk로 남겼으며, 관측된 결함을 넘어 새 상태나 저장 protocol을 만들 근거로 승격하지 않았다. Devflow 9개 P2 package의 manifest와 소비 코드를 읽기 전용으로 조사한 결과 모두 runtime 0.3.3/validator 0.6.1의 동일 cohort였고 generated runtime 밖에서 `resume/1` 또는 `next_command`를 파싱하는 소비자는 발견되지 않았다. 따라서 기존 package는 변경 없이 유지되며, 0.3.4 채택 시에만 9개를 한 cohort 변경으로 재빌드하고 nullable `resume/2` adapter 경계를 확인한다.
 
+### 6.28 package `v0.4.0` 릴리스 경계
+
+새 공개 유지보수 표면과 P2 입력 재진입 계약 교정을 package `0.3.2 → 0.4.0` minor 경계로 함께 출시한다. `maintain --describe --query [--json]`와 `--map`은 기존 package를 변경하지 않는 새 authoring 기능이고, runtime 0.3.4는 생성 P2 package가 채택할 수 있는 continuation·결과 저장·resume 계약을 바꾼다. 따라서 package patch로 축소하지 않는다. 내부 계보는 runtime `0.3.3 → 0.3.4`, validator `0.6.1 → 0.6.2`, kernel `6`이며 `SPEC.version = "5"`와 Decision·trace 핵심 스키마, closed export, effect authority는 유지한다.
+
+기존 P0/P1/P2 package는 creator-side describe를 위해 migration하거나 rebuild할 필요가 없다. Runtime 0.3.4를 실제 using-agent 경로에 채택하는 P2 package만 재빌드하며, Devflow처럼 runtime hash cohort 불변식을 가진 소비 저장소는 전체 cohort를 하나의 변경으로 갱신한다. Package와 lock version을 모두 `0.4.0`으로 맞춘 릴리스 경계에서 전체 검증과 tag-version 일치를 다시 실행한다. 공식 release·설치 receipt는 성공 뒤 현재 상태 문서에 기록하며, fresh Devflow caller-input 재진입은 실제 관찰 전까지 `UNPROVEN`이다.
+
 ---
 
 ## 7. P2 version-5 보존 및 변경 원장
