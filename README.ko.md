@@ -4,7 +4,7 @@
 
 <br />
 
-<p align="center"><strong>AI 에이전트를 통한 Skills 개발 과정에서 발생하는 대부분의 문제를 해결합니다.</strong></p>
+<p align="center"><strong>Skill Rails는 자연어로 서술된 Skill의 실행을 AI Agent가 온전히 보장하기 어렵다는 신뢰성 문제를, 기계화할 수 있는 로직을 반복 가능한 실행 구조로 전환해 해결합니다. 이를 통해 Skill 로직을 최적화하고 유지보수성을 높입니다.</strong></p>
 
 <p align="center">
   <img src="docs/assets/readme-rule.svg" alt="" width="100%" height="1" />

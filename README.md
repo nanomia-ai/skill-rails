@@ -4,7 +4,7 @@
 
 <br />
 
-<p align="center"><strong>Solves most of the problems that arise when developing Skills with AI agents.</strong></p>
+<p align="center"><strong>Skill Rails addresses a reliability problem: AI agents cannot fully guarantee that a Skill described in natural language will execute as intended. It turns logic that can be mechanized into repeatable executable structures, optimizing Skill logic and improving maintainability.</strong></p>
 
 <p align="center">
   <img src="docs/assets/readme-rule.svg" alt="" width="100%" height="1" />
