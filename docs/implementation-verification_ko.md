@@ -637,7 +637,9 @@ Devflow Adopt의 cold-agent 실패를 생성 패키지와 동일한 runtime 0.3.
 
 새 공개 유지보수 표면과 P2 입력 재진입 계약 교정을 package `0.3.2 → 0.4.0` minor 경계로 함께 출시한다. `maintain --describe --query [--json]`와 `--map`은 기존 package를 변경하지 않는 새 authoring 기능이고, runtime 0.3.4는 생성 P2 package가 채택할 수 있는 continuation·결과 저장·resume 계약을 바꾼다. 따라서 package patch로 축소하지 않는다. 내부 계보는 runtime `0.3.3 → 0.3.4`, validator `0.6.1 → 0.6.2`, kernel `6`이며 `SPEC.version = "5"`와 Decision·trace 핵심 스키마, closed export, effect authority는 유지한다.
 
-기존 P0/P1/P2 package는 creator-side describe를 위해 migration하거나 rebuild할 필요가 없다. Runtime 0.3.4를 실제 using-agent 경로에 채택하는 P2 package만 재빌드하며, Devflow처럼 runtime hash cohort 불변식을 가진 소비 저장소는 전체 cohort를 하나의 변경으로 갱신한다. Package와 lock version을 모두 `0.4.0`으로 맞춘 릴리스 경계에서 전체 검증과 tag-version 일치를 다시 실행한다. 공식 release·설치 receipt는 성공 뒤 현재 상태 문서에 기록하며, fresh Devflow caller-input 재진입은 실제 관찰 전까지 `UNPROVEN`이다.
+기존 P0/P1/P2 package는 creator-side describe를 위해 migration하거나 rebuild할 필요가 없다. Runtime 0.3.4를 실제 using-agent 경로에 채택하는 P2 package만 재빌드하며, Devflow처럼 runtime hash cohort 불변식을 가진 소비 저장소는 전체 cohort를 하나의 변경으로 갱신한다. Package와 lock version을 모두 `0.4.0`으로 맞춘 릴리스 경계에서 전체 검증과 tag-version 일치를 다시 실행한다. Fresh Devflow caller-input 재진입은 실제 관찰 전까지 `UNPROVEN`이다.
+
+Release-boundary commit `ff4ed25ce8789a3adec450b197d99a1aabf6bc24`와 annotated tag `v0.4.0`을 `git push --atomic origin main v0.4.0`으로 함께 push했다. Workflow run `34291008866`은 tag/package/lock version 일치, 의존성 설치와 전체 `npm run verify`를 통과하고 GitHub Release `v0.4.0`을 Latest로 publish했다. 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes` 설치는 Codex universal package를 갱신하고 Claude Code를 같은 경로의 junction으로 연결했다. Release source와 설치본의 `git diff --no-index --ignore-cr-at-eol`은 exit 0, 설치본 self lint는 pass였고 fingerprint는 runtime `0.3.4`, validator `0.6.2`, kernel `6`이다. Installer의 외부 security summary는 Gen Safe, Socket 1 alert, Snyk Low Risk였으며 이를 제품 행동 증거나 보안 문제 해소로 승격하지 않는다.
 
 ---
 

@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-09 KST (`v0.4.0` 릴리스 후보: 유지보수 컨텍스트와 P2 입력 재진입 교정 구현·전체 검증·제한된 실사용 검증 완료)
+최종 갱신: 2026-09-09 KST (`v0.4.0` 공식 릴리스·Codex/Claude Code 설치 완료)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: 유지보수 컨텍스트와 입력 대기 BLOCK 교정을 묶은 `v0.4.0` 릴리스 후보
+## 0. 현재 위치: 유지보수 컨텍스트와 입력 대기 BLOCK 교정을 묶은 `v0.4.0` 배포 완료
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -34,15 +34,15 @@ v0.1.9 다음 판 `v0.2.0`(commit `e7a4f98`, validator `0.5.0`, runtime `0.3.2`,
 
 Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated tag `v0.3.2`와 `main`을 atomic push했다. Workflow run `34146283656`이 version 일치·전체 검증·GitHub Release 생성을 완료했다. 공식 installer 1.5.24로 Codex universal package와 Claude Code junction을 한 번에 갱신했고, source/install 각 62 files, diff 0, 설치본 self lint pass와 runtime `0.3.3`/validator `0.6.1`/kernel `6` 일치를 확인했다.
 
-`v0.4.0` 릴리스 후보는 기존 package의 산문·코드·fixture·manifest·원장을 현재 byte에서 함께 캡처해 사람용 map과 AI용 source-linked causal capsule로 투영한다(구현·검증 기록 6.26). 별도 저장 graph나 수동 인과 정본은 만들지 않고, status·gap·source basis·resume query를 함께 제공해 일부 결과를 전체로 오인하지 않게 한다. Describe는 target code를 실행하지 않으며 P0/P1/P2·unmanaged·invalid package를 read-only로 다룬다. 기존 생성 skill의 정상 실행 경로는 바뀌지 않는다.
+`v0.4.0`은 기존 package의 산문·코드·fixture·manifest·원장을 현재 byte에서 함께 캡처해 사람용 map과 AI용 source-linked causal capsule로 투영한다(구현·검증 기록 6.26). 별도 저장 graph나 수동 인과 정본은 만들지 않고, status·gap·source basis·resume query를 함께 제공해 일부 결과를 전체로 오인하지 않게 한다. Describe는 target code를 실행하지 않으며 P0/P1/P2·unmanaged·invalid package를 read-only로 다룬다. 기존 생성 skill의 정상 실행 경로는 바뀌지 않는다.
 
-같은 후보의 P2 runtime 0.3.4는 Devflow Adopt에서 현실화된 입력 대기 BLOCK의 저장·재진입 공백을 공통 owner에서 닫는다(구현·검증 기록 6.27). `after-input`은 effect-free BLOCK의 non-empty needs가 모두 caller-supplied일 때만 파생되고, traced stage는 UTF-8 결과 파일을 자동 저장하며, `resume/2`는 값 없는 명령을 제시하지 않는다. observed/mixed/terminal BLOCK, duplicate guard, stale·after-effects continuation, evidence authority와 `SPEC.version = "5"`는 보존한다.
+같은 릴리스의 P2 runtime 0.3.4는 Devflow Adopt에서 현실화된 입력 대기 BLOCK의 저장·재진입 공백을 공통 owner에서 닫는다(구현·검증 기록 6.27). `after-input`은 effect-free BLOCK의 non-empty needs가 모두 caller-supplied일 때만 파생되고, traced stage는 UTF-8 결과 파일을 자동 저장하며, `resume/2`는 값 없는 명령을 제시하지 않는다. observed/mixed/terminal BLOCK, duplicate guard, stale·after-effects continuation, evidence authority와 `SPEC.version = "5"`는 보존한다.
 
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 공식 배포 package version은 `0.3.2`(2026-09-07T17:08:18Z published, 현재 Latest)이고 annotated tag는 commit `632bb1f`를 가리킨다. Release workflow run `34146283656`과 공식 source의 Codex·Claude Code 전역 설치가 성공했다.
-- 현재 local `main`과 `origin/main`은 maintenance-context commit `cea279c`와 P2 입력 재진입 교정 commit `7e15362`를 함께 포함한다. 사용자 소유 `.gitignore` 변경과 `docs/plan/`은 릴리스 범위에서 제외한다. Package와 lock version은 `0.4.0` 릴리스 후보로 맞췄다.
+- 공식 배포 package version은 `0.4.0`(2026-09-09 KST published, 현재 Latest)이고 annotated tag는 release-boundary commit `ff4ed25`를 가리킨다. Release workflow run `34291008866`이 version 일치·전체 검증·GitHub Release 생성을 성공했고 공식 NPX 명령으로 Codex universal package와 Claude Code junction을 갱신했다.
+- Package와 lock version은 `0.4.0`이다. 사용자 소유 `.gitignore` 변경과 `docs/plan/`은 release commit과 설치에 포함하지 않았다.
 - 현재 fingerprint는 runtime `0.3.4`, validator `0.6.2`, kernel `6`이다. L16 locator universe는 그대로이고 P2 runtime은 기존 needs에서 `after-input`을 파생한다.
 - `SPEC.version = "5"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 그대로다.
 
@@ -76,7 +76,7 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 - 설치된 GitHub `main` 소스로 수행한 Orca 실제 사용에서는 fresh Codex Sol이 새 P1 skill을 생성한 뒤 map과 exact-owner query를 사용해 intent-only 유지보수를 완료했다. 변경 전후 source basis가 달라졌고 정확 owner query는 `closed`, gap 0을 반환했으며 helper·test hash와 생성물 소유 경계가 보존됐다. 별도 fresh consumer의 trigger·adherence 검증은 실행하지 않아 behavior는 계속 `unproven`, release readiness는 `forward-test-required`다.
 - Fresh Terra high의 첫 두 미공개 계획 사례는 owner 진단·역할·모델 확인·두 검증 lane을 복원했지만 위임 context와 실제 이해도 확인을 사용자-facing 배정안에서 누락했다. 같은 실패가 두 번 반복되어 이를 `Delegation readiness`와 역할 배정의 완료 조건으로 재배치했고, 세 번째 미공개 사례는 전달 context와 실제 이해 확인 방법까지 스스로 계획했다. 한 모델·한 최종 사례의 `PARTIAL` 행동 증거이며 반복성·실제 위임 성공은 아니다.
 - Astra xhigh 구현 전 전제 검수와 Sol xhigh 전체 diff 검수를 사용했다. Sol이 역할 권장성, task/input attribution과 회귀 과잉의 세 blocker를 찾았고, 수정 후 두 차례 후속 검수는 blocker 0과 no-migration compatibility를 판정했다.
-- `v0.3.2` release workflow와 공식 NPX 설치가 성공했다. Release source와 canonical 설치본은 각각 62 files, diff 0이고 설치본 self lint가 pass했다. Codex는 universal package를 직접 사용하고 Claude Code는 같은 package를 가리키는 junction을 사용한다.
+- `v0.4.0` release workflow와 공식 NPX 설치가 성공했다. Release source와 canonical 설치본의 newline-insensitive diff는 0이고 설치본 self lint가 pass했다. 설치 fingerprint는 runtime `0.3.4`/validator `0.6.2`/kernel `6`이다. Codex는 universal package를 직접 사용하고 Claude Code는 같은 package를 가리키는 junction을 사용한다.
 - 구현 후 fresh Claude Fable xhigh 독립 감사와 교정 후 같은 세션의 closure audit가 모두 PASS했고 남은 MUST/SHOULD는 0건이다. Fresh-author 장기 이행은 행동 증거로 승격하지 않는다.
 - Markdown local link scan: 47 files, 53 local links, missing 0.
 - Local official-installer smoke: 1 skill discovered; installed 61 files; `SKILL.md` 1; forbidden repository-only file 0; source/install missing·extra·different 0; installed creator P1 generation과 lint pass.
@@ -113,14 +113,12 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 - `v0.1.8`의 변경된 표면(interior-space path domain, quoted `--artifact`)에 대한 fresh-agent 소비 행동은 `UNPROVEN`이다. 이번 release는 tag·push·GitHub Release·전역 설치·설치본 diff/lint/fingerprint 재확인까지 완료했지만 fresh-agent behavior 증거를 새로 만들지 않는다.
 - 새 authoring 운영 하네스의 다른 모델·host 반복성, structured orchestration의 실제 역할 분리, recursive delegation 두 번째 hop 이후 의미 보존, supervisor의 실제 교착 탐지·briefing 교정·역할 재배치, long-session/compaction 유지와 실제 skill 품질 향상량은 `UNPROVEN`이다.
 - Maintenance-context의 다른 모델·host 반복성, 장기 session·compaction 재진입, 대형 Devflow package에서의 출력 비용과 실제 오수정 감소량, capture 중 외부 write, 모든 의미 관계의 완전성은 `UNPROVEN`이다. `complete-for-declared-scope`와 partial catalog를 전체 package의 의미적 완전성으로 승격하지 않는다.
-- 후보 runtime 0.3.4 bootstrap을 처음 보는 fresh agent가 caller-input BLOCK을 실제로 저장하고 값 없는 retry 없이 재평가하는 행동은 실사용 관찰 전까지 `UNPROVEN`이다.
+- 배포된 runtime 0.3.4 bootstrap을 처음 보는 fresh agent가 caller-input BLOCK을 실제로 저장하고 값 없는 retry 없이 재평가하는 행동은 실사용 관찰 전까지 `UNPROVEN`이다.
 
 ---
 
 ## 5. 정확한 다음 단계
 
-1. Package와 lock version `0.4.0`을 포함한 릴리스 경계에서 `npm run verify`와 tag-version 일치를 다시 확인한다.
-2. 사용자 소유 `.gitignore`와 `docs/plan/`을 제외한 릴리스 commit을 만들고 annotated tag `v0.4.0`과 `main`을 atomic push한다.
-3. GitHub Release workflow 성공 뒤 공식 NPX 명령으로 Codex·Claude Code 설치를 갱신하고 source/install parity, self lint와 runtime `0.3.4`·validator `0.6.2`·kernel `6`을 확인한다.
-4. 기존 Devflow package는 describe를 위해 migration하거나 rebuild하지 않는다. Runtime 0.3.4를 채택할 때만 9-package cohort를 한 변경에서 재빌드한다.
-5. Fresh Devflow caller-input BLOCK 실제 재진입은 배포 뒤 별도 실사용 검증 전까지 `UNPROVEN`으로 유지한다.
+1. 기존 Devflow package는 describe를 위해 migration하거나 rebuild하지 않는다. 현재 배포된 Skill Rails로 current-source maintenance context를 바로 사용할 수 있다.
+2. Devflow가 runtime 0.3.4를 채택할 때만 9-package cohort를 한 별도 변경에서 재빌드하고 nullable `resume/2` adapter 경계를 확인한다.
+3. Fresh Devflow caller-input BLOCK 실제 재진입은 별도 실사용 검증 전까지 `UNPROVEN`으로 유지한다.
