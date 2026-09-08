@@ -61,7 +61,8 @@ test("human-only documentation stays outside installed skill routing", async () 
 });
 
 test("authoring guidance preserves intent anchors, role structure, and distinct review lanes", async () => {
-  const [workflow, evaluation] = await Promise.all([
+  const [entry, workflow, evaluation] = await Promise.all([
+    readFile(join(SKILL_ROOT, "SKILL.md"), "utf8"),
     readFile(join(SKILL_ROOT, "references", "authoring-workflow.md"), "utf8"),
     readFile(join(SKILL_ROOT, "references", "evaluation.md"), "utf8")
   ]);
@@ -79,6 +80,11 @@ test("authoring guidance preserves intent anchors, role structure, and distinct 
   assert.match(roles, /Every dispatch or subagent call must state the recipient's assigned role and bounded scope[\s\S]*If an agent delegates again, it must state the next recipient's role and scope/);
 
   assert.match(workflow, /before approving a substantive plan[\s\S]*before declaring its implementation complete[\s\S]*re-read the user's original purpose and the relevant Skill Rails guidance/);
+  assert.match(entry, /already-existing target skill package[\s\S]*read-only `--describe` view of current bytes[\s\S]*New-skill creation still begins from intent/);
+  assert.match(workflow, /without importing or executing its spec, collectors, or helpers/);
+  assert.match(workflow, /navigation, not full validation, runtime admission, execution proof, consumer completeness, or deletion safety/);
+  assert.match(workflow, /--describe --map[\s\S]*same captured source model, not another maintained document/);
+  assert.match(workflow, /re-run the saved invocation at both boundaries against current bytes/);
 
   assert.match(evaluation, /## Review lanes/);
   assert.match(evaluation, /Do not credit an informed review as evidence that a cold consumer/);

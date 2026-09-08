@@ -30,7 +30,6 @@ export async function resolveTemplate(skillRoot, id, declaration, bodyMarkdown =
 
 export function validateTemplateDeclaration(id, declaration, text) {
   const diagnostics = [];
-  if (declaration.example === true) return diagnostics;
   const fields = declaration.fields ?? {};
   const declared = Object.keys(fields).sort();
   const actual = [...new Set(placeholderNames(text))].sort();

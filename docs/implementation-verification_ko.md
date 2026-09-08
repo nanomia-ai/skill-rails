@@ -609,9 +609,36 @@ Package와 lock version은 `0.3.2`이고 `SPEC.version = "5"`, runtime·validato
 
 모든 dispatch와 subagent 호출은 대상의 배정 역할과 제한된 범위를 명시한 뒤 기존 의도 보존 context를 전달하며, 그 대상이 다시 위임할 때도 다음 역할·범위와 같은 핵심 배경을 반복한다. 변경 owner는 `authoring-workflow.md`와 그 의미 회귀뿐이며 runtime·validator·generator·schema·manifest·profile·version-5 경계와 기존 생성 package byte는 바뀌지 않는다. Skill Creator quick validation, 표적 authoring 회귀 1/1, `git diff --check`와 `npm run verify`의 vendor check·self lint·repository test 78/78·frozen G0.5 eval이 통과했다. 자연어 별칭과 다단 위임이 실제 host·model에서 같은 범위를 유지하는 행동은 별도 관찰 전까지 `UNPROVEN`이다.
 
+### 6.26 현재 원본에서 재구성하는 사람·AI 유지보수 컨텍스트
+
+이번 후보는 Skill Rails로 만들어진 skill이 산문, `spec.mjs`, collector, fixture, manifest와 생성 projection으로 갈라진 뒤 사람이 전체를 다시 역산해야 하고 AI가 일부 검색 결과를 전체로 오인할 수 있는 문제를 다룬다. 사람용 설명과 AI용 정밀 인덱스를 서로 대체하지 않는다. 대신 별도 graph database나 수동 causal ledger를 두지 않고, **대상 package의 현재 byte에서 한 번 캡처한 읽기 전용 maintenance-context 하나**를 매 호출마다 재구성해 두 표면으로 투영한다. `--describe --query ... [--json]`은 근거와 source identity가 붙은 역할형 causal capsule을, `--describe --map`은 같은 model의 사람용 stdout preview를 낸다. map은 저장 정본이나 완전성 증명이 아니다.
+
+AI 표면은 목적·profile·현재 source basis, 선택된 requirement/owner/consumer/evidence, exact source span과 raw hash, 다음 read/change/verify, 재진입 query를 함께 준다. 동시에 `complete-for-declared-scope`만 주장하고 동적 collector, package 밖 receipt, external/project path 같은 frontier를 먼저 드러낸다. 찾지 못한 query는 유한한 native locator 집합 안의 absence와 extractor가 지원하지 않는 unknown을 구분한다. 자연어 query는 공백·`_`·`-`·`:`·`.`·slash 변형을 탐색 편의상 정규화하지만 원래 query, match basis와 복수 match를 보존한다. 정확한 native locator는 그 정규화를 거치지 않는다. 전체 catalog와 inventory는 필요할 때 명시적으로 확장하며, 기본 capsule을 전체 package의 정답지로 과장하지 않는다.
+
+구현 owner는 `scripts/lib/maintenance-context.mjs` 하나이고 CLI mode 경계는 `scripts/maintain.mjs`, L16 locator 해석 정본은 `scripts/runtime/authoring-ledger.mjs`가 소유한다. describe는 대상 `spec.mjs`, collector, helper를 import하거나 실행하지 않고 UTF-16 offset·node kind·캡처 raw hash로 source identity를 만든다. parse나 manifest 문제가 있어도 가능한 inventory와 gap을 반환하며 구조 추출을 full validation이나 fresh-agent behavior로 승격하지 않는다. P0·P1·P2와 unmanaged/invalid fixture가 모두 read-only 진단 대상이다. 기존 package는 migration이나 rebuild 없이 describe할 수 있다.
+
+공개 진입은 기존 `SKILL.md`의 Maintenance route 안에만 추가했다. 기존 package의 이해·진단·재개·변경은 먼저 describe할 수 있고, 새 skill 생성은 계속 intent-first다. 기획 승인과 구현 완료의 기존 전체 대조 checkpoint에서는 저장한 query를 현재 source basis로 다시 실행한다. 생성된 skill을 정상 사용하려는 agent의 bootstrap이나 runtime path에는 maintenance 명령을 넣지 않았다. 별도 정상사용 fresh control은 target `SKILL.md`에서 `enter`와 verify route만 따라 `UNPROVEN`을 판정했고 maintenance surface를 열지 않아 비개입을 관찰했다.
+
+회귀는 새 `tests/maintenance-context.test.mjs` 12/12에서 P2 causal capsule, finite absence/unknown, 자연어 복수 match와 명시적 cut, 악성·invalid target 비실행, JSON source span, bounded reverse consumer, P0/P1 projection ownership, comment가 아닌 AST module edge, CLI mode 배타성과 compact JSON·legacy diagnose, map, 공개 resolver의 기존 L16 universe, 정적으로 해석할 수 없는 선언 관계의 fail-closed 차단을 확인한다. 전체 `npm run verify`는 vendor check, self lint, repository test 90/90와 frozen G0.5 eval을 통과했다. canonical pilot의 `--repeats 50` rebuild는 L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, manifest 15 content + 38 generated = 53, build ID `sha256:4f81126091d6e47aa319cd5b048a3d1b3ddc113d5930e525d818ca6543f196bd`를 기록했다.
+
+두 번의 blind fresh-maintainer 관찰은 공개 `SKILL.md`와 일반 task만 받고 Maintenance route와 describe를 발견했다. 첫 관찰의 자연어 miss와 과대 출력은 같은 agent가 수정 후 재실행해 복수 match·부분 catalog·resume 경계를 확인했고, 두 번째 독립 관찰에서 출력 truncation이 드러나 ledger file-hub fan-out과 inventory를 줄인 뒤 같은 agent가 다시 실행해 목적, requirement, owning stage, fixture, source basis, gap과 다음 exact query를 보존하면서 truncation이 사라졌음을 확인했다. 이는 발견성과 한 package의 제한된 인과 추적에 대한 `PARTIAL` 증거다. 다른 모델·host, 장기 session/compaction, 대형 Devflow package, capture 중 외부 write, 실제 오수정 감소량, 모든 의미 관계의 완전성은 계속 `UNPROVEN`이다.
+
 ---
 
 ## 7. P2 version-5 보존 및 변경 원장
+
+### 7.-0 2026-09-09 유지보수 locator 관측 표면 추가 (validator 0.6.2)
+
+`resolveSpecLocator(spec, path)`를 authoring-ledger의 공개 pure resolver로 추출했다. 기존 `locatorExists`도 이 결과의 `resolved`만 사용하므로 L16이 인정하는 group과 arity, 진단 의미는 바뀌지 않는다. 유지보수 model은 이 resolver를 정본으로 재사용하며 별도 locator 문법을 복제하지 않는다.
+
+| 변경 | 호환성 영향 | 근거와 증거 |
+| --- | --- | --- |
+| L16 locator resolver | boolean 내부 판정을 `{ recognized, shape, resolved, group, first, second, value }`로 관측 가능하게 export | validator가 이미 판정하던 구조를 읽기 전용으로 노출한다. 전체 기존 locator universe 회귀가 동일 인정을 고정한다 |
+| validator version | `0.6.1 → 0.6.2` | export와 validator byte가 바뀌므로 patch를 올린다. runtime은 `0.3.3`, kernel은 `6` 유지 |
+| 기존 P0/P1/P2 package | 수정·migration·rebuild 없이 creator-side describe 가능 | inspector가 target code를 import·execute하지 않고 현재 파일을 캡처한다 |
+| 재빌드한 package | `validator_hash`와 공유 runtime projection byte가 현재 creator 정본으로 갱신 | `SPEC.version = "5"`, 14 closed exports, L0–L18 의미, Decision/Trace schema, effect authority와 using-agent 소비 경로는 그대로다 |
+
+Canonical pilot은 새 resolver와 validator 0.6.2를 생성 projection에 봉인하기 위해 builder로 재생성했다. 이것은 maintenance-context 자체를 generated loader에 넣은 것이 아니다. 기존 package를 describe하기 위한 재생성 요구는 0이며, 소비 저장소가 cohort hash 일치를 자체 불변식으로 요구할 때만 그 저장소의 별도 채택 결정이 필요하다.
 
 ### 7.-1 2026-09-04 생성 시작점·소비 파일 정직성 보정 (validator 0.5.0)
 

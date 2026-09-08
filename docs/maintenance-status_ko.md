@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-08 KST (`v0.3.2` 배포 후 역할 활성화·재위임 경계 보정 검증 완료·원격 미반영)
+최종 갱신: 2026-09-09 KST (`v0.3.2` 위 creator-side maintenance context 구현·전체 검증 완료, 최종 교차 검토 중·원격 미반영)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: `v0.3.2` 릴리스·설치 완료, 역할 활성화·재위임 경계 후속 보정 검증 완료
+## 0. 현재 위치: `v0.3.2` 릴리스 위 유지보수 컨텍스트 후보 구현·전체 검증 완료
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -34,14 +34,14 @@ v0.1.9 다음 판 `v0.2.0`(commit `e7a4f98`, validator `0.5.0`, runtime `0.3.2`,
 
 Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated tag `v0.3.2`와 `main`을 atomic push했다. Workflow run `34146283656`이 version 일치·전체 검증·GitHub Release 생성을 완료했다. 공식 installer 1.5.24로 Codex universal package와 Claude Code junction을 한 번에 갱신했고, source/install 각 62 files, diff 0, 설치본 self lint pass와 runtime `0.3.3`/validator `0.6.1`/kernel `6` 일치를 확인했다.
 
-현재 원격 미반영 후속 보정은 역할별 정체성·권한·행동이 명시적인 자연어 배정에서만 활성화되고, 역할명은 정확한 철자가 아니라 함께 부여된 책임·범위로 네 책임에 대응하도록 authoring owner를 보정한다(구현·검증 기록 6.25). 미배정 agent는 기존 host/task 역할과 공통 안전장치만 유지하며, 모든 dispatch·subagent 호출은 대상 역할과 제한된 범위를 명시한 뒤 기존 의도 보존 context를 전달한다. Runtime·validator·generator·schema·manifest·생성 package·version은 바뀌지 않는다.
+현재 원격 미반영 후보는 기존 package의 산문·코드·fixture·manifest·원장을 현재 byte에서 함께 캡처해 사람용 map과 AI용 source-linked causal capsule로 투영한다(구현·검증 기록 6.26). 별도 저장 graph나 수동 인과 정본은 만들지 않고, status·gap·source basis·resume query를 함께 제공해 일부 결과를 전체로 오인하지 않게 한다. Describe는 target code를 실행하지 않으며 P0/P1/P2·unmanaged·invalid package를 read-only로 다룬다. 기존 생성 skill의 정상 실행 경로는 바뀌지 않는다.
 
 ## 1. 저장소 기준선
 
 - branch: `main`
 - 공식 배포 package version은 `0.3.2`(2026-09-07T17:08:18Z published, 현재 Latest)이고 annotated tag는 commit `632bb1f`를 가리킨다. Release workflow run `34146283656`과 공식 source의 Codex·Claude Code 전역 설치가 성공했다.
-- 현재 local `main`은 역할 활성화·재위임 경계 보정 commit을 포함하고 `origin/main`은 `v0.3.2` release·installation receipt commit에 머문다. Working tree에는 사용자 소유 untracked `docs/plan/`만 남기며 package와 lock version은 모두 `0.3.2`다.
-- 현재 fingerprint는 runtime `0.3.3`, validator `0.6.1`, kernel `6`이다. 이번 후속 보정은 runtime·validator·generator·schema byte를 바꾸지 않는다.
+- 현재 local `main`과 `origin/main`은 모두 `a4e3c4e`다. Working tree에는 사용자가 이미 가지고 있던 `.gitignore` 변경과 `docs/plan/`, 이번 maintenance-context 구현·문서·test 및 builder로 재생성한 canonical pilot이 함께 있다. 이번 후보는 commit되지 않았다. Package와 lock version은 `0.3.2`다.
+- 현재 fingerprint는 runtime `0.3.3`, validator `0.6.2`, kernel `6`이다. L16 locator 해석 정본을 structured pure resolver로 노출해 validator byte와 generated projection이 바뀌었지만 인정하는 locator universe는 그대로다.
 - `SPEC.version = "5"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 그대로다.
 
 ---
@@ -58,14 +58,16 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 - Optional public `targetPath`/`--target`을 portable project-relative path로 정규화하고 lexical·realpath containment 뒤 collector와 custom `snapshotBasis`에만 전달한다. Traced `decision_emitted.data.targetPath`와 CLI `resume`은 normalized target을 연속 투영하며 target이 없을 때 기존 shape를 유지한다.
 - Unknown read로 guard가 멈출 때 evaluator는 `guard_matched.pending_reads`를 내고 build coverage는 `guard-pending:<id>`로 구분한다. L14는 실제 predicate match와 pending-read block을 각각 대응하는 token으로만 인정한다.
 - 공개 `path` domain이 내부 U+0020 공백 하나를 허용하도록 넓어졌고, 생성 loader의 `--artifact <path>` 예시가 `--artifact "<path>"`로 quote됐다(`v0.1.8`).
+- 기존 package를 변경하지 않고 현재 원본에서 목적·owner·consumer·evidence·frontier를 재구성하는 `maintain --describe`와 `--query [--json]`, 같은 model의 사람용 `--map` preview를 추가했다. 출력은 `complete-for-declared-scope`만 주장하고 source identity·gap·재진입 명령을 함께 제공한다.
 
 ---
 
 ## 3. 현재 증거
 
-- 현재 역할 활성화·재위임 경계 보정의 Skill Creator quick validation과 표적 회귀 1/1이 pass했다. 회귀는 명시적 배정 활성화, 자연어 역할명의 책임·범위 대응, 미배정 역할 유지, 호출 시 역할·범위 명시를 기존 authoring 구조 안에서 고정하며 실제 host·model 별칭 해석은 주장하지 않는다.
-- 현재 역할 owner·test byte의 `npm run verify`: vendor check, self lint, repository test 78/78, frozen G0.5 eval pass.
-- 현재 변경한 Markdown 3개의 local file link scan: 링크 8개, missing 0.
+- 현재 maintenance-context 표적 회귀 12/12가 pass했다. P2 causal capsule, finite absence와 unknown, 자연어 match cut, invalid·악성 target 비실행, JSON source span, bounded reverse consumer, P0/P1 projection ownership, AST module edge, CLI mode 배타성·compact JSON·legacy diagnose, map, 기존 L16 locator universe와 정적으로 해석할 수 없는 선언 관계의 fail-closed 차단을 고정한다.
+- 현재 전체 `npm run verify`: vendor check, self lint, repository test 90/90, frozen G0.5 eval pass.
+- Canonical pilot rebuild: runtime `0.3.3`, validator `0.6.2`, kernel `6`; L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, manifest 15 content + 38 generated = 53, build ID `sha256:4f81126091d6e47aa319cd5b048a3d1b3ddc113d5930e525d818ca6543f196bd`.
+- 두 blind fresh-maintainer가 공개 route와 describe를 발견했다. 같은 agent와 수정·재실행을 반복해 자연어 miss, 과대 fan-out과 truncation을 줄였고, 최종 관찰은 목적·requirement·owner stage·fixture·source basis·gap·resume을 보존했다. 별도 normal-use control은 생성 skill의 runtime route만 사용해 maintenance surface 비개입을 관찰했다. 모두 제한된 `PARTIAL` 행동 증거다.
 - Fresh Terra high의 첫 두 미공개 계획 사례는 owner 진단·역할·모델 확인·두 검증 lane을 복원했지만 위임 context와 실제 이해도 확인을 사용자-facing 배정안에서 누락했다. 같은 실패가 두 번 반복되어 이를 `Delegation readiness`와 역할 배정의 완료 조건으로 재배치했고, 세 번째 미공개 사례는 전달 context와 실제 이해 확인 방법까지 스스로 계획했다. 한 모델·한 최종 사례의 `PARTIAL` 행동 증거이며 반복성·실제 위임 성공은 아니다.
 - Astra xhigh 구현 전 전제 검수와 Sol xhigh 전체 diff 검수를 사용했다. Sol이 역할 권장성, task/input attribution과 회귀 과잉의 세 blocker를 찾았고, 수정 후 두 차례 후속 검수는 blocker 0과 no-migration compatibility를 판정했다.
 - `v0.3.2` release workflow와 공식 NPX 설치가 성공했다. Release source와 canonical 설치본은 각각 62 files, diff 0이고 설치본 self lint가 pass했다. Codex는 universal package를 직접 사용하고 Claude Code는 같은 package를 가리키는 junction을 사용한다.
@@ -104,13 +106,14 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 - v0.1.7/v0.1.8 설치본 creator의 새 package 생성·실행은 `UNPROVEN`이다. Downstream Devflow 아홉 package는 v0.3.0 builder로 재빌드되어 validator `0.6.1`/runtime `0.3.3`을 봉인했다(Devflow commit `2eca653`); 그 fresh-agent 실행 행동은 여전히 `UNPROVEN`이다.
 - `v0.1.8`의 변경된 표면(interior-space path domain, quoted `--artifact`)에 대한 fresh-agent 소비 행동은 `UNPROVEN`이다. 이번 release는 tag·push·GitHub Release·전역 설치·설치본 diff/lint/fingerprint 재확인까지 완료했지만 fresh-agent behavior 증거를 새로 만들지 않는다.
 - 새 authoring 운영 하네스의 다른 모델·host 반복성, structured orchestration의 실제 역할 분리, recursive delegation 두 번째 hop 이후 의미 보존, supervisor의 실제 교착 탐지·briefing 교정·역할 재배치, long-session/compaction 유지와 실제 skill 품질 향상량은 `UNPROVEN`이다.
+- Maintenance-context의 다른 모델·host 반복성, 장기 session·compaction 재진입, 대형 Devflow package에서의 출력 비용과 실제 오수정 감소량, capture 중 외부 write, 모든 의미 관계의 완전성은 `UNPROVEN`이다. `complete-for-declared-scope`와 partial catalog를 전체 package의 의미적 완전성으로 승격하지 않는다.
 
 ---
 
 ## 5. 정확한 다음 단계
 
-1. 역할 활성화·재위임 경계 후속 보정은 구현·검증·local commit까지 완료하고 push·release·install은 하지 않았다. 사용자의 명시적 요청 전에는 외부 경계를 넘지 않는다.
-2. Runtime·validator·generator·schema·생성 package byte가 같으므로 Devflow 아홉 P2 package를 포함한 기존 P0/P1/P2 package와 원장을 다시 빌드하거나 변환하지 않는다.
-3. 다음 검토자는 `AGENTS.md`와 이 snapshot을 읽은 뒤 구현·검증 기록 6.24–6.25의 실제 변경, 세 번의 fresh probe와 남은 `UNPROVEN`을 확인한다. 구조 pass를 여러 모델·실제 위임·장기 행동의 증거로 승격하지 않는다.
-4. 깨진 locator 중복이 같은 L16 진단을 여러 번 내는 현상은 다음 validator byte 변경 때 함께 고칠 후보로 남긴다. 유효 package 판정은 이미 같고 이번 사건의 원인도 아니므로 이것만을 위해 validator hash와 소비 코호트를 바꾸지 않는다.
-5. 기존의 prefix 효과 순차 수행과 외부 trace 위치에 대한 fresh consumer 검증도 여전히 남아 있으며, 구조 검사를 그 행동 증거로 승격하지 않는다.
+1. 기존 informed 설계 검증자에게 최초 목적, 승인된 설계, 전체 diff, 실행 증거와 fresh simulation을 다시 전달하고 같은 검증자와 이견을 왕복해 whole-result 결론을 좁힌다.
+2. blocker가 나오면 owning abstraction에서 수정하고 표적·전체 검증을 다시 실행한다. 구조 pass나 한 fresh run을 여러 모델·host·장기 행동 증거로 승격하지 않는다.
+3. blocker가 없으면 실제 Devflow capability 하나에서 직접 탐색(A)과 source-linked context(B)를 bounded 비교한다. 이 비교 전에는 stored index, default generated handoff나 새 causal schema를 제품화하지 않는다.
+4. 기존 package는 describe를 위해 migration하거나 rebuild하지 않는다. Validator cohort hash 일치를 별도 불변식으로 요구하는 소비 저장소만 자체 채택 결정 뒤 한 경계에서 재빌드한다.
+5. Commit·push·release·install은 사용자가 명시적으로 요청하기 전에는 수행하지 않는다.

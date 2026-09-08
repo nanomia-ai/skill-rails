@@ -11,6 +11,8 @@ Work on one target skill at a time and select its profile independently, never f
 
 Before running a bundled script, resolve `<skill-root>` to the directory containing this `SKILL.md`. Use the host's discovered skill path when it exposes one. In Claude Code use `${CLAUDE_SKILL_DIR}`; in Codex use the absolute path supplied with the available-skill metadata. On another file-based host, resolve the active `SKILL.md` location before running a command. Never resolve scripts relative to the user's working project, and stop if the host does not expose a stable skill location.
 
+When the task is to understand, diagnose, resume, or change an already-existing target skill package, read the Maintenance section of [authoring-workflow.md](references/authoring-workflow.md) and begin from its read-only `--describe` view of current bytes. New-skill creation still begins from intent; it has no target package to describe.
+
 1. Capture or update an intent brief from [intent-brief.json](templates/intent-brief.json); its eleven requirement fields are the input contract. A `judgment_points` entry may remain an always-visible string or declare an independently routed `{ id, when, points }` topic. Read [authoring-workflow.md](references/authoring-workflow.md) for creation or maintenance.
 2. Choose the smallest sufficient profile: P0 for judgment-only guidance, P1 for exact formats or deterministic helpers without stateful branching, or P2 for repeated state-dependent guards, stages, ordered effects, and evidence gates.
 3. For P2 work, read [p2-contract.md](references/p2-contract.md). Keep `spec.mjs` as the only behavior source and keep judgment in `body.md`. Its `SPEC.version = "5"` lineage is a compatibility boundary, not the Skill Rails package version.

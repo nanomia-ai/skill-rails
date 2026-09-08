@@ -91,8 +91,9 @@ async function stageSkillOnce({ skillRoot, projectRoot, targetPath = null, judge
   const end = await captureSnapshot(project, registry.snapshotBasis, targetContext);
   const snapshot = compareSnapshots(start, end);
   if (traceDir) {
-    // Trace storage may intentionally live under the project. Record only after
-    // the end snapshot so the runtime's own evidence cannot make the domain stale.
+    // Trace storage belongs outside the project, and the generated instruction says so; a caller
+    // may still place it anywhere. Record only after the end snapshot either way, so the runtime's
+    // own evidence cannot make the domain stale.
     await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "spec_loaded", authority: "runtime_observed", spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: start.fingerprint, data: { skill: loaded.spec.SPEC.id } });
     await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "snapshot_started", authority: "runtime_observed", spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: start.fingerprint, data: { basis: start.material?.kind ?? "custom" } });
     for (const event of observationTraceEvents(loaded, observations, snapshot)) await appendTraceEvent(traceDir, { ...event, run_id: effectiveRunId });

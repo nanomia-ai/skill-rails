@@ -2,7 +2,7 @@
 
 문서 상태: 현재 제품 목적과 안정적인 설계 경계의 정본
 
-기준일: 2026-08-29 KST
+기준일: 2026-09-09 KST
 
 핵심 범위: 에이전트에 종속되지 않는 스킬 작성·유지보수·검증 구조
 
@@ -482,6 +482,8 @@ Migration atom은 별도 원장에 쓰지 않고 `.skill-rails/obligation-ledger
 
 실제 유지보수 명령과 change envelope는 설치 package의 [`SKILL.md`](../skills/skill-rails/SKILL.md)가 조건부로 안내한다.
 
+이미 존재하는 target skill은 변경 전에 현재 bytes를 한 번 캡처한 read-only maintenance context로 읽는다. 이 모델은 전체 package inventory와 현재 source basis를 잡고, P0/P1/P2 또는 아직 관리되지 않는 산문·코드에서 purpose, canonical owner, native locator, obligation, body, fixture, manifest evidence와 정적으로 확인 가능한 직접 관계를 분리한다. AI용 JSON·text와 사람용 map은 이 한 모델의 질의 투영이며 저장되는 제2 정본이 아니다. Target package의 spec·collector·helper는 import하거나 실행하지 않고, `found`는 전체성으로, fixture·manifest membership은 실행 증거로, 정적 정의는 runtime/write admission으로 승격하지 않는다. 유한 extractor가 현재 stable bytes에서 완결된 exact locator만 `absent-in-declared-scope`라 할 수 있고 그 밖의 miss는 `unknown`이다. 동적 consumer, 외부 receipt와 host authority는 frontier로 남겨 다음 직접 읽기와 검증을 안내한다.
+
 Intent-backed P0/P1은 `update-intent` operation만 허용한다. 현재 intent에서 생성되는 `SKILL.md`, adapter, guidance index, topic과 실제 파일이 다르면 덮어쓰지 않고 중단한다. Auto-profiled package에서 갱신된 intent가 다른 profile을 선택하면 명시적 재생성을 요구하고, explicit profile 결정은 그대로 고정해 감사 가능하게 남긴다. 정상 유지보수는 intent, ledger, projection, eval case를 원자적으로 갱신하고 별도 소유 helper와 파일은 보존한다. P2는 문장 위치가 아니라 stable ID를 주소로 사용하며, 변경 전후 predicate, stage, row, body, template, owner, fixture, generated artifact의 line diff와 semantic impact report를 함께 본다. whole-file 교체는 등록된 typed artifact(`spec.mjs`, `collectors/index.mjs`, `references/` 아래 기존 파일)에만 현재 hash를 요구하며 허용하고, 원자적 install은 package root를 단독 소유한 하나의 authorized writer를 전제한다. 외부 process의 동시 쓰기에 대한 잠금이나 보존은 제공하지 않으며, 그 경계는 성공이 아니라 `UNPROVEN`이다.
 
 ### 13.7 완료 경계
@@ -492,6 +494,8 @@ Intent-backed P0/P1은 `update-intent` operation만 허용한다. 현재 intent�
 - task-output comparison: 결과 품질에 대한 증거
 
 앞 단계가 뒤 단계를 자동으로 증명하지 않는다.
+
+기존 package의 plan·implementation 완료 경계에서는 저장한 maintenance query를 현재 bytes에 다시 실행한다. Source basis가 바뀌면 이전 capsule은 낡은 navigation이고, source basis가 같아도 별도의 직접 검사와 실행 evidence를 대신하지 않는다.
 
 ---
 

@@ -141,11 +141,15 @@ The obligation ledger is provenance, not a second behavior source. Keep original
 
 First confirm that the reported problem exists in the current source, projection, consumer path, execution, or failure scene, then apply the attribution boundary in [Failure cases](#failure-cases) before editing the product. For a substantive change, use the role-separated pattern when the user selects it; otherwise cover the same premise and whole-result checks without claiming that they were independent. Keep one integrated writer in either case.
 
-Address stable IDs, not prose locations. Before a P2 change, query affected predicates, stages, rows, body sections, templates, owners, fixtures, and generated artifacts:
+For an already-existing target package, first ask the current bytes for a bounded maintenance view. This works for Skill Rails P0/P1/P2 packages and for an inspectable prose-plus-code skill that has not been adopted. It captures the package without importing or executing its spec, collectors, or helpers; reports purpose, owners, a native-locator catalog, direct source-linked causal context, evidence authority, gaps, and an exact re-entry key; and distinguishes absence only inside a stable finite extraction scope. It is navigation, not full validation, runtime admission, execution proof, consumer completeness, or deletion safety.
 
 ```text
-node "<skill-root>/scripts/maintain.mjs" --skill <folder> --diagnose --query <stable-id-or-text>
+node "<skill-root>/scripts/maintain.mjs" --skill <folder> --describe --query <native-locator-or-interest> --json
 ```
+
+Use `--describe --map` when a person needs the compact purpose-and-owner overview; it is a stdout preview from the same captured source model, not another maintained document. Follow returned source spans and unresolved frontiers with ordinary inspection and judgment instead of treating the catalog as the whole package. If work resumes later or current bytes change, run the returned describe invocation again rather than carrying the old capsule forward. New-skill creation remains intent-first because no package exists to inspect. The older `--diagnose --query` mode remains available for its P2 semantic-snapshot contract; it is not the current-source causal view.
+
+Address stable IDs, not prose locations. Before changing a P2 owner, use the describe capsule to locate affected predicates, stages, rows, body sections, templates, obligations, fixtures, generated projections, and any frontier that still requires direct inspection.
 
 Pass the actual update as `--change <change.json>`. The file has one envelope, `{ "id": "<change-id>", "intent": "<why>", "operations": [...] }`, and each operation uses the smallest matching shape:
 
@@ -171,6 +175,8 @@ Replace a status or verification report with its current truth instead of append
 Creation is structurally complete only when lint and build pass. Behavior is verified only when forward tests provide evidence. A new skill remains an initial release candidate until real use confirms its trigger, adherence, outputs, and maintenance locality.
 
 At two drift-sensitive boundaries—before approving a substantive plan and before declaring its implementation complete—re-read the user's original purpose and the relevant Skill Rails guidance from their canonical paths, then counterprove the whole plan or result against them. At the plan boundary, test whether the proposed owner, scope, and verification still serve the intended result; at the implementation boundary, test the actual diff, consumer path, and evidence.
+
+When an already-existing target package was inspected through `--describe`, re-run the saved invocation at both boundaries against current bytes, using one exact-owner query for every intended or actually touched owner. `assessment.relation_coverage.status` must be `closed` before that capsule can support a completion claim: `blocked` withholds `next.change` and names the deterministic relation slot or finite source universe that must be repaired, while `discovery-only` is navigation and cannot satisfy the checkpoint. This closure covers only the listed explicit relation families on that source basis; it is not whole-impact, runtime, deletion, or semantic-edit authority. Direct inspection handles prose, dynamic implementation, and external meaning but cannot override a blocked mechanized family. Use the refreshed capsule as a navigation and drift check, then perform the required direct inspection and execution checks; a matching source basis does not turn definitions into behavior evidence, and a changed basis invalidates the older re-entry context.
 
 When role-separated work is selected and an independent reviewer is available, give that reviewer the original purpose and intent-bearing wording, observed failure, confirmed facts and uncertainties, owner and consumer relationships, approved scope, entire relevant diff, and executed evidence. The reviewer challenges both the premise and the result, consolidates blocking findings instead of creating a one-item correction loop, and distinguishes a defect from style preference or another valid form. Otherwise perform the same whole-result audit and report independent counterproof as `unproven`.
 

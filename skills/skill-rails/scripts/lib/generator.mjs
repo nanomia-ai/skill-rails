@@ -133,6 +133,16 @@ export async function writeSimplePackage(root, intent, profile, options = {}) {
 }
 
 export async function assertSimpleProjectionOwnership(root, intent, profile) {
+  const expected = simpleProjectionEntries(intent, profile);
+  for (const [local, source] of expected) {
+    let actual;
+    try { actual = await readFile(join(root, ...local.split("/")), "utf8"); }
+    catch (error) { throw new Error(`SR_SIMPLE_OWNERSHIP: canonical projection is unavailable: ${local}: ${error.message}`); }
+    if (normalizeNewlines(actual) !== normalizeNewlines(source)) throw new Error(`SR_SIMPLE_OWNERSHIP: ${local} differs from the intent-derived projection; preserve the change in intent or another owned file before maintenance.`);
+  }
+}
+
+export function simpleProjectionEntries(intent, profile) {
   const expected = new Map([
     ["SKILL.md", renderSimpleSkillMarkdown(intent, profile)],
     ["agents/openai.yaml", renderOpenAiAdapter(intent)]
@@ -140,12 +150,7 @@ export async function assertSimpleProjectionOwnership(root, intent, profile) {
   const topics = judgmentTopics(intent);
   if (topics.length > 0) expected.set("references/guidance-index.md", renderGuidanceIndex(topics));
   for (const topic of topics) expected.set(guidanceTopicPath(topic.id), renderGuidanceTopic(topic));
-  for (const [local, source] of expected) {
-    let actual;
-    try { actual = await readFile(join(root, ...local.split("/")), "utf8"); }
-    catch (error) { throw new Error(`SR_SIMPLE_OWNERSHIP: canonical projection is unavailable: ${local}: ${error.message}`); }
-    if (normalizeNewlines(actual) !== normalizeNewlines(source)) throw new Error(`SR_SIMPLE_OWNERSHIP: ${local} differs from the intent-derived projection; preserve the change in intent or another owned file before maintenance.`);
-  }
+  return expected;
 }
 
 async function removeOwnedGuidance(root) {

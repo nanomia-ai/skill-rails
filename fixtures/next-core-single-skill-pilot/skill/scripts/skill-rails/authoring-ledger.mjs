@@ -45,16 +45,35 @@ async function locatorExists(locator, context) {
   if (locator.startsWith("body:")) return context.body?.sections.some((item) => item.ref === locator.slice(5)) ?? false;
   if (locator.startsWith("fixture:")) return context.fixtures.some((item) => item.id === locator.slice(8));
   if (locator.startsWith("eval:")) return context.evalCases.some((item) => item.id === locator.slice(5));
-  if (locator.startsWith("spec:")) return specLocatorExists(context.spec, locator.slice(5));
+  if (locator.startsWith("spec:")) return resolveSpecLocator(context.spec, locator.slice(5)).resolved;
   return false;
 }
 
-function specLocatorExists(spec, path) {
-  const [group, first, second] = path.split("/");
-  if (["GUARDS", "STAGES", "ROLES", "DEFERRED"].includes(group)) return (spec[group] ?? []).some((item) => item.id === first);
-  if (group === "TABLES") return Boolean(spec.TABLES?.[first]?.rows?.some((item) => item.state === second));
-  if (["OBSERVATIONS", "FORMATS", "TEMPLATES", "ARTIFACTS", "DECLARATIONS"].includes(group)) return Object.hasOwn(spec[group] ?? {}, first);
-  return false;
+export function resolveSpecLocator(spec, path) {
+  const segments = path.split("/");
+  const [group, first, second] = segments;
+  // A locator addresses exactly one thing. Without this, a trailing segment was silently ignored and a
+  // mistyped locator resolved as though it named its parent.
+  const recognized = ["GUARDS", "STAGES", "DEFERRED", "TABLES", "OBSERVATIONS", "FORMATS", "TEMPLATES", "ARTIFACTS", "DECLARATIONS", "ROLES"].includes(group);
+  const expectedSegments = group === "TABLES" ? 3 : 2;
+  if (!recognized || segments.length !== expectedSegments) return { recognized, shape: false, resolved: false, group, first, second, value: undefined };
+  // `ROLES` is an object keyed by role id, not an array of entries. Resolving it with the array branch
+  // threw a TypeError instead of answering, which made a role an unusable landing place: an author who
+  // named one lost the build rather than the atom. It belongs with the other keyed groups.
+  let value;
+  let resolved = false;
+  if (["GUARDS", "STAGES", "DEFERRED"].includes(group)) {
+    value = (Array.isArray(spec?.[group]) ? spec[group] : []).find((item) => item?.id === first);
+    resolved = value !== undefined;
+  } else if (group === "TABLES") {
+    value = (Array.isArray(spec?.TABLES?.[first]?.rows) ? spec.TABLES[first].rows : []).find((item) => item?.state === second);
+    resolved = value !== undefined;
+  } else {
+    const keyed = spec?.[group];
+    resolved = Boolean(keyed && typeof keyed === "object" && !Array.isArray(keyed) && Object.hasOwn(keyed, first));
+    if (resolved) value = keyed[first];
+  }
+  return { recognized: true, shape: true, resolved, group, first, second, value };
 }
 
 async function optionalArray(path) {

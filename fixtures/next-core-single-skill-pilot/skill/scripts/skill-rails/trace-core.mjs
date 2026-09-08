@@ -45,4 +45,7 @@ export async function assertExternalStateDir(skillRoot, stateDir) {
   if (isInside(resolve(skillRoot), resolve(stateDir))) fail("SR_STATE_INSIDE_SKILL", "Runtime state must be outside the installed skill package.", { pointer: stateDir });
   const [canonicalSkill, canonicalState] = await Promise.all([canonicalPath(skillRoot), canonicalPath(stateDir)]);
   if (isInside(canonicalSkill, canonicalState)) fail("SR_STATE_INSIDE_SKILL", "Runtime state must be outside the installed skill package, including symlink and junction targets.", { pointer: stateDir });
+  // The observed project is the other place runtime state does not belong, but that is a caller
+  // decision the generated instruction states; enforcing it here refused a placement version 5
+  // accepted, which costs more than the mistake it caught.
 }

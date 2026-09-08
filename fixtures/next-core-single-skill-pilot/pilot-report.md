@@ -12,7 +12,7 @@ This P2 skill routes a work or verify intent while preventing a verifier claim f
 - The generated loader binds record and alignment evidence to the exact Decision file, does not carry it across reinvocation automatically, and tells consumers to use current <code>stage_artifacts</code> instead of inspecting collectors or authoring files for replacement paths.
 - <code>DECLARATIONS</code> contains only <code>complexityBudget</code>. Continuation is an ordinary declared identity column, not another runtime mode or declaration.
 - The embedded schemas and 29 shared runtime files came from the creator tree used for the canonical build. The generated package adds only the four entry points <code>align.mjs</code>, <code>lint.mjs</code>, <code>run.mjs</code>, and <code>trace.mjs</code>, while its manifest-bound package-root <code>.gitattributes</code> preserves those emitted bytes across Git checkout modes.
-- The canonical build embeds runtime 0.3.2, validator 0.4.2, and Decision schema <code>skill-rails/decision/2</code>. Trace schema is unchanged; alignment now rejects an unsealed supplied Decision or one that is not stable-structurally equal to its runtime-observed emission before deriving expectations.
+- The canonical build embeds runtime 0.3.3, validator 0.6.2, and Decision schema <code>skill-rails/decision/2</code>. Trace schema is unchanged; alignment rejects an unsealed supplied Decision or one that is not stable-structurally equal to its runtime-observed emission before deriving expectations. Validator 0.6.2 also exposes the existing L16 locator resolver as structured read-only data for creator-side maintenance inspection without widening the accepted locator universe.
 
 ## 3. Binding rule
 
@@ -69,7 +69,7 @@ Receipt: exit 0; L0 through L18 pass with no diagnostics.
 
     node skills/skill-rails/scripts/build.mjs --skill fixtures/next-core-single-skill-pilot/skill --repeats 50 --json
 
-Receipt: exit 0; 20/20 mutations killed, 10/10 scenarios passed for 50 deterministic repeats with no mismatch, predicate performance passed the 50 ms limit, and 256/256 format round trips passed with CRLF rejected. The canonical build identifier is <code>sha256:c1492ff7217f9fe54f9b15b9012bfcea4f69948f2a2663408dcb2ef232420a01</code>, with <code>built_at: null</code>.
+Receipt: exit 0; 20/20 mutations killed, 10/10 scenarios passed for 50 deterministic repeats with no mismatch, predicate performance passed the 50 ms limit, and 256/256 format round trips passed with CRLF rejected. The canonical build identifier is <code>sha256:4f81126091d6e47aa319cd5b048a3d1b3ddc113d5930e525d818ca6543f196bd</code>, with <code>built_at: null</code>.
 
 ### Embedded lint and focused real-state e2e
 
@@ -82,7 +82,7 @@ Receipt: embedded L0 through L18 pass; 2/2 e2e tests pass. The first test assert
 
     node --input-type=module -e "import {verifyManifest} from './fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/manifest.mjs'; const {manifest}=await verifyManifest('./fixtures/next-core-single-skill-pilot/skill'); console.log(JSON.stringify({build_id:manifest.build_id,content_hashes:Object.keys(manifest.content).length,generated_hashes:Object.keys(manifest.generated_files).length,declared_hashes:Object.keys(manifest.content).length+Object.keys(manifest.generated_files).length},null,2));"
 
-Receipt: manifest verification succeeds with 15 content hashes, 37 generated hashes, and 52 declared hashes; the build identifier matches the formal build receipt.
+Receipt: manifest verification succeeds with 15 content hashes, 38 generated hashes, and 53 declared hashes; the build identifier matches the formal build receipt.
 
 ### Git checkout byte preservation
 
@@ -108,11 +108,21 @@ Receipt: at deployed baseline <code>126be23</code>, the full <code>npm run verif
 
 Receipt: focused reconciled regressions 4/4 and runtime plus integration 42/42 pass (26 integration + 16 runtime top-level tests); the regression covers normalized target delivery, all Decision-emission outcome paths, same-target resume, byte-shaped target absence, Windows junction rejection, unified fixture lanes, L5 read gating, and guard-pending trace order; creator lint passes. The canonical build records mutation 20/20, scenario 10/10, deterministic repeat 50 with 0 mismatches, format round-trip 256/256, manifest 15 content + 38 generated = 53, and build ID <code>sha256:d2855deb87b5b1b4cbcba467975cbfcc87c7661e7072ffc6478e13b85f49ca1c</code>; embedded lint is L0 through L18 and real-state e2e is 2/2. This receipt is the released <code>v0.1.7</code> boundary (commit <code>c739bff</code>/<code>e1c09e6</code>); the single release-boundary <code>npm run verify</code> is recorded in the implementation-verification document rather than this bounded mechanics receipt.
 
-### Current uncommitted candidate: interior-space path domain and quoted artifact path
+### Released v0.1.8 receipt: interior-space path domain and quoted artifact path
 
-The current worktree candidate widens the public `path` domain to accept an interior U+0020 space while continuing to reject a leading or trailing space, CR, LF, `;`, `.`/`./` alone, and a `..` traversal segment, and it quotes the generated `record --type artifact_verified ... --artifact "<path>"` example in the thin loader so a selected path containing a space stays one shell token. Both changes are covered by the same targeted regression: `node --test --test-name-pattern "named, list, object, NONE, and UNKNOWN domains fail closed" tests/runtime.test.mjs` passes 1/1, and the existing `tests/integration.test.mjs` public-stage-target regression now exercises a `cards/task two.md` selection end to end (normalized `targetPath`, traced `decision_emitted.data.targetPath`, and the quoted CLI `resume --target "cards/task two.md"`). The canonical pilot rebuild embeds `RUNTIME_VERSION` 0.3.2 and `VALIDATOR_VERSION` 0.4.2 with the same `KERNEL_VERSION` 6, Decision schema `skill-rails/decision/2`, and Trace schema; `SPEC.version = "5"`, the 14 closed exports, and effect authority are unchanged. Rebuild receipts: root lint L0 through L18 pass with no diagnostics; the formal `--repeats 50` build reports mutation 20/20, scenario 10/10 across 50 deterministic repeats with 0 mismatches, and format round trip 256/256 with CRLF rejected, at build ID `sha256:c1492ff7217f9fe54f9b15b9012bfcea4f69948f2a2663408dcb2ef232420a01`. A repository-wide `npm run verify` on this candidate tree reports vendor check pass, self lint pass, repository test 70/70, and the frozen G0.5 eval pass. An independent Sol/Opus/Fable cross-review of the domain widening and the quoting fix found no MUST-fix.
+The v0.1.8 change widened the public `path` domain to accept an interior U+0020 space while continuing to reject a leading or trailing space, CR, LF, `;`, `.`/`./` alone, and a `..` traversal segment, and quoted the generated `record --type artifact_verified ... --artifact "<path>"` example in the thin loader so a selected path containing a space stays one shell token. Both changes were covered by the same targeted regression: `node --test --test-name-pattern "named, list, object, NONE, and UNKNOWN domains fail closed" tests/runtime.test.mjs` passed 1/1, and the existing `tests/integration.test.mjs` public-stage-target regression exercised a `cards/task two.md` selection end to end. The release-boundary rebuild embedded `RUNTIME_VERSION` 0.3.2 and `VALIDATOR_VERSION` 0.4.2 with `KERNEL_VERSION` 6 and build ID `sha256:c1492ff7217f9fe54f9b15b9012bfcea4f69948f2a2663408dcb2ef232420a01`; repository verification passed 70/70 plus the frozen G0.5 eval. An independent Sol/Opus/Fable cross-review found no MUST-fix.
 
-This candidate is not yet committed, tagged, pushed, released, or installed through any package manager, and no fresh agent has consumed it; do not read the version bump or these receipts as a published `v0.1.8`.
+This is a historical receipt. The change was subsequently committed, tagged, pushed, released, and installed as `v0.1.8`; the receipt does not claim fresh-agent consumption of a space-containing selected path.
+
+### Current uncommitted candidate: creator-side maintenance context
+
+The current candidate adds a read-only creator-side maintenance view for an existing target skill. `maintain.mjs --skill <package> --describe` reconstructs a current-source model from the package inventory, intent and obligation records, P2 source, body, fixtures, manifest, and available evidence metadata. `--query` returns a source-linked causal capsule, `--json` returns the same model for AI use, and `--map` renders a human preview to stdout. The model leads with gaps and limits, distinguishes finite absence from unsupported or unresolved extraction, and claims only `complete-for-declared-scope`. It never imports or executes the target package's spec, collectors, or helpers, and it does not create a persistent second source of truth.
+
+The maintenance feature itself does not add a generated-package loader or alter the using-agent path. The pilot was rebuilt only because the canonical shared runtime projection now exports the already-existing L16 locator resolver and carries validator 0.6.2. `SPEC.version = "5"`, runtime 0.3.3, kernel 6, Decision and Trace schemas, effect authority, and the L16 locator universe are unchanged. Existing packages can be described without migration or rebuild.
+
+Evidence on this candidate: the focused maintenance-context suite passes 12/12, including the final review's locator, partial-extraction, source-position, bounded reverse-consumer, P0/P1 ownership, AST-import, query-cut, and fail-closed declared-relation counterexamples; the repository-wide `npm run verify` passes vendor check, self lint, 90/90 tests, and the frozen G0.5 eval; the canonical `--repeats 50` pilot rebuild records L0–L18, mutation 20/20, scenario 10/10 across 50 repeats with 0 mismatches, format 256/256 with CRLF rejected, manifest 15 content + 38 generated = 53 declared hashes, and build ID `sha256:4f81126091d6e47aa319cd5b048a3d1b3ddc113d5930e525d818ca6543f196bd`. A blind fresh maintainer discovered the public route and recovered purpose, owning stage, fixtures, source basis, gaps, and a resumable next query; a separate normal-use control stayed on the generated skill's runtime path and did not activate maintenance. These are bounded behavioral observations, not proof across models, hosts, or long sessions.
+
+This checkpoint has not been tagged, pushed, released, or installed.
 
 ### Prior landing readiness
 
@@ -122,7 +132,7 @@ Receipt: Git baseline <code>126be23</code> is on <code>origin/main</code>. The o
 
     node -e "const fs=require('fs'),p='fixtures/next-core-single-skill-pilot/skill/'; const b=f=>fs.readFileSync(p+f); const m=f=>({bytes:b(f).length,lines:(b(f).toString('utf8').match(/\n/g)||[]).length}); const files=[]; const walk=d=>{for(const e of fs.readdirSync(d,{withFileTypes:true})){const x=d+'/'+e.name;e.isDirectory()?walk(x):files.push(x)}}; walk(p.slice(0,-1)); console.log(JSON.stringify({spec:m('spec.mjs'),collector:m('collectors/index.mjs'),skill:m('SKILL.md'),verify_read_set:b('SKILL.md').length+b('references/canon.md').length+b('references/verify.md').length,work_read_set:b('SKILL.md').length+b('references/canon.md').length+b('references/work.md').length,package_bytes:files.reduce((n,f)=>n+fs.readFileSync(f).length,0),package_files:files.length},null,2));"
 
-Measured on 2026-08-31: <code>spec.mjs</code> is 7,224 bytes and 67 lines; the collector is 5,999 bytes and 121 lines; <code>SKILL.md</code> is 3,457 bytes and 20 lines; the verify read set is 9,706 bytes; the work read set is 7,261 bytes; and the 55-file skill package is 499,909 bytes.
+Measured on 2026-09-09: <code>spec.mjs</code> is 7,224 bytes and 67 lines; the collector is 5,999 bytes and 121 lines; <code>SKILL.md</code> is 3,712 bytes and 20 lines; the verify read set is 9,961 bytes; the work read set is 7,516 bytes; and the 55-file skill package is 502,976 bytes.
 
 ## 7. What remains UNPROVEN
 
@@ -132,11 +142,12 @@ Measured on 2026-08-31: <code>spec.mjs</code> is 7,224 bytes and 67 lines; the c
 - The public lane records agent claims plus artifact path-and-byte verification, but no harness-trusted <code>effect_observed</code>; public effect execution therefore remains partial or unproven as reported by alignment.
 - This run observes the Windows junction branch. The same test selects a POSIX directory symlink on non-Windows hosts, but POSIX execution is not evidence from this run.
 - Fresh AI invocation beginning from the official installed path, long-session behavior, and out-of-band writer concurrency are unproven. The installed pilot is byte-identical to the fresh-consumed package, but path-level behavior is not inferred from byte equality alone.
-- The interior-space path domain and quoted `--artifact` candidate (runtime 0.3.2 / validator 0.4.2, build `sha256:c1492ff7217f9fe54f9b15b9012bfcea4f69948f2a2663408dcb2ef232420a01`) is not committed, tagged, pushed, released, or installed, and no fresh agent has exercised a space-containing selected path through the installed loader; treat its behavior evidence as candidate-scope only.
+- Fresh-agent use of a space-containing selected path through an installed v0.1.8 loader remains unproven even though the mechanics were released and structurally verified.
+- Maintenance-context reliability across other models and hosts, long sessions or compaction, large Devflow-scale packages, unmanaged variants beyond the fixtures, and out-of-band writes during capture remains unproven. The two fresh observations do not quantify error reduction or prove that every relevant causal relation was extracted.
 
 ## 8. Immediate next step
 
-Do not reopen the format projection without a new product falsification. If additional empirical scope is needed, use one bounded consumer run for skipped judgment and tampered-Decision rejection rather than repeating repository verification or the completed matching-pass route.
+Finish the whole-result cross-review against the original human-and-AI maintenance purpose. If no blocker remains, compare direct exploration with the source-linked context on one bounded Devflow capability before considering a default surface, persisted map, release, or installation.
 
 ## Appendix A. Retired designs
 
