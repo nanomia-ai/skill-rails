@@ -256,6 +256,51 @@ test("a skipped judgment NEXT branch cannot leak state into the next selected st
   assert.equal(Object.hasOwn(decision, "execution_events"), false);
 });
 
+test("reinvoke distinguishes caller-supplied input from observed and terminal BLOCKs", async () => {
+  const runtime = { spec_hash: "sha256:" + "b".repeat(64), runtime_hash: "sha256:" + "c".repeat(64), dsl_hash: "sha256:" + "d".repeat(64), validator_hash: "sha256:" + "e".repeat(64), minimum_node_major: 20 };
+  const snapshot = { fingerprint: "sha256:" + "a".repeat(64), status: "stable" };
+  const missing = unknown("not supplied");
+  const evaluate = (OBSERVATIONS, reads, flat, nested, stage = {}) => evaluateSpec({
+    spec: {
+      SPEC: { id: "reinvoke-source", version: "5" }, OBSERVATIONS, GUARDS: [], TABLES: {}, FORMATS: {}, TEMPLATES: {}, ARTIFACTS: {},
+      STAGES: [{ id: "wait", reads, needs: reads, done: () => false, reentry: "rejudge", branches: { stop: ["BLOCK"] }, ...stage }]
+    },
+    skillRoot: ROOT, observations: { flat, nested, unknowns: reads }, snapshot, runtime
+  });
+
+  const caller = await evaluate(
+    { "review.state": { judged: true, domain: ["stop"] }, "approval.state": { decided: true, domain: ["stop"] } },
+    ["review.state", "approval.state"],
+    { "review.state": missing, "approval.state": missing },
+    { review: { state: missing }, approval: { state: missing } }
+  );
+  assert.equal(caller.status, "BLOCK");
+  assert.deepEqual(caller.effects, []);
+  assert.deepEqual(caller.needs.map(({ source }) => source), ["judged", "decided"]);
+  assert.equal(caller.reinvoke, "after-input");
+
+  const observed = await evaluate(
+    { "probe.state": { collector: "probe/state", domain: ["stop"] } },
+    ["probe.state"], { "probe.state": missing }, { probe: { state: missing } }
+  );
+  assert.equal(observed.reinvoke, null);
+
+  const mixed = await evaluate(
+    { "review.state": { judged: true, domain: ["stop"] }, "probe.state": { collector: "probe/state", domain: ["stop"] } },
+    ["review.state", "probe.state"],
+    { "review.state": missing, "probe.state": missing },
+    { review: { state: missing }, probe: { state: missing } }
+  );
+  assert.equal(mixed.reinvoke, null);
+
+  const terminal = await evaluate(
+    { "review.state": { judged: true, domain: ["stop"] } },
+    ["review.state"], { "review.state": "stop" }, { review: { state: "stop" } }
+  );
+  assert.equal(terminal.status, "BLOCK");
+  assert.equal(terminal.reinvoke, null);
+});
+
 test("runtime CLI rejects ambiguous booleans and command-inappropriate options before I/O", async () => {
   const errors = [];
   const io = { log() {}, error(value) { errors.push(String(value)); } };
@@ -437,7 +482,7 @@ test("trace store serializes concurrent writers and rejects duplicate run emissi
     decision_id: null,
     spec: { fingerprint: "sha256:" + "b".repeat(64) },
     snapshot: { fingerprint: "sha256:" + "c".repeat(64) },
-    restrict: [], effects: [], proof_required: []
+    status: "NEXT", reinvoke: "after-effects", needs: [], restrict: [], effects: ["NEXT"], proof_required: []
   });
   await appendTraceEvent(externalTrace, {
     run_id: "resume-run", type: "decision_emitted", authority: "runtime_observed",
@@ -452,9 +497,12 @@ test("trace store serializes concurrent writers and rejects duplicate run emissi
   ], { log(value) { output.push(String(value)); }, error(value) { errors.push(String(value)); } });
   assert.equal(resumed, 0, errors.join("\n"));
   const resumeReport = JSON.parse(output[0]);
+  assert.equal(resumeReport.schema, "skill-rails/resume/2");
+  assert.equal(resumeReport.reason, "after-effects");
   assert.match(resumeReport.next_command, new RegExp(escapeRegExp(join(SKILL_ROOT, "scripts", "runtime", "run.mjs"))));
   assert.match(resumeReport.next_command, /--trace-dir/);
   assert.match(resumeReport.next_command, /--run-id \"resume-run\"/);
+  assert.match(resumeReport.next_command, /--json$/);
 });
 
 function decisionEvent(decision) {

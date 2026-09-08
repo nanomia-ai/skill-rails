@@ -159,7 +159,7 @@ async function decisionParts(context) {
     stage_artifacts: projectStageArtifacts(spec, stage, guard),
     needs,
     proof_required: proofRequired,
-    reinvoke: projection.effects.at?.(-1) === "NEXT" ? "after-effects" : null,
+    reinvoke: reinvokeFor(status, projection.effects, needs),
     assurance: "checked"
   };
 }
@@ -211,6 +211,12 @@ function terminalStatus(terminal) {
   if (terminal?.startsWith?.("ROUTE:")) return "ROUTE";
   if (["ASK", "WAIT", "BLOCK", "DONE", "NEXT"].includes(terminal)) return terminal;
   return "NEXT";
+}
+
+function reinvokeFor(status, effects, needs) {
+  if (effects.at(-1) === "NEXT") return "after-effects";
+  if (status === "BLOCK" && effects.length === 0 && needs.length > 0 && needs.every((need) => ["judged", "decided"].includes(need.source))) return "after-input";
+  return null;
 }
 
 function needDescriptor(spec, field, bodyRef) {

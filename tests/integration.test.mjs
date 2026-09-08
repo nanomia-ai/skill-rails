@@ -62,6 +62,7 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   const p2Skill = await readFile(join(outputs.p2, "SKILL.md"), "utf8");
   assert.match(p2Skill, /current task explicitly identifies a complete saved stage-result file/);
   assert.match(p2Skill, /If any condition is absent or uncertain, run `node "<skill-root>\/scripts\/skill-rails\/run\.mjs" stage/);
+  assert.match(p2Skill, /runtime saves the complete UTF-8 stage-result envelope at the reported `result_path`/);
   assert.match(p2Skill, /Use judgment only within domain work that the current Decision leaves open/);
   assert.match(p2Skill, /never skip, reorder, or substitute for the Decision/);
   assert.match(p2Skill, /Decision body, `stage_artifacts`, and ordered effects/);
@@ -78,6 +79,9 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.match(p2Skill, /matching proof reference from the current Decision/);
   assert.doesNotMatch(p2Skill, /BLOCK: consumer guidance missing/);
   assert.match(p2Skill, /bound to the exact Decision/);
+  assert.match(p2Skill, /Interpret `reinvoke` by value/);
+  assert.match(p2Skill, /For `after-input`, run no effects/);
+  assert.match(p2Skill, /an unchanged invocation is not progress/);
   assert.match(p2Skill, /do not automatically carry to the new Decision/);
   assert.equal((await readFile(join(outputs.p2, "scripts", "skill-rails", "manifest.mjs"), "utf8")).includes("\r"), false);
   assert.equal((await readFile(join(outputs.p2, "schemas", "decision.schema.json"), "utf8")).includes("\r"), false);
@@ -139,6 +143,7 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.match(p2EvalReport.caveat, /remain unproven until forward runs/);
   const unknown = await stageSkill({ skillRoot: outputs.p2, projectRoot: ROOT });
   assert.deepEqual(unknown.decision.needs.map((item) => item.field), ["authoring.readiness"]);
+  assert.equal(unknown.decision.reinvoke, "after-input");
   const ready = await stageSkill({ skillRoot: outputs.p2, projectRoot: ROOT, decided: { "authoring.readiness": "ready" } });
   assert.equal(ready.decision.status, "DONE");
   assert.equal(ready.decision.stage, "operate");
@@ -812,6 +817,56 @@ test("trace state stays external and alignment distinguishes observed evidence",
   assert.equal(alignDecision(staged.decision, events).aggregate, "aligned");
 });
 
+test("traced CLI persists caller-input BLOCKs and permits only supplied same-run progress", async (t) => {
+  const base = await makeTestDir("input-continuation");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const project = join(base, "project");
+  const traceDir = join(base, "trace");
+  await mkdir(project, { recursive: true });
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 1 }) });
+  await completeGeneratedP2ForRuntimeTest(root);
+  await buildP2(root, { repeats: 1 });
+
+  const stageArgs = ["stage", "--skill", root, "--runtime-dir", join(root, "scripts", "skill-rails"), "--project", project, "--trace-dir", traceDir, "--run-id", "input-run", "--json"];
+  const blockedIo = captureIo();
+  assert.equal(await runtimeMain(stageArgs, blockedIo), 2, blockedIo.errors.join("\n"));
+  const blocked = JSON.parse(blockedIo.logs.at(-1));
+  const resultPath = join(traceDir, "input-run.stage-result.json");
+  assert.equal(blocked.result_path, resultPath);
+  assert.equal(blocked.decision.status, "BLOCK");
+  assert.equal(blocked.decision.reinvoke, "after-input");
+  assert.deepEqual(blocked.decision.needs.map(({ field, source }) => ({ field, source })), [{ field: "authoring.readiness", source: "decided" }]);
+  assert.equal((await readFile(resultPath)).at(0), 0x7b, "UTF-8 result begins with '{' and has no BOM");
+  assert.deepEqual(await readJson(resultPath), blocked);
+
+  const waitingResumeIo = captureIo();
+  assert.equal(await runtimeMain(["resume", "--skill", root, "--runtime-dir", join(root, "scripts", "skill-rails"), "--trace", blocked.trace_path, "--project", project, "--json"], waitingResumeIo), 0);
+  const waitingResume = JSON.parse(waitingResumeIo.logs.at(-1));
+  assert.equal(waitingResume.schema, "skill-rails/resume/2");
+  assert.equal(waitingResume.reason, "after-input");
+  assert.equal(waitingResume.next_command, null);
+
+  const continuedIo = captureIo();
+  assert.equal(await runtimeMain([...stageArgs, "--decided", "authoring.readiness=ready"], continuedIo), 0, continuedIo.errors.join("\n"));
+  const continued = JSON.parse(continuedIo.logs.at(-1));
+  assert.equal(continued.decision.status, "DONE");
+  assert.equal(continued.decision.reinvoke, null);
+  assert.deepEqual(await readJson(resultPath), continued, "the current-result file advances only after a legitimate evaluation");
+
+  const terminalResumeIo = captureIo();
+  assert.equal(await runtimeMain(["resume", "--skill", root, "--runtime-dir", join(root, "scripts", "skill-rails"), "--trace", continued.trace_path, "--project", project, "--json"], terminalResumeIo), 0);
+  const terminalResume = JSON.parse(terminalResumeIo.logs.at(-1));
+  assert.equal(terminalResume.reason, "terminal");
+  assert.equal(terminalResume.next_command, null);
+
+  const duplicateIo = captureIo();
+  assert.equal(await runtimeMain(stageArgs, duplicateIo), 1);
+  assert.equal(JSON.parse(duplicateIo.errors.at(-1)).diagnostic.code, "SR_TRACE_INVALID");
+  assert.deepEqual(await readJson(resultPath), continued, "a rejected duplicate cannot overwrite the usable current result");
+});
+
 test("snapshot changes during collection fail closed as stale", async (t) => {
   const base = await makeTestDir("stale");
   t.after(() => removeTestDir(base));
@@ -841,6 +896,11 @@ test("snapshot changes during collection fail closed as stale", async (t) => {
   const staleEvents = await readTrace(join(traceDir, "stale-run.jsonl"));
   assert.ok(staleEvents.some((event) => event.type === "snapshot_stale"));
   assert.equal(staleEvents.findLast((event) => event.type === "decision_emitted").data.targetPath, "watched.txt");
+  const resumeIo = captureIo();
+  assert.equal(await runtimeMain(["resume", "--skill", root, "--runtime-dir", join(root, "scripts", "skill-rails"), "--trace", staged.tracePath, "--project", project, "--json"], resumeIo), 0);
+  const resumed = JSON.parse(resumeIo.logs.at(-1));
+  assert.equal(resumed.reason, "recompute");
+  assert.match(resumed.next_command, /--target "watched\.txt" --json$/);
 });
 
 test("public stage target is normalized, collector-owned, optional, and containment-safe across API and CLI", async (t) => {
@@ -920,7 +980,8 @@ export const snapshotBasis = async (ctx) => Object.hasOwn(ctx, "targetPath")
   const targetResumeIo = captureIo();
   assert.equal(await runtimeMain(["resume", "--skill", root, "--runtime-dir", join(root, "scripts", "skill-rails"), "--trace", tracedTarget.tracePath, "--project", project, "--json"], targetResumeIo), 0);
   const targetResume = JSON.parse(targetResumeIo.logs.at(-1));
-  assert.equal(targetResume.next_command.endsWith(' --target "cards/task two.md"'), true);
+  assert.equal(targetResume.reason, "terminal");
+  assert.equal(targetResume.next_command, null);
 
   const tracedAbsent = await stageSkill({ skillRoot: root, projectRoot: project, decided, traceDir, runId: "target-absent" });
   const absentEmission = (await readTrace(tracedAbsent.tracePath)).findLast((event) => event.type === "decision_emitted");
@@ -928,7 +989,7 @@ export const snapshotBasis = async (ctx) => Object.hasOwn(ctx, "targetPath")
   assert.equal(JSON.stringify(absentEmission.data), JSON.stringify({ status: tracedAbsent.decision.status, stage: tracedAbsent.decision.stage, row: tracedAbsent.decision.row, decision: tracedAbsent.decision }));
   const absentResumeIo = captureIo();
   assert.equal(await runtimeMain(["resume", "--skill", root, "--runtime-dir", join(root, "scripts", "skill-rails"), "--trace", tracedAbsent.tracePath, "--project", project, "--json"], absentResumeIo), 0);
-  assert.equal(JSON.parse(absentResumeIo.logs.at(-1)).next_command.includes(" --target "), false);
+  assert.equal(JSON.parse(absentResumeIo.logs.at(-1)).next_command, null);
 
   const invalidTargets = [join(project, "cards", "task.md"), "cards/../task.md", 42];
   for (const targetPath of invalidTargets) {

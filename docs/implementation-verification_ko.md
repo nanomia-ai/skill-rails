@@ -623,11 +623,32 @@ AI 표면은 목적·profile·현재 source basis, 선택된 requirement/owner/c
 
 두 번의 blind fresh-maintainer 관찰은 공개 `SKILL.md`와 일반 task만 받고 Maintenance route와 describe를 발견했다. 첫 관찰의 자연어 miss와 과대 출력은 같은 agent가 수정 후 재실행해 복수 match·부분 catalog·resume 경계를 확인했고, 두 번째 독립 관찰에서 출력 truncation이 드러나 ledger file-hub fan-out과 inventory를 줄인 뒤 같은 agent가 다시 실행해 목적, requirement, owning stage, fixture, source basis, gap과 다음 exact query를 보존하면서 truncation이 사라졌음을 확인했다. 이는 발견성과 한 package의 제한된 인과 추적에 대한 `PARTIAL` 증거다. 다른 모델·host, 장기 session/compaction, 대형 Devflow package, capture 중 외부 write, 실제 오수정 감소량, 모든 의미 관계의 완전성은 계속 `UNPROVEN`이다.
 
+### 6.27 입력 대기 BLOCK의 저장·재진입 계약 복구
+
+Devflow Adopt의 cold-agent 실패를 생성 패키지와 동일한 runtime 0.3.3에서 재현했다. caller가 제공할 수 있는 `judged` need만 남은 effect-free BLOCK이 `reinvoke: null`로 나왔고, 기존 `resume`은 반대로 값이 없는 동일 stage 명령을 제시했다. 그 명령은 같은 Decision을 다시 방출해 정상적인 `duplicate-decision-emission` guard에 거부됐다. 결함은 guard나 Devflow predicate가 아니라 기존 Decision 정보의 불완전한 continuation 투영이었다.
+
+수정은 공통 P2 owner에만 두었다. evaluator는 effect-free BLOCK의 non-empty needs가 모두 `judged` 또는 `decided`일 때만 `reinvoke: after-input`을 파생한다. observed 또는 mixed need, 명시적 terminal BLOCK은 계속 null이고, 기존 NEXT·stale·authoring continuation은 각각 `after-effects`·`recompute`·`after-authoring`을 유지한다. traced CLI는 반환 전에 완전한 UTF-8 stage-result envelope를 `<trace-dir>/<run-id>.stage-result.json`에 저장한다. 새 유효 Decision만 현재 파일을 교체하며 trace가 이전 Decision을 보존하고, duplicate 진단은 파일을 덮지 않는다. `resume/2`는 history lookup임을 유지하면서 reason을 반환하고, 값 없이도 정확한 명령을 만들 수 있는 `after-effects`와 `recompute`에만 `next_command`를 제공한다. `after-input`은 `last_decision.needs`를 남기되 값을 발명하지 않으므로 command가 null이다.
+
+생성 bootstrap과 `p2-contract.md`는 이 네 continuation을 한 흐름으로 연결했다. 새 state ledger, export command, 개별 skill 예외, duplicate guard 완화, Decision/trace schema 변경은 없다. runtime은 `0.3.3 → 0.3.4`; validator `0.6.2`, kernel `6`, `SPEC.version = "5"`는 유지한다. 표적 runtime·integration 회귀 44/44와 canonical pilot `--repeats 50` build가 통과했다. pilot은 mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, build ID `sha256:4cd825e0e609322e81f618d245fc6fa1bc09a2ef2bd0abf61aec8c973ca9ef3b`를 기록했다. 전체 `npm run verify`도 vendor check, self lint, repository test 92/92와 frozen G0.5 eval을 통과했다. 배포본의 fresh-agent 행동은 별도 실사용 관찰 전까지 주장하지 않는다.
+
+구현 전 결함을 재현하고 설계를 좁힌 동일 Claude Fable high에게 전체 diff와 증거를 다시 전달했다. 같은 세션의 후속 검수는 canonical/pilot byte parity, half-update, 표적 회귀를 재확인하고 correctness blocker 0으로 PASS했다. ASK·WAIT의 resume reason을 `terminal`로 묶는 명명과 stage-result write의 non-atomic 성질은 non-blocking risk로 남겼으며, 관측된 결함을 넘어 새 상태나 저장 protocol을 만들 근거로 승격하지 않았다. Devflow 9개 P2 package의 manifest와 소비 코드를 읽기 전용으로 조사한 결과 모두 runtime 0.3.3/validator 0.6.1의 동일 cohort였고 generated runtime 밖에서 `resume/1` 또는 `next_command`를 파싱하는 소비자는 발견되지 않았다. 따라서 기존 package는 변경 없이 유지되며, 0.3.4 채택 시에만 9개를 한 cohort 변경으로 재빌드하고 nullable `resume/2` adapter 경계를 확인한다.
+
 ---
 
 ## 7. P2 version-5 보존 및 변경 원장
 
-### 7.-0 2026-09-09 유지보수 locator 관측 표면 추가 (validator 0.6.2)
+### 7.-0 2026-09-09 입력 대기 BLOCK continuation 투영 (runtime 0.3.4)
+
+| 변경 | 호환성 영향 | 근거와 증거 |
+| --- | --- | --- |
+| `reinvoke: after-input` | 기존 caller-supplied needs BLOCK의 null을 실행 가능한 파생 의미로 교정 | 기존 `needs.source`와 effect-free BLOCK에서만 계산하며 observed/mixed/terminal은 null을 보존한다 |
+| traced stage result | stdout envelope에 additive `result_path`를 더하고 같은 envelope를 UTF-8 파일로 자동 저장 | Decision·trace identity와 schema는 그대로이며 duplicate 실패는 마지막 유효 파일을 보존한다 |
+| `resume/2` | terminal과 값이 필요한 continuation의 `next_command`를 null로 바꾸고 `reason`을 추가 | 과거 `/1`의 무조건 명령이 실제 duplicate guard와 충돌했으므로 schema를 명시적으로 올린다. `after-effects`·`recompute`의 명령과 target 연속성은 보존한다 |
+| 기존 생성 package | 강제 migration 없음; 재빌드 전 runtime 0.3.3 의미를 그대로 유지 | 채택해 재빌드한 package만 runtime 0.3.4와 새 bootstrap을 받는다. cohort hash를 묶는 소비 저장소는 한 변경으로 함께 재빌드한다 |
+
+`SPEC.version = "5"`, Decision schema 2, trace schema, closed exports, effect authority, freshness, duplicate rejection은 바뀌지 않는다. 소비자가 `resume/1` schema 또는 terminal에서도 문자열인 `next_command`를 직접 파싱했다면 runtime 0.3.4 채택 시 `/2`의 nullable 계약으로 갱신해야 한다. 이는 숨긴 호환성 축소가 아니라 잘못된 실행 제안을 제거하기 위한 명시적 adapter 변경이다.
+
+### 7.-1 2026-09-09 유지보수 locator 관측 표면 추가 (validator 0.6.2)
 
 `resolveSpecLocator(spec, path)`를 authoring-ledger의 공개 pure resolver로 추출했다. 기존 `locatorExists`도 이 결과의 `resolved`만 사용하므로 L16이 인정하는 group과 arity, 진단 의미는 바뀌지 않는다. 유지보수 model은 이 resolver를 정본으로 재사용하며 별도 locator 문법을 복제하지 않는다.
 
@@ -640,7 +661,7 @@ AI 표면은 목적·profile·현재 source basis, 선택된 requirement/owner/c
 
 Canonical pilot은 새 resolver와 validator 0.6.2를 생성 projection에 봉인하기 위해 builder로 재생성했다. 이것은 maintenance-context 자체를 generated loader에 넣은 것이 아니다. 기존 package를 describe하기 위한 재생성 요구는 0이며, 소비 저장소가 cohort hash 일치를 자체 불변식으로 요구할 때만 그 저장소의 별도 채택 결정이 필요하다.
 
-### 7.-1 2026-09-04 생성 시작점·소비 파일 정직성 보정 (validator 0.5.0)
+### 7.-2 2026-09-04 생성 시작점·소비 파일 정직성 보정 (validator 0.5.0)
 
 `SPEC.version`은 `"5"`로 유지한다. 문법·closed export·Decision/trace schema는 바꾸지 않았고, 검증 범위와 생성 scaffold 모양만 좁혔다.
 

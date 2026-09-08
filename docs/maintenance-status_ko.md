@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-09 KST (`v0.3.2` 위 creator-side maintenance context 구현·전체 검증 완료, 최종 교차 검토 중·원격 미반영)
+최종 갱신: 2026-09-09 KST (`v0.3.2` 위 maintenance context와 P2 입력 재진입 교정 구현·전체 검증·교차 검토 완료, 실사용 검증 직전·원격 미반영)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: `v0.3.2` 릴리스 위 유지보수 컨텍스트 후보 구현·전체 검증 완료
+## 0. 현재 위치: `v0.3.2` 릴리스 위 유지보수 컨텍스트와 입력 대기 BLOCK 교정 완료
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -36,12 +36,14 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 
 현재 원격 미반영 후보는 기존 package의 산문·코드·fixture·manifest·원장을 현재 byte에서 함께 캡처해 사람용 map과 AI용 source-linked causal capsule로 투영한다(구현·검증 기록 6.26). 별도 저장 graph나 수동 인과 정본은 만들지 않고, status·gap·source basis·resume query를 함께 제공해 일부 결과를 전체로 오인하지 않게 한다. Describe는 target code를 실행하지 않으며 P0/P1/P2·unmanaged·invalid package를 read-only로 다룬다. 기존 생성 skill의 정상 실행 경로는 바뀌지 않는다.
 
+같은 후보의 P2 runtime 0.3.4는 Devflow Adopt에서 현실화된 입력 대기 BLOCK의 저장·재진입 공백을 공통 owner에서 닫는다(구현·검증 기록 6.27). `after-input`은 effect-free BLOCK의 non-empty needs가 모두 caller-supplied일 때만 파생되고, traced stage는 UTF-8 결과 파일을 자동 저장하며, `resume/2`는 값 없는 명령을 제시하지 않는다. observed/mixed/terminal BLOCK, duplicate guard, stale·after-effects continuation, evidence authority와 `SPEC.version = "5"`는 보존한다.
+
 ## 1. 저장소 기준선
 
 - branch: `main`
 - 공식 배포 package version은 `0.3.2`(2026-09-07T17:08:18Z published, 현재 Latest)이고 annotated tag는 commit `632bb1f`를 가리킨다. Release workflow run `34146283656`과 공식 source의 Codex·Claude Code 전역 설치가 성공했다.
-- 현재 local `main`과 `origin/main`은 모두 `a4e3c4e`다. Working tree에는 사용자가 이미 가지고 있던 `.gitignore` 변경과 `docs/plan/`, 이번 maintenance-context 구현·문서·test 및 builder로 재생성한 canonical pilot이 함께 있다. 이번 후보는 commit되지 않았다. Package와 lock version은 `0.3.2`다.
-- 현재 fingerprint는 runtime `0.3.3`, validator `0.6.2`, kernel `6`이다. L16 locator 해석 정본을 structured pure resolver로 노출해 validator byte와 generated projection이 바뀌었지만 인정하는 locator universe는 그대로다.
+- 현재 local `main`은 maintenance-context checkpoint `cea279c`를 포함하고 `origin/main`은 `a4e3c4e`다. 이 snapshot 다음 commit은 P2 입력 재진입 교정만 묶으며, 사용자가 이미 가진 `.gitignore` 변경과 `docs/plan/`은 제외한다. Package와 lock version은 `0.3.2`다.
+- 현재 fingerprint는 runtime `0.3.4`, validator `0.6.2`, kernel `6`이다. L16 locator universe는 그대로이고 P2 runtime은 기존 needs에서 `after-input`을 파생한다.
 - `SPEC.version = "5"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 그대로다.
 
 ---
@@ -59,14 +61,17 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 - Unknown read로 guard가 멈출 때 evaluator는 `guard_matched.pending_reads`를 내고 build coverage는 `guard-pending:<id>`로 구분한다. L14는 실제 predicate match와 pending-read block을 각각 대응하는 token으로만 인정한다.
 - 공개 `path` domain이 내부 U+0020 공백 하나를 허용하도록 넓어졌고, 생성 loader의 `--artifact <path>` 예시가 `--artifact "<path>"`로 quote됐다(`v0.1.8`).
 - 기존 package를 변경하지 않고 현재 원본에서 목적·owner·consumer·evidence·frontier를 재구성하는 `maintain --describe`와 `--query [--json]`, 같은 model의 사람용 `--map` preview를 추가했다. 출력은 `complete-for-declared-scope`만 주장하고 source identity·gap·재진입 명령을 함께 제공한다.
+- P2 caller-input BLOCK은 `reinvoke: after-input`을 명시하고 traced stage 결과는 외부 trace directory에 UTF-8로 자동 저장된다. `resume/2`는 실행 가능한 continuation에만 명령을 제공하며 입력 값이나 결정 권한을 발명하지 않는다.
 
 ---
 
 ## 3. 현재 증거
 
 - 현재 maintenance-context 표적 회귀 12/12가 pass했다. P2 causal capsule, finite absence와 unknown, 자연어 match cut, invalid·악성 target 비실행, JSON source span, bounded reverse consumer, P0/P1 projection ownership, AST module edge, CLI mode 배타성·compact JSON·legacy diagnose, map, 기존 L16 locator universe와 정적으로 해석할 수 없는 선언 관계의 fail-closed 차단을 고정한다.
-- 현재 전체 `npm run verify`: vendor check, self lint, repository test 90/90, frozen G0.5 eval pass.
-- Canonical pilot rebuild: runtime `0.3.3`, validator `0.6.2`, kernel `6`; L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, manifest 15 content + 38 generated = 53, build ID `sha256:4f81126091d6e47aa319cd5b048a3d1b3ddc113d5930e525d818ca6543f196bd`.
+- 현재 전체 `npm run verify`: vendor check, self lint, repository test 92/92, frozen G0.5 eval pass.
+- Canonical pilot rebuild: runtime `0.3.4`, validator `0.6.2`, kernel `6`; L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, manifest 15 content + 38 generated = 53, build ID `sha256:4cd825e0e609322e81f618d245fc6fa1bc09a2ef2bd0abf61aec8c973ca9ef3b`.
+- 입력 재진입 표적 회귀 44/44가 pass했고, 동일 Fable high 세션의 구현 후 whole-diff 검수는 blocker 0으로 PASS했다. Fable이 남긴 non-blocking risk는 ASK/WAIT의 `reason: terminal` 명명과 결과 파일의 non-atomic write이며, 둘 다 관측된 결함 범위를 넓혀 지금 기계화하지 않는다.
+- Devflow의 9개 P2 package는 runtime 0.3.3/validator 0.6.1과 동일 runtime hash를 봉인하며, generated runtime 밖에서 `resume/1` 또는 `next_command`를 파싱하는 소비자는 검색되지 않았다. 기존 package는 그대로 호환되고, 새 runtime 채택 시 cohort 불변식에 따라 9개를 한 변경에서 재빌드한다.
 - 두 blind fresh-maintainer가 공개 route와 describe를 발견했다. 같은 agent와 수정·재실행을 반복해 자연어 miss, 과대 fan-out과 truncation을 줄였고, 최종 관찰은 목적·requirement·owner stage·fixture·source basis·gap·resume을 보존했다. 별도 normal-use control은 생성 skill의 runtime route만 사용해 maintenance surface 비개입을 관찰했다. 모두 제한된 `PARTIAL` 행동 증거다.
 - Fresh Terra high의 첫 두 미공개 계획 사례는 owner 진단·역할·모델 확인·두 검증 lane을 복원했지만 위임 context와 실제 이해도 확인을 사용자-facing 배정안에서 누락했다. 같은 실패가 두 번 반복되어 이를 `Delegation readiness`와 역할 배정의 완료 조건으로 재배치했고, 세 번째 미공개 사례는 전달 context와 실제 이해 확인 방법까지 스스로 계획했다. 한 모델·한 최종 사례의 `PARTIAL` 행동 증거이며 반복성·실제 위임 성공은 아니다.
 - Astra xhigh 구현 전 전제 검수와 Sol xhigh 전체 diff 검수를 사용했다. Sol이 역할 권장성, task/input attribution과 회귀 과잉의 세 blocker를 찾았고, 수정 후 두 차례 후속 검수는 blocker 0과 no-migration compatibility를 판정했다.
@@ -107,13 +112,14 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 - `v0.1.8`의 변경된 표면(interior-space path domain, quoted `--artifact`)에 대한 fresh-agent 소비 행동은 `UNPROVEN`이다. 이번 release는 tag·push·GitHub Release·전역 설치·설치본 diff/lint/fingerprint 재확인까지 완료했지만 fresh-agent behavior 증거를 새로 만들지 않는다.
 - 새 authoring 운영 하네스의 다른 모델·host 반복성, structured orchestration의 실제 역할 분리, recursive delegation 두 번째 hop 이후 의미 보존, supervisor의 실제 교착 탐지·briefing 교정·역할 재배치, long-session/compaction 유지와 실제 skill 품질 향상량은 `UNPROVEN`이다.
 - Maintenance-context의 다른 모델·host 반복성, 장기 session·compaction 재진입, 대형 Devflow package에서의 출력 비용과 실제 오수정 감소량, capture 중 외부 write, 모든 의미 관계의 완전성은 `UNPROVEN`이다. `complete-for-declared-scope`와 partial catalog를 전체 package의 의미적 완전성으로 승격하지 않는다.
+- 배포된 runtime 0.3.4 bootstrap을 처음 보는 fresh agent가 caller-input BLOCK을 실제로 저장하고 값 없는 retry 없이 재평가하는 행동은 실사용 관찰 전까지 `UNPROVEN`이다.
 
 ---
 
 ## 5. 정확한 다음 단계
 
-1. 기존 informed 설계 검증자에게 최초 목적, 승인된 설계, 전체 diff, 실행 증거와 fresh simulation을 다시 전달하고 같은 검증자와 이견을 왕복해 whole-result 결론을 좁힌다.
-2. blocker가 나오면 owning abstraction에서 수정하고 표적·전체 검증을 다시 실행한다. 구조 pass나 한 fresh run을 여러 모델·host·장기 행동 증거로 승격하지 않는다.
-3. blocker가 없으면 실제 Devflow capability 하나에서 직접 탐색(A)과 source-linked context(B)를 bounded 비교한다. 이 비교 전에는 stored index, default generated handoff나 새 causal schema를 제품화하지 않는다.
-4. 기존 package는 describe를 위해 migration하거나 rebuild하지 않는다. Validator cohort hash 일치를 별도 불변식으로 요구하는 소비 저장소만 자체 채택 결정 뒤 한 경계에서 재빌드한다.
-5. Commit·push·release·install은 사용자가 명시적으로 요청하기 전에는 수행하지 않는다.
+1. 현재 P2 교정을 사용자 소유 `.gitignore`와 `docs/plan/` 없이 별도 commit한다.
+2. 그 commit의 `skills/skill-rails`를 로컬 canonical install에 배포한 뒤, Orca CLI의 fresh agent 한 개로 Devflow Adopt의 source-linked context 발견성과 runtime 0.3.4 caller-input 재진입을 bounded 관찰한다.
+3. 실사용 결과에 문제가 있으면 즉시 수정하지 말고 product defect, fixture/harness, environment, agent interpretation으로 먼저 분류해 보고하고 멈춘다. 한 fresh run을 여러 모델·host·장기 행동 증거로 승격하지 않는다.
+4. 기존 Devflow package는 describe를 위해 migration하거나 rebuild하지 않는다. Runtime 0.3.4를 채택할 때만 9-package cohort를 한 변경에서 재빌드한다.
+5. Push·tag·GitHub Release는 별도의 명시적 요청 전에는 수행하지 않는다.
