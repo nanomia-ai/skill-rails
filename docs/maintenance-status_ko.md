@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-09 KST (`v0.4.2` 유지보수 인덱스 폐쇄 교정 구현·검증 완료, 배포 전)
+최종 갱신: 2026-09-09 KST (`v0.4.2` 유지보수 인덱스 폐쇄 교정 공식 배포·전역 설치 완료)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: `v0.4.2` 유지보수 인덱스 폐쇄 교정 구현·검증 완료, 배포 전
+## 0. 현재 위치: `v0.4.2` 유지보수 인덱스 폐쇄 교정 공식 배포·전역 설치 완료
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -42,10 +42,12 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 
 Devflow의 후속 유지보수 인덱스 실측은 52개 stage-owner exact query 중 네 개가 반복해도 닫히지 않는 문제를 드러냈다. `v0.4.2` 후보는 direct required relation을 secondary fan-out보다 먼저 예약하고 canonical structured JSON에 별도 유한 parse budget을 적용한다. Migration provenance를 current intent로 가장하지 않고 source·hash·kind가 구분되는 bounded-label external boundary로 보존하며 같은 목록의 중복 locator는 한 edge로 계산한다. 근본 교정 뒤 frontier가 이미 작아져 별도 필터는 제거하고 overview와 exact query 모두 전체 frontier를 유지한다. P2 runtime·validator·kernel과 생성 package byte는 바뀌지 않는다(구현·검증 기록 6.30).
 
+Release-boundary commit `5af4b5e1df13de24d40e0041593504b45d7fbd7c`와 annotated tag `v0.4.2`를 `git push --atomic origin main v0.4.2`로 함께 push했다. Workflow run `34345776140`이 version 일치, `npm run verify`, GitHub Release 생성을 모두 성공했고 공식 Release `v0.4.2`가 published됐다. 공식 NPX installer로 Codex universal package와 Claude Code symlink를 갱신한 뒤 release source와 설치본의 newline-tolerant directory diff 0, 설치본 self lint pass, lock의 source와 갱신 시각을 확인했다. 설치본으로 현재 Devflow `0.23.21`에서 과거 blocked 네 owner를 다시 질의한 결과 모두 `closed`, blocker 0, frontier 5–8이었다.
+
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 공식 배포 Latest는 `v0.4.1`이고 annotated tag는 release-boundary commit `75355f3`를 가리킨다. Local source와 lock은 아직 배포되지 않은 `0.4.2`에 일치하며, `origin/main`은 push 전까지 `v0.4.1` 문서 후속 commit `3fd8791`에 있다.
+- 공식 배포 Latest는 `v0.4.2`이고 annotated tag는 release-boundary commit `5af4b5e`를 가리킨다. `main`은 배포·설치 영수증을 기록한 후속 문서 commit을 포함하며 제품 byte는 tag와 같다.
 - 사용자 소유 `.gitignore` 변경과 `docs/plan/`은 이번 제품 변경과 커밋에 포함하지 않는다.
 - 현재 배포 fingerprint는 runtime `0.3.5`, validator `0.6.2`, kernel `6`이다. L16 locator universe와 `after-input` 파생 의미는 그대로이며 순차 caller 입력 결합만 교정한다.
 - `SPEC.version = "5"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 그대로다.
@@ -75,6 +77,7 @@ Devflow의 후속 유지보수 인덱스 실측은 52개 stage-owner exact query
 
 - 현재 maintenance-context 표적 회귀 19/19가 pass했다. 기존 P2 causal capsule, finite absence와 unknown, 비실행·source span·bounded projection·map·L16·fail-closed 경계에 더해 direct required relation 선예약, canonical structured source의 별도 유한 budget, 같은 목록의 provenance dedupe, migration external provenance identity·bounded label과 전체 frontier 보존을 고정한다.
 - 현재 전체 `npm run verify`: vendor check, self lint, repository test 100/100, frozen G0.5 eval pass. 앞선 병렬 실행의 임의 Windows `EPERM`은 서로 다른 atomic rename에서 발생했고 격리·직렬 재실행 뒤 agent 작업이 끝난 표준 명령에서도 재현되지 않았다.
+- GitHub release workflow `34345776140`은 tagged source에서 version 검사와 같은 전체 verify를 통과해 `v0.4.2` Release를 생성했다. 공식 설치본은 release source와 directory diff 0, self lint pass이며 runtime `0.3.5`/validator `0.6.2`/kernel `6`을 유지한다. 설치본으로 Devflow `0.23.21`의 이전 blocked owner 네 개를 재질의해 `closed` 4/4와 blocker 0을 확인했다.
 - Canonical pilot rebuild: runtime `0.3.5`, validator `0.6.2`, kernel `6`; L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, manifest 15 content + 38 generated = 53, build ID `sha256:c10796022a4ae2a7766e305f46639fbee0a5e89a9ff54f2c1b264c377b3f43d8`.
 - 순차 caller 입력 표적 회귀는 `A → B → C → DONE`, 현재값 override, terminal/project/snapshot/package no-inherit, run transplant·UNKNOWN/context 변조 거부와 nested UNKNOWN/동형 known JSON의 lossless 구분을 통과했다. 같은 Claude Opus xhigh와 Astra xhigh 세션의 후속 whole-result 감사가 모두 runtime API를 근본 owner로 판정하고 blocker 0으로 `ACCEPT`했다.
 - 입력 재진입 표적 회귀 44/44가 pass했고, 동일 Fable high 세션의 구현 후 whole-diff 검수는 blocker 0으로 PASS했다. Fable이 남긴 non-blocking risk는 ASK/WAIT의 `reason: terminal` 명명과 결과 파일의 non-atomic write이며, 둘 다 관측된 결함 범위를 넓혀 지금 기계화하지 않는다.
@@ -126,6 +129,6 @@ Devflow의 후속 유지보수 인덱스 실측은 52개 stage-owner exact query
 
 ## 5. 정확한 다음 단계
 
-1. 공식 Latest `v0.4.1`과 Codex·Claude Code 전역 설치가 완료됐다. 다음 작업은 이 설치본을 사용한 Devflow 실사용 검증이다.
+1. 공식 Latest `v0.4.2`와 Codex·Claude Code 전역 설치가 완료됐다. Devflow 유지보수는 새 설치본이 현재 byte에서 다시 계산한 describe/map/exact capsule을 사용하고, 이전 stdout 또는 외부 scratch 사본은 폐기한다.
 2. Runtime 0.3.5를 채택할 소비 저장소는 정본 builder로 P2 runtime hash cohort 전체를 한 변경에서 재빌드한다. 기존 package는 자동 변경되지 않는다.
 3. 0.3.4에서 이미 순차 caller 입력 결함으로 막힌 active run은 새 runtime과 새 run ID로 다시 시작한다. Fresh Devflow 전체 흐름은 별도 실사용 검증 전까지 `UNPROVEN`으로 유지한다.
