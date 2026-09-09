@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-09 KST (`v0.4.0` 공식 릴리스·Codex/Claude Code 설치 완료)
+최종 갱신: 2026-09-09 KST (`v0.4.1` 순차 after-input 교정 후보 구현·검증 완료)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: 유지보수 컨텍스트와 입력 대기 BLOCK 교정을 묶은 `v0.4.0` 배포 완료
+## 0. 현재 위치: 순차 after-input caller 입력 승계의 `v0.4.1` 교정 후보 검증 완료
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -38,12 +38,14 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 
 같은 릴리스의 P2 runtime 0.3.4는 Devflow Adopt에서 현실화된 입력 대기 BLOCK의 저장·재진입 공백을 공통 owner에서 닫는다(구현·검증 기록 6.27). `after-input`은 effect-free BLOCK의 non-empty needs가 모두 caller-supplied일 때만 파생되고, traced stage는 UTF-8 결과 파일을 자동 저장하며, `resume/2`는 값 없는 명령을 제시하지 않는다. observed/mixed/terminal BLOCK, duplicate guard, stale·after-effects continuation, evidence authority와 `SPEC.version = "5"`는 보존한다.
 
+후속 실제 연속 호출은 runtime 0.3.4가 현재 명령줄의 caller 입력만 결합해 `A` 제출 뒤 `B`만 제출하면 `A`를 잃는 결함을 드러냈다. Runtime 0.3.5 후보는 P2 stage API에서 가장 최근의 호환되는 `after-input` Decision에 결합된 입력만 한 단계 승계하고 현재 명시값을 우선한다. Run·package·project·target·stable snapshot·runtime/spec identity가 달라지거나 terminal/stale/다른 continuation이면 승계하지 않는다. Lossless caller 입력은 Decision과 context에 self-seal되며, 부분 변조나 다른 run 이식은 fail-closed한다. 새 ledger·schema·Devflow 예외는 추가하지 않았다(구현·검증 기록 6.29).
+
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 공식 배포 package version은 `0.4.0`(2026-09-09 KST published, 현재 Latest)이고 annotated tag는 release-boundary commit `ff4ed25`를 가리킨다. Release workflow run `34291008866`이 version 일치·전체 검증·GitHub Release 생성을 성공했고 공식 NPX 명령으로 Codex universal package와 Claude Code junction을 갱신했다.
-- Package와 lock version은 `0.4.0`이다. 사용자 소유 `.gitignore` 변경과 `docs/plan/`은 release commit과 설치에 포함하지 않았다.
-- 현재 fingerprint는 runtime `0.3.4`, validator `0.6.2`, kernel `6`이다. L16 locator universe는 그대로이고 P2 runtime은 기존 needs에서 `after-input`을 파생한다.
+- 공식 배포 Latest는 `v0.4.0`이고 annotated tag는 release-boundary commit `ff4ed25`를 가리킨다. 현재 source와 lock은 아직 배포하지 않은 patch 후보 `0.4.1`이다.
+- 사용자 소유 `.gitignore` 변경과 `docs/plan/`은 이번 제품 변경과 커밋에 포함하지 않는다.
+- 현재 후보 fingerprint는 runtime `0.3.5`, validator `0.6.2`, kernel `6`이다. L16 locator universe와 `after-input` 파생 의미는 그대로이며 순차 caller 입력 결합만 교정한다.
 - `SPEC.version = "5"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 그대로다.
 
 ---
@@ -62,14 +64,16 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 - 공개 `path` domain이 내부 U+0020 공백 하나를 허용하도록 넓어졌고, 생성 loader의 `--artifact <path>` 예시가 `--artifact "<path>"`로 quote됐다(`v0.1.8`).
 - 기존 package를 변경하지 않고 현재 원본에서 목적·owner·consumer·evidence·frontier를 재구성하는 `maintain --describe`와 `--query [--json]`, 같은 model의 사람용 `--map` preview를 추가했다. 출력은 `complete-for-declared-scope`만 주장하고 source identity·gap·재진입 명령을 함께 제공한다.
 - P2 caller-input BLOCK은 `reinvoke: after-input`을 명시하고 traced stage 결과는 외부 trace directory에 UTF-8로 자동 저장된다. `resume/2`는 실행 가능한 continuation에만 명령을 제공하며 입력 값이나 결정 권한을 발명하지 않는다.
+- 순차 `after-input`은 직전 동일 context의 lossless caller 입력만 이어받는다. 현재 flag가 이전 값을 대체하고, terminal·stale·다른 package/project/target/snapshot/run에는 승계하지 않으며 provenance 불일치는 fail-closed한다.
 
 ---
 
 ## 3. 현재 증거
 
 - 현재 maintenance-context 표적 회귀 12/12가 pass했다. P2 causal capsule, finite absence와 unknown, 자연어 match cut, invalid·악성 target 비실행, JSON source span, bounded reverse consumer, P0/P1 projection ownership, AST module edge, CLI mode 배타성·compact JSON·legacy diagnose, map, 기존 L16 locator universe와 정적으로 해석할 수 없는 선언 관계의 fail-closed 차단을 고정한다.
-- 현재 전체 `npm run verify`: vendor check, self lint, repository test 92/92, frozen G0.5 eval pass.
-- Canonical pilot rebuild: runtime `0.3.4`, validator `0.6.2`, kernel `6`; L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, manifest 15 content + 38 generated = 53, build ID `sha256:4cd825e0e609322e81f618d245fc6fa1bc09a2ef2bd0abf61aec8c973ca9ef3b`.
+- 현재 전체 `npm run verify`: vendor check, self lint, repository test 93/93, frozen G0.5 eval pass.
+- Canonical pilot rebuild: runtime `0.3.5`, validator `0.6.2`, kernel `6`; L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, manifest 15 content + 38 generated = 53, build ID `sha256:c10796022a4ae2a7766e305f46639fbee0a5e89a9ff54f2c1b264c377b3f43d8`.
+- 순차 caller 입력 표적 회귀는 `A → B → C → DONE`, 현재값 override, terminal/project/snapshot/package no-inherit, run transplant·UNKNOWN/context 변조 거부와 nested UNKNOWN/동형 known JSON의 lossless 구분을 통과했다. 같은 Claude Opus xhigh와 Astra xhigh 세션의 후속 whole-result 감사가 모두 runtime API를 근본 owner로 판정하고 blocker 0으로 `ACCEPT`했다.
 - 입력 재진입 표적 회귀 44/44가 pass했고, 동일 Fable high 세션의 구현 후 whole-diff 검수는 blocker 0으로 PASS했다. Fable이 남긴 non-blocking risk는 ASK/WAIT의 `reason: terminal` 명명과 결과 파일의 non-atomic write이며, 둘 다 관측된 결함 범위를 넓혀 지금 기계화하지 않는다.
 - Devflow의 9개 P2 package는 runtime 0.3.3/validator 0.6.1과 동일 runtime hash를 봉인하며, generated runtime 밖에서 `resume/1` 또는 `next_command`를 파싱하는 소비자는 검색되지 않았다. 기존 package는 그대로 호환되고, 새 runtime 채택 시 cohort 불변식에 따라 9개를 한 변경에서 재빌드한다.
 - 두 blind fresh-maintainer가 공개 route와 describe를 발견했다. 같은 agent와 수정·재실행을 반복해 자연어 miss, 과대 fan-out과 truncation을 줄였고, 최종 관찰은 목적·requirement·owner stage·fixture·source basis·gap·resume을 보존했다. 별도 normal-use control은 생성 skill의 runtime route만 사용해 maintenance surface 비개입을 관찰했다. 모두 제한된 `PARTIAL` 행동 증거다.
@@ -113,12 +117,12 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 - `v0.1.8`의 변경된 표면(interior-space path domain, quoted `--artifact`)에 대한 fresh-agent 소비 행동은 `UNPROVEN`이다. 이번 release는 tag·push·GitHub Release·전역 설치·설치본 diff/lint/fingerprint 재확인까지 완료했지만 fresh-agent behavior 증거를 새로 만들지 않는다.
 - 새 authoring 운영 하네스의 다른 모델·host 반복성, structured orchestration의 실제 역할 분리, recursive delegation 두 번째 hop 이후 의미 보존, supervisor의 실제 교착 탐지·briefing 교정·역할 재배치, long-session/compaction 유지와 실제 skill 품질 향상량은 `UNPROVEN`이다.
 - Maintenance-context의 다른 모델·host 반복성, 장기 session·compaction 재진입, 대형 Devflow package에서의 출력 비용과 실제 오수정 감소량, capture 중 외부 write, 모든 의미 관계의 완전성은 `UNPROVEN`이다. `complete-for-declared-scope`와 partial catalog를 전체 package의 의미적 완전성으로 승격하지 않는다.
-- 배포된 runtime 0.3.4 bootstrap을 처음 보는 fresh agent가 caller-input BLOCK을 실제로 저장하고 값 없는 retry 없이 재평가하는 행동은 실사용 관찰 전까지 `UNPROVEN`이다.
+- Runtime 0.3.5를 처음 보는 fresh agent가 순차 caller-input BLOCK을 실제로 끝까지 재평가하는 행동과 Devflow 전체 흐름은 실사용 관찰 전까지 `UNPROVEN`이다.
 
 ---
 
 ## 5. 정확한 다음 단계
 
-1. 기존 Devflow package는 describe를 위해 migration하거나 rebuild하지 않는다. 현재 배포된 Skill Rails로 current-source maintenance context를 바로 사용할 수 있다.
-2. Devflow가 runtime 0.3.4를 채택할 때만 9-package cohort를 한 별도 변경에서 재빌드하고 nullable `resume/2` adapter 경계를 확인한다.
-3. Fresh Devflow caller-input BLOCK 실제 재진입은 별도 실사용 검증 전까지 `UNPROVEN`으로 유지한다.
+1. 공식 Latest는 계속 `v0.4.0`이다. 사용자가 별도 릴리스를 요청하기 전에는 검증된 `v0.4.1` source commit만 유지한다.
+2. Runtime 0.3.5를 채택할 소비 저장소는 정본 builder로 P2 runtime hash cohort 전체를 한 변경에서 재빌드한다. 기존 package는 자동 변경되지 않는다.
+3. 0.3.4에서 이미 순차 caller 입력 결함으로 막힌 active run은 새 runtime과 새 run ID로 다시 시작한다. Fresh Devflow 전체 흐름은 별도 실사용 검증 전까지 `UNPROVEN`으로 유지한다.

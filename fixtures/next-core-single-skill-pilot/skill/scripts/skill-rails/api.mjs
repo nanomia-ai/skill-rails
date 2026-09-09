@@ -8,7 +8,7 @@ import { loadBuiltSkill, reverifyBuiltSkill } from "./loader.mjs";
 import { loadCollectorRegistry, collectObservations } from "./collectors.mjs";
 import { bindObservationInputs, prepareFixtureInputs } from "./observations.mjs";
 import { captureSnapshot, compareSnapshots } from "./snapshot.mjs";
-import { evaluateSpec } from "./evaluator.mjs";
+import { evaluateSpec, serializeDecisionValue } from "./evaluator.mjs";
 import { renderGuide } from "./guide.mjs";
 import { loadBody, resolveBodySection } from "./body.mjs";
 import { resolveTemplate } from "./templates.mjs";
@@ -18,7 +18,8 @@ import { alignDecision } from "./alignment.mjs";
 import { DECISION_SCHEMA, KERNEL_VERSION, RUNTIME_VERSION, VALIDATOR_VERSION } from "./constants.mjs";
 import { sha256, stableStringify } from "./hash.mjs";
 import { fail } from "./diagnostics.mjs";
-import { normalizeProjectTarget, resolveInside } from "./path-policy.mjs";
+import { canonicalPath, normalizeProjectTarget, resolveInside } from "./path-policy.mjs";
+import { validateDomainValue } from "./domains.mjs";
 
 export async function loadAuthoringSkill(skillRoot, runtimeDir = null) {
   const root = resolve(skillRoot);
@@ -84,8 +85,17 @@ async function stageSkillOnce({ skillRoot, projectRoot, targetPath = null, judge
   project ??= resolve(projectRoot);
   const registry = await loadCollectorRegistry(root);
   const start = await captureSnapshot(project, registry.snapshotBasis, targetContext);
-  const parsedJudged = bindObservationInputs(loaded.spec, judged, "judged", start.fingerprint);
-  const parsedDecided = bindObservationInputs(loaded.spec, decided, "decided", start.fingerprint);
+  const currentJudged = bindObservationInputs(loaded.spec, judged, "judged", start.fingerprint);
+  const currentDecided = bindObservationInputs(loaded.spec, decided, "decided", start.fingerprint);
+  const continuationContext = {
+    package_fingerprint: loaded.runtime.content_hash,
+    project_fingerprint: sha256({ project_root: await canonicalPath(project) })
+  };
+  const inherited = tracePath
+    ? callerInputContinuation(await readTrace(tracePath), loaded, start, targetContext, continuationContext)
+    : { judged: {}, decided: {} };
+  const parsedJudged = { ...inherited.judged, ...currentJudged };
+  const parsedDecided = { ...inherited.decided, ...currentDecided };
   const collectorContext = { projectRoot: project, skillRoot: root, snapshot: start, ...(targetContext ?? {}) };
   const observations = await collectObservations(loaded.spec, registry, collectorContext, { ...parsedJudged, ...parsedDecided });
   const end = await captureSnapshot(project, registry.snapshotBasis, targetContext);
@@ -103,7 +113,7 @@ async function stageSkillOnce({ skillRoot, projectRoot, targetPath = null, judge
     await reverifyBuiltSkill(loaded);
     if (traceDir) {
       await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "snapshot_stale", authority: "runtime_observed", decision_id: decision.decision_id, spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: snapshot.fingerprint, data: { start: snapshot.start_fingerprint, end: snapshot.end_fingerprint } });
-      await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "decision_emitted", authority: "runtime_observed", decision_id: decision.decision_id, spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: snapshot.fingerprint, data: { status: decision.status, decision, ...(targetContext ?? {}) } });
+      await appendTraceEvent(traceDir, { run_id: effectiveRunId, type: "decision_emitted", authority: "runtime_observed", decision_id: decision.decision_id, spec_fingerprint: loaded.runtime.spec_hash, snapshot_fingerprint: snapshot.fingerprint, data: decisionEventData(decision, parsedJudged, parsedDecided, targetContext, continuationContext, effectiveRunId) });
     }
     return { decision, guide: null, runId: effectiveRunId, tracePath };
   }
@@ -113,7 +123,7 @@ async function stageSkillOnce({ skillRoot, projectRoot, targetPath = null, judge
   const guide = renderGuide(decision, { enterHash: enter.enter_hash });
   await reverifyBuiltSkill(loaded);
   if (traceDir) {
-    for (const event of decisionTraceEvents(decision, guide, guardTrace, targetContext)) await appendTraceEvent(traceDir, { ...event, run_id: effectiveRunId });
+    for (const event of decisionTraceEvents(decision, guide, guardTrace, targetContext, continuationContext, parsedJudged, parsedDecided, effectiveRunId)) await appendTraceEvent(traceDir, { ...event, run_id: effectiveRunId });
   }
   return { decision, guide, runId: effectiveRunId, tracePath };
 }
@@ -223,13 +233,84 @@ function observationTraceEvents(loaded, observations, snapshot) {
   return events;
 }
 
-function decisionTraceEvents(decision, guide, guardTrace, targetContext) {
+function decisionTraceEvents(decision, guide, guardTrace, targetContext, continuationContext, judged, decided, runId) {
   const base = { authority: "runtime_observed", decision_id: decision.decision_id, spec_fingerprint: decision.spec.fingerprint, snapshot_fingerprint: decision.snapshot.fingerprint };
   const events = guardTrace.map((event) => ({ ...base, ...event }));
   if (decision.stage) events.push({ ...base, type: "stage_entered", data: { stage: decision.stage, row: decision.row } });
   for (const [index, effect] of decision.effects.entries()) if (Array.isArray(effect)) events.push({ ...base, type: "effect_planned", data: { index, verb: effect[0], args: effect[1] } });
   if (["ASK", "WAIT", "BLOCK"].includes(decision.status)) events.push({ ...base, type: "review_required", data: { status: decision.status, needs: decision.needs } });
-  events.push({ ...base, type: "decision_emitted", data: { status: decision.status, stage: decision.stage, row: decision.row, decision, ...(targetContext ?? {}) } });
+  events.push({ ...base, type: "decision_emitted", data: decisionEventData(decision, judged, decided, targetContext, continuationContext, runId) });
   events.push({ ...base, type: "guide_rendered", data: { guide_hash: sha256(guide) } });
   return events;
+}
+
+function decisionEventData(decision, judged, decided, targetContext, continuationContext, runId) {
+  const data = {
+    status: decision.status,
+    stage: decision.stage,
+    row: decision.row,
+    decision,
+    ...(targetContext ?? {})
+  };
+  if (decision.reinvoke === "after-input") {
+    data.continuation = { ...continuationContext, caller_inputs: { judged, decided } };
+    data.continuation.fingerprint = callerInputContinuationFingerprint(decision.decision_id, data.continuation, targetContext?.targetPath ?? null, runId);
+  }
+  return data;
+}
+
+function callerInputContinuation(events, loaded, snapshot, targetContext, continuationContext) {
+  const last = [...events].reverse().find((event) => event.type === "decision_emitted");
+  const decision = last?.data?.decision;
+  const recorded = last?.data?.continuation;
+  if (!last || last.authority !== "runtime_observed" || !decision || decision.reinvoke !== "after-input" || decision.snapshot?.status !== "stable") return { judged: {}, decided: {} };
+  if (!recorded) return { judged: {}, decided: {} };
+  if (recorded.fingerprint !== callerInputContinuationFingerprint(decision.decision_id, recorded, last.data?.targetPath ?? null, last.run_id)) fail("SR_TRACE_INVALID", "The latest continuation input provenance is not self-consistent.");
+  if (recorded.package_fingerprint !== continuationContext.package_fingerprint || recorded.project_fingerprint !== continuationContext.project_fingerprint) return { judged: {}, decided: {} };
+  if ((last.data?.targetPath ?? null) !== (targetContext?.targetPath ?? null)) return { judged: {}, decided: {} };
+  if (decision.spec?.fingerprint !== loaded.runtime.spec_hash || decision.runtime?.version !== loaded.runtime.version || decision.runtime?.hash !== loaded.runtime.runtime_hash || decision.runtime?.dsl_hash !== loaded.runtime.dsl_hash || decision.runtime?.validator_version !== loaded.runtime.validator_version || decision.runtime?.validator_hash !== loaded.runtime.validator_hash) return { judged: {}, decided: {} };
+  if (decision.snapshot.fingerprint !== snapshot.fingerprint) return { judged: {}, decided: {} };
+  if (!isEligibleCallerInputDecision(decision, loaded)) fail("SR_TRACE_INVALID", "The latest after-input Decision is not an eligible caller-input continuation.");
+  if (last.decision_id !== decision.decision_id || last.spec_fingerprint !== decision.spec.fingerprint || last.snapshot_fingerprint !== decision.snapshot.fingerprint || sha256({ ...decision, decision_id: undefined }) !== decision.decision_id) fail("SR_TRACE_INVALID", "The latest continuation Decision is not self-consistent.");
+  const judged = validateRecordedCallerInputs(loaded.spec, recorded.caller_inputs?.judged, "judged");
+  const decided = validateRecordedCallerInputs(loaded.spec, recorded.caller_inputs?.decided, "decided");
+  if (stableStringify(serializeDecisionValue(judged)) !== stableStringify(decision.judged) || stableStringify(serializeDecisionValue(decided)) !== stableStringify(decision.decided)) fail("SR_TRACE_INVALID", "The latest continuation input provenance does not match its Decision.");
+  return { judged, decided };
+}
+
+function callerInputContinuationFingerprint(decisionId, continuation, targetPath, runId) {
+  return sha256({
+    contract: "caller-input-continuation/1",
+    run_id: runId,
+    decision_id: decisionId,
+    package_fingerprint: continuation.package_fingerprint,
+    project_fingerprint: continuation.project_fingerprint,
+    targetPath,
+    caller_inputs: continuation.caller_inputs
+  });
+}
+
+function isEligibleCallerInputDecision(decision, loaded) {
+  return decision.schema === DECISION_SCHEMA
+    && decision.skill === loaded.spec.SPEC.id
+    && decision.spec?.id === loaded.spec.SPEC.id
+    && decision.spec?.version === "5"
+    && decision.status === "BLOCK"
+    && Array.isArray(decision.effects) && decision.effects.length === 0
+    && Array.isArray(decision.needs) && decision.needs.length > 0
+    && decision.needs.every((need) => {
+      const declaration = loaded.spec.OBSERVATIONS?.[need?.field];
+      return ["judged", "decided"].includes(need?.source) && declaration?.[need.source] === true;
+    });
+}
+
+function validateRecordedCallerInputs(spec, value, kind) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) fail("SR_TRACE_INVALID", `The latest continuation ${kind} input map is invalid.`);
+  const output = {};
+  for (const [field, item] of Object.entries(value)) {
+    const declaration = spec.OBSERVATIONS?.[field];
+    if (!declaration?.[kind] || !validateDomainValue(declaration.domain, item).ok) fail("SR_TRACE_INVALID", `The latest continuation ${kind} input is outside its declared lane or domain.`, { pointer: field });
+    output[field] = item;
+  }
+  return output;
 }

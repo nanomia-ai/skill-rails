@@ -146,12 +146,12 @@ async function decisionParts(context) {
     restrict: [...restrictions.keys()].sort(),
     stage,
     row,
-    facts: [...facts.entries()].map(([field, value]) => ({ field, value: serializable(value) })),
-    judged: serializable(judged),
-    decided: serializable(decided),
+    facts: [...facts.entries()].map(([field, value]) => ({ field, value: serializeDecisionValue(value) })),
+    judged: serializeDecisionValue(judged),
+    decided: serializeDecisionValue(decided),
     record,
     reads: [...facts.keys()].sort(),
-    effects: serializable(projection.effects),
+    effects: serializeDecisionValue(projection.effects),
     format: projection.format,
     template: projection.template,
     template_text: projection.templateText,
@@ -188,7 +188,7 @@ export function checkReads(spec, item, flat, facts, needFields = []) {
     if (!Object.hasOwn(flat, field)) fail("L4", `Observation is absent from snapshot: ${field}`);
     const value = flat[field];
     if (!validateDomainValue(declaration.domain, value).ok) fail("L3", `Observation is outside domain: ${field}`);
-    facts.set(field, serializable(value));
+    facts.set(field, serializeDecisionValue(value));
     if (isUnknown(value) && !(item.acceptsUnknown ?? []).includes(field)) {
       needs.push(needDescriptor(spec, field, item.body ?? null));
     }
@@ -296,9 +296,9 @@ function proofFor(spec, record, effects) {
 
 function isNoEffectNext(plan) { return Array.isArray(plan) && plan.length === 1 && plan[0] === "NEXT"; }
 
-function serializable(value) {
+export function serializeDecisionValue(value) {
   if (isUnknown(value)) return { kind: "UNKNOWN", reason: value.reason, details: value.details ?? null };
-  if (Array.isArray(value)) return value.map(serializable);
-  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, serializable(item)]));
+  if (Array.isArray(value)) return value.map(serializeDecisionValue);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, serializeDecisionValue(item)]));
   return value;
 }

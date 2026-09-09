@@ -68,6 +68,8 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.match(p2Skill, /Decision body, `stage_artifacts`, and ordered effects/);
   assert.match(p2Skill, /processing every effect in order through the final terminal/);
   assert.match(p2Skill, /ASK, WAIT, BLOCK, DONE, and ROUTE stop only when reached after all preceding effects/);
+  assert.match(p2Skill, /runtime retains caller inputs self-sealed with the immediately preceding `after-input` Decision/);
+  assert.match(p2Skill, /never carries caller inputs across another continuation kind or changed, unsealed context/);
   assert.doesNotMatch(p2Skill, /Stop on a diagnostic, stale snapshot, BLOCK, ASK, or WAIT/);
   assert.match(p2Skill, /Do not infer replacement paths from collector or authoring files/);
   // The bootstrap must not claim a package meaning for an effect argument: the runtime renders those
@@ -867,6 +869,143 @@ test("traced CLI persists caller-input BLOCKs and permits only supplied same-run
   assert.deepEqual(await readJson(resultPath), continued, "a rejected duplicate cannot overwrite the usable current result");
 });
 
+test("after-input retains sequential caller lanes only inside the same stable continuation context", async (t) => {
+  const base = await makeTestDir("sequential-input-continuation");
+  t.after(() => removeTestDir(base));
+  const root = join(base, "skill");
+  const otherRoot = join(base, "other-skill");
+  const project = join(base, "project");
+  const otherProject = join(base, "other-project");
+  const traceDir = join(base, "trace");
+  await Promise.all([mkdir(project, { recursive: true }), mkdir(otherProject, { recursive: true })]);
+  const intent = await readJson(join(ROOT, "fixtures", "intents", "p2.json"));
+  await generatePackage({ intent, output: root, finalize: async (stage) => buildP2(stage, { repeats: 1 }) });
+  await completeGeneratedP2ForRuntimeTest(root);
+  await authorSequentialCallerInputFixture(root);
+  await buildP2(root, { repeats: 1 });
+
+  const runtimeDir = join(root, "scripts", "skill-rails");
+  const stageArgs = ["stage", "--skill", root, "--runtime-dir", runtimeDir, "--project", project, "--trace-dir", traceDir, "--run-id", "sequential-run", "--json"];
+  const firstIo = captureIo();
+  assert.equal(await runtimeMain(stageArgs, firstIo), 2, firstIo.errors.join("\n"));
+  assert.deepEqual(JSON.parse(firstIo.logs.at(-1)).decision.needs.map(({ field, source }) => ({ field, source })), [{ field: "authoring.readiness", source: "decided" }]);
+
+  const secondIo = captureIo();
+  assert.equal(await runtimeMain([...stageArgs, "--decided", "authoring.readiness=ready"], secondIo), 2, secondIo.errors.join("\n"));
+  const second = JSON.parse(secondIo.logs.at(-1));
+  assert.deepEqual(second.decision.decided, { "authoring.readiness": "ready" });
+  assert.deepEqual(second.decision.needs.map(({ field, source }) => ({ field, source })), [{ field: "release.approval", source: "judged" }]);
+
+  const thirdIo = captureIo();
+  assert.equal(await runtimeMain([...stageArgs, "--judged", "release.approval=ready"], thirdIo), 2, thirdIo.errors.join("\n"));
+  const third = JSON.parse(thirdIo.logs.at(-1));
+  assert.deepEqual(third.decision.needs.map(({ field, source }) => ({ field, source })), [{ field: "release.confirmation", source: "decided" }]);
+  const thirdEmission = (await readTrace(third.trace_path)).findLast((event) => event.type === "decision_emitted");
+  assert.deepEqual(thirdEmission.data.continuation.caller_inputs, {
+    judged: { "release.approval": "ready" },
+    decided: { "authoring.readiness": "ready" }
+  });
+
+  const finalIo = captureIo();
+  assert.equal(await runtimeMain([...stageArgs, "--decided", "release.confirmation=ready"], finalIo), 0, finalIo.errors.join("\n"));
+  const final = JSON.parse(finalIo.logs.at(-1));
+  assert.equal(final.decision.status, "DONE");
+  assert.equal(final.decision.stage, "operate");
+  assert.deepEqual(final.decision.decided, { "authoring.readiness": "ready", "release.confirmation": "ready" });
+  assert.deepEqual(final.decision.judged, { "release.approval": "ready" });
+  const finalEmission = (await readTrace(final.trace_path)).findLast((event) => event.type === "decision_emitted");
+  assert.equal(Object.hasOwn(finalEmission.data, "continuation"), false, "terminal trace data keeps its previous shape");
+
+  const unknownArgs = ["stage", "--skill", root, "--runtime-dir", runtimeDir, "--project", project, "--trace-dir", traceDir, "--run-id", "unknown-tamper-run", "--json"];
+  const unknownIo = captureIo();
+  assert.equal(await runtimeMain([...unknownArgs, "--judged", "review.payload=UNKNOWN"], unknownIo), 2);
+  await rewriteLatestContinuation(join(traceDir, "unknown-tamper-run.jsonl"), (continuation) => {
+    continuation.caller_inputs.judged["review.payload"] = { kind: "UNKNOWN", reason: "unknown", details: null };
+  });
+  const unknownTamperIo = captureIo();
+  assert.equal(await runtimeMain([...unknownArgs, "--decided", "authoring.readiness=ready"], unknownTamperIo), 1);
+  assert.equal(JSON.parse(unknownTamperIo.errors.at(-1)).diagnostic.code, "SR_TRACE_INVALID", "UNKNOWN provenance cannot become a projection-shaped known JSON input");
+
+  const ambiguousJson = [
+    { runId: "nested-unknown-run", value: { item: { __skillRailsUnknown: true, reason: "unknown" } } },
+    { runId: "projection-shaped-json-run", value: { item: { kind: "UNKNOWN", reason: "unknown", details: null } } }
+  ];
+  const ambiguousDecisions = [];
+  const retainedPayloads = [];
+  for (const { runId, value } of ambiguousJson) {
+    const initial = await stageSkill({ skillRoot: root, projectRoot: project, traceDir, runId, judged: { "review.payload": value } });
+    ambiguousDecisions.push(initial.decision.decision_id);
+    const advanced = await stageSkill({ skillRoot: root, projectRoot: project, traceDir, runId, decided: { "authoring.readiness": "ready" } });
+    assert.deepEqual(advanced.decision.needs.map(({ field }) => field), ["release.approval"]);
+    retainedPayloads.push((await readTrace(advanced.tracePath)).findLast((event) => event.type === "decision_emitted").data.continuation.caller_inputs.judged["review.payload"]);
+  }
+  assert.equal(ambiguousDecisions[0], ambiguousDecisions[1], "the public Decision projection cannot distinguish these generic JSON inputs");
+  assert.equal(retainedPayloads[0].item.__skillRailsUnknown, true, "the lossless receipt restores nested UNKNOWN semantics");
+  assert.deepEqual(retainedPayloads[1], ambiguousJson[1].value, "a projection-shaped JSON object remains ordinary known data");
+
+  const contextArgs = ["stage", "--skill", root, "--runtime-dir", runtimeDir, "--project", project, "--trace-dir", traceDir, "--run-id", "context-tamper-run", "--json"];
+  const contextIo = captureIo();
+  assert.equal(await runtimeMain([...contextArgs, "--decided", "authoring.readiness=ready"], contextIo), 2);
+  await rewriteLatestContinuation(join(traceDir, "context-tamper-run.jsonl"), (continuation) => {
+    continuation.project_fingerprint = `sha256:${"0".repeat(64)}`;
+  });
+  const contextTamperIo = captureIo();
+  assert.equal(await runtimeMain([...contextArgs, "--judged", "release.approval=ready"], contextTamperIo), 1);
+  assert.equal(JSON.parse(contextTamperIo.errors.at(-1)).diagnostic.code, "SR_TRACE_INVALID", "continuation context cannot be retargeted independently");
+
+  const originArgs = ["stage", "--skill", root, "--runtime-dir", runtimeDir, "--project", project, "--trace-dir", traceDir, "--run-id", "origin-run", "--json"];
+  const originIo = captureIo();
+  assert.equal(await runtimeMain([...originArgs, "--decided", "authoring.readiness=ready"], originIo), 2);
+  const transplantedEvents = (await readFile(join(traceDir, "origin-run.jsonl"), "utf8"))
+    .trim().split(/\r?\n/).map((line) => ({ ...JSON.parse(line), run_id: "transplanted-run" }));
+  await writeFile(join(traceDir, "transplanted-run.jsonl"), `${transplantedEvents.map((event) => JSON.stringify(event)).join("\n")}\n`, "utf8");
+  const transplantedIo = captureIo();
+  assert.equal(await runtimeMain([...originArgs.slice(0, 10), "transplanted-run", "--json", "--judged", "release.approval=ready"], transplantedIo), 1);
+  assert.equal(JSON.parse(transplantedIo.errors.at(-1)).diagnostic.code, "SR_TRACE_INVALID", "continuation provenance cannot be transplanted to another run");
+
+  const packageBoundaryArgs = ["stage", "--skill", root, "--runtime-dir", runtimeDir, "--project", project, "--trace-dir", traceDir, "--run-id", "package-boundary-run", "--json"];
+  const packageBoundaryIo = captureIo();
+  assert.equal(await runtimeMain([...packageBoundaryArgs, "--decided", "authoring.readiness=ready"], packageBoundaryIo), 2);
+  await generatePackage({ intent: { ...intent, name: "other-evidence-release" }, output: otherRoot, finalize: async (stage) => buildP2(stage, { repeats: 1 }) });
+  await completeGeneratedP2ForRuntimeTest(otherRoot);
+  await authorSequentialCallerInputFixture(otherRoot, "other-evidence-release");
+  await buildP2(otherRoot, { repeats: 1 });
+  const otherPackageIo = captureIo();
+  assert.equal(await runtimeMain(["stage", "--skill", otherRoot, "--runtime-dir", join(otherRoot, "scripts", "skill-rails"), "--project", project, "--trace-dir", traceDir, "--run-id", "package-boundary-run", "--json", "--judged", "release.approval=ready"], otherPackageIo), 2);
+  assert.deepEqual(JSON.parse(otherPackageIo.logs.at(-1)).decision.needs.map(({ field }) => field), ["authoring.readiness"], "a different package sharing the run id does not inherit or brick the run");
+
+  const overrideArgs = ["stage", "--skill", root, "--runtime-dir", runtimeDir, "--project", project, "--trace-dir", traceDir, "--run-id", "override-run", "--json"];
+  const overrideFirstIo = captureIo();
+  assert.equal(await runtimeMain([...overrideArgs, "--decided", "authoring.readiness=ready"], overrideFirstIo), 2);
+  const overrideIo = captureIo();
+  assert.equal(await runtimeMain([...overrideArgs, "--decided", "authoring.readiness=needs-design"], overrideIo), 2);
+  const overridden = JSON.parse(overrideIo.logs.at(-1));
+  assert.equal(overridden.decision.reinvoke, null);
+  assert.deepEqual(overridden.decision.decided, { "authoring.readiness": "needs-design" });
+
+  const afterTerminalIo = captureIo();
+  assert.equal(await runtimeMain([...overrideArgs, "--judged", "release.approval=ready"], afterTerminalIo), 2);
+  const afterTerminal = JSON.parse(afterTerminalIo.logs.at(-1));
+  assert.deepEqual(afterTerminal.decision.needs.map(({ field }) => field), ["authoring.readiness"], "terminal Decisions do not leak retained inputs");
+
+  const projectBoundaryArgs = ["stage", "--skill", root, "--runtime-dir", runtimeDir, "--project", project, "--trace-dir", traceDir, "--run-id", "project-boundary-run", "--json"];
+  const projectFirstIo = captureIo();
+  assert.equal(await runtimeMain([...projectBoundaryArgs, "--decided", "authoring.readiness=ready"], projectFirstIo), 2);
+  const otherProjectIo = captureIo();
+  assert.equal(await runtimeMain([...projectBoundaryArgs.slice(0, 6), otherProject, ...projectBoundaryArgs.slice(7), "--judged", "release.approval=ready"], otherProjectIo), 2);
+  const otherProjectDecision = JSON.parse(otherProjectIo.logs.at(-1)).decision;
+  assert.deepEqual(otherProjectDecision.needs.map(({ field }) => field), ["authoring.readiness"], "caller inputs do not cross project identity");
+
+  const snapshotArgs = ["stage", "--skill", root, "--runtime-dir", runtimeDir, "--project", project, "--trace-dir", traceDir, "--run-id", "snapshot-boundary-run", "--json"];
+  const snapshotFirstIo = captureIo();
+  assert.equal(await runtimeMain([...snapshotArgs, "--decided", "authoring.readiness=ready"], snapshotFirstIo), 2);
+  await writeFile(join(project, "changed.txt"), "changed snapshot\n", "utf8");
+  const changedSnapshotIo = captureIo();
+  assert.equal(await runtimeMain([...snapshotArgs, "--judged", "release.approval=ready"], changedSnapshotIo), 2);
+  const changedSnapshotDecision = JSON.parse(changedSnapshotIo.logs.at(-1)).decision;
+  assert.deepEqual(changedSnapshotDecision.needs.map(({ field }) => field), ["authoring.readiness"], "caller inputs do not cross snapshot identity");
+});
+
 test("snapshot changes during collection fail closed as stale", async (t) => {
   const base = await makeTestDir("stale");
   t.after(() => removeTestDir(base));
@@ -1186,4 +1325,103 @@ async function completeGeneratedP2ForRuntimeTest(root) {
     atom.evidence = ["fixture:ready"];
   }
   await writeJsonAtomic(ledgerPath, ledger);
+}
+
+async function authorSequentialCallerInputFixture(root, skillId = "evidence-release") {
+  await writeTextAtomic(join(root, "spec.mjs"), `export const SPEC = { version: "5", id: ${JSON.stringify(skillId)}, profile: "single", imports: [] };
+export const OBSERVATIONS = {
+  "authoring.readiness": { decided: true, domain: ["ready", "needs-design", "complete"] },
+  "release.approval": { judged: true, domain: ["ready", "needs-design", "complete"] },
+  "release.confirmation": { decided: true, domain: ["ready", "needs-design", "complete"] },
+  "review.payload": { judged: true, domain: "json" }
+};
+export const FORMATS = {};
+export const TEMPLATES = {
+  result: { file: "templates/result.md", fields: { summary: "block" }, sections: [] }
+};
+export const ORDERS = {};
+export const OWNERSHIP = {};
+export const GUARDS = [];
+export const STAGES = [
+  { id: "input-a", reads: ["authoring.readiness"], acceptsUnknown: [], done: s => s.authoring.readiness === "complete", needs: ["authoring.readiness"], reentry: "rejudge", branches: {
+    ready: ["NEXT"],
+    "needs-design": ["BLOCK"]
+  }, body: "stage: input-a" },
+  { id: "input-b", reads: ["release.approval"], acceptsUnknown: [], done: s => s.release.approval === "complete", needs: ["release.approval"], reentry: "rejudge", branches: {
+    ready: ["NEXT"],
+    "needs-design": ["BLOCK"]
+  }, body: "stage: input-b" },
+  { id: "input-c", reads: ["release.confirmation"], acceptsUnknown: [], done: s => s.release.confirmation === "complete", needs: ["release.confirmation"], reentry: "rejudge", branches: {
+    ready: ["NEXT"],
+    "needs-design": ["BLOCK"]
+  }, body: "stage: input-c" },
+  { id: "operate", reads: [], done: () => false, record: { kind: "message", message: "complete" }, effects: ["DONE"], body: "stage: operate" }
+];
+export const TABLES = {};
+export const ARTIFACTS = {};
+export const ROLES = {};
+export const READ_FIRST = [{ body: "why: purpose" }];
+export const DECLARATIONS = {
+  profile: { value: "p2", consumer: "build:profile" }
+};
+export const DEFERRED = [];
+`);
+  await writeTextAtomic(join(root, "collectors", "index.mjs"), `import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+
+export const collectors = Object.freeze({});
+
+export async function snapshotBasis(ctx) {
+  try { return { state: await readFile(join(ctx.projectRoot, "changed.txt"), "utf8") }; }
+  catch (error) { if (error.code === "ENOENT") return { state: "missing" }; throw error; }
+}
+`);
+  await writeTextAtomic(join(root, "body.md"), `# Evidence Release
+
+## why: purpose
+
+Long sessions can skip a release gate or confuse a remembered success with current evidence.
+
+## stage: input-a
+
+Judgment: authoring.readiness is ready, needs-design, or complete; supply the first caller-owned decision.
+
+Why: The first input gates the second.
+
+## stage: input-b
+
+Judgment: release.approval is ready, needs-design, or complete; supply the second caller-owned judgment.
+
+Why: The second input follows the first in the same run.
+
+## stage: input-c
+
+Judgment: release.confirmation is ready, needs-design, or complete; supply the third caller-owned decision.
+
+Why: The third input proves that both earlier caller lanes remain available.
+
+## stage: operate
+
+Judgment: Treat both accepted inputs as sufficient for this reproduction.
+
+Why: This stage makes successful cumulative input binding observable.
+`);
+  await writeJsonAtomic(join(root, "fixtures", "scenarios.json"), [
+    { id: "a-missing", s: {}, decided: {}, judged: {}, expect: { stage: "input-a", status: "BLOCK" }, cover: ["stage:input-a"] },
+    { id: "a-needs-design", s: {}, decided: { "authoring.readiness": "needs-design" }, judged: {}, expect: { stage: "input-a", status: "BLOCK", effects: ["BLOCK"] }, cover: ["branch:input-a/needs-design"] },
+    { id: "b-missing", s: {}, decided: { "authoring.readiness": "ready" }, judged: {}, expect: { stage: "input-b", status: "BLOCK" }, cover: ["branch:input-a/ready", "stage:input-b"] },
+    { id: "b-needs-design", s: {}, decided: { "authoring.readiness": "ready" }, judged: { "release.approval": "needs-design" }, expect: { stage: "input-b", status: "BLOCK", effects: ["BLOCK"] }, cover: ["branch:input-b/needs-design"] },
+    { id: "c-missing", s: {}, decided: { "authoring.readiness": "ready" }, judged: { "release.approval": "ready" }, expect: { stage: "input-c", status: "BLOCK" }, cover: ["branch:input-b/ready", "stage:input-c"] },
+    { id: "c-needs-design", s: {}, decided: { "authoring.readiness": "ready", "release.confirmation": "needs-design" }, judged: { "release.approval": "ready" }, expect: { stage: "input-c", status: "BLOCK", effects: ["BLOCK"] }, cover: ["branch:input-c/needs-design"] },
+    { id: "ready", s: {}, decided: { "authoring.readiness": "ready", "release.confirmation": "ready" }, judged: { "release.approval": "ready" }, expect: { stage: "operate", status: "DONE", effects: ["DONE"] }, cover: ["branch:input-c/ready", "stage:operate"] },
+    { id: "complete", s: {}, decided: { "authoring.readiness": "complete", "release.confirmation": "complete" }, judged: { "release.approval": "complete" }, expect: { stage: "operate", status: "DONE", effects: ["DONE"] }, cover: [] }
+  ]);
+}
+
+async function rewriteLatestContinuation(tracePath, mutate) {
+  const events = (await readFile(tracePath, "utf8")).trimEnd().split(/\r?\n/).map((line) => JSON.parse(line));
+  const index = events.findLastIndex((event) => event.type === "decision_emitted");
+  assert.notEqual(index, -1);
+  mutate(events[index].data.continuation);
+  await writeFile(tracePath, `${events.map((event) => JSON.stringify(event)).join("\n")}\n`, "utf8");
 }

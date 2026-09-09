@@ -641,6 +641,20 @@ Devflow Adopt의 cold-agent 실패를 생성 패키지와 동일한 runtime 0.3.
 
 Release-boundary commit `ff4ed25ce8789a3adec450b197d99a1aabf6bc24`와 annotated tag `v0.4.0`을 `git push --atomic origin main v0.4.0`으로 함께 push했다. Workflow run `34291008866`은 tag/package/lock version 일치, 의존성 설치와 전체 `npm run verify`를 통과하고 GitHub Release `v0.4.0`을 Latest로 publish했다. 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes` 설치는 Codex universal package를 갱신하고 Claude Code를 같은 경로의 junction으로 연결했다. Release source와 설치본의 `git diff --no-index --ignore-cr-at-eol`은 exit 0, 설치본 self lint는 pass였고 fingerprint는 runtime `0.3.4`, validator `0.6.2`, kernel `6`이다. Installer의 외부 security summary는 Gen Safe, Socket 1 alert, Snyk Low Risk였으며 이를 제품 행동 증거나 보안 문제 해소로 승격하지 않는다.
 
+### 6.29 순차 after-input caller 입력 승계 복구
+
+Runtime 0.3.4의 실제 연속 호출에서 `A`를 제출해 `B` 요청으로 전진한 뒤 지침대로 `B`만 제출하면 `A`가 다시 `UNKNOWN`이 됐다. 앞 stage가 재개방되고 다음 호출에서 같은 Decision을 다시 방출하면 정상적인 `duplicate-decision-emission` guard가 run을 차단했다. 이는 Devflow stage 의미나 duplicate guard의 결함이 아니라, 생성 안내가 현재 요청값만 요구하면서 stage API가 직전 동일-run caller 입력을 결합하지 않은 공통 continuation 결함이었다.
+
+수정 owner는 P2 stage API의 입력 결합 경계다. Runtime은 가장 최근 `decision_emitted`가 effect-free `after-input` BLOCK이고, run·package·project canonical path·normalized target·stable snapshot·spec/runtime identity가 모두 같을 때만 그 Decision에 결합된 `judged`/`decided` 입력을 한 단계 승계한다. 새 명시값은 같은 field의 승계값을 대체한다. 과거 Decision을 검색하지 않으며 terminal, stale, 다른 continuation, 다른 package/project/target/snapshot, legacy metadata-free context에서는 승계하지 않는다. 호환되지 않는 context는 정상적인 no-inherit로 처리한 뒤 현재 입력만 평가하고, 같은 context 안의 변조된 provenance는 `SR_TRACE_INVALID`로 닫는다.
+
+Decision의 공개 `judged`/`decided`는 branded `UNKNOWN`을 JSON projection으로 바꾸므로 모든 합법 JSON domain 값에 대해 역변환 가능한 입력 정본이 아니다. 따라서 기존 Decision schema를 바꾸는 대신 `after-input`인 `decision_emitted.data`에만 lossless normalized caller input과 context fingerprint를 추가했다. Fingerprint는 run ID, Decision ID, package/project/target identity와 caller input을 묶고 Decision 자체 seal 및 lane/domain과 함께 검사한다. 이는 trace 전체의 외부 재작성자를 인증하는 보안 원장이 아니라 현재 trace 안의 부분 치환·이식이 승계 근거가 되는 것을 막는 자기 일관성 경계다. Terminal·stale·다른 continuation의 기존 event shape는 유지한다.
+
+Runtime은 `0.3.4 → 0.3.5`, package 후보는 `0.4.0 → 0.4.1`이며 validator `0.6.2`, kernel `6`, `SPEC.version = "5"`, Decision/Trace schema, effect authority, freshness와 duplicate rejection은 유지한다. 표적 회귀는 `A → B → C → DONE`, 새 값 override, terminal/project/snapshot/package 경계의 no-inherit, run transplant·UNKNOWN/context 변조의 fail-closed와 nested UNKNOWN/동형 known JSON의 lossless 구분을 고정했다. Canonical pilot `--repeats 50` rebuild는 L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, build ID `sha256:c10796022a4ae2a7766e305f46639fbee0a5e89a9ff54f2c1b264c377b3f43d8`를 기록했다. 최종 현재 tree의 전체 `npm run verify`는 vendor check, self lint, repository test 93/93와 frozen G0.5 eval을 통과했다.
+
+같은 이해도를 유지한 Claude Opus xhigh와 Astra xhigh에게 최초 결함, 제품 목적, 전체 diff와 실행 증거를 다시 주고 blocker를 상호 축소했다. 첫 감사에서 발견된 context-before-eligibility 순서와 run ID seal 누락을 교정한 뒤 두 후속 감사 모두 `ACCEPT`와 blocker 0을 판정했다. 두 감사는 stage API가 run·verified package·project·target·snapshot·현재 flag를 결합 전에 함께 아는 유일한 owner이고, 기존 Decision projection만으로는 generic JSON과 nested branded `UNKNOWN`의 동형 값을 역복원할 수 없음을 독립적으로 확인했다. Fresh-agent/Devflow 실제 행동과 trace 전체를 다시 쓰는 외부 writer 인증은 이 논리·source 감사의 증거로 승격하지 않는다.
+
+기존 생성 package와 trace는 자동 변경되지 않는다. Runtime 0.3.5를 채택할 P2 package만 정본 builder로 재빌드하며, runtime hash cohort를 묶는 소비 저장소는 전체 cohort를 한 변경으로 갱신한다. 0.3.4에서 이미 이 결함으로 막힌 active run은 승계 metadata가 없으므로 새 runtime에서 새 run ID로 다시 시작한다. Fresh Devflow 전체 흐름과 다른 host의 장기 caller 행동은 계속 `UNPROVEN`이다. Trace lease timeout, stage-result atomic write, Git 기본 snapshot의 dirty byte 범위는 이번 원인의 소유 경계가 아니며 별도 관측 없이 이 수정에 합치지 않았다.
+
 ---
 
 ## 7. P2 version-5 보존 및 변경 원장
@@ -655,6 +669,17 @@ Release-boundary commit `ff4ed25ce8789a3adec450b197d99a1aabf6bc24`와 annotated 
 | 기존 생성 package | 강제 migration 없음; 재빌드 전 runtime 0.3.3 의미를 그대로 유지 | 채택해 재빌드한 package만 runtime 0.3.4와 새 bootstrap을 받는다. cohort hash를 묶는 소비 저장소는 한 변경으로 함께 재빌드한다 |
 
 `SPEC.version = "5"`, Decision schema 2, trace schema, closed exports, effect authority, freshness, duplicate rejection은 바뀌지 않는다. 소비자가 `resume/1` schema 또는 terminal에서도 문자열인 `next_command`를 직접 파싱했다면 runtime 0.3.4 채택 시 `/2`의 nullable 계약으로 갱신해야 한다. 이는 숨긴 호환성 축소가 아니라 잘못된 실행 제안을 제거하기 위한 명시적 adapter 변경이다.
+
+### 7.-0a 2026-09-09 순차 after-input 입력 승계 (runtime 0.3.5)
+
+| 변경 | 호환성 영향 | 근거와 증거 |
+| --- | --- | --- |
+| 직전 `after-input` caller 입력 승계 | 같은 안정 context의 다음 호출은 새로 요청된 flag만 제출해도 이전 caller 입력을 유지 | 생성 안내의 기존 사용법과 runtime 결합 의미를 일치시키며, 현재 명시값 우선과 한 Decision 한계로 숨은 history merge를 막는다 |
+| lossless continuation provenance | `after-input` `decision_emitted.data`만 additive metadata를 가짐 | 공개 Decision projection만으로 branded `UNKNOWN`과 같은 모양의 합법 JSON 값을 구분할 수 없어 원본 lane 값을 별도로 self-seal한다. 핵심 Decision/Trace schema와 terminal event shape는 유지한다 |
+| context mismatch와 변조 분리 | 다른 package/project/target/snapshot은 no-inherit, 같은 context의 불일치는 fail-closed | 다른 skill이 같은 trace-dir/run-id를 사용해도 run을 불필요하게 brick하지 않으며 run transplant와 부분 변조는 승계 근거가 되지 않는다 |
+| 기존 생성 package·trace | 강제 migration 없음; runtime 0.3.5 채택 package만 재빌드 | metadata-free 0.3.4 trace에서는 승계하지 않는다. 이미 순차 재진입에서 막힌 run은 새 run ID로 시작한다 |
+
+`SPEC.version = "5"`, Decision schema 2, trace schema, validator `0.6.2`, kernel `6`, effect authority, freshness와 duplicate rejection은 바뀌지 않는다. 입력 승계는 관찰이나 effect evidence로 승격되지 않으며, 다른 continuation kind로 넘어가면 종료된다.
 
 ### 7.-1 2026-09-09 유지보수 locator 관측 표면 추가 (validator 0.6.2)
 
