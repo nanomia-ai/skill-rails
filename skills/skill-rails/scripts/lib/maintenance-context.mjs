@@ -226,12 +226,12 @@ export async function createMaintenanceContext(skillRoot, options = {}) {
   addSpecRelations(builder, relationSites);
   addFixtureRelations(builder);
   addManifestRelations(builder, manifest, started);
-  addGenericPathCandidates(builder, genericEntries);
+  const outsidePackageLiterals = addGenericPathCandidates(builder, genericEntries);
   const textMatches = addQueryTextSubjects(builder, genericEntries, options.query);
   builder.resolveRelations();
 
   const manifestAssessment = assessManifest(manifest, started, entryByPath);
-  const frontiers = collectFrontiers({ entries, issues, builder, staticSpec, specEntry, manifest, moduleExtraction });
+  const frontiers = collectFrontiers({ entries, issues, builder, staticSpec, specEntry, manifest, moduleExtraction, outsidePackageLiterals });
   extraction.inventory = {
     status: started.complete ? "complete-for-declared-scope" : "partial",
     scope: "regular entries below the package root excluding .git and node_modules; symlink and special-entry targets are not followed",
@@ -310,7 +310,7 @@ export function renderMaintenanceContextText(value) {
   lines.push("Purpose");
   lines.push(`- name: ${value.purpose.name ?? "unknown"}`);
   lines.push(`- profile: ${value.classification.profile ?? "unknown"} (${value.classification.profile_basis})`);
-  lines.push(`- problem: ${value.purpose.problem ?? "unknown"}`);
+  lines.push(...purposeSummaryLines(value));
   if (value.purpose.profile_reason) lines.push(`- profile reason: ${value.purpose.profile_reason}`);
   if (value.purpose.profile_warning) lines.push(`- profile warning: ${value.purpose.profile_warning}`);
   lines.push("");
@@ -366,15 +366,14 @@ export function renderSkillMapPreview(value) {
     "",
     "## Purpose",
     "",
-    value.purpose.problem ?? "Purpose is unknown from the current bounded sources.",
-    "",
+    ...purposeSummaryLines(value),
     `- Skill: \`${value.purpose.name ?? "unknown"}\``,
     `- Profile: \`${value.classification.profile ?? "unknown"}\` (${value.classification.profile_basis})`,
     `- Profile reason: ${value.purpose.profile_reason ?? "unknown"}`,
-    ...(value.purpose.profile_warning ? [`- Scaffold warning: ${value.purpose.profile_warning}`] : []),
-    `- Inputs: ${summarizeIntent(value, "inputs")}`,
-    `- Outputs: ${summarizeIntent(value, "outputs")}`,
-    `- Important boundaries: ${summarizeIntent(value, "irreversible_boundaries")}`,
+    ...(value.purpose.profile_warning ? [`- Profile warning: ${value.purpose.profile_warning}`] : []),
+    `- Declared inputs: ${summarizeIntent(value, "inputs")}`,
+    `- Declared outputs: ${summarizeIntent(value, "outputs")}`,
+    `- Declared important boundaries: ${summarizeIntent(value, "irreversible_boundaries")}`,
     "",
     "## Owners and consumers",
     "",
@@ -970,7 +969,7 @@ function addFixtureRelations(builder) {
       const target = coverageTarget(builder, token);
       builder.addRelation(subject.id, target, "declares-cover", { basis: "declared", source_locator: subject.display, ordinal, note: token });
     }
-    if (fixture?.expect?.stage) builder.addRelation(subject.id, `spec:STAGES/${fixture.expect.stage}`, "declares-stage-expectation", { basis: "declared", source_locator: subject.display });
+    if (typeof fixture?.expect?.stage === "string") builder.addRelation(subject.id, `spec:STAGES/${fixture.expect.stage}`, "declares-stage-expectation", { basis: "declared", source_locator: subject.display });
   }
 }
 
@@ -1012,12 +1011,43 @@ function addManifestRelations(builder, manifest, inventory) {
 }
 
 function addGenericPathCandidates(builder, entries) {
-  const pattern = /(?:references|templates|fixtures|scripts|collectors|schemas|agents)\/[A-Za-z0-9_.\-/ ]+?\.(?:md|json|mjs|cjs|js|ya?ml)(?:#[A-Za-z0-9_.:-]+)?/g;
+  const pattern = /(?:\.\/)?(?:references|templates|fixtures|scripts|collectors|schemas|agents)\/[A-Za-z0-9_.\-/ ]+?\.(?:md|json|mjs|cjs|js|ya?ml)(?:#[A-Za-z0-9_.:-]+)?/g;
+  const skillRootPattern = /<skill-root>\/((?:references|templates|fixtures|scripts|collectors|schemas|agents)\/[A-Za-z0-9_.\-/ ]+?\.(?:md|json|mjs|cjs|js|ya?ml)(?:#[A-Za-z0-9_.:-]+)?)/g;
+  const siblingPattern = /<skill-root>\/\.\.\/([a-z0-9]+(?:-[a-z0-9]+)*)\/([A-Za-z0-9_. -]+(?:\/[A-Za-z0-9_. -]+)*\.(?:md|json|mjs|cjs|js|ya?ml)(?:#[A-Za-z0-9_.:-]+)?)/g;
+  const outsidePackageLiterals = [];
   for (const entry of entries) {
     if (!entry.text) continue;
+    for (const match of entry.text.matchAll(skillRootPattern)) {
+      const raw = match[0];
+      const preceding = match.index > 0 ? entry.text[match.index - 1] : "";
+      if (preceding && /[A-Za-z0-9_.\-\/<]/.test(preceding)) continue;
+      const target = match[1].split("#", 1)[0];
+      if (target.split("/").some((segment) => !segment || segment === "." || segment === "..")) continue;
+      const owner = builder.nearestSourceSubject(entry.path, match.index);
+      builder.addRelation(owner.id, `file:${target}`, "literal-path-candidate", {
+        basis: "candidate-literal",
+        source_locator: sourceDisplay(entry, match.index, match.index + raw.length),
+        note: "Skill-root-anchored source text; not automatically a runtime-owned reference."
+      });
+    }
+    if (/\.md$/i.test(entry.path)) for (const match of entry.text.matchAll(siblingPattern)) {
+      const raw = match[0];
+      const preceding = match.index > 0 ? entry.text[match.index - 1] : "";
+      if (preceding && /[A-Za-z0-9_.\-\/<]/.test(preceding)) continue;
+      const relative = match[2].split("#", 1)[0];
+      if (relative.split("/").some((segment) => !segment || segment === "." || segment === "..")) continue;
+      outsidePackageLiterals.push({
+        kind: "outside-selected-package-literal",
+        source: sourceDisplay(entry, match.index, match.index + raw.length),
+        consequence: "high",
+        message: `Observed literal \`${raw}\`; its target, existence, execution, freshness, and authority were not inspected.`
+      });
+    }
     for (const match of entry.text.matchAll(pattern)) {
       const raw = match[0];
-      const target = raw.split("#", 1)[0].trim();
+      const preceding = match.index > 0 ? entry.text[match.index - 1] : "";
+      if (preceding && /[A-Za-z0-9_.\-\/<]/.test(preceding)) continue;
+      const target = raw.split("#", 1)[0].replace(/^\.\//, "").trim();
       if (target === entry.path) continue;
       const owner = builder.nearestSourceSubject(entry.path, match.index);
       builder.addRelation(owner.id, `file:${target}`, "literal-path-candidate", {
@@ -1027,6 +1057,7 @@ function addGenericPathCandidates(builder, entries) {
       });
     }
   }
+  return dedupeObjects(outsidePackageLiterals);
 }
 
 function addQueryTextSubjects(builder, entries, queryInput) {
@@ -1133,8 +1164,8 @@ function evidenceSummary(manifest, semanticDiff, manifestAssessment) {
   };
 }
 
-function collectFrontiers({ entries, issues, builder, staticSpec, specEntry, manifest, moduleExtraction }) {
-  const frontiers = [];
+function collectFrontiers({ entries, issues, builder, staticSpec, specEntry, manifest, moduleExtraction, outsidePackageLiterals = [] }) {
+  const frontiers = [...outsidePackageLiterals];
   for (const item of issues) frontiers.push({ kind: item.code, source: item.path, consequence: item.consequence, message: item.message });
   for (const entry of entries.filter((item) => ["oversize", "opaque", "unreadable", "unsupported"].includes(item.handling))) {
     frontiers.push({ kind: `${entry.handling}-content`, source: entry.path, consequence: entry.handling === "opaque" ? "medium" : "high", message: `${entry.handling} content was not semantically extracted.` });
@@ -1161,12 +1192,14 @@ function derivePurpose(intent, skillDocument, profileDecision, staticSpec) {
   return {
     name: intent?.name ?? skillDocument?.frontmatter?.name ?? staticSpec?.SPEC?.id ?? null,
     description: intent?.description ?? skillDocument?.frontmatter?.description ?? null,
+    description_basis: intent?.description ? "intent.description" : skillDocument?.frontmatter?.description ? "SKILL.md frontmatter.description" : null,
     problem: intent?.problem ?? paragraph,
+    problem_basis: intent?.problem ? "intent.problem" : paragraph ? "SKILL.md first body paragraph" : null,
     profile_reason: profileDecision?.explicit === true ? `explicit ${profileDecision.profile ?? "profile"}${signals.length ? `; observed signals: ${signals.join("; ")}` : ""}` : signals.join("; ") || null,
     profile_warning: typeof profileDecision?.warning === "string" ? profileDecision.warning : null,
-    inputs: Array.isArray(intent?.inputs) ? intent.inputs : [],
-    outputs: Array.isArray(intent?.outputs) ? intent.outputs : [],
-    irreversible_boundaries: Array.isArray(intent?.irreversible_boundaries) ? intent.irreversible_boundaries : []
+    inputs: Array.isArray(intent?.inputs) ? intent.inputs : null,
+    outputs: Array.isArray(intent?.outputs) ? intent.outputs : null,
+    irreversible_boundaries: Array.isArray(intent?.irreversible_boundaries) ? intent.irreversible_boundaries : null
   };
 }
 
@@ -1713,8 +1746,20 @@ function representativeMaintenanceChain(value) {
 }
 
 function summarizeIntent(value, field) {
-  const items = value.purpose[field] ?? [];
-  return items.length ? items.slice(0, 3).join("; ") : "unknown in current bounded sources";
+  const items = value.purpose[field];
+  if (!Array.isArray(items)) return "unknown in current bounded sources";
+  return items.length ? items.slice(0, 3).join("; ") : "none declared in intent; this does not prove runtime or domain absence";
+}
+
+function purposeSummaryLines(value) {
+  const description = value.purpose.description;
+  const problem = value.purpose.problem;
+  const lines = [description
+    ? `- Function and trigger (${value.purpose.description_basis ?? "bounded source fallback"}): ${description}`
+    : "- Function and trigger: unknown in current bounded sources"];
+  if (problem) lines.push(`- Problem / authoring objective (${value.purpose.problem_basis ?? "bounded source fallback"}): ${problem}`);
+  else if (!problem) lines.push("- Problem / authoring objective: unknown in current bounded sources");
+  return lines;
 }
 
 function summarizeCountReceipt(value, extraKeys = []) {
@@ -1959,7 +2004,7 @@ function validateJsonFamily(family, value) {
         if (item.cover !== undefined && !Array.isArray(item.cover)) issues.push(`${family}[${index}].cover must be an array when present.`);
         else if (Array.isArray(item.cover) && item.cover.some((token) => typeof token !== "string")) issues.push(`${family}[${index}].cover entries must be strings.`);
         if (item.expect !== undefined && !isRecord(item.expect)) issues.push(`${family}[${index}].expect must be an object when present.`);
-        else if (item.expect?.stage !== undefined && typeof item.expect.stage !== "string") issues.push(`${family}[${index}].expect.stage must be a string when present.`);
+        else if (item.expect?.stage !== undefined && item.expect.stage !== null && typeof item.expect.stage !== "string") issues.push(`${family}[${index}].expect.stage must be a string or null when present.`);
       }
     }
   }
