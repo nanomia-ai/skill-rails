@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-09 KST (`v0.4.3` 셸 중립 record 입력 후보 검증 완료)
+최종 갱신: 2026-09-09 KST (`v0.4.3` 셸 중립 record 입력 배포 완료)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: `v0.4.3` 셸 중립 record 입력 후보 검증 완료
+## 0. 현재 위치: `v0.4.3` 셸 중립 record 입력 배포 완료
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -44,12 +44,12 @@ Devflow의 후속 유지보수 인덱스 실측은 52개 stage-owner exact query
 
 Release-boundary commit `5af4b5e1df13de24d40e0041593504b45d7fbd7c`와 annotated tag `v0.4.2`를 `git push --atomic origin main v0.4.2`로 함께 push했다. Workflow run `34345776140`이 version 일치, `npm run verify`, GitHub Release 생성을 모두 성공했고 공식 Release `v0.4.2`가 published됐다. 공식 NPX installer로 Codex universal package와 Claude Code symlink를 갱신한 뒤 release source와 설치본의 newline-tolerant directory diff 0, 설치본 self lint pass, lock의 source와 갱신 시각을 확인했다. 설치본으로 현재 Devflow `0.23.21`에서 과거 blocked 네 owner를 다시 질의한 결과 모두 `closed`, blocker 0, frontier 5–8이었다.
 
-현재 `v0.4.3` 후보는 생성 지침의 inline JSON이 stock Windows PowerShell과 PowerShell→RTK 경계에서 따옴표를 잃는 공통 P2 record 결함을 닫는다. Runtime 0.3.6은 기존 `--data`를 유지하면서 bounded UTF-8 `--data-file`과 계획 효과용 `--effect <index>`를 제공하고, guide가 현재 Decision의 정확한 record 입력을 투영한다. 외부 입력 오류는 trace append 전에 `SR_INPUT_*`/`SR_EVIDENCE_*`로 분류한다. 효과 실행·권한·alignment·Decision/Trace schema는 바꾸지 않는다. 두 독립 whole-diff closure audit와 release-boundary 전체 검증은 blocker 0으로 완료됐고, Ubuntu·Windows·macOS의 실제 shell 표적 test를 tag release의 선행 조건으로 추가했다(구현·검증 기록 6.31).
+Released `v0.4.3`은 생성 지침의 inline JSON이 stock Windows PowerShell과 PowerShell→RTK 경계에서 따옴표를 잃는 공통 P2 record 결함을 닫는다. Runtime 0.3.6은 기존 `--data`를 유지하면서 bounded UTF-8 `--data-file`과 계획 효과용 `--effect <index>`를 제공하고, guide가 현재 Decision의 정확한 record 입력을 투영한다. 외부 입력 오류는 trace append 전에 `SR_INPUT_*`/`SR_EVIDENCE_*`로 분류한다. 효과 실행·권한·alignment·Decision/Trace schema는 바꾸지 않는다. 두 독립 whole-diff closure audit와 release-boundary 전체 검증은 blocker 0으로 완료됐고, Ubuntu·Windows·macOS의 실제 shell 표적 test를 tag release의 선행 조건으로 고정했다(구현·검증 기록 6.31).
 
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 공식 배포 Latest는 아직 `v0.4.2`다. 작업 tree의 package/lock 후보는 `0.4.3`이며 tag·push·release·설치는 release-boundary 검증 뒤에만 수행한다.
+- 공식 배포 Latest는 `v0.4.3`이며 package/lock은 `0.4.3`이다.
 - 사용자 소유 `.gitignore` 변경과 `docs/plan/`은 이번 제품 변경과 커밋에 포함하지 않는다.
 - 현재 후보 fingerprint는 runtime `0.3.6`, validator `0.6.2`, kernel `6`이다. L16 locator universe와 `after-input` 의미, Decision/Trace schema는 그대로다.
 - `SPEC.version = "5"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 그대로다.
@@ -80,7 +80,8 @@ Release-boundary commit `5af4b5e1df13de24d40e0041593504b45d7fbd7c`와 annotated 
 
 - 현재 maintenance-context 표적 회귀 19/19가 pass했다. 기존 P2 causal capsule, finite absence와 unknown, 비실행·source span·bounded projection·map·L16·fail-closed 경계에 더해 direct required relation 선예약, canonical structured source의 별도 유한 budget, 같은 목록의 provenance dedupe, migration external provenance identity·bounded label과 전체 frontier 보존을 고정한다.
 - 현재 전체 `npm run verify`: vendor check, self lint, repository test 100/100, frozen G0.5 eval pass. 앞선 병렬 실행의 임의 Windows `EPERM`은 서로 다른 atomic rename에서 발생했고 격리·직렬 재실행 뒤 agent 작업이 끝난 표준 명령에서도 재현되지 않았다.
-- v0.4.3 후보의 runtime 단위 회귀 17/17과 실제 Windows PowerShell을 건너는 전용 shell 회귀 1/1이 pass했다. 최종 `npm run verify`는 vendor check, self lint, repository test 101/101과 frozen G0.5 eval을 모두 통과했다. 그 전 두 실행에서 변경되지 않은 atomic directory rename이 서로 다른 테스트에서 일시적 Windows `EPERM`을 냈지만 원본 target은 정상 복구됐고 두 실패 사례의 격리 재실행과 이후 독립 전체 suite 3회가 모두 pass했다. 두 독립 검토자는 이를 record release의 비차단 환경 현상으로 판정해 원자성 코드를 이번 범위에 합치지 않았다. 3-OS release workflow는 tag 전이라 아직 미실행이다.
+- v0.4.3의 runtime 단위 회귀 17/17과 실제 Windows PowerShell을 건너는 전용 shell 회귀 1/1이 pass했다. 최종 `npm run verify`는 vendor check, self lint, repository test 101/101과 frozen G0.5 eval을 모두 통과했다. 그 전 두 실행에서 변경되지 않은 atomic directory rename이 서로 다른 테스트에서 일시적 Windows `EPERM`을 냈지만 원본 target은 정상 복구됐고 두 실패 사례의 격리 재실행과 이후 독립 전체 suite 3회가 모두 pass했다. 두 독립 검토자는 이를 record release의 비차단 환경 현상으로 판정해 원자성 코드를 이번 범위에 합치지 않았다. Tagged source의 release workflow `34361477971`은 Ubuntu·Windows·macOS의 실제 shell 표적 회귀와 Ubuntu 전체 verify를 모두 통과했다.
+- Release-boundary commit은 `f9ba22f6e498a43f166c6ef0e10a36d0c8e9e463`, annotated tag는 `v0.4.3`이다. `main`과 tag를 atomic push했고 GitHub Release `v0.4.3`이 published됐다. 공식 NPX installer는 Codex universal package와 Claude Code symlink를 갱신했으며 release source와 설치본의 newline-tolerant diff 0, 설치본 self lint pass, runtime `0.3.6`/validator `0.6.2`/kernel `6` 일치를 확인했다.
 - GitHub release workflow `34345776140`은 tagged source에서 version 검사와 같은 전체 verify를 통과해 `v0.4.2` Release를 생성했다. 공식 설치본은 release source와 directory diff 0, self lint pass이며 runtime `0.3.5`/validator `0.6.2`/kernel `6`을 유지한다. 설치본으로 Devflow `0.23.21`의 이전 blocked owner 네 개를 재질의해 `closed` 4/4와 blocker 0을 확인했다.
 - Canonical pilot rebuild: runtime `0.3.6`, validator `0.6.2`, kernel `6`; L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, build ID `sha256:928dfd46f43f2dd11da1064df2d8fac78940d5f3b7507a8ac35d8dadd1711f19`.
 - 순차 caller 입력 표적 회귀는 `A → B → C → DONE`, 현재값 override, terminal/project/snapshot/package no-inherit, run transplant·UNKNOWN/context 변조 거부와 nested UNKNOWN/동형 known JSON의 lossless 구분을 통과했다. 같은 Claude Opus xhigh와 Astra xhigh 세션의 후속 whole-result 감사가 모두 runtime API를 근본 owner로 판정하고 blocker 0으로 `ACCEPT`했다.
