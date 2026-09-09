@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-09 KST (`v0.4.1` 순차 after-input 교정 후보 구현·검증 완료)
+최종 갱신: 2026-09-09 KST (`v0.4.1` 구현·릴리스 검증·공식 배포·전역 설치 완료)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: 순차 after-input caller 입력 승계의 `v0.4.1` 교정 후보 검증 완료
+## 0. 현재 위치: `v0.4.1` 배포·설치 완료, Devflow 실사용 검증 대기
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -43,9 +43,9 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 공식 배포 Latest는 `v0.4.0`이고 annotated tag는 release-boundary commit `ff4ed25`를 가리킨다. 현재 source와 lock은 아직 배포하지 않은 patch 후보 `0.4.1`이다.
+- 공식 배포 Latest는 `v0.4.1`이고 annotated tag는 release-boundary commit `75355f3`를 가리킨다. 현재 `main`, `origin/main`, source와 lock version이 이 릴리스에 일치한다.
 - 사용자 소유 `.gitignore` 변경과 `docs/plan/`은 이번 제품 변경과 커밋에 포함하지 않는다.
-- 현재 후보 fingerprint는 runtime `0.3.5`, validator `0.6.2`, kernel `6`이다. L16 locator universe와 `after-input` 파생 의미는 그대로이며 순차 caller 입력 결합만 교정한다.
+- 현재 배포 fingerprint는 runtime `0.3.5`, validator `0.6.2`, kernel `6`이다. L16 locator universe와 `after-input` 파생 의미는 그대로이며 순차 caller 입력 결합만 교정한다.
 - `SPEC.version = "5"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 그대로다.
 
 ---
@@ -81,7 +81,7 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 - 설치된 GitHub `main` 소스로 수행한 Orca 실제 사용에서는 fresh Codex Sol이 새 P1 skill을 생성한 뒤 map과 exact-owner query를 사용해 intent-only 유지보수를 완료했다. 변경 전후 source basis가 달라졌고 정확 owner query는 `closed`, gap 0을 반환했으며 helper·test hash와 생성물 소유 경계가 보존됐다. 별도 fresh consumer의 trigger·adherence 검증은 실행하지 않아 behavior는 계속 `unproven`, release readiness는 `forward-test-required`다.
 - Fresh Terra high의 첫 두 미공개 계획 사례는 owner 진단·역할·모델 확인·두 검증 lane을 복원했지만 위임 context와 실제 이해도 확인을 사용자-facing 배정안에서 누락했다. 같은 실패가 두 번 반복되어 이를 `Delegation readiness`와 역할 배정의 완료 조건으로 재배치했고, 세 번째 미공개 사례는 전달 context와 실제 이해 확인 방법까지 스스로 계획했다. 한 모델·한 최종 사례의 `PARTIAL` 행동 증거이며 반복성·실제 위임 성공은 아니다.
 - Astra xhigh 구현 전 전제 검수와 Sol xhigh 전체 diff 검수를 사용했다. Sol이 역할 권장성, task/input attribution과 회귀 과잉의 세 blocker를 찾았고, 수정 후 두 차례 후속 검수는 blocker 0과 no-migration compatibility를 판정했다.
-- `v0.4.0` release workflow와 공식 NPX 설치가 성공했다. Release source와 canonical 설치본의 newline-insensitive diff는 0이고 설치본 self lint가 pass했다. 설치 fingerprint는 runtime `0.3.4`/validator `0.6.2`/kernel `6`이다. Codex는 universal package를 직접 사용하고 Claude Code는 같은 package를 가리키는 junction을 사용한다.
+- `v0.4.1` annotated tag와 `main`을 atomic push했고 release workflow run `34322605020`이 tag/package/lock 일치, 전체 검증과 GitHub Release 생성을 성공했다. 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes` 설치는 skill 하나를 발견해 Codex universal package와 Claude Code junction을 갱신했다. Release source와 canonical 설치본의 newline-insensitive diff는 0, 설치본 self lint는 pass, fingerprint는 runtime `0.3.5`/validator `0.6.2`/kernel `6`이다. Installer의 외부 보안 표시는 Gen Safe, Socket 1 alert, Snyk Low Risk였으며 이 표시는 제품 증거로 승격하지 않는다.
 - 구현 후 fresh Claude Fable xhigh 독립 감사와 교정 후 같은 세션의 closure audit가 모두 PASS했고 남은 MUST/SHOULD는 0건이다. Fresh-author 장기 이행은 행동 증거로 승격하지 않는다.
 - Markdown local link scan: 47 files, 53 local links, missing 0.
 - Local official-installer smoke: 1 skill discovered; installed 61 files; `SKILL.md` 1; forbidden repository-only file 0; source/install missing·extra·different 0; installed creator P1 generation과 lint pass.
@@ -124,6 +124,6 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 
 ## 5. 정확한 다음 단계
 
-1. 공식 Latest는 계속 `v0.4.0`이다. 사용자가 별도 릴리스를 요청하기 전에는 검증된 `v0.4.1` source commit만 유지한다.
+1. 공식 Latest `v0.4.1`과 Codex·Claude Code 전역 설치가 완료됐다. 다음 작업은 이 설치본을 사용한 Devflow 실사용 검증이다.
 2. Runtime 0.3.5를 채택할 소비 저장소는 정본 builder로 P2 runtime hash cohort 전체를 한 변경에서 재빌드한다. 기존 package는 자동 변경되지 않는다.
 3. 0.3.4에서 이미 순차 caller 입력 결함으로 막힌 active run은 새 runtime과 새 run ID로 다시 시작한다. Fresh Devflow 전체 흐름은 별도 실사용 검증 전까지 `UNPROVEN`으로 유지한다.
