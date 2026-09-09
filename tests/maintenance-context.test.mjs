@@ -273,6 +273,93 @@ test("map preview exposes purpose, owners, limits, and an exact re-entry command
   assert.match(map, /--describe --query <locator-or-interest> --json/);
 });
 
+test("map exposes bounded package-local seams without inventing a workspace graph", async (t) => {
+  const root = await makeTestDir("describe-declared-seams");
+  t.after(() => removeTestDir(root));
+  await writeFile(join(root, "SKILL.md"), "---\nname: seam-probe\ndescription: Show declared package seams without resolving another package.\n---\n\n# Seam Probe\n", "utf8");
+  const longCondition = `Only after the named review condition is active, ${"keep the surrounding condition visible; ".repeat(20)}`;
+  const longSibling = `<skill-root>/../${"s".repeat(650)}/references/long.md`;
+  await writeFile(join(root, "body.md"), [
+    "## why: purpose",
+    "",
+    "Always read `<skill-root>/../principles/references/policy-index.md` as shared policy without invoking its request classifier.",
+    "",
+    longCondition,
+    "read `<skill-root>/../arch/references/workflow.md` for the selected columns only.",
+    "",
+    `Inspect \`${longSibling}\` only as a deliberately long literal lead.`,
+    ""
+  ].join("\n"), "utf8");
+  const artifacts = Object.fromEntries(Array.from({ length: 9 }, (_, index) => [index === 0 ? "journal" : index === 1 ? "requestRecord" : `item${index}`, {
+    path: index < 2 ? ".project/journal.md" : index === 2 ? `.project/<scope>/${"p".repeat(700)}.md` : `.project/item-${index}.md`,
+    writer: index === 0 ? "external.principles" : index === 1 ? "direct" : index === 2 ? `external.${"w".repeat(300)}` : `external.owner-${index}`,
+    readers: index === 0 ? Array.from({ length: 41 }, (__, reader) => reader === 0 ? `stage.${"r".repeat(300)}` : `stage.reader-${reader}`) : index === 1 ? [1, "stage.consumer-1"] : [`stage.consumer-${index}`]
+  }]));
+  await writeFile(join(root, "spec.mjs"), [
+    "export const SPEC = { version: 5, id: 'seam-probe' };",
+    `export const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};`,
+    "export const READ_FIRST = [{ body: 'why: purpose' }];",
+    ""
+  ].join("\n"), "utf8");
+
+  const value = await createMaintenanceContext(root);
+  const seams = value.index.declared_seams;
+  assert.equal(seams.outside_package_literals.total, 3);
+  assert.equal(seams.outside_package_literals.provided, 3);
+  assert.ok(seams.outside_package_literals.items.every((item) => item.owner_locator === "body:why: purpose"));
+  assert.ok(seams.outside_package_literals.items.every((item) => item.read_first_declared_by.some((entry) => /^spec\.mjs:/.test(entry.source))));
+  const conditionalLead = seams.outside_package_literals.items.find((item) => /\.\.\/arch\//.test(item.literal));
+  assert.match(conditionalLead.context, /Only after the named review condition is active/);
+  assert.match(conditionalLead.context, /<skill-root>\/\.\.\/arch\/references\/workflow\.md/);
+  assert.match(conditionalLead.context, /context omitted/);
+  assert.equal(conditionalLead.target_status, "not-inspected");
+  const boundedLead = seams.outside_package_literals.items.find((item) => item.literal_truncated);
+  assert.ok(boundedLead);
+  assert.ok(boundedLead.literal.length <= 600);
+  assert.equal(JSON.stringify(value).includes(longSibling), false);
+  assert.ok(value.summary.critical_gaps.some((gap) => /truncated; open the exact source span/.test(gap)));
+
+  assert.equal(seams.artifacts.status, "complete-for-declared-scope");
+  assert.equal(seams.artifacts.total, 9);
+  assert.equal(seams.artifacts.provided, 8);
+  assert.equal(seams.artifacts.omitted, 1);
+  const journal = seams.artifacts.items.find((item) => item.locator === "spec:ARTIFACTS/journal");
+  const request = seams.artifacts.items.find((item) => item.locator === "spec:ARTIFACTS/requestRecord");
+  assert.equal(journal.path, request.path);
+  assert.notEqual(journal.writer, request.writer);
+  assert.equal(journal.readers.provided.length, 6);
+  assert.equal(journal.readers.total, 41);
+  assert.equal(journal.readers.omitted, 35);
+  const longArtifact = seams.artifacts.items.find((item) => item.locator === "spec:ARTIFACTS/item2");
+  assert.equal(longArtifact.path_truncated, true);
+  assert.equal(longArtifact.writer_truncated, true);
+
+  const map = renderSkillMapPreview(value);
+  assert.match(map, /## Package-local declared seams/);
+  assert.match(map, /not a complete dependency map, verified handoff, or incoming-impact analysis/);
+  assert.match(map, /Always read .*shared policy without invoking its request classifier/);
+  assert.match(map, /spec:ARTIFACTS\/journal/);
+  assert.match(map, /external\.principles/);
+  assert.match(map, /\.project\/&lt;scope&gt;\//);
+  assert.match(map, /truncated; query the artifact locator/);
+  assert.match(map, /truncated; open the exact source span/);
+  assert.match(map, /stage\.r+… \[truncated; query the artifact locator\]/);
+  assert.match(map, /unknown, stage\.consumer-1/);
+  assert.doesNotMatch(map, /\[object Object\]/);
+  assert.doesNotMatch(map, /ROUTE:/);
+  assert.ok(map.length < 40_000);
+  assert.ok(JSON.stringify(value).length < 100_000);
+
+  const exact = await createMaintenanceContext(root, { query: "spec:ARTIFACTS/journal" });
+  assert.equal(Object.hasOwn(exact.index, "declared_seams"), false, "exact-owner output must not pay the overview seam cost");
+  assert.ok(exact.capsule.relations.some((relation) => relation.kind === "writer"));
+
+  await writeFile(join(root, "spec.mjs"), `export const SPEC = { version: 5, id: "seam-probe" };\nexport const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};\nexport const READ_FIRST = [];\n`, "utf8");
+  const detached = await createMaintenanceContext(root);
+  assert.ok(detached.index.declared_seams.outside_package_literals.items.every((item) => item.read_first_declared_by.length === 0));
+  assert.equal(detached.index.declared_seams.outside_package_literals.total, 3, "literal observation remains even when READ_FIRST no longer selects its owner");
+});
+
 test("maintenance projection preserves null stage, intent field state, and outside-package literals without invented local edges", async (t) => {
   const base = await makeTestDir("describe-source-truth");
   t.after(() => removeTestDir(base));

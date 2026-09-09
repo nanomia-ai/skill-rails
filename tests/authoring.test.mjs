@@ -84,7 +84,9 @@ test("authoring guidance preserves intent anchors, role structure, and distinct 
   assert.match(workflow, /without importing or executing its spec, collectors, or helpers/);
   assert.match(workflow, /navigation, not full validation, runtime admission, execution proof, consumer completeness, or deletion safety/);
   assert.match(workflow, /--describe --map[\s\S]*same captured source model, not another maintained document/);
+  assert.match(workflow, /package-local declared seams[\s\S]*do not resolve another package[\s\S]*workspace graph/);
   assert.match(workflow, /re-run the saved invocation at both boundaries against current bytes/);
+  assert.match(workflow, /touches or relies on a package-local outside lead[\s\S]*local exact-owner closure cannot close that external meaning/);
 
   assert.match(evaluation, /## Review lanes/);
   assert.match(evaluation, /Do not credit an informed review as evidence that a cold consumer/);

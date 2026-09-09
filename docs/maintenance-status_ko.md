@@ -63,7 +63,7 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 - Unknown read로 guard가 멈출 때 evaluator는 `guard_matched.pending_reads`를 내고 build coverage는 `guard-pending:<id>`로 구분한다. L14는 실제 predicate match와 pending-read block을 각각 대응하는 token으로만 인정한다.
 - 공개 `path` domain이 내부 U+0020 공백 하나를 허용하도록 넓어졌고, 생성 loader의 `--artifact <path>` 예시가 `--artifact "<path>"`로 quote됐다(`v0.1.8`).
 - 기존 package를 변경하지 않고 현재 원본에서 목적·owner·consumer·evidence·frontier를 재구성하는 `maintain --describe`와 `--query [--json]`, 같은 model의 사람용 `--map` preview를 추가했다. 출력은 `complete-for-declared-scope`만 주장하고 source identity·gap·재진입 명령을 함께 제공한다.
-- Devflow 0.23.20 실물에서 확인된 maintenance projection 오진을 교정했다. 합법 `expect.stage: null`, intent의 선언 0건과 미확정, function/trigger와 problem/authoring objective, package-local path와 공식 `<skill-root>/../<sibling>/<path>` 관찰 frontier를 구분한다. Sibling target의 존재·실행·freshness·authority는 여전히 주장하지 않는다.
+- Devflow 0.23.20 실물에서 확인된 maintenance projection 오진을 교정했다. 합법 `expect.stage: null`, intent의 선언 0건과 미확정, function/trigger와 problem/authoring objective, package-local path와 공식 `<skill-root>/../<sibling>/<path>` 관찰 frontier를 구분한다. 사람용 map과 overview JSON은 같은 현재-source model에서 package-local declared seams를 투영해 sibling literal의 원문 문맥·owner·READ_FIRST 출처와 정적 `ARTIFACTS` path·writer·readers를 보여준다. 표시 한도와 생략을 명시하며 sibling target, 상대 package, incoming impact, 실행·freshness·authority는 여전히 주장하지 않는다.
 - P2 caller-input BLOCK은 `reinvoke: after-input`을 명시하고 traced stage 결과는 외부 trace directory에 UTF-8로 자동 저장된다. `resume/2`는 실행 가능한 continuation에만 명령을 제공하며 입력 값이나 결정 권한을 발명하지 않는다.
 - 순차 `after-input`은 직전 동일 context의 lossless caller 입력만 이어받는다. 현재 flag가 이전 값을 대체하고, terminal·stale·다른 package/project/target/snapshot/run에는 승계하지 않으며 provenance 불일치는 fail-closed한다.
 
@@ -71,8 +71,8 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 
 ## 3. 현재 증거
 
-- 현재 maintenance-context 표적 회귀 13/13이 pass했다. P2 causal capsule, finite absence와 unknown, 자연어 match cut, invalid·악성 target 비실행, JSON source span, bounded reverse consumer, P0/P1 projection ownership, AST module edge, CLI mode 배타성·compact JSON·legacy diagnose, map, 합법 null-stage·intent field tri-state·package-external literal frontier, 기존 L16 locator universe와 정적으로 해석할 수 없는 선언 관계의 fail-closed 차단을 고정한다.
-- 현재 전체 `npm run verify`: vendor check, self lint, repository test 94/94, frozen G0.5 eval pass.
+- 현재 maintenance-context 표적 회귀 14/14가 pass했다. P2 causal capsule, finite absence와 unknown, 자연어 match cut, invalid·악성 target 비실행, JSON source span, bounded reverse consumer, P0/P1 projection ownership, AST module edge, CLI mode 배타성·compact JSON·legacy diagnose, map, 합법 null-stage·intent field tri-state·package-external literal frontier, lossless artifact 집계 뒤의 명시적 표시 cap, 기존 L16 locator universe와 정적으로 해석할 수 없는 선언 관계의 fail-closed 차단을 고정한다.
+- 현재 전체 `npm run verify`: vendor check, self lint, repository test 95/95, frozen G0.5 eval pass.
 - Canonical pilot rebuild: runtime `0.3.5`, validator `0.6.2`, kernel `6`; L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, manifest 15 content + 38 generated = 53, build ID `sha256:c10796022a4ae2a7766e305f46639fbee0a5e89a9ff54f2c1b264c377b3f43d8`.
 - 순차 caller 입력 표적 회귀는 `A → B → C → DONE`, 현재값 override, terminal/project/snapshot/package no-inherit, run transplant·UNKNOWN/context 변조 거부와 nested UNKNOWN/동형 known JSON의 lossless 구분을 통과했다. 같은 Claude Opus xhigh와 Astra xhigh 세션의 후속 whole-result 감사가 모두 runtime API를 근본 owner로 판정하고 blocker 0으로 `ACCEPT`했다.
 - 입력 재진입 표적 회귀 44/44가 pass했고, 동일 Fable high 세션의 구현 후 whole-diff 검수는 blocker 0으로 PASS했다. Fable이 남긴 non-blocking risk는 ASK/WAIT의 `reason: terminal` 명명과 결과 파일의 non-atomic write이며, 둘 다 관측된 결함 범위를 넓혀 지금 기계화하지 않는다.
