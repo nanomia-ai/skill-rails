@@ -2,13 +2,13 @@
 
 문서 상태: 교체형 작업 snapshot
 
-최종 갱신: 2026-09-09 KST (`v0.4.1` 구현·릴리스 검증·공식 배포·전역 설치 완료)
+최종 갱신: 2026-09-09 KST (`v0.4.2` 유지보수 인덱스 폐쇄 교정 구현·검증 완료, 배포 전)
 
 이 문서는 새 세션이 “마지막으로 어디까지 끝났고 어디서 이어야 하는가”를 빠르게 복구하기 위한 시작점이다. 제품의 안정적인 목적과 설계는 [제품·설계 정본](skill-rails_ko.md), 정확한 구현·증거·P2 version-5 호환 변경은 [구현·검증 기록](implementation-verification_ko.md), 큰 전환의 인과와 재사용할 저작·운영 교훈은 [저작 경험 계승](authoring-lessons_ko.md)이 소유한다. 일상 chronology는 Git과 Orca 실행 기록에 맡기고 이 파일에는 현재 truth만 둔다.
 
 ---
 
-## 0. 현재 위치: `v0.4.1` 배포·설치 완료, Devflow 실사용 검증 대기
+## 0. 현재 위치: `v0.4.2` 유지보수 인덱스 폐쇄 교정 구현·검증 완료, 배포 전
 
 v0.1.4까지의 root `SKILL.md` 방식은 creator 기능을 빠뜨리지는 않았지만, `npx skills@latest`가 repository 전체와 fixture의 중첩 skill까지 설치 scope로 복사하게 했다. Package 0.1.5 후보는 설치 가능한 정본을 공식 관례인 `skills/skill-rails/`로 옮겼다. Repository-only `docs/`, `tests/`, `evals/`, `fixtures/`는 GitHub source에 그대로 남고 설치 payload에서는 제외된다.
 
@@ -40,10 +40,12 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 
 후속 실제 연속 호출은 runtime 0.3.4가 현재 명령줄의 caller 입력만 결합해 `A` 제출 뒤 `B`만 제출하면 `A`를 잃는 결함을 드러냈다. Runtime 0.3.5 후보는 P2 stage API에서 가장 최근의 호환되는 `after-input` Decision에 결합된 입력만 한 단계 승계하고 현재 명시값을 우선한다. Run·package·project·target·stable snapshot·runtime/spec identity가 달라지거나 terminal/stale/다른 continuation이면 승계하지 않는다. Lossless caller 입력은 Decision과 context에 self-seal되며, 부분 변조나 다른 run 이식은 fail-closed한다. 새 ledger·schema·Devflow 예외는 추가하지 않았다(구현·검증 기록 6.29).
 
+Devflow의 후속 유지보수 인덱스 실측은 52개 stage-owner exact query 중 네 개가 반복해도 닫히지 않는 문제를 드러냈다. `v0.4.2` 후보는 direct required relation을 secondary fan-out보다 먼저 예약하고 canonical structured JSON에 별도 유한 parse budget을 적용한다. Migration provenance를 current intent로 가장하지 않고 source·hash·kind가 구분되는 bounded-label external boundary로 보존하며 같은 목록의 중복 locator는 한 edge로 계산한다. 근본 교정 뒤 frontier가 이미 작아져 별도 필터는 제거하고 overview와 exact query 모두 전체 frontier를 유지한다. P2 runtime·validator·kernel과 생성 package byte는 바뀌지 않는다(구현·검증 기록 6.30).
+
 ## 1. 저장소 기준선
 
 - branch: `main`
-- 공식 배포 Latest는 `v0.4.1`이고 annotated tag는 release-boundary commit `75355f3`를 가리킨다. 현재 `main`, `origin/main`, source와 lock version이 이 릴리스에 일치한다.
+- 공식 배포 Latest는 `v0.4.1`이고 annotated tag는 release-boundary commit `75355f3`를 가리킨다. Local source와 lock은 아직 배포되지 않은 `0.4.2`에 일치하며, `origin/main`은 push 전까지 `v0.4.1` 문서 후속 commit `3fd8791`에 있다.
 - 사용자 소유 `.gitignore` 변경과 `docs/plan/`은 이번 제품 변경과 커밋에 포함하지 않는다.
 - 현재 배포 fingerprint는 runtime `0.3.5`, validator `0.6.2`, kernel `6`이다. L16 locator universe와 `after-input` 파생 의미는 그대로이며 순차 caller 입력 결합만 교정한다.
 - `SPEC.version = "5"`, Decision/Trace schema, closed exports, effect authority와 host permission 경계는 그대로다.
@@ -71,8 +73,8 @@ Release-boundary commit `632bb1f3d1048f715b426c2cc807a151b48d6763`, annotated ta
 
 ## 3. 현재 증거
 
-- 현재 maintenance-context 표적 회귀 14/14가 pass했다. P2 causal capsule, finite absence와 unknown, 자연어 match cut, invalid·악성 target 비실행, JSON source span, bounded reverse consumer, P0/P1 projection ownership, AST module edge, CLI mode 배타성·compact JSON·legacy diagnose, map, 합법 null-stage·intent field tri-state·package-external literal frontier, lossless artifact 집계 뒤의 명시적 표시 cap, 기존 L16 locator universe와 정적으로 해석할 수 없는 선언 관계의 fail-closed 차단을 고정한다.
-- 현재 전체 `npm run verify`: vendor check, self lint, repository test 95/95, frozen G0.5 eval pass.
+- 현재 maintenance-context 표적 회귀 19/19가 pass했다. 기존 P2 causal capsule, finite absence와 unknown, 비실행·source span·bounded projection·map·L16·fail-closed 경계에 더해 direct required relation 선예약, canonical structured source의 별도 유한 budget, 같은 목록의 provenance dedupe, migration external provenance identity·bounded label과 전체 frontier 보존을 고정한다.
+- 현재 전체 `npm run verify`: vendor check, self lint, repository test 100/100, frozen G0.5 eval pass. 앞선 병렬 실행의 임의 Windows `EPERM`은 서로 다른 atomic rename에서 발생했고 격리·직렬 재실행 뒤 agent 작업이 끝난 표준 명령에서도 재현되지 않았다.
 - Canonical pilot rebuild: runtime `0.3.5`, validator `0.6.2`, kernel `6`; L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256·CRLF 거부, manifest 15 content + 38 generated = 53, build ID `sha256:c10796022a4ae2a7766e305f46639fbee0a5e89a9ff54f2c1b264c377b3f43d8`.
 - 순차 caller 입력 표적 회귀는 `A → B → C → DONE`, 현재값 override, terminal/project/snapshot/package no-inherit, run transplant·UNKNOWN/context 변조 거부와 nested UNKNOWN/동형 known JSON의 lossless 구분을 통과했다. 같은 Claude Opus xhigh와 Astra xhigh 세션의 후속 whole-result 감사가 모두 runtime API를 근본 owner로 판정하고 blocker 0으로 `ACCEPT`했다.
 - 입력 재진입 표적 회귀 44/44가 pass했고, 동일 Fable high 세션의 구현 후 whole-diff 검수는 blocker 0으로 PASS했다. Fable이 남긴 non-blocking risk는 ASK/WAIT의 `reason: terminal` 명명과 결과 파일의 non-atomic write이며, 둘 다 관측된 결함 범위를 넓혀 지금 기계화하지 않는다.

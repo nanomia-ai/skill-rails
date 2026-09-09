@@ -14,6 +14,7 @@ import { validateIntent } from "./profiles.mjs";
 const PREVIEW_SCHEMA = "skill-rails/maintenance-context-preview/1";
 const EXCLUDED_ROOTS = new Set([".git", "node_modules"]);
 const MAX_TEXT_BYTES = 512 * 1024;
+const MAX_STRUCTURED_TEXT_BYTES = 4 * 1024 * 1024;
 const MAX_EXCERPT_CHARS = 1800;
 const MAX_CAPSULE_SUBJECTS = 72;
 const MAX_CAPSULE_RELATIONS = 180;
@@ -21,6 +22,15 @@ const MAX_MAP_OUTSIDE_LEADS = 6;
 const MAX_MAP_ARTIFACTS = 8;
 const MAX_MAP_ARTIFACT_READERS = 6;
 const MAX_MAP_LEAD_CONTEXT_CHARS = 600;
+const STRUCTURED_SOURCE_PATHS = new Set([
+  ".generated.json",
+  ".skill-rails/intent.json",
+  ".skill-rails/profile-decision.json",
+  ".skill-rails/obligation-ledger.json",
+  ".skill-rails/eval-cases.json",
+  ".skill-rails/semantic-diff.json",
+  "fixtures/scenarios.json"
+]);
 const SPEC_ARRAY_GROUPS = new Set(["GUARDS", "STAGES", "DEFERRED"]);
 const SPEC_KEYED_L16_GROUPS = new Set(["OBSERVATIONS", "FORMATS", "TEMPLATES", "ARTIFACTS", "DECLARATIONS", "ROLES"]);
 const SPEC_OBJECT_GROUPS = new Set(["OBSERVATIONS", "FORMATS", "TEMPLATES", "ORDERS", "OWNERSHIP", "TABLES", "ARTIFACTS", "ROLES", "DECLARATIONS"]);
@@ -289,7 +299,7 @@ export async function createMaintenanceContext(skillRoot, options = {}) {
     frontiers,
     declared_artifacts: builder.find((subject) => subject.kind === "spec-artifacts").map((subject) => ({ subject_id: subject.id, value: builder.value(subject) })),
     issues: dedupeObjects(issues),
-    limits: { max_text_bytes: MAX_TEXT_BYTES, max_excerpt_chars: MAX_EXCERPT_CHARS, max_capsule_subjects: MAX_CAPSULE_SUBJECTS, max_capsule_relations: MAX_CAPSULE_RELATIONS }
+    limits: { max_text_bytes: MAX_TEXT_BYTES, max_structured_text_bytes: MAX_STRUCTURED_TEXT_BYTES, max_excerpt_chars: MAX_EXCERPT_CHARS, max_capsule_subjects: MAX_CAPSULE_SUBJECTS, max_capsule_relations: MAX_CAPSULE_RELATIONS }
   };
   model.spec_groups = specGroups;
   model.text_matches = textMatches;
@@ -474,7 +484,7 @@ function createModelBuilder(entryByPath, generatedPaths) {
   };
 
   const addExternalSubject = (kind, name, text, options = {}) => {
-    const id = `external:${kind}:${sha256(`${name}\0${text}`).slice(7, 23)}`;
+    const id = `external:${kind}:${sha256(`${options.identityKey ?? name}\0${text}`).slice(7, 23)}`;
     const existing = subjects.find((subject) => subject.id === id);
     if (existing) return existing;
     return addSubject({ id, locator: null, display: name, kind: `external-${kind}`, name, identity: "external-boundary", basis: options.basis ?? "declared", authority: "external-endpoint", text, data: options.data ?? null });
@@ -555,13 +565,17 @@ async function captureInventory(root, options = {}) {
         }
         let text = null;
         let handling = "opaque";
-        if (bytes.length <= (options.maxTextBytes ?? MAX_TEXT_BYTES)) {
+        const genericTextLimit = options.maxTextBytes ?? MAX_TEXT_BYTES;
+        const structuredTextLimit = options.maxStructuredTextBytes
+          ?? (options.maxTextBytes === undefined ? MAX_STRUCTURED_TEXT_BYTES : genericTextLimit);
+        const textLimit = STRUCTURED_SOURCE_PATHS.has(local) ? structuredTextLimit : genericTextLimit;
+        if (bytes.length <= textLimit) {
           try {
             text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-            handling = "text-searched";
+            handling = bytes.length <= genericTextLimit ? "text-searched" : "structured-only";
           } catch { handling = "opaque"; }
         } else handling = "oversize";
-        entries.push({ path: local, type: "file", bytes: bytes.length, hash: sha256(bytes), text, handling, generated: false });
+        entries.push({ path: local, type: "file", bytes: bytes.length, hash: sha256(bytes), text, handling, generated: false, genericTextEligible: bytes.length <= genericTextLimit });
       } else {
         entries.push({ path: local, type: "special", bytes: null, hash: null, text: null, handling: "unsupported", generated: false });
         issues.push(issue(local, "unsupported-entry", "Special filesystem entry was not inspected.", "high"));
@@ -622,10 +636,48 @@ function addLedgerSubjects(builder, ledger, entry, spans) {
     }, "positional");
     builder.addSubject(subject, atom);
     builder.addRelation(subject.id, { id: `file:${entry.path}` }, "contained-in", { source_locator: subject.display });
-    if (atom?.source) builder.addRelation(subject.id, intentLocator(atom.source), "originates-from", { basis: "declared", source_locator: subject.display });
-    for (const [ordinal, target] of (Array.isArray(atom?.targets) ? atom.targets : []).entries()) builder.addRelation(subject.id, target, "targets", { basis: "declared", source_locator: subject.display, ordinal });
-    for (const [ordinal, target] of (Array.isArray(atom?.evidence) ? atom.evidence : []).entries()) builder.addRelation(subject.id, target, "names-evidence", { basis: "declared", source_locator: subject.display, ordinal, note: "Membership is not a direct proof edge." });
+    if (atom?.source) addObligationOrigin(builder, subject, atom);
+    for (const [ordinal, target] of uniqueLocatorEntries(atom?.targets)) builder.addRelation(subject.id, target, "targets", { basis: "declared", source_locator: subject.display, ordinal });
+    for (const [ordinal, target] of uniqueLocatorEntries(atom?.evidence)) builder.addRelation(subject.id, target, "names-evidence", { basis: "declared", source_locator: subject.display, ordinal, note: "Membership is not a direct proof edge." });
   }
+}
+
+function addObligationOrigin(builder, subject, atom) {
+  const declaredSource = String(atom.source);
+  if (declaredSource.startsWith("intent.")) {
+    builder.addRelation(subject.id, intentLocator(declaredSource), "originates-from", { basis: "declared", source_locator: subject.display });
+    return;
+  }
+  const sourceLabel = boundedDeclaredValue(declaredSource, 600);
+  const provenance = builder.addExternalSubject(
+    "provenance",
+    `${sourceLabel.value}${sourceLabel.truncated ? "…" : ""}`,
+    "This declared obligation origin is outside the current canonical intent; its source bytes and semantic adequacy are not verified by this package-local inspector.",
+    {
+      basis: "declared-external-provenance",
+      identityKey: JSON.stringify([declaredSource, atom.source_hash ?? null, atom.source_kind ?? null]),
+      data: { source: declaredSource, source_hash: atom.source_hash ?? null, source_kind: atom.source_kind ?? null }
+    }
+  );
+  builder.addRelation(subject.id, { id: provenance.id }, "originates-from", {
+    basis: "declared-external-provenance",
+    source_locator: subject.display,
+    note: "Resolved as an external provenance boundary, not as current intent or execution evidence."
+  });
+}
+
+function uniqueLocatorEntries(value) {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  const entries = [];
+  for (const [ordinal, locator] of value.entries()) {
+    if (typeof locator === "string") {
+      if (seen.has(locator)) continue;
+      seen.add(locator);
+    }
+    entries.push([ordinal, locator]);
+  }
+  return entries;
 }
 
 function addArraySubjects(builder, value, entry, locatorPrefix, kind, spans) {
@@ -1127,8 +1179,9 @@ function addQueryTextSubjects(builder, entries, queryInput) {
 }
 
 function shouldExtractGenericSource(entry, queryInput) {
-  if (!entry.generated) return true;
   const query = queryInput === null || queryInput === undefined ? "" : String(queryInput).trim();
+  if (entry.genericTextEligible === false) return query.startsWith("file:") && query.slice(5) === entry.path;
+  if (!entry.generated) return true;
   if (!query.startsWith("file:")) return false;
   return query.slice(5) === entry.path;
 }
@@ -1287,7 +1340,7 @@ function projectMaintenanceContext(model, queryInput, { staticSpec }) {
     note = `The finite scope could not be completed on stable current bytes: ${finite.scope}.`;
   }
 
-  const capsule = expandCapsule(model, matches);
+  const capsule = expandCapsule(model, matches, { exactOwner: Boolean(exact && matches.length === 1) });
   capsule.omitted.subjects += Math.max(0, modeledMatchTotal - matches.length) + (model.text_matches?.omitted ?? 0);
   const subjectById = new Map(model.subjects.map((subject) => [subject.id, subject]));
   const selectedIds = new Set(capsule.subjects.map((subject) => subject.id));
@@ -1300,6 +1353,7 @@ function projectMaintenanceContext(model, queryInput, { staticSpec }) {
     ...capsule.subjects.filter((subject) => subject.path && !subject.generated && subject.kind !== "file").slice(0, 7).map((subject) => subject.display ?? subject.path),
     ...cutRelations.slice(0, 3).map((relation) => subjectLabel(subjectById.get(relation.to)) ?? relation.target)
   ].filter(Boolean)).slice(0, 8);
+  const relationCoverage = assessRelationCoverage({ model, exact, queryStatus: status, matches, capsule });
   const criticalGaps = unique([
     ...model.frontiers.filter((item) => item.consequence === "high").map((item) => `${item.kind} at ${item.source}: ${item.message}`),
     ...(capsule.omitted.subjects || capsule.omitted.relations ? [`Capsule truncated: subjects omitted=${capsule.omitted.subjects}, relations omitted=${capsule.omitted.relations}.`] : []),
@@ -1307,7 +1361,6 @@ function projectMaintenanceContext(model, queryInput, { staticSpec }) {
   ]);
   const relevantExtraction = Object.values(model.assessment.extraction).filter((item) => item.status !== "not-present");
   const extractionStatus = !model.snapshot.stable ? "changed" : relevantExtraction.some((item) => item.status === "partial") ? "partial" : "complete-for-declared-scope";
-  const relationCoverage = assessRelationCoverage({ model, exact, queryStatus: status, matches, capsule });
   const nextInvocation = describeInvocation(model.snapshot.root, query ?? matches[0]?.locator ?? null);
   const declaredSeams = query ? null : projectDeclaredSeams(model);
   const next = {
@@ -1387,7 +1440,7 @@ function projectMaintenanceContext(model, queryInput, { staticSpec }) {
   return output;
 }
 
-function expandCapsule(model, matches) {
+function expandCapsule(model, matches, { exactOwner = false } = {}) {
   const subjectById = new Map(model.subjects.map((subject) => [subject.id, subject]));
   const selected = new Set();
   const selectedOrder = [];
@@ -1420,6 +1473,15 @@ function expandCapsule(model, matches) {
   for (const subject of [...matches].sort(compareSubjectPriority).slice(0, MAX_CAPSULE_SUBJECTS)) {
     anchorIds.add(subject.id);
     addSubject(subject.id);
+  }
+
+  // Exact-owner closure must not depend on which explanatory path happened to be
+  // traversed first. Reserve the bounded capsule for its finite direct envelope
+  // before adding secondary causal context.
+  if (exactOwner) {
+    for (const item of requiredRelationsForOwner(model, matches[0])) {
+      addRelation(item.relation, item.direction === "incoming" ? { from: false, targets: false } : undefined);
+    }
   }
 
   const structuralKinds = new Set([
@@ -1569,6 +1631,40 @@ function exactQueryKind(query) {
   return null;
 }
 
+function ownerRelationRequirements(owner) {
+  const outgoing = SPEC_KIND_RELATION_FAMILIES[owner?.kind]
+    ?? (owner?.kind === "obligation-atom" ? ["originates-from", "targets", "names-evidence"] : owner?.kind === "scenario-fixture" ? ["declares-cover", "declares-stage-expectation"] : []);
+  const incoming = DECLARED_INCOMING_BY_KIND[owner?.kind] ?? [];
+  return { outgoing, incoming };
+}
+
+function relationMatchesOwner(relation, owner, direction) {
+  if (direction === "outgoing") return relation.from === owner.id;
+  return relation.to === owner.id || relation.target === owner.locator || relation.candidates?.includes(owner.id);
+}
+
+function compareRequiredRelations(left, right) {
+  const leftKey = `${left.source_locator ?? ""}\0${left.from}\0${left.to ?? left.target ?? ""}`;
+  const rightKey = `${right.source_locator ?? ""}\0${right.from}\0${right.to ?? right.target ?? ""}`;
+  const keyOrder = leftKey < rightKey ? -1 : leftKey > rightKey ? 1 : 0;
+  if (keyOrder) return keyOrder;
+  const ordinalOrder = (left.ordinal ?? -1) - (right.ordinal ?? -1);
+  return ordinalOrder || (left.id < right.id ? -1 : left.id > right.id ? 1 : 0);
+}
+
+function requiredRelationsForOwner(model, owner) {
+  if (!owner) return [];
+  const { outgoing, incoming } = ownerRelationRequirements(owner);
+  const requirements = [
+    ...outgoing.map((family) => ({ family, direction: "outgoing" })),
+    ...incoming.map((family) => ({ family, direction: "incoming" }))
+  ];
+  return requirements.flatMap((requirement) => model.relations
+    .filter((relation) => relation.kind === requirement.family && relationMatchesOwner(relation, owner, requirement.direction))
+    .sort(compareRequiredRelations)
+    .map((relation) => ({ relation, direction: requirement.direction })));
+}
+
 function assessRelationCoverage({ model, exact, queryStatus, matches, capsule }) {
   const base = {
     status: "discovery-only",
@@ -1584,9 +1680,7 @@ function assessRelationCoverage({ model, exact, queryStatus, matches, capsule })
     return { ...base, status: "blocked", blockers: [coverageBlocker("ambiguous-owner", matches[0], null, "The exact locator does not identify exactly one current source owner.", "Query one collision-free source:... id from the returned candidates.")] };
   }
   const owner = matches[0];
-  const outgoing = SPEC_KIND_RELATION_FAMILIES[owner.kind]
-    ?? (owner.kind === "obligation-atom" ? ["originates-from", "targets", "names-evidence"] : owner.kind === "scenario-fixture" ? ["declares-cover", "declares-stage-expectation"] : []);
-  const incoming = DECLARED_INCOMING_BY_KIND[owner.kind] ?? [];
+  const { outgoing, incoming } = ownerRelationRequirements(owner);
   const supported = outgoing.length > 0 || incoming.length > 0;
   if (!supported) return base;
 
@@ -1624,18 +1718,15 @@ function assessRelationCoverage({ model, exact, queryStatus, matches, capsule })
       blockers.push({ code: "unresolved-relation-site", family: requirement.family, source_id: site.source_id, source_locator: site.source_locator, span: site.span, reason: site.reason, hint: site.hint });
     }
 
-    const relevantRelations = model.relations.filter((relation) => {
-      if (relation.kind !== requirement.family) return false;
-      if (requirement.direction === "outgoing") return relation.from === owner.id;
-      return relation.to === owner.id || relation.target === owner.locator || relation.candidates?.includes(owner.id);
-    });
+    const relevantRelations = model.relations
+      .filter((relation) => relation.kind === requirement.family && relationMatchesOwner(relation, owner, requirement.direction))
+      .sort(compareRequiredRelations);
     for (const relation of relevantRelations.filter((item) => item.resolution !== "resolved")) {
       blockers.push(coverageBlocker(`relation-${relation.resolution}`, owner, requirement.family, `${relation.source_locator ?? relation.from} has a ${relation.resolution} ${requirement.family} target.`, `Inspect ${relation.source_locator ?? relation.from} and make the declared target unambiguous.`));
     }
-    const supplementalRelations = relevantRelations.filter((relation) => !selectedRelationIds.has(relation.id));
-    const omittedRelations = supplementalRelations.slice(12);
+    const omittedRelations = relevantRelations.filter((relation) => !selectedRelationIds.has(relation.id));
     if (omittedRelations.length) {
-      blockers.push(coverageBlocker("required-output-cut", owner, requirement.family, `Required ${requirement.family} context was cut: relations=${omittedRelations.length}.`, "Run a narrower exact query or increase the owning bounded projection before planning the change."));
+      blockers.push(coverageBlocker("required-output-cut", owner, requirement.family, `Required ${requirement.family} context was cut: relations=${omittedRelations.length}.`, "This owner's direct declared relation envelope exceeds the bounded capsule; repeating the same query will not close it. Rescope the owner or review the inspector limit as an explicit product change."));
     }
     families.push({
       kind: requirement.family,
@@ -1645,7 +1736,7 @@ function assessRelationCoverage({ model, exact, queryStatus, matches, capsule })
       unresolved_sites: sites.filter((item) => item.status === "blocked").length,
       provided_relations: relevantRelations.length - omittedRelations.length,
       omitted_relations: omittedRelations.length,
-      supplemental_relations: supplementalRelations.slice(0, 12).map((relation) => ({ source_locator: relation.source_locator, resolution: relation.resolution }))
+      supplemental_relations: omittedRelations.slice(0, 12).map((relation) => ({ source_locator: relation.source_locator, resolution: relation.resolution }))
     });
   }
   const reportedFamilies = families.filter((item) => item.unresolved_sites || item.supplemental_relations.length || item.omitted_relations);

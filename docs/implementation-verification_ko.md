@@ -663,6 +663,16 @@ Runtime은 `0.3.4 → 0.3.5`, package 후보는 `0.4.0 → 0.4.1`이며 validato
 
 기존 생성 package와 trace는 자동 변경되지 않는다. Runtime 0.3.5를 채택할 P2 package만 정본 builder로 재빌드하며, runtime hash cohort를 묶는 소비 저장소는 전체 cohort를 한 변경으로 갱신한다. 0.3.4에서 이미 이 결함으로 막힌 active run은 승계 metadata가 없으므로 새 runtime에서 새 run ID로 다시 시작한다. Fresh Devflow 전체 흐름과 다른 host의 장기 caller 행동은 계속 `UNPROVEN`이다. Trace lease timeout, stage-result atomic write, Git 기본 snapshot의 dirty byte 범위는 이번 원인의 소유 경계가 아니며 별도 관측 없이 이 수정에 합치지 않았다.
 
+### 6.30 대형 package의 exact-owner 관계 폐쇄와 provenance 경계
+
+Devflow 0.23.20의 52개 stage owner를 현재 package byte에서 질의하자 48개는 닫혔지만 네 개는 반복해도 닫히지 않았다. Adopt `adoption`, Resume `scope-entry`, Work `task-finalization`은 180개 capsule 한도를 없앤 문제가 아니라 secondary·structural fan-out이 direct required relation보다 먼저 자리를 소비한 admission-order 결함이었다. Principles `classify`는 1.29 MiB canonical obligation ledger에 일반 산문용 512 KiB decode 한도를 공유해 선언 관계의 source universe가 부분 추출된 별도 결함이었다. `blocked` 판정 자체는 거짓 완결을 막았으므로 유지했다.
+
+교정은 `maintenance-context.mjs`의 capture와 projection owner에만 둔다. Exact native owner는 지원되는 direct outgoing/incoming relation을 code-unit 순서로 안정 정렬해 먼저 예약하고, 이 유한 envelope 자체가 한도를 넘을 때만 계속 `blocked`로 남는다. Canonical JSON source는 generic text 512 KiB와 분리된 4 MiB 유한 parse budget을 사용하고, 일반 자연어 검색 대상으로 승격하지 않는다. Migration provenance 교정 뒤 Devflow package의 전체 frontier가 5–8개로 줄어 별도 exact-query frontier 필터와 schema는 이익 없이 안전 표면만 좁힌다고 판단해 제거했다. Overview와 exact capsule은 모두 기존처럼 발견한 frontier 전체를 보존한다. Pagination, 저장 graph, workspace 자동 발견, P2 runtime·validator·schema는 추가하거나 바꾸지 않았다.
+
+같은 전수 감사에서 migration provenance source를 무조건 `intent:` locator로 바꾸어 다수 exact atom query를 거짓 차단하는 인접 결함도 확인했다. `intent.*`만 현재 canonical intent로 연결하고 `migration:*` 등 나머지는 원래 source spelling·hash·kind로 identity가 구분되는 explicit external provenance boundary로 둔다. 표시 label은 600자, projected structured value는 기존 excerpt 한도로 제한하며 전체 source는 원장 source span에서 직접 확인한다. 이는 외부 의미를 증명하지 않으며 current intent나 execution evidence로 승격하지 않는다. 한 atom의 같은 `targets` 또는 `evidence` 목록에 중복된 동일 locator는 authoring contract대로 한 provenance edge로 계산한다.
+
+표적 maintenance-context 회귀 19/19와 Devflow 9개 P2 package의 stage-owner exact query 52/52가 현재 후보에서 `closed`를 반환했다. 이 결과는 선언된 relation family와 동일 source basis의 폐쇄만 증명하며 동적 collector, 외부 owner 의미, runtime behavior, deletion safety나 전체 workspace impact를 증명하지 않는다. 독립 Sol·Claude Opus·Astra 감사는 최초 네 건을 두 결함으로 분리하고 global cap 확대·무제한 출력·새 database·자동 workspace graph를 기각했다. Claude가 최종 diff에서 찾은 provenance metadata collision·표시 증폭·locale-dependent reservation을 교정했고, Claude와 Astra가 별도 frontier projection 제거에 합의했다. 최종 `npm run verify`는 vendor check, self lint, repository test 100/100과 frozen G0.5 eval을 통과했다. 앞선 병렬 suite 두 번에서 서로 다른 atomic directory rename이 일시적 Windows `EPERM`을 냈지만 각 실패의 격리 재실행과 전체 직렬 100/100이 통과했고, agent 작업이 끝난 뒤 동일한 표준 명령도 100/100으로 완료됐다.
+
 ---
 
 ## 7. P2 version-5 보존 및 변경 원장

@@ -45,7 +45,7 @@ test("describe projects one bounded P2 causal capsule from current source", asyn
   assert.ok(value.capsule.subjects.every((subject) => !subject.path?.startsWith("scripts/skill-rails/")));
   assert.equal(value.index.catalog_complete_for_native_locators, false);
   assert.match(value.index.full_catalog_invocation, /--describe --json$/);
-  assert.ok(JSON.stringify(value).length < 75_000, "the exact-stage result must remain usable as AI context");
+  assert.ok(JSON.stringify(value).length < 77_000, "the exact-stage result must remain usable as AI context");
   assert.ok(renderMaintenanceContextText(value).length < 40_000, "the human projection must remain bounded");
 });
 
@@ -232,6 +232,147 @@ test("exact-owner relation coverage fails closed on a silently unextractable dec
   assert.equal(value.next.change.length, 0);
   assert.ok(value.next.read.some((item) => /cannot enumerate its uses-body edges/.test(item)));
   assert.doesNotMatch(renderMaintenanceContextText(value), /^- change:/m);
+});
+
+test("exact-owner capsules reserve direct required relations before explanatory fan-out", async (t) => {
+  const root = await makeTestDir("describe-required-envelope");
+  t.after(() => removeTestDir(root));
+  await cp(PILOT, root, { recursive: true });
+  const specPath = join(root, "spec.mjs");
+  const source = await readFile(specPath, "utf8");
+  const extraArtifacts = Array.from({ length: 80 }, (_, index) =>
+    `  envelope${index}: { path: "state/envelope-${index}.json", writer: "project.consumer", readers: ["stage.evidence"], update: "replace", template: null },`
+  ).join("\n");
+  const expanded = source.replace("export const ARTIFACTS = {", `export const ARTIFACTS = {\n${extraArtifacts}`);
+  assert.notEqual(expanded, source);
+  await writeFile(specPath, expanded, "utf8");
+
+  const value = await createMaintenanceContext(root, { query: "spec:STAGES/evidence" });
+  const incomingReaders = value.capsule.relations.filter((relation) => relation.kind === "reader" && relation.to_id === "spec:STAGES/evidence");
+  assert.equal(value.assessment.relation_coverage.status, "closed");
+  assert.equal(incomingReaders.length, 84);
+  assert.ok(value.capsule.relations.length <= value.limits.max_capsule_relations);
+});
+
+test("canonical structured sources use a separate finite parse budget", async (t) => {
+  const root = await makeTestDir("describe-structured-budget");
+  t.after(() => removeTestDir(root));
+  await cp(PILOT, root, { recursive: true });
+  const ledgerPath = join(root, ".skill-rails", "obligation-ledger.json");
+  const ledger = await readJson(ledgerPath);
+  ledger.atoms.push({ id: "unrelated-frontier", source: "intent.missing", targets: ["spec:STAGES/missing"], evidence: [] });
+  ledger.structured_budget_probe = "x".repeat(600_000);
+  await writeFile(ledgerPath, `${JSON.stringify(ledger, null, 2)}\n`, "utf8");
+
+  const supported = await createMaintenanceContext(root, { query: "spec:STAGES/evidence" });
+  assert.equal(supported.assessment.extraction["obligation-ledger"].status, "complete-for-declared-scope");
+  assert.equal(supported.assessment.relation_coverage.status, "closed");
+  assert.equal(supported.limits.max_text_bytes, 512 * 1024);
+  assert.equal(supported.limits.max_structured_text_bytes, 4 * 1024 * 1024);
+  assert.ok(supported.frontiers.some((item) => /STAGES\/missing|intent:missing/.test(item.message)));
+
+  const boundedOut = await createMaintenanceContext(root, { query: "spec:STAGES/evidence", maxStructuredTextBytes: 512 * 1024 });
+  assert.equal(boundedOut.assessment.extraction["obligation-ledger"].status, "partial");
+  assert.equal(boundedOut.assessment.relation_coverage.status, "blocked");
+  assert.ok(boundedOut.assessment.relation_coverage.blockers.some((item) => item.code === "source-universe-incomplete" && item.family === "targets"));
+});
+
+test("duplicate locators within one obligation list remain one provenance edge", async (t) => {
+  const root = await makeTestDir("describe-duplicate-provenance");
+  t.after(() => removeTestDir(root));
+  await cp(PILOT, root, { recursive: true });
+  const ledgerPath = join(root, ".skill-rails", "obligation-ledger.json");
+  const ledger = await readJson(ledgerPath);
+  const atom = ledger.atoms.find((item) => item.targets?.includes("spec:STAGES/evidence"));
+  assert.ok(atom);
+  atom.targets = Array.from({ length: 201 }, () => "spec:STAGES/evidence");
+  await writeFile(ledgerPath, `${JSON.stringify(ledger, null, 2)}\n`, "utf8");
+
+  const value = await createMaintenanceContext(root, { query: "spec:STAGES/evidence" });
+  const edges = value.capsule.relations.filter((relation) => relation.kind === "targets" && relation.from_id === `atom:${atom.id}` && relation.to_id === "spec:STAGES/evidence");
+  assert.equal(edges.length, 1);
+  assert.equal(value.assessment.relation_coverage.status, "closed");
+});
+
+test("non-intent obligation origins remain explicit external provenance boundaries", async (t) => {
+  const root = await makeTestDir("describe-external-provenance");
+  t.after(() => removeTestDir(root));
+  await cp(PILOT, root, { recursive: true });
+  const ledgerPath = join(root, ".skill-rails", "obligation-ledger.json");
+  const ledger = await readJson(ledgerPath);
+  ledger.atoms.push({
+    id: "migration-origin",
+    source: "migration:SKILL.md:1-4",
+    text: "Preserve the migrated requirement without pretending it came from current intent.",
+    candidate_class: "judgment",
+    consequence: "high",
+    disposition: "review-required",
+    targets: [],
+    evidence: [],
+    source_hash: `sha256:${"1".repeat(64)}`,
+    source_kind: "frontmatter"
+  });
+  await writeFile(ledgerPath, `${JSON.stringify(ledger, null, 2)}\n`, "utf8");
+
+  const value = await createMaintenanceContext(root, { query: "atom:migration-origin" });
+  const origin = value.capsule.relations.find((relation) => relation.kind === "originates-from" && relation.from_id === "atom:migration-origin");
+  const external = value.capsule.subjects.find((subject) => subject.id === origin?.to_id);
+  assert.equal(value.assessment.relation_coverage.status, "closed");
+  assert.equal(origin?.resolution, "resolved");
+  assert.equal(origin?.basis, "declared-external-provenance");
+  assert.equal(external?.kind, "external-provenance");
+  assert.equal(external?.identity, "external-boundary");
+  assert.equal(external?.authority, "external-endpoint");
+  assert.match(origin?.note ?? "", /not as current intent or execution evidence/);
+});
+
+test("external provenance identity preserves distinct declared source metadata", async (t) => {
+  const root = await makeTestDir("describe-external-provenance-identity");
+  t.after(() => removeTestDir(root));
+  await cp(PILOT, root, { recursive: true });
+  const ledgerPath = join(root, ".skill-rails", "obligation-ledger.json");
+  const ledger = await readJson(ledgerPath);
+  for (const [id, digit] of [["migration-first", "1"], ["migration-second", "2"]]) ledger.atoms.push({
+    id,
+    source: "migration:SKILL.md:1-4",
+    text: id,
+    candidate_class: "judgment",
+    consequence: "high",
+    disposition: "review-required",
+    targets: [],
+    evidence: [],
+    source_hash: `sha256:${digit.repeat(64)}`,
+    source_kind: "frontmatter"
+  });
+  const longSource = `migration:${"x".repeat(200_000)}`;
+  ledger.atoms.push({
+    id: "migration-long-source",
+    source: longSource,
+    text: "Keep the full source in structured data without flooding labels.",
+    candidate_class: "judgment",
+    consequence: "high",
+    disposition: "review-required",
+    targets: [],
+    evidence: [],
+    source_hash: `sha256:${"3".repeat(64)}`,
+    source_kind: "paragraph"
+  });
+  await writeFile(ledgerPath, `${JSON.stringify(ledger, null, 2)}\n`, "utf8");
+
+  const value = await createMaintenanceContext(root, { query: "atom:migration-second" });
+  const origin = value.capsule.relations.find((relation) => relation.kind === "originates-from" && relation.from_id === "atom:migration-second");
+  const external = value.capsule.subjects.find((subject) => subject.id === origin?.to_id);
+  assert.equal(value.assessment.relation_coverage.status, "closed");
+  assert.equal(external?.data?.source_hash, `sha256:${"2".repeat(64)}`);
+
+  const longValue = await createMaintenanceContext(root, { query: "atom:migration-long-source" });
+  const longOrigin = longValue.capsule.relations.find((relation) => relation.kind === "originates-from" && relation.from_id === "atom:migration-long-source");
+  const longExternal = longValue.capsule.subjects.find((subject) => subject.id === longOrigin?.to_id);
+  assert.match(longExternal?.data?.source ?? "", /^migration:x+…$/);
+  assert.ok((longExternal?.data?.source?.length ?? Infinity) <= 1801);
+  assert.equal(longExternal?.data?.source_hash, `sha256:${"3".repeat(64)}`);
+  assert.ok((longExternal?.display?.length ?? Infinity) <= 601);
+  assert.ok(renderMaintenanceContextText(longValue).length < 40_000);
 });
 
 test("query caps report the omitted source matches instead of presenting a complete result", async (t) => {
