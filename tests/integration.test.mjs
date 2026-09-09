@@ -77,8 +77,11 @@ test("P0 and P1 stay thin while P2 is self-contained and executable", async (t) 
   assert.doesNotMatch(p2Skill, /`READ` effect's `path`/, "the bootstrap may not reserve an effect argument version 5 left open");
   assert.match(p2Skill, /current task or role already identifies one project-relative file target/);
   assert.match(p2Skill, /add `--target "<path>"`; never infer a target, and omit the option/);
-  assert.match(p2Skill, /artifact_verified --data '\{"reference":"<proof\.reference>"\}'/);
-  assert.match(p2Skill, /matching proof reference from the current Decision/);
+  assert.match(p2Skill, /--type effect_claimed --effect <effect-index>/);
+  assert.match(p2Skill, /--data-file \"<trace-dir>\/<data\.json>\"/);
+  assert.match(p2Skill, /resolve that path under the selected project/);
+  assert.doesNotMatch(p2Skill, /--data '\{/);
+  assert.match(p2Skill, /Use the current guide's `record inputs`/);
   assert.doesNotMatch(p2Skill, /BLOCK: consumer guidance missing/);
   assert.match(p2Skill, /bound to the exact Decision/);
   assert.match(p2Skill, /Interpret `reinvoke` by value/);
@@ -812,11 +815,66 @@ test("trace state stays external and alignment distinguishes observed evidence",
   assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_claimed", "--unknown-probe", "true"], quiet), 1);
   assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_observed", "--authority", "harness_observed", "--data", '{"index":0,"verb":"REPORT"}'], quiet), 1);
   assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_observed", "--data", '{"index":0,"verb":"REPORT"}'], quiet), 1);
+  const dataDir = join(base, "record data 한글's");
+  const dataPath = join(dataDir, "claim.json");
+  await mkdir(dataDir, { recursive: true });
+  await writeFile(dataPath, `\ufeff${JSON.stringify({ message_id: "msg_$;\\\"한글", note: "line one\nline two" })}`, "utf8");
+  assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_claimed", "--effect", "0", "--data-file", dataPath, "--json"], quiet), 0);
   let events = await readTrace(tracePath);
+  const shellClaim = events.find((event) => event.type === "effect_claimed");
+  assert.deepEqual(shellClaim.data, { message_id: "msg_$;\\\"한글", note: "line one\nline two", index: 0, verb: "REPORT" });
   assert.equal(alignDecision(staged.decision, events).aggregate, "unproven");
+
+  const malformedPath = join(dataDir, "malformed.json");
+  await writeFile(malformedPath, "{effect_index:0}", "utf8");
+  const traceBeforeInvalid = await readFile(tracePath);
+  const rejectRecord = async (args, code) => {
+    const io = captureIo();
+    assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_claimed", ...args, "--json"], io), 1);
+    assert.equal(JSON.parse(io.errors.at(-1)).diagnostic.code, code);
+  };
+  const invalidIo = captureIo();
+  assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_claimed", "--data-file", malformedPath, "--json"], invalidIo), 1);
+  assert.equal(JSON.parse(invalidIo.errors.at(-1)).diagnostic.code, "SR_INPUT_JSON");
+  const inlineInvalidIo = captureIo();
+  assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_claimed", "--data", "{effect_index:0}", "--json"], inlineInvalidIo), 1);
+  assert.equal(JSON.parse(inlineInvalidIo.errors.at(-1)).diagnostic.code, "SR_INPUT_JSON");
+  const wrongEffectIo = captureIo();
+  assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_claimed", "--effect", "99", "--json"], wrongEffectIo), 1);
+  assert.equal(JSON.parse(wrongEffectIo.errors.at(-1)).diagnostic.code, "SR_EVIDENCE_EFFECT");
+  const conflictingIo = captureIo();
+  assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_claimed", "--effect", "0", "--data", "{}", "--data-file", dataPath, "--json"], conflictingIo), 1);
+  assert.equal(JSON.parse(conflictingIo.errors.at(-1)).diagnostic.code, "SR_EVIDENCE_INPUT");
+  const invalidUtf8Path = join(dataDir, "invalid-utf8.json");
+  await writeFile(invalidUtf8Path, Buffer.from([0xff]));
+  await rejectRecord(["--data-file", invalidUtf8Path], "SR_INPUT_ENCODING");
+  await rejectRecord(["--data-file", join(dataDir, "missing.json")], "SR_INPUT_FILE");
+  await rejectRecord(["--data-file", dataDir], "SR_INPUT_FILE");
+  if (process.platform !== "win32") {
+    const fifoPath = join(dataDir, "record.fifo");
+    const madeFifo = spawnSync("mkfifo", [fifoPath], { encoding: "utf8" });
+    assert.equal(madeFifo.status, 0, madeFifo.stderr);
+    const fifo = spawnSync(process.execPath, [join(root, "scripts", "skill-rails", "run.mjs"), "record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_claimed", "--data-file", fifoPath, "--json"], { encoding: "utf8", timeout: 2_000 });
+    assert.notEqual(fifo.error?.code, "ETIMEDOUT", "nonregular data sources are rejected before a blocking open");
+    assert.equal(JSON.parse(fifo.stderr).diagnostic.code, "SR_INPUT_FILE");
+  }
+  await rejectRecord(["--data", "[]"], "SR_EVIDENCE_DATA");
+  await rejectRecord(["--effect", "0", "--data", '{"index":1}'], "SR_EVIDENCE_EFFECT");
+  const oversizedPath = join(dataDir, "oversized.json");
+  await writeFile(oversizedPath, `{"note":"${"x".repeat(65_536)}"}`, "utf8");
+  const oversizedIo = captureIo();
+  assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "receipt_recorded", "--data-file", oversizedPath, "--json"], oversizedIo), 1);
+  assert.equal(JSON.parse(oversizedIo.errors.at(-1)).diagnostic.code, "SR_INPUT_SIZE");
+  assert.deepEqual(await readFile(tracePath), traceBeforeInvalid, "invalid record inputs leave trace bytes unchanged");
+  assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "proof_recorded", "--data", '{"kind":"note"}'], quiet), 0, "generic weak proof annotations remain compatible without a reference");
   await recordHarnessEvidence({ skillRoot: root, traceDir, runId: "run-1", decision: staged.decision, type: "effect_observed", data: { index: 0, verb: "REPORT", kind: "effect" } });
   events = await readTrace(tracePath);
   assert.equal(alignDecision(staged.decision, events).aggregate, "aligned");
+  const confessionPath = join(dataDir, "confession.json");
+  await writeFile(confessionPath, JSON.stringify({ index: 0, verb: "WRITE", message_id: "unplanned" }), "utf8");
+  assert.equal(await runtimeMain(["record", "--skill", root, "--decision", decisionPath, "--trace-dir", traceDir, "--run-id", "run-1", "--type", "effect_claimed", "--data-file", confessionPath], quiet), 0);
+  events = await readTrace(tracePath);
+  assert.ok(alignDecision(staged.decision, events).issues.some((item) => item.code === "claimed-unplanned-effect"), "generic file data preserves unplanned-effect confessions");
 });
 
 test("traced CLI persists caller-input BLOCKs and permits only supplied same-run progress", async (t) => {

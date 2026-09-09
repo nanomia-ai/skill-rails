@@ -53,7 +53,7 @@ export const DECISION_SCHEMA = "urn:nanomia:skill-contract:decision:2";
 export const TRACE_SCHEMA = "urn:nanomia:skill-contract:trace-event:1";
 export const MINIMUM_NODE_MAJOR = 20;
 export const VALIDATOR_VERSION = "0.6.2";
-export const RUNTIME_VERSION = "0.3.5";
+export const RUNTIME_VERSION = "0.3.6";
 export const KERNEL_VERSION = "6";
 
 export const PLACEHOLDER_KINDS = Object.freeze(["line", "block", "list", "generated"]);

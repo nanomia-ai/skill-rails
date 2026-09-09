@@ -13,6 +13,7 @@ export function renderGuide(decision, options = {}) {
     `needs / reads / record / reentry: ${decision.needs.length ? stableStringify(decision.needs) : "none"} | ${list(decision.reads)} | ${decision.record ? stableStringify(decision.record) : "none"} | ${decision.reinvoke ?? "none"}`,
     `ordered effects: ${renderEffects(decision.effects)}`,
     `proof required: ${decision.proof_required.length ? stableStringify(decision.proof_required) : "none"}`,
+    `record inputs: ${recordInputs(decision)}`,
     `stage artifacts: ${decision.stage_artifacts.length ? stableStringify(decision.stage_artifacts) : "none"}`,
     `format / template: ${decision.format?.example ?? "none"} | ${decision.template ?? "none"}`
   ];
@@ -37,3 +38,12 @@ function stopReason(decision) {
 
 function list(value) { return value?.length ? value.join(",") : "none"; }
 function object(value) { return value && Object.keys(value).length ? stableStringify(value) : "none"; }
+
+function recordInputs(decision) {
+  const inputs = decision.proof_required.map((proof) => proof.kind === "effect"
+    ? { type: "effect_claimed", effect: proof.index, data: { index: proof.index, verb: proof.verb } }
+    : proof.path
+      ? { type: "artifact_verified", data_file: { reference: proof.reference }, artifact: { base: "<project>", path: proof.path }, project: "<project>" }
+      : { type: ["proof_recorded", "receipt_recorded"], data_file: { kind: proof.kind, reference: proof.reference } });
+  return inputs.length ? stableStringify(inputs) : "none";
+}

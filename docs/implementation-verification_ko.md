@@ -675,9 +675,35 @@ Devflow 0.23.20의 52개 stage owner를 현재 package byte에서 질의하자 4
 
 공식 release boundary는 commit `5af4b5e1df13de24d40e0041593504b45d7fbd7c`, annotated tag `v0.4.2`다. Atomic main/tag push가 트리거한 workflow run `34345776140`은 tagged source의 package/tag version 일치와 `npm run verify`를 통과하고 GitHub Release `v0.4.2`를 published했다. 이어 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes`를 한 번 실행해 `C:\Users\joinj\.agents\skills\skill-rails`을 갱신하고 Claude Code를 그 canonical package로 symlink했다. Release source와 설치본의 `git diff --no-index --ignore-cr-at-eol`은 exit 0, 설치본 self lint는 pass였으며 설치본 fingerprint는 runtime `0.3.5`, validator `0.6.2`, kernel `6`이다. 설치된 CLI로 Devflow `0.23.21`의 과거 blocked owner인 Adopt `adoption`, Resume `scope-entry`, Work `task-finalization`, Principles `classify`를 현재 package byte에서 재질의한 결과 네 건 모두 exact owner 1개, relation coverage `closed`, blocker 0이었고 전체 frontier는 각각 8, 5, 8, 5였다. 이는 설치와 정적 관계 폐쇄의 실사용 영수증이며 Devflow 전체 실행 또는 fresh-agent 행동 증거로 승격하지 않는다.
 
+### 6.31 셸 중립 record 입력과 현재 Decision 기반 입력 발견성 (runtime 0.3.6)
+
+Devflow 0.23.21의 실제 P2 흐름에서 생성 bootstrap이 요구한 inline `--data '{...}'`가 Windows PowerShell에서 Node에 도달하기 전에 내부 큰따옴표를 잃어 유효한 JSON이 아니게 됐다. 같은 손상은 stock PowerShell→Node와 PowerShell→RTK→Node 양쪽에서 재현됐으므로 RTK 전용 결함이나 AI의 의미 판단 실패가 아니다. POSIX shell과 PowerShell에 함께 맞는 하나의 JSON argv 리터럴도 없었다. 이어진 `JSON.parse` 예외가 `SR_INTERNAL`로 정규화되어 cold AI에게 내부 런타임 고장처럼 보인 것과, `effect_claimed`가 실제로 요구하는 `index`·`verb`를 Decision만 보고 안전하게 조립하기 어려웠던 것도 같은 입력 경계의 결함이다.
+
+공통 P2 CLI에 제한된 두 입력 경로만 추가했다. `--data-file`은 최대 64 KiB의 정규 파일 하나를 UTF-8로 읽고 UTF-8 BOM을 허용한다. 생성 안내는 이 파일을 이미 외부 상태 경계인 `<trace-dir>`에 두므로 관찰 프로젝트나 설치 package를 오염시키지 않는다. `--effect <index>`는 `--type effect_claimed`에서만 사용하며 정확한 Decision의 계획 효과로부터 verb를 가져온다. 메타데이터가 필요하면 `--effect`와 `--data-file` 또는 기존 `--data` 중 하나를 함께 쓸 수 있고, 명시된 `index`·`verb`가 Decision과 충돌하면 거부한다. Generic file/inline 경로는 계획 밖·금지 효과를 자진 기록하는 기존 confession을 보존한다. `--type`은 계속 명시적이고 `--data`도 argv bytes를 보존하는 API·wrapper 호환 경로로 유지한다.
+
+현재 guide는 `proof_required`에서 record 입력 projection을 계산한다. 계획 효과는 type·effect index·파생된 index/verb를, artifact proof는 reference·artifact·project를, 그 밖의 proof는 kind·reference와 허용 record type을 보여준다. 생성 bootstrap은 이 guide를 먼저 따르게 하며 shell JSON quoting에 의존하는 예시를 더 이상 만들지 않는다. 새 Decision 또는 stage-result field, proof selector, stdin protocol, workflow controller는 추가하지 않았다. 런타임은 domain effect를 실행하지 않고 agent claim을 강한 관찰로 승격하지 않으며, `align`은 기존과 같이 agent-only evidence를 `unproven`으로 둔다.
+
+외부 인자·JSON·UTF-8·파일·크기·record shape·effect binding 오류는 각 입력 지점에서 `SR_CLI_ARGUMENT`, `SR_INPUT_*`, `SR_EVIDENCE_*`로 분류한다. Record payload 검증은 trace 경계 확인·읽기·append보다 앞서므로 이 실패들은 trace byte를 바꾸지 않는다. 알 수 없는 내부 예외를 포괄적으로 입력 오류로 바꾸지 않아 실제 모듈·runtime fault는 계속 `SR_INTERNAL`에 남는다.
+
+회귀는 생성한 P2 package의 `record`를 실제 Windows PowerShell 또는 POSIX `/bin/sh` 프로세스를 통해 실행한다. 공백·비ASCII 경로, UTF-8 BOM, shell metacharacter와 backslash/quote metadata의 byte 보존, malformed inline/file JSON, 잘못된 payload shape와 effect index, 두 data source 충돌, 64 KiB 초과, invalid 입력 뒤 trace 무변경, generic unplanned confession과 weak claim의 `unproven`을 한 흐름에서 확인한다. Release workflow는 이 표적 테스트를 Ubuntu·Windows·macOS matrix에서 먼저 통과시킨 뒤 Ubuntu 전체 verify와 Release 생성을 실행한다. RTK·IPK처럼 선택적 argv wrapper의 모든 버전과 동작은 Skill Rails가 보증하지 않지만, 공식 file transport는 JSON을 argv로 통과시키지 않으므로 해당 부류의 quoting 손상과 분리된다.
+
+Package 후보는 `0.4.3`, runtime은 `0.3.5 → 0.3.6`이다. Validator `0.6.2`, kernel `6`, `SPEC.version = "5"`, Decision/Trace schema, evidence authority, effect ordering, freshness와 duplicate rejection은 유지한다. 설치 root identity 확장과 multi-package workspace/cohort map은 이 실행 결함과 독립적이고 기존 package-local maintenance 경계를 바꾸므로 이번 release에 합치지 않는다. 구현 전 두 독립 검토가 결함과 owner를 재현했고, selector·schema 확대에 대한 이견을 같은 검토자들과 후속 교환해 현재의 `--effect`+bounded `--data-file` 설계로 합의했다. 구현 뒤 같은 Claude Opus와 Astra 검토자가 generic confession·bounded reader·artifact base·생성 예시·3-OS gate를 반증한 뒤 closure audit에서 blocker 0을 판정했다. 최종 Windows `npm run verify`는 vendor check, self lint, repository test 101/101과 frozen G0.5 eval을 통과했다. 앞선 두 실행의 서로 다른 기존 atomic-rename `EPERM`은 각각 원본을 정상 복구했고 격리 재실행 및 독립 전체 suite 3회에서 재현되지 않아, 두 후속 검토의 합의대로 원자성 코드를 이번 record 변경에 합치지 않았다. Canonical pilot은 runtime `0.3.6`, L0–L18, mutation 20/20, scenario 10/10·50회 불일치 0, format 256/256과 build ID `sha256:928dfd46f43f2dd11da1064df2d8fac78940d5f3b7507a8ac35d8dadd1711f19`을 기록했다. macOS/Linux 실제 shell 증거는 tag의 3-OS release workflow 전까지 `UNPROVEN`이다.
+
 ---
 
 ## 7. P2 version-5 보존 및 변경 원장
+
+### 7.-3 2026-09-09 record 입력 운반 교정 (runtime 0.3.6)
+
+| 변경 | 호환성 영향 | 근거와 증거 |
+| --- | --- | --- |
+| `--data-file` | 기존 `--data`를 유지하며 shell-neutral UTF-8 object 입력을 additive 제공 | JSON을 shell argv quoting에 맡기지 않고 64 KiB·정규 파일·UTF-8 경계에서 fail-closed한다 |
+| `--effect <index>` | `effect_claimed`의 계획 효과에만 additive selector 제공 | index와 verb를 exact Decision에 결합하되 metadata와 generic confession 경로를 보존한다 |
+| guide `record inputs` | Decision schema를 바꾸지 않는 비versioned 안내 projection | `proof_required` 정본에서 현재 호출에 필요한 key와 값을 계산한다 |
+| 입력 진단 | caller input failure를 `SR_INPUT_*`/`SR_EVIDENCE_*`로 분류 | append 전에 실패하며 내부 예외는 계속 `SR_INTERNAL`이다 |
+| 기존 package | 자동 변경 없음 | runtime 0.3.6을 채택할 P2 package만 canonical builder로 재생성한다 |
+
+Version-5의 effect 계획·증거 authority·alignment 의미는 바뀌지 않는다. `--effect`는 외부 효과를 실행하거나 effect 관찰을 발명하지 않고 agent claim의 구조만 Decision에 맞춘다.
 
 ### 7.-0 2026-09-09 입력 대기 BLOCK continuation 투영 (runtime 0.3.4)
 

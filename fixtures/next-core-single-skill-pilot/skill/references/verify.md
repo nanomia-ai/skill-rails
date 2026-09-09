@@ -32,7 +32,9 @@ Follow the current Decision's `stage_artifacts` and ordered effects exactly. `st
 
 For every current Decision proof_required descriptor, pass its reference unchanged as record --data.reference, and pass the file named by its path as --artifact under the same --project. For the pilot result proof, the exact mapping is:
 
-    node <skill-root>/scripts/skill-rails/run.mjs record --decision <stage-result.json> --type artifact_verified --data {reference:verifierResult} --artifact <project>/<proof.path> --project <project> --json
+    Save `{"reference":"verifierResult"}` as a UTF-8 JSON object at `<trace-dir>/verifier-result-proof.json`, then run:
+
+    node <skill-root>/scripts/skill-rails/run.mjs record --decision <stage-result.json> --type artifact_verified --data-file <trace-dir>/verifier-result-proof.json --artifact <project>/<proof.path> --project <project> --json
 
 ## Evidence interpretation
 

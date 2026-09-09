@@ -171,6 +171,8 @@ test("exact golden format is projected onto the owning effect without mutating t
   assert.equal(decision.format.example, expected);
   assert.equal(Object.hasOwn(sourceEffect[1], "format_example"), false, "projection must not mutate spec effect args");
   assert.ok(renderGuide(decision).includes(`WRITE(action=record-result,artifact=verifierResult,format=verifierResult,format_example=${expected})`));
+  assert.match(renderGuide(decision), /record inputs: \[\{"artifact":\{"base":"<project>","path":"state\/verifier-result\.log"\},"data_file":\{"reference":"verifierResult"\},"project":"<project>","type":"artifact_verified"\}/);
+  assert.match(renderGuide(decision), /\{"data":\{"index":0,"verb":"RUN"\},"effect":0,"type":"effect_claimed"\}/);
 });
 
 test("selected stages and stopping guards project only their declared static artifacts", async () => {
