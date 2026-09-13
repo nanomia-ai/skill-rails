@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "gate": "m8-pre-release-end-to-end",
   "observedAt": "2026-09-14T07:38:34+09:00",
-  "decision": "RELEASE_CANDIDATE_ACCEPTED",
+  "decision": "PRODUCTION_CUTOVER_COMPLETE",
   "producedSkillAccepted": true,
   "productionCutoverReady": true,
   "project": {
@@ -361,12 +361,118 @@
     "readmeAndFrozenPlansChanged": false,
     "legacyRuntimeReferences": 0
   },
+  "productionCutover": {
+    "authorized": true,
+    "route": "public GitHub repository consumed by skills@1.5.26; no npm package publish or dist-tag operation",
+    "candidateCommit": "e321879dc3b1fbadf3677eb1eb06abb7d0f46551",
+    "candidateGitTree": "f6bcf7479a8af9f11b9a4a57a31b0a8fb3113295",
+    "remote": {
+      "url": "https://github.com/nanomia-ai/skill-rails.git",
+      "branch": "main",
+      "push": "fast-forward 0369324..e321879",
+      "verifiedHead": "e321879dc3b1fbadf3677eb1eb06abb7d0f46551"
+    },
+    "packageDryRun": {
+      "identity": "@nanomia/skill-rails@1.0.0",
+      "private": true,
+      "entries": 39,
+      "packedBytes": 63826,
+      "unpackedBytes": 227085,
+      "shasum": "a2f0755a0087cf6e685844727485da14d70efc55",
+      "integrity": "sha512-SZccPzT2mz12SAHZoTSfieN+0IOTkqId5qUnM5Dmk47115AKDNyMz8z32JYx9WPImZ3oThTsYIhWEPqpav9PYg=="
+    },
+    "installer": {
+      "commandShape": "npx skills@latest add nanomia-ai/skill-rails --skill skill-rails --agent codex claude-code --global|project --copy -y --json",
+      "resolvedVersion": "1.5.26",
+      "resolvedSkillHash": "9f8619d23436036ad31ebc069d4f5cf47a797b9e7fb9b9b011268448fda0d685",
+      "securitySummary": {
+        "gen": "safe",
+        "socket": "1 alert",
+        "snyk": "low",
+        "alertDetailAvailableInRun": false
+      }
+    },
+    "globalReplacement": {
+      "before": {
+        "paths": [
+          "C:/Users/joinj/.agents/skills/skill-rails",
+          "C:/Users/joinj/.claude/skills/skill-rails"
+        ],
+        "filesEach": 63,
+        "bytesEach": 1028325,
+        "taskLocalPathContentSha256": "42995c8f79237cce81fe3b40bc45dc0d44e3882a33170bb2a4fd2b6b4edf8195"
+      },
+      "after": {
+        "filesEach": 36,
+        "bytesEach": 201705,
+        "taskLocalPathContentSha256": "52e4070a56545ba552a6cd9cf4e4ef2b7b23a1619012b8eeabbb11581f98c921",
+        "treeSha256": "cab9710da8105611dbb56e8d5e4b8ca4c1721378feec1a30f646ed96690b4fc7",
+        "artifactIntact": true
+      },
+      "unrelatedSkillsDeleted": false,
+      "postInstallGlobalNames": [
+        "computer-use",
+        "find-skills",
+        "natural-language-pilot-resume-next",
+        "natural-language-pilot-verify-next",
+        "orca-cli",
+        "orchestration",
+        "skill-rails",
+        "skill-rails-next"
+      ]
+    },
+    "projectSmoke": {
+      "path": "D:/Projects/Private/nanomia/skill-rails-production-smoke-20260914-e321879",
+      "installPaths": [
+        ".agents/skills/skill-rails",
+        ".claude/skills/skill-rails"
+      ],
+      "filesEach": 36,
+      "bytesEach": 201705,
+      "taskLocalPathContentSha256": "52e4070a56545ba552a6cd9cf4e4ef2b7b23a1619012b8eeabbb11581f98c921",
+      "codex": {
+        "host": "Codex CLI",
+        "model": "gpt-5.6-sol",
+        "reasoningEffort": "medium",
+        "threadId": "01a09d24-8fd7-76c3-ae6d-ef1bfefffcf7",
+        "selectedPath": ".agents/skills/skill-rails",
+        "result": "PASS_WITH_NON_BLOCKING_COMMAND_DISCOVERY_CONCERN",
+        "cliTreeSha256": "cab9710da8105611dbb56e8d5e4b8ca4c1721378feec1a30f646ed96690b4fc7",
+        "artifactIntact": true,
+        "unsupportedHelpAttempts": 2,
+        "inputTokens": 168545,
+        "cachedInputTokens": 144384,
+        "outputTokens": 1411,
+        "reasoningOutputTokens": 426
+      },
+      "claude": {
+        "host": "Claude Code 2.1.270",
+        "modelResolved": "claude-opus-5",
+        "reasoningEffort": "medium",
+        "permissionMode": "bypassPermissions",
+        "sessionId": "5ff00720-b4e1-44f1-ab7d-c437b60507c1",
+        "selectedPath": ".claude/skills/skill-rails",
+        "result": "PASS",
+        "cliTreeSha256": "cab9710da8105611dbb56e8d5e4b8ca4c1721378feec1a30f646ed96690b4fc7",
+        "artifactIntact": true,
+        "toolDenials": 0,
+        "numTurns": 6,
+        "wallTimeMs": 33809
+      },
+      "scope": "Discovery and installed artifact check only; prior authoring/use behavior and effect claims were not rerun or broadened."
+    },
+    "codeHome": "C:/Users/joinj/AppData/Roaming/orca/codex-runtime-home/home",
+    "codeHomeChanged": false,
+    "readmesAndFrozenPlansChanged": false,
+    "legacyArchiveDeleted": false
+  },
   "claims": {
     "proven": [
       "The official npx skills local-source flow installed the current unpublished generated authoring tree project-locally for Codex and Claude without CODEX_HOME changes.",
       "One fresh Codex used that installed entry and its embedded CLI to author a two-target non-Devflow prose package with one genuine shared owner and deterministic standalone builds.",
       "One shared owner edit made exactly both real consumers stale; rebuilding those affected targets restored currentness and the normal installer updated both project-local host trees.",
       "One fresh unfamiliar Claude bypass run discovered both installed targets, wrote two semantically acceptable effects, and reread the input and effects; coordinator reread confirmed bytes."
+      ,"Production identity skill-rails was fast-forwarded to the public intended origin and the repository-based normal installer selected the exact generated tree for global Codex and Claude plus one separate project-local smoke."
     ],
     "failed": [],
     "nonBlockingConcerns": [
@@ -376,9 +482,9 @@
     "unproven": [
       "Exact fresh-author tool round trips and wall time because the ephemeral raw stream was not durably captured and the run was not repeated.",
       "Whether Framework navigation improved authoring quality or reduced cost.",
-      "Authoring-process efficiency and causal attribution of the reported host input tokens, repeatability, broader hosts/models/domains, concurrent maintenance, release identity, remote install, and public latest cutover.",
+      "Authoring-process efficiency and causal attribution of the reported host input tokens, repeatability, broader hosts/models/domains, and concurrent maintenance.",
       "Human overview comprehension benefit beyond the bounded relation lookup recorded here."
     ]
   },
-  "nextAction": "Create and push the coherent non-force production candidate, verify the exact remote candidate, then use the repository-based nanomia-ai/skill-rails installer route for the authorized production replacement and lightweight two-host discovery/CLI smoke; do not rerun authoring for telemetry or delete the legacy capsule."
+  "nextAction": "Review the completed M8 release evidence and keep unsupported breadth claims unproven. Do not delete the legacy capsule or change README/frozen plans without a separate explicit decision; address the observed unsupported-help DX friction only through the existing CLI/entry owner if it becomes a repeated practical failure."
 }

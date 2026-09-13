@@ -2,18 +2,18 @@
 
 문서 상태: 교체형 현재 snapshot
 
-최종 갱신: 2026-09-14 KST — M8 produced-skill pre-release acceptance 통과, cutover 미실행
+최종 갱신: 2026-09-14 KST — M8 production repository cutover와 Codex·Claude 설치 완료
 
 ## 현재 위치
 
 - 사용자 계획 checkpoint commit: `9d35b75` (`docs: checkpoint greenfield Skill Rails plan`)
-- M0~M4 구현 checkpoint commit: `eb08ff3` (`feat: checkpoint greenfield Skill Rails through M4`). M5~M7 변경은 coordinator 검토 전 uncommitted worktree다.
+- M0~M4 구현 checkpoint commit: `eb08ff3` (`feat: checkpoint greenfield Skill Rails through M4`). M5~M8 accumulated candidate commit은 `e321879`이며 기존 `origin/main`에 non-force fast-forward됐다.
 - 기존 v0.4.3 implementation 257개 파일은 `legacy/archive/v0.4.3/legacy-source.tar`에 보존했다. Capsule SHA-256은 `c79dcf45dc9ab520aa100e19ecf6ef95102d1a423c89c5090cadd40293db31fc`다.
 - `inventory.json`이 원경로·Git/working hash·mode를, `restore-receipt.json`이 Windows temporary-root 복원 257/257와 mismatch 0을 소유한다. POSIX mode 복원은 `unproven`이다.
 - Root package는 private metadata `@nanomia/skill-rails@1.0.0`, Node 범위는 `>=24 <25`이고 외부 runtime dependency는 없다. 공식 공개 전달은 npm registry package가 아니라 `nanomia-ai/skill-rails` repository의 `npx skills@latest` 경로다.
-- Canonical authoring source는 `authoring/skill-rails/`, generated tracked skill은 `skills/skill-rails/`이다. 현재 repository discovery에 active skill은 production candidate `skill-rails` 하나뿐이다.
+- Canonical authoring source는 `authoring/skill-rails/`, generated tracked skill은 `skills/skill-rails/`이다. 현재 repository discovery에 active production skill은 `skill-rails` 하나뿐이다.
 - Natural-language pilot의 현재 record-only Verify 설치 target tree SHA-256은 `25798e8a916d8b0062427c3d38f100198e94cb2bda8e90f79d5bd1bfde21763a`다. 표준 installer로 Codex·Claude Code에 설치했고 두 runtime `check`는 `ARTIFACT_INTACT`다.
-- Production cutover 직전 기존 전역 `skill-rails`는 두 host 위치에서 각각 63 files/1,028,325B, raw path+content hash `367dc53f...`로 불변이다. Pilot target `natural-language-pilot-verify-next`와 project-local alpha evidence는 별도 이름으로 보존하며 production source로 사용하지 않는다.
+- Production cutover 직전 기존 전역 `skill-rails`는 두 host 위치에서 각각 63 files/1,028,325B였다. 승인된 교체 뒤 Codex·Claude 위치는 각각 production 36 files/201,705B, task-local path+content hash `52e4070a...`, generated tree `cab9710...`로 같고 artifact-intact다. Pilot target `natural-language-pilot-verify-next`, unrelated global skills와 project-local alpha evidence는 보존한다.
 - Coherent M5 종료의 default `npm test`는 29/29였고 bounded embedded authoring CLI 단위 종료의 현재 default `npm test`는 31/31 pass다. M4/M5 historical evaluation test는 기본 discovery 밖에 보존한다. 구조 검사는 fresh AI 행동이나 실제 effect를 대신 증명하지 않는다.
 
 ## milestone 상태
@@ -36,6 +36,7 @@
 - **M7 bounded machine generalization 통과**: Core vocabulary 검사에서 `stage`는 임시 filesystem staging 의미였고 `brief`·`verification`은 없었지만, `src/runtime/prepare.mjs`가 `cardId`와 Verify-shaped field 목록을 packet에 고정한 최초 dependency 실패를 발견했다. 사용자의 명확한 결함 개선 지시에 따라 목록을 제거하고 기존 domain-owned answer contract만 따르는 한 문장으로 좁혔으며 historical prepare-record targeted test는 6/6 통과했다. 비-Devflow museum-label editorial review package 하나는 canonical inspect, standalone build/check, observer prepare, invalid no-write, valid apply+reread, human prefix 보존과 `APPLIED_ALREADY`를 기존 core/runtime으로 완료했다. 이 한 domain의 machine reuse만 proven이며 fresh AI discovery·semantic answer·editorial quality와 다른 domain/host/scene은 `unproven`이다.
 - **M8 전 완결성 감사와 portable authoring 보정 종료**: Canonical authoring entry의 작은 operational flow와 on-demand `overview --source`를 유지하면서 prose target의 optional enum-of-one `embeddedCoreTooling: "authoring-cli-v1"`을 추가했다. Authoring target만 이를 선언하고 generated `scripts/skill-rails-cli/`는 canonical 27-file closure를 기존 receipt/currentness 아래 전달한다. Production identity 재생성 뒤 release suite 31/31과 generated tree `cab9710da8105611dbb56e8d5e4b8ca4c1721378feec1a30f646ed96690b4fc7`의 artifact-intact/source-current가 통과했다.
 - **M8 produced-skill pre-release acceptance 통과**: 별도 일반 project에서 정상 `npx skills@latest` local-source flow로 current authoring skill을 두 host 위치에 설치했다. Fresh Codex는 두 prose target과 한 genuine shared module을 저작·double-build했고, shared owner 1회 변경은 두 consumer를 모두 stale로 만든 뒤 affected-only rebuild와 정상 재설치로 current를 복구했다. Fresh Claude Opus medium bypass 1회는 두 installed target을 발견해 570B/921B 실제 effect를 만들고 reread했으며 coordinator도 다시 읽었다. Generated target은 각각 8 files/약 19KB였고 fresh consumer의 실제 pre-write read는 5 files/6,081B, Skill Rails 내부 read/call은 0이었다. 기존 user-level `skill-rails` 두 위치는 각각 63 files/1,028,325B와 기존 task-local hash `367dc53f...`로 불변이고 `CODEX_HOME`도 바꾸지 않았다. Codex author input 468,994 tokens와 누락된 exact author tool/wall telemetry는 generated output 결함과 인과가 관찰되지 않은 secondary DX concern이지 release-blocking output failure가 아니다.
+- **M8 production cutover 완료**: Candidate `e321879`을 public `origin/main`에 fast-forward했고 `skills@1.5.26`의 repository route가 resolved hash `9f8619d...`와 production `skill-rails`를 선택했다. 두 전역 host 위치와 별도 일반 smoke project의 두 project-local 위치는 모두 generated tree `cab9710...`다. Fresh Codex Sol medium과 Claude Opus medium bypass가 각 project-local entry를 발견해 skill-local CLI integrity check를 통과했다. 이는 discovery/artifact smoke만 증명하며 prior authoring/use/effect claim을 넓히지 않는다. Npm publish/dist-tag, force/history rewrite, README·동결 계획 변경과 archive 삭제는 없었다.
 
 ## M4 판정
 
@@ -47,10 +48,10 @@ Treatment의 canonical renderer/record는 두 control이 발명한 비호환 mar
 
 M5의 renderer-only 선행 gate는 E-019와 `evals/m5/results/renderer-only-boundary-gate-2026-09-13.json`으로 닫혔다. Framework 초기 교정과 중단·격리는 E-020/E-021 및 `evals/m5/results/framework/`가 소유한다.
 
-1. M8 produced-skill acceptance와 종단 evidence는 `docs/implementation-verification_ko.md` 마지막 절, `evals/m8/results/pre-release-end-to-end-2026-09-14.json`, E-034가 소유한다.
-2. Bounded final audit는 post-consumer input hash, Claude raw-session authority, tracked generated currentness, package payload와 release suite까지 닫혔다. 다음은 coherent non-force release commit/push와 exact remote candidate 확인이다. Author telemetry를 보충하려고 fresh author를 재실행하거나 harness를 추가하지 않는다.
-3. Remote candidate에서 README의 공식 `npx skills@latest add nanomia-ai/skill-rails` 경로와 두 project-local host 설치가 exact candidate를 고르는지 확인한다. 두 번째 tooling 값·consumer·closure, domain executable 또는 generic asset grammar는 열지 않는다.
-4. Production identity, remote 배포와 기존 전역 `skill-rails` 교체는 이번 M8 사용자 승인 범위다. Force/history rewrite, README 변경과 archive 삭제는 계속 금지한다.
+1. M8 종단·final audit·production cutover evidence는 `docs/implementation-verification_ko.md` 마지막 세 절, `evals/m8/results/pre-release-end-to-end-2026-09-14.json`, E-034/E-035가 소유한다.
+2. 다음은 coordinator/user의 release evidence review다. Author telemetry나 broad coverage를 보충하려고 fresh flow, matrix, schema 또는 harness를 추가하지 않는다.
+3. 실제 저작·복구에서 unsupported-help 마찰이 반복되어 결정을 바꿀 때만 기존 CLI/entry owner를 최소 수정한다. 두 번째 tooling 값·consumer·closure, domain executable 또는 generic asset grammar는 열지 않는다.
+4. Force/history rewrite, README 변경과 archive 삭제는 계속 금지한다. Archive 제거와 POSIX restore 검증은 production cutover에 묶지 않고 별도 사용자 결정으로 남긴다.
 
 ## 아직 unproven 또는 기각된 범위
 
@@ -62,7 +63,7 @@ M5의 renderer-only 선행 gate는 E-019와 `evals/m5/results/renderer-only-boun
 - M6 whole-module의 context·품질·unchanged prose 대비 총비용 우위, exact source-only token attribution, greenfield의 더 작은 source boundary, selective-stale, inverse impact와 9-target integration. 세-target consumer graph와 all-consumer changed-common currentness 전파만 좁게 proven이다.
 - M7의 fresh AI discovery·semantic answer·editorial quality, 다른 비-Devflow domain·host·scene, prepare/fallback production adoption. 한 editorial-review domain의 machine-level source graph·observer·renderer·error/result 재사용만 좁게 proven이다.
 - 정상 설치된 embedded authoring CLI의 fresh author·unfamiliar use·maintain effect는 한 M8 project에서 관찰됐지만 반복성, authoring-process 비용 효율, 새 operational guidance의 인과적 품질 이득과 on-demand overview의 실제 human comprehension 효과는 unproven이다.
-- Remote release와 production installer/global 교체의 실제 결과는 cutover receipt가 생기기 전까지 `unproven`
+- Production smoke 밖의 반복 remote install, 다른 installer/host version과 장기 update behavior
 - POSIX capsule mode restoration
 
 세부 evidence와 실패 원본은 `docs/implementation-verification_ko.md`가 소유하고, 계획과 달라진 선택은 `docs/plan/implementation-evolution-plan_ko.md`가 소유한다.

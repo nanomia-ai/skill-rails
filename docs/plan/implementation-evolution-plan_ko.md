@@ -705,7 +705,7 @@ Framework navigation의 순이익, exact author tool/wall telemetry, authoring-p
 
 ## E-035 — Production identity는 repository delivery로 승계하고 protocol namespace는 보존
 
-상태: **bounded final candidate audit 통과 — remote/install 결과 대기**
+상태: **production repository cutover와 두 host 설치 완료 — broad behavior는 기존 범위 유지**
 
 ### 실제 문제와 evidence
 
@@ -717,4 +717,6 @@ M8 produced-skill acceptance 뒤 실제 registry와 installer 경로를 확인�
 
 ### 가장 단순한 선택과 검증·재검토 조건
 
-Canonical owner인 root package metadata, authoring package version, authoring target descriptor와 entry 이름만 production으로 바꾸고 generated target을 rebuild했다. `npm pack --dry-run --json`은 39 entries, 63,826B packed/227,085B unpacked이며 legacy/evals/tests/repository source를 제외했고 release `npm run verify`는 31/31 pass했다. Post-consumer input hash는 기존 receipt와 같았고 Claude raw session은 `--no-session-persistence` 때문에 없으므로 retained CLI metadata와 coordinator-reread effect만 권한으로 남긴다. Remote push와 normal installer 교체 뒤 exact commit/tree/path와 기존 unrelated skill 불변을 같은 M8 receipt에 추가한다. 공식 route가 다른 identity를 고르거나 collision·auth·source-current 실패를 보이면 workaround 없이 중단한다.
+Canonical owner인 root package metadata, authoring package version, authoring target descriptor와 entry 이름만 production으로 바꾸고 generated target을 rebuild했다. `npm pack --dry-run --json`은 39 entries, 63,826B packed/227,085B unpacked이며 legacy/evals/tests/repository source를 제외했고 release `npm run verify`는 31/31 pass했다. Post-consumer input hash는 기존 receipt와 같았고 Claude raw session은 `--no-session-persistence` 때문에 없으므로 retained CLI metadata와 coordinator-reread effect만 권한으로 남긴다.
+
+Candidate commit `e321879dc3b1fbadf3677eb1eb06abb7d0f46551`은 기존 origin `main`에 force 없이 fast-forward됐고 remote head가 같음을 재확인했다. `skills@1.5.26`의 repository route는 production `skill-rails`와 generated tree `cab9710...`를 골라 Codex·Claude 전역 위치와 별도 일반 project의 두 project-local 위치에 설치했다. 전역 old tree는 승인된 범위에서 63 files/1,028,325B에서 36 files/201,705B production tree로 교체됐고 unrelated skill 이름은 설치 뒤에도 보존됐다. 별도 project의 fresh Codex Sol medium과 Claude Opus medium은 각각 project-local entry를 발견하고 skill-local CLI로 artifact-intact/tree hash를 확인했다. Codex가 문서에 없는 `--help`를 두 번 시도한 마찰과 installer의 상세가 노출되지 않은 Socket alert 1건은 숨기지 않되 이번 integrity smoke 결과를 broad behavior/effect로 확대하지 않는다. `CODEX_HOME`, README, 동결 계획과 legacy capsule은 바꾸지 않았다. 두 번째 tooling 값·consumer·closure나 domain executable 수요가 생기면 이 capability를 넓히지 않고 사용자 결정으로 되돌린다.

@@ -375,3 +375,14 @@
 - Release-proportional `npm run verify`는 31/31 pass했다. 이는 candidate delivery·safety·source currentness만 증명하며 M8의 prior fresh behavior/effect 범위를 넓히지 않는다. Force/history rewrite, README 변경과 archive 삭제는 계속 승인 밖이다.
 
 현재 판정은 **production candidate audit 통과, remote push와 공식 installer cutover 실행 전**이다. 상세 값은 `evals/m8/results/pre-release-end-to-end-2026-09-14.json`의 `finalCandidateAudit`이 소유한다.
+
+## M8 production cutover — repository release와 설치 완료
+
+- Coherent accumulated M5~M8 candidate commit `e321879dc3b1fbadf3677eb1eb06abb7d0f46551`(tree `f6bcf7479a8af9f11b9a4a57a31b0a8fb3113295`)을 기존 `origin/main`에 force 없이 `0369324..e321879` fast-forward했고 `git ls-remote`로 같은 remote head를 확인했다.
+- 공식 delivery는 `skills@1.5.26`이 public `nanomia-ai/skill-rails` repository를 읽는 경로다. Installer resolved skill hash는 `9f8619d23436036ad31ebc069d4f5cf47a797b9e7fb9b9b011268448fda0d685`였고 npm package publish/dist-tag 작업은 없었다. Installer security summary는 Gen safe, Socket 1 alert, Snyk low였으며 이번 출력에는 alert 상세가 없었으므로 그 원인을 추정하지 않는다.
+- 승인된 production 교체 전 두 host의 기존 `skill-rails`는 각각 63 files/1,028,325B였고, 교체 뒤 Codex `~/.agents/skills/skill-rails`와 Claude `~/.claude/skills/skill-rails`는 각각 36 files/201,705B, task-local path+content SHA-256 `52e4070a56545ba552a6cd9cf4e4ef2b7b23a1619012b8eeabbb11581f98c921`로 같았다. 두 skill-local CLI integrity check는 target `skill-rails`, tree `cab9710...`, artifact-intact를 반환했다. Installer는 이 skill 하나만 선택했고 post-install global list에는 기존 unrelated skill 7개가 남아 있다.
+- 별도 일반 project `D:/Projects/Private/nanomia/skill-rails-production-smoke-20260914-e321879`의 Codex·Claude project-local 표준 위치에도 같은 36-file tree를 설치했다. Fresh Codex Sol medium은 `.agents/skills/skill-rails`, fresh Claude Opus medium bypass는 `.claude/skills/skill-rails`를 각각 발견해 skill-local CLI integrity check를 통과했다. 이 smoke는 discovery와 artifact check만 증명하며 M8 prior authoring/use/effect 범위를 넓히지 않는다.
+- Codex smoke는 문서에 없는 `--help`를 두 번 시도한 뒤 entry의 문장과 CLI source에서 정확한 `check --out`을 찾아 통과했고 168,545 input tokens를 보고했다. 이는 authoring entry의 command-discovery 마찰과 host fixed-context concern이며 generated target 품질이나 이전 실제 effect를 실패로 바꾸지 않는다. 같은 실패가 실제 저작·복구를 막는 반복 evidence가 생길 때만 기존 CLI/entry owner의 최소 개선을 검토한다.
+- `CODEX_HOME`은 `C:/Users/joinj/AppData/Roaming/orca/codex-runtime-home/home` 그대로였고 README, 두 동결 계획과 legacy capsule은 바꾸거나 삭제하지 않았다. Exact values와 좁은 claim은 M8 receipt의 `productionCutover`가 소유한다.
+
+현재 판정은 **M8 production repository cutover와 정상 두-host 설치 완료**다. Broad host/domain repeatability, Framework의 인과적 이익, authoring-process 비용 효율, POSIX capsule mode 복원은 계속 `unproven`이다.
