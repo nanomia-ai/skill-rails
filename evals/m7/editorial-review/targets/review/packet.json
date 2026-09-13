@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "purposeModule": "purpose",
+  "action": "Review the museum-label draft for the declared audience and record one bounded editorial decision.",
+  "judgment": {
+    "question": "Is this label clear and appropriate for the stated audience without adding unsupported facts?",
+    "criteria": [
+      "Accept only when the draft is understandable for the stated audience and no unsupported factual correction is required.",
+      "Use revise when a specific clarity or tone issue is present; keep factual uncertainty explicit instead of inventing a correction.",
+      "Use unproven when the document identity or audience basis is unknown.",
+      "Do not claim file effects beyond the record command's reread result."
+    ]
+  },
+  "reads": [
+    {"path": "review/draft.md", "reason": "Read the exact label text and stable document identity."},
+    {"path": "review/audience.md", "reason": "Read the intended visitor audience."},
+    {"path": "review/decisions.md", "reason": "Preserve prose outside the managed editorial region."}
+  ],
+  "doneWhen": [
+    "The answer conforms to the domain-owned contract and leaves uncertainty explicit.",
+    "Record returns an observed apply result, an idempotent no-write result, or a fail-closed error."
+  ]
+}

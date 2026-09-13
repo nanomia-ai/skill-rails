@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "gate": "m5-product-adoption",
+  "recordedAt": "2026-09-14",
+  "status": "PASSED_SINGLE_OBSERVATION",
+  "decision": "Adopt the prose-only Product target for this pilot and resume the next M5 dependency without generalizing the result to another stage or Framework lane.",
+  "fixedBoundary": {
+    "semanticRuns": 2,
+    "allowedRuns": [
+      "one fresh Codex author",
+      "one fresh Claude unfamiliar consumer after a documented non-interactive host precondition is available"
+    ],
+    "failedLaunchesBeforeSemanticRun": 1,
+    "userCorrection": "After the first Claude launch stopped before task acceptance, the user explicitly opened exactly one new consumer run using Claude's documented bypassPermissions mode and print-mode trust-dialog skip.",
+    "retryPolicy": "No additional consumer retry is allowed.",
+    "prohibitedGrowth": [
+      "additional verifier or counterexample agent",
+      "additional cell",
+      "new protocol or receipt schema",
+      "new product core layer",
+      "record-only machinery for Product"
+    ]
+  },
+  "candidate": {
+    "targetId": "natural-language-pilot-product-next",
+    "mode": "prose",
+    "canonicalFiles": [
+      "domains/natural-language-pilot/skill-package.json",
+      "domains/natural-language-pilot/targets/product/target.json",
+      "domains/natural-language-pilot/targets/product/entry.md"
+    ],
+    "fixture": "fixtures/product-v1/project/pilot/product-request.md",
+    "generatedTreeSha256": "6b8aff91c9fcc86d6ec6a822c03fa8bc8af8987261be0715bcadbc244b93fe17",
+    "artifactIntact": true,
+    "sourceCurrent": true,
+    "coherentGateRegression": "npm test: 28/28 pass",
+    "mechanisms": {
+      "observer": false,
+      "packet": false,
+      "prepare": false,
+      "fallback": false,
+      "renderer": false,
+      "durableSemanticState": false
+    }
+  },
+  "runs": [
+    {
+      "role": "author",
+      "host": "Codex",
+      "model": "gpt-5.6-sol",
+      "effort": "high",
+      "taskId": "task_0bf81da50075",
+      "dispatchId": "ctx_b161ded16b53",
+      "startedAt": "2026-09-13T16:57:02Z",
+      "completedAt": "2026-09-13T17:04:42Z",
+      "wallTimeMs": 460000,
+      "taskDelivery": "accepted",
+      "hostOutcome": "succeeded",
+      "toolCalls": null,
+      "readBytes": null,
+      "measurementUnknowns": [
+        "Orca archived the raw provider transcript, but this bounded gate did not normalize tool-call count or read bytes."
+      ],
+      "frameworkSectionsReported": [
+        "0",
+        "0.1",
+        "1",
+        "2",
+        "4.1-4.3",
+        "4.5",
+        "6",
+        "7",
+        "8.1-8.3",
+        "9.2"
+      ],
+      "observedEffect": {
+        "filesModified": [
+          "domains/natural-language-pilot/skill-package.json",
+          "domains/natural-language-pilot/targets/product/target.json",
+          "domains/natural-language-pilot/targets/product/entry.md",
+          "fixtures/product-v1/project/pilot/product-request.md",
+          "tests/build.test.mjs"
+        ],
+        "targetedTest": "node --test tests/build.test.mjs",
+        "targetedTestResult": "11/11 pass",
+        "standaloneBuild": "BUILT",
+        "artifactIntact": true,
+        "sourceCurrent": true
+      },
+      "rawEvidence": {
+        "provider": "codex",
+        "archiveSource": "transcript",
+        "sourceIdentity": "C2MdvyKeaweYrwcnTQD5yIJdC3LxFb-u",
+        "workerReportMessageId": "msg_23a3fcf9e7bf"
+      }
+    },
+    {
+      "role": "unfamiliar-consumer",
+      "host": "Claude Code",
+      "model": "fable",
+      "effort": "high",
+      "taskId": "task_d9a31baf4c50",
+      "dispatchId": "ctx_634b1dd3f176",
+      "startedAt": "2026-09-13T17:16:38Z",
+      "completedAt": "2026-09-13T17:17:14Z",
+      "wallTimeMs": 36000,
+      "rawTask": "Write the product brief for this project from pilot/product-request.md.",
+      "taskDelivery": "failed-before-acceptance",
+      "hostOutcome": "failed",
+      "failureCode": "agent_prompt_stalled",
+      "failureStage": "dispatch_input",
+      "toolCalls": 0,
+      "readBytes": 0,
+      "fixtureRoot": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m5-product-consumer-20260914-01",
+      "fixtureInputSha256": "8075b9b103f5f468e588c5f29a76042d68de8cf23d2ca9f238fcc13f36ef2b90",
+      "installedSkillPath": ".claude/skills/natural-language-pilot-product-next",
+      "installedTreeSha256": "6b8aff91c9fcc86d6ec6a822c03fa8bc8af8987261be0715bcadbc244b93fe17",
+      "observedEffect": {
+        "briefExistsAfterRun": false,
+        "behavior": "unproven",
+        "fileEffect": "none"
+      },
+      "rawEvidence": {
+        "provider": "claude",
+        "archiveSource": "terminal",
+        "sourceIdentity": "TlXdyMX717Nf_UObQLyV8RbNIcsNDxDd",
+        "terminalTail": [
+          "Accessing workspace: C:\\Users\\joinj\\AppData\\Local\\Temp\\skill-rails-m5-product-consumer-20260914-01",
+          "Quick safety check: Is this a project you created or one you trust?",
+          "Claude Code'll be able to read, edit, and execute files here."
+        ]
+      }
+    },
+    {
+      "role": "unfamiliar-consumer-user-reopened-run",
+      "host": "Claude Code 2.1.270",
+      "model": "claude-fable-5-1",
+      "effort": "high",
+      "sessionId": "8441a755-74d2-4ed3-857a-ed77f5ab5370",
+      "rawTask": "Write the product brief for this project from pilot/product-request.md.",
+      "hostCommandBoundary": {
+        "interactive": false,
+        "permissionMode": "bypassPermissions",
+        "permissionPrompts": "none",
+        "trustDialog": "skipped by documented --print behavior",
+        "codexYoloApplied": false
+      },
+      "taskDelivery": "accepted",
+      "hostOutcome": "succeeded",
+      "wallTimeMs": 29368,
+      "apiTimeMs": 15546,
+      "toolCalls": 3,
+      "readBytes": 2249,
+      "readByteBasis": {
+        "generatedEntry": 1885,
+        "productRequest": 364
+      },
+      "costUsd": 0.402299,
+      "usage": {
+        "inputTokens": 68,
+        "cacheCreationInputTokens": 16296,
+        "cacheReadInputTokens": 106604,
+        "outputTokens": 961,
+        "thinkingTokens": 144
+      },
+      "fixtureRoot": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m5-product-consumer-20260914-01",
+      "fixtureInputSha256": "8075b9b103f5f468e588c5f29a76042d68de8cf23d2ca9f238fcc13f36ef2b90",
+      "installedSkillPath": ".claude/skills/natural-language-pilot-product-next",
+      "installedTreeSha256": "6b8aff91c9fcc86d6ec6a822c03fa8bc8af8987261be0715bcadbc244b93fe17",
+      "observedBehavior": {
+        "installedSkillDiscovered": true,
+        "entryRead": true,
+        "observerUsed": false,
+        "packetUsed": false,
+        "prepareUsed": false,
+        "fallbackUsed": false,
+        "exclusiveCreateUsed": true
+      },
+      "observedEffect": {
+        "briefExistsAfterRun": true,
+        "outputBytes": 555,
+        "outputSha256": "c034188c8fb0de1a74d388ab7279dfb30325e782514df65e7eaa3212c1919e80",
+        "requestParagraphVerbatim": true,
+        "httpsOnlyBoundaryExplicit": true,
+        "storageLocationUnknown": true,
+        "retentionPeriodUnknown": true,
+        "importSupportUnknown": true,
+        "inventedScopeObserved": false,
+        "changedProjectFiles": [
+          "pilot/brief.md"
+        ],
+        "effectAuthority": "coordinator reread bytes and SHA-256 after host completion"
+      },
+      "rawEvidence": "evals/m5/results/raw/claude-product-adoption-captured.json"
+    }
+  ],
+  "setupDiagnostics": [
+    "The first isolated build invocation combined --target with --out-root and failed closed with ARGUMENT_INVALID; the documented --target with --out form was used before the consumer launch.",
+    "Orca repo registration initially rejected the folder because it was not a Git repository; an empty local Git repository was initialized solely to provide an isolated Orca worktree selector.",
+    "The failed Claude worker archive was captured, while post-failure terminal release reported release_unknown/tab_not_found; no task input was sent manually.",
+    "The user later authorized exactly one new Claude consumer run after help confirmed that --print skips the workspace trust dialog and bypassPermissions is a Claude-native permission mode."
+  ],
+  "claims": {
+    "proven": [
+      "The prose-only Product candidate builds as a standalone target and was source-current and artifact-intact at the author gate.",
+      "A fresh Codex author produced the smallest declared candidate without adding observer, packet, prepare, fallback, renderer, semantic state, schema, or core machinery.",
+      "The isolated Claude fixture had the identical Product tree and unchanged input before both launches.",
+      "In the one user-reopened semantic run, fresh Claude discovered the installed Product skill, read the entry and request, used an exclusive-create operation, and produced exactly one brief whose bytes passed the fixed acceptance reread."
+    ],
+    "failed": [
+      "The first fresh Claude unfamiliar-consumer launch did not pass Claude Code's workspace trust prompt, so Orca classified task delivery as agent_prompt_stalled at dispatch_input; this failed launch remains preserved and is not rewritten as success."
+    ],
+    "unproven": [
+      "repeatability beyond this one author/consumer observation",
+      "Product behavior in interactive Claude mode",
+      "Product behavior on another fixture, model, or version",
+      "Framework L0/L1/L2 relative effect",
+      "whether Product prose is cheaper than a renderer across repeated maintenance",
+      "adoption of Direct, Work, Verify, Resume, or any other stage"
+    ]
+  },
+  "nextAction": "Resume M5 at the maintainer/source-graph dependency. Do not repeat the Product gate or copy this single-stage result to Direct, Work, Verify, or Resume."
+}

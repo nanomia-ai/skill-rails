@@ -7,6 +7,10 @@
     "verifyBaseline": "modules/verify-baseline.md"
   },
   "targets": {
+    "direct-next": "targets/direct/target.json",
+    "product-next": "targets/product/target.json",
+    "resume-next": "targets/resume/target.json",
+    "work-next": "targets/work/target.json",
     "verify-next": "targets/verify/target.json"
   }
 }

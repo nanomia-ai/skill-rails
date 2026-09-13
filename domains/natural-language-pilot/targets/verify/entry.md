@@ -5,12 +5,13 @@ description: Verify the fixed bookmark-storage pilot and safely record pass, fai
 
 # Verify the bookmark-storage pilot
 
-Run `node <target-root>/scripts/run.mjs prepare --project <project-root>` first.
+Run `node <target-root>/scripts/run.mjs initialize --project <project-root>` first.
 
-- On `PREPARED`, open only the returned `packet` plus the files it explicitly lists.
-- Fill the returned `answer` JSON without adding fields, then run its exact `recordCommand`.
+- On `RECORD_INITIALIZED`, read every returned current `inputs[].absolutePath`, then read the returned `domainConfig`. Do not inspect runtime source or look for a prepared packet.
+- Run the exact verification command declared by `domainConfig.verificationCommand` from its declared project-relative `cwd`.
+- Decide whether the evidence justifies `pass`, `fail`, or `unproven` for the declared `cardId`: pass requires the command to succeed and report the expected test identity; a command execution failure, an unexecuted command, an unknown card identity, or insufficient evidence is unproven; use fail only for direct evidence that the acceptance behavior does not hold.
+- Fill the returned `answer` JSON without adding fields. Preserve unknown reasons and do not claim file or host effects beyond the authority actually observed, then run the returned exact `recordCommand`.
 - If `recordCommand` exits without one valid JSON result, retry that exact command once; a write that already succeeded returns `APPLIED_ALREADY`. Never reconstruct or edit the output manually.
-- Open `references/fallback.md` only when prepare returns `PREPARE_FAILED`; use only that fallback and the project files it names, without inspecting or invoking other target runtime files. Record the run as fallback, not treatment success.
-- On integrity, stale, conflict, lock, renderer, or apply errors, perform only the returned `nextAction`. Never repair generated files or merge report bytes by hand.
+- On initialize, integrity, answer, stale, conflict, lock, renderer, or apply errors, perform only the returned `nextAction`. Never repair generated files or merge report bytes by hand.
 
-Build delivery, AI behavior, semantic correctness, and observed file effect are separate evidence lanes. Anything not observed in its proper lane remains `unproven`.
+Done means record returns an observed `APPLIED`, idempotent `APPLIED_ALREADY`, or a fail-closed recovery result without overstating semantic or effect authority. Build delivery, AI behavior, semantic correctness, and observed file effect are separate evidence lanes; anything not observed in its proper lane remains `unproven`.

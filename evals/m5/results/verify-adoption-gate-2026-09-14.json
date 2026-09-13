@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "gate": "m5-verify-adoption",
+  "recordedAt": "2026-09-14",
+  "status": "PASSED_CURRENT_TREE_SINGLE_CODEX_OBSERVATION_AFTER_APPROVED_INSTALL",
+  "decision": "Adopt the current record-only Verify target for the one observed Codex Sol medium scope. Preserve the two earlier stale-install observations and process failures; do not generalize this result to another host, recovery scene, or Resume.",
+  "fixedBoundary": {
+    "semanticRuns": 3,
+    "allowedRuns": [
+      "one fresh Codex Sol medium primary consumer",
+      "one fresh Claude Opus medium comparison consumer",
+      "one user-approved fresh Codex Sol medium current-tree consumer after the alpha-only standard install"
+    ],
+    "runsStarted": 3,
+    "retryPolicy": "The third run was the exact user-approved current-tree delivery closure under E-025. No additional Verify run, identity, discovery path, evaluator, or harness is allowed."
+  },
+  "candidate": {
+    "targetId": "natural-language-pilot-verify-next",
+    "mode": "record-only",
+    "canonicalFiles": [
+      "domains/natural-language-pilot/skill-package.json",
+      "domains/natural-language-pilot/targets/verify/target.json",
+      "domains/natural-language-pilot/targets/verify/entry.md"
+    ],
+    "currentBuiltTreeSha256": "25798e8a916d8b0062427c3d38f100198e94cb2bda8e90f79d5bd1bfde21763a",
+    "currentBuildArtifactIntact": true,
+    "currentBuildSourceCurrent": true,
+    "selectedUserInstallTreeSha256BeforeApprovedInstall": "cf9ad62da45c925f12c63142dcf45d7603a1c591b020379c3739af6909c829cf",
+    "selectedUserInstallArtifactIntactBeforeApprovedInstall": true,
+    "selectedUserInstallSourceCurrentBeforeApprovedInstall": false,
+    "approvedInstall": {
+      "commandKind": "skills@latest global copy install for Codex and Claude Code",
+      "source": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m5-verify-build-624596a84e5b4343aff1a9b54f9fbc66/skill",
+      "selectedSkill": "natural-language-pilot-verify-next",
+      "installerReportedHash": "d0b559698c7e08a0ab872293308f36435fbac11868ad45f4f29850682dcd30ef",
+      "installedTreeSha256": "25798e8a916d8b0062427c3d38f100198e94cb2bda8e90f79d5bd1bfde21763a",
+      "codexArtifactIntact": true,
+      "codexSourceCurrent": true,
+      "claudeArtifactIntact": true,
+      "claudeSourceCurrent": true,
+      "existingSkillRailsUnchanged": true,
+      "codexHomeChanged": false
+    },
+    "treeDifference": "The entry, executable runtime behavior, domain config, answer contract, and renderer are byte-identical. The current tree adds headingIndex:null to generated target metadata and three D-14 test-pointer comments to record.mjs, and its build receipt records the expanded package manifest. This narrows risk but does not establish delivery of the current tree."
+  },
+  "fixture": {
+    "source": "The accepted Codex Sol Work output was copied byte-for-byte into two fresh isolated roots before verification.",
+    "inputHashes": {
+      "pilot/brief.md": "c034188c8fb0de1a74d388ab7279dfb30325e782514df65e7eaa3212c1919e80",
+      "pilot/plan.md": "46ae192293d9c07a790e0052d66c6c5d825d2c2a87375514495c6f983005da29",
+      "pilot/progress.md": "1dcc153b9ae934394a63b469f104a6cab7ce4475321be24352adb348c0a90ea3",
+      "src/bookmark-storage.mjs": "cd22b4ef22a5380a1b9e82188e42353d8ff9b043ba839ca007ec88df56bedc86",
+      "test/run.mjs": "21575a00ef0e68bf9f53c690120c39caf84d44387892944c9fbf17dad31ff68c"
+    }
+  },
+  "runs": [
+    {
+      "host": "Codex CLI 0.148.0",
+      "model": "gpt-5.6-sol",
+      "effort": "medium",
+      "fixtureRoot": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m5-verify-sol-e7ce4703392346d5bcddf780cb622022",
+      "projectLocalInstalledPath": ".agents/skills/natural-language-pilot-verify-next",
+      "selectedSkillPath": "C:/Users/joinj/.agents/skills/natural-language-pilot-verify-next",
+      "taskDelivery": "accepted",
+      "hostOutcome": "behavior-succeeded-delivery-provenance-failed",
+      "observedBehavior": {
+        "initializeFirst": true,
+        "declaredInputsRead": true,
+        "domainConfigRead": true,
+        "exactVerificationCommandRunOnce": true,
+        "answerContractRead": true,
+        "closedAnswerWritten": true,
+        "exactRecordCommandRun": true,
+        "observerUsed": false,
+        "packetUsed": false,
+        "prepareUsed": false,
+        "fallbackUsed": false
+      },
+      "observedEffect": {
+        "recordStatus": "APPLIED",
+        "reportedAuthority": "observed",
+        "reportedOperation": "file-reread",
+        "verificationBytesSha256": "8d448fb0885aad0adbb1d736c8263ff70e406e6f8604793b120377f0e609abd6",
+        "verdict": "pass",
+        "unknownsPreserved": true,
+        "coordinatorReread": true
+      },
+      "processFailure": "The host bundled independent reads with semicolons despite repository command discipline.",
+      "rawEvidence": "evals/m5/results/raw/codex-sol-verify-adoption-captured.json"
+    },
+    {
+      "host": "Claude Code 2.1.270",
+      "model": "claude-opus-5",
+      "effort": "medium",
+      "sessionId": "2422a942-3a3f-467d-977a-afe536ad2868",
+      "fixtureRoot": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m5-verify-opus-6fee10acbc3c421a92557bb0c72998f2",
+      "projectLocalInstalledPath": ".claude/skills/natural-language-pilot-verify-next",
+      "selectedSkillPath": "C:/Users/joinj/.claude/skills/natural-language-pilot-verify-next",
+      "taskDelivery": "accepted",
+      "hostOutcome": "behavior-succeeded-delivery-provenance-failed",
+      "observedBehavior": {
+        "initializeFirst": true,
+        "declaredInputsRead": true,
+        "domainConfigRead": true,
+        "exactVerificationCommandRunOnce": true,
+        "closedAnswerWritten": true,
+        "exactRecordCommandRun": true,
+        "observerUsed": false,
+        "packetUsed": false,
+        "prepareUsed": false,
+        "fallbackUsed": false
+      },
+      "observedEffect": {
+        "recordStatus": "APPLIED",
+        "reportedAuthority": "observed",
+        "reportedOperation": "file-reread",
+        "verificationBytesSha256": "74219e60151dfe7d31247b722a057b50a27a42c61bbfcb210641711f44668bae",
+        "verdict": "pass",
+        "unknownsPreserved": true,
+        "coordinatorReread": true
+      },
+      "rawEvidence": "evals/m5/results/raw/claude-opus-verify-adoption-captured.json"
+    },
+    {
+      "host": "Codex CLI 0.148.0",
+      "model": "gpt-5.6-sol",
+      "effort": "medium",
+      "threadId": "01a09c41-7971-7a71-a0ea-d0b9bdf09c2e",
+      "fixtureRoot": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m5-work-sol-0Vbr3z",
+      "selectedSkillPath": "C:/Users/joinj/.agents/skills/natural-language-pilot-verify-next",
+      "selectedTreeSha256": "25798e8a916d8b0062427c3d38f100198e94cb2bda8e90f79d5bd1bfde21763a",
+      "selectedTreeSourceCurrent": true,
+      "taskDelivery": "accepted",
+      "hostOutcome": "succeeded-with-command-process-failures",
+      "observedBehavior": {
+        "initializeFirst": true,
+        "declaredInputsRead": true,
+        "domainConfigRead": true,
+        "exactVerificationCommandRunOnce": true,
+        "answerContractRead": true,
+        "closedAnswerWritten": true,
+        "exactRecordCommandRun": true,
+        "observerUsed": false,
+        "packetUsed": false,
+        "prepareUsed": false,
+        "fallbackUsed": false
+      },
+      "observedEffect": {
+        "recordStatus": "APPLIED",
+        "reportedAuthority": "observed",
+        "reportedOperation": "file-reread",
+        "verificationBytesSha256": "7c6e3ce666036a04f2c3042dab44b979e630af4e46f30f1813d8d6f1c9d5d844",
+        "verdict": "pass",
+        "unknownsPreserved": true,
+        "unchangedInputHashes": true,
+        "coordinatorReread": true,
+        "installedTreeArtifactIntactAfterRun": true,
+        "installedTreeSourceCurrentAfterRun": true
+      },
+      "processFailures": [
+        "The host bundled the RTK and skill-entry reads in one PowerShell command.",
+        "Two PowerShell attempts to batch the declared reads failed to parse before the host completed the reads through individual commands."
+      ],
+      "rawEvidence": "evals/m5/results/raw/codex-sol-verify-current-tree-captured.json"
+    }
+  ],
+  "claims": {
+    "proven": [
+      "The current Verify candidate builds artifact-intact and source-current as tree 25798e8a916d8b0062427c3d38f100198e94cb2bda8e90f79d5bd1bfde21763a.",
+      "On byte-identical accepted Work inputs, both hosts selected an intact older user installation, ran initialize-inputs-command-answer-record without observer, packet, prepare, or fallback, returned APPLIED with observed reread authority, and produced pass records that preserved all three unknowns.",
+      "The user-approved standard installer updated only the separate alpha Verify skill for both normal host locations; both installs were artifact-intact/source-current at tree 25798e8a916d8b0062427c3d38f100198e94cb2bda8e90f79d5bd1bfde21763a and the existing skill-rails file/hash listing was unchanged.",
+      "One fresh Codex Sol medium consumer selected the current user-level tree, completed initialize-inputs-command-answer-record without prepare machinery, returned APPLIED, and the coordinator reread the exact report hash, preserved unknowns, unchanged inputs, and current installed tree."
+    ],
+    "failed": [
+      "Both hosts selected the pre-existing user-level skill tree cf9ad62da45c925f12c63142dcf45d7603a1c591b020379c3739af6909c829cf instead of the project-local current tree 25798e8a916d8b0062427c3d38f100198e94cb2bda8e90f79d5bd1bfde21763a.",
+      "The first Codex host and the approved current-tree Codex host did not follow the repository one-command-per-exec and no-semicolon discipline while reading declared inputs; the current-tree run also had two PowerShell parse failures before completing the reads."
+    ],
+    "unproven": [
+      "the host discovery precedence that would reliably select a project-local skill when the same identity exists at user scope",
+      "current-tree Verify behavior on Claude Code or another fixture/model/version",
+      "repeatability, recovery scenes, and Resume adoption"
+    ]
+  },
+  "nextAction": "Re-open AGENTS.md and Maintainer entry steps 1-3, then open only the existing bounded Resume stage. Do not run another Verify observation."
+}

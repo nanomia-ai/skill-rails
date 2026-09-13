@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "gate": "m5-maintainer-source-graph",
+  "status": "PARTIAL_FAILED",
+  "taskId": "task_b2cb01338145",
+  "dispatchId": "ctx_6608c5a52638",
+  "host": "Codex",
+  "model": "gpt-5.6-sol",
+  "effort": "high",
+  "startedAt": "2026-09-13T17:40:00Z",
+  "completedAt": "2026-09-13T17:50:26Z",
+  "wallTimeMs": 626000,
+  "hostOutcome": "failed",
+  "failure": {
+    "terminationReason": "operator_close",
+    "lastFailure": "Terminal closed by operator request",
+    "cause": "The maintainer had sufficient observations but stalled while constructing its report after a PowerShell here-string parse error.",
+    "retryAttempted": false
+  },
+  "observedGraphQueries": [
+    {
+      "focus": "natural-language-pilot-product-next",
+      "sourceGraphSha256": "102747662c4cf4a05c59a3ed30aa1372a8b77552eae732ade09e13d660df2d43",
+      "imports": [],
+      "consumers": [],
+      "artifacts": [
+        {
+          "targetId": "natural-language-pilot-product-next",
+          "path": "SKILL.md"
+        }
+      ],
+      "mechanisms": {
+        "observer": null,
+        "renderer": null,
+        "contract": null
+      },
+      "declaredInputs": [],
+      "declaredOutput": null,
+      "checks": [],
+      "externalBoundaries": [],
+      "gaps": [
+        "requirement/check/external-boundary semantic edges are not declared in v1"
+      ]
+    },
+    {
+      "focus": "natural-language-pilot package",
+      "sourceGraphSha256": "102747662c4cf4a05c59a3ed30aa1372a8b77552eae732ade09e13d660df2d43",
+      "consumers": [
+        "natural-language-pilot-product-next",
+        "natural-language-pilot-verify-next"
+      ],
+      "gaps": [
+        "requirement/check/external-boundary semantic edges are not declared in v1"
+      ]
+    }
+  ],
+  "sevenQuestions": [
+    {
+      "number": 1,
+      "result": "partial",
+      "finding": "The graph identified the package owner but not a semantic requirement owner; bounded prose reads located the Product request fixture, target entry, E-022, and Product receipt."
+    },
+    {
+      "number": 2,
+      "result": "pass",
+      "finding": "The Product target-specific sources are targets/product/target.json and targets/product/entry.md; it imports no shared module."
+    },
+    {
+      "number": 3,
+      "result": "pass",
+      "finding": "Product has no imported module consumer relation, while package focus enumerated both real Product and Verify targets."
+    },
+    {
+      "number": 4,
+      "result": "partial",
+      "finding": "Inspect named generated SKILL.md, but locating its build receipt required leaving the graph for the built artifact and evidence owner."
+    },
+    {
+      "number": 5,
+      "result": "pass",
+      "finding": "Product has no observer, renderer, answer contract, declared machine input, or declared machine output; its human input/output contract is owned by entry.md."
+    },
+    {
+      "number": 6,
+      "result": "partial",
+      "finding": "Inspect returned no check relation; targeted tests and the current evidence lane were found through bounded source/evidence reads outside the graph."
+    },
+    {
+      "number": 7,
+      "result": "partial",
+      "finding": "Inspect explicitly returned no external boundary plus a semantic-edge gap; actual host effect authority was found in the Product adoption receipt rather than inferred from the graph."
+    }
+  ],
+  "commandDisciplineFailures": [
+    "The worker invoked CodeGraph after a combined PowerShell existence probe failed to interpolate correctly, even though this repository has no .codegraph directory.",
+    "The worker used broad repository rg output with 279 matches instead of keeping every read bounded.",
+    "The worker combined independent shell commands with semicolons in multiple invocations.",
+    "The worker's final PowerShell here-string report construction failed to parse and no worker_done report was produced."
+  ],
+  "d14Observation": {
+    "finding": "No code-near stable test pointer was present beside the Verify safe-record CAS, output lock, or reread authority logic, causing the maintainer to broaden its search.",
+    "correction": [
+      "Added one-line pointers in src/runtime/record.mjs beside output lock, raw-basis CAS, and post-write reread authority.",
+      "Each pointer names an existing targeted test and does not restate graph relations or exact runtime behavior."
+    ],
+    "targetedVerification": "node --test tests/record.test.mjs: 13/13 pass",
+    "freshMaintainerBenefit": "unproven; the failed gate was not rerun"
+  },
+  "decisions": {
+    "colocatedEdgeGateOpened": false,
+    "reason": "The run exposed sparse semantic edges but did not establish a wrong-owner/consumer consequence that could not be resolved through existing target entry, test, receipt, and evidence owners. Adding schema now would exceed the observed need.",
+    "humanProjectionGateOpened": false,
+    "commentPointerCorrectionApplied": true,
+    "newSchemaOrCoreLayerAdded": false
+  },
+  "claims": {
+    "proven": [
+      "Current inspect truthfully reports Product's declared graph relations and semantic-edge gaps.",
+      "The fresh maintainer could identify the target-specific source, lack of imports/mechanisms, and both real package targets.",
+      "The missing D-14 pointer caused broader searching, and the existing owning code can carry the correction without a new layer."
+    ],
+    "failed": [
+      "The fresh maintainer did not complete a bounded seven-question report and violated the shell-command discipline before its dispatch was closed."
+    ],
+    "unproven": [
+      "A fresh maintainer can now answer all seven questions with bounded reads.",
+      "The added comment pointers reduce future read or recovery cost.",
+      "A colocated semantic edge would reduce total maintenance cost.",
+      "A human projection is needed."
+    ]
+  },
+  "nextAction": "Do not rerun this maintainer gate or add graph schema. Preserve the partial failure, keep the minimal code-near pointers, and continue M5 stage-specific adoption without claiming maintainer completion."
+}

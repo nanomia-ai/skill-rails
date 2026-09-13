@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "gate": "m7-non-devflow-core-generalization",
+  "recordedAt": "2026-09-14",
+  "status": "MACHINE_GENERALIZATION_PASSED_FRESH_BEHAVIOR_UNPROVEN",
+  "decision": "A minimal core extraction removed the Verify-specific answer-field list from the prepare packet, after which one unrelated editorial-review domain reused the existing source graph, observer, renderer, safe record, and error vocabulary without another core or schema change. This supports machine-level platform independence only; fresh-AI behavior, editorial quality, and broader domain generality remain unproven.",
+  "dependencyInspection": {
+    "searchedRoots": ["src/core", "src/runtime", "contracts"],
+    "terms": ["card", "stage", "brief", "verification"],
+    "initialFinding": {
+      "blocking": "src/runtime/prepare.mjs:22 hardcoded cardId and the Verify semantic answer shape in a core-owned packet",
+      "genericOnly": "stage occurrences were temporary filesystem staging variables",
+      "absent": ["brief", "verification"]
+    },
+    "observerPath": {
+      "schema": "contracts/target.schema.json:21-32 permits observer only for prepare-record",
+      "build": "src/core/build.mjs:89-100 materializes observer and prepare runtime only for prepare-record"
+    },
+    "postExtractionDomainTerms": []
+  },
+  "coreExtraction": {
+    "file": "src/runtime/prepare.mjs",
+    "change": "Replace the Verify-shaped semantic field enumeration with an instruction to follow the existing domain-owned answer contract exactly.",
+    "newSchema": false,
+    "newProtocolOrHarness": false,
+    "compatibilityCheck": {
+      "command": "node --test evals/m4/prepare.test.mjs",
+      "passed": 6,
+      "failed": 0
+    }
+  },
+  "domain": {
+    "package": "evals/m7/editorial-review/skill-package.json",
+    "targetId": "editorial-review-next",
+    "kind": "museum-label editorial review",
+    "devflowOrLegacySourceUsed": false,
+    "sourceGraphSha256": "748398ba4f123e9e9a314ccef76f831df4b50bee323f0480165af149f234dedf",
+    "inspect": {
+      "imports": ["purpose"],
+      "observer": "targets/review/observer.mjs",
+      "renderer": "targets/review/renderer.mjs",
+      "contract": "targets/review/contracts/semantic-answer.editorial-review.schema.json",
+      "declaredInputs": ["review/audience.md", "review/decisions.md", "review/draft.md"],
+      "declaredOutput": "review/decisions.md",
+      "gaps": ["requirement/check/external-boundary semantic edges are not declared in v1"]
+    }
+  },
+  "delivery": {
+    "temporaryRoot": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m7-editorial-whW43e",
+    "treeSha256": "7e055de100a80aa20b968ce6979493f431cbfca7a830fd3e4ebae8a3a748ebea",
+    "artifactIntact": true,
+    "sourceCurrent": true,
+    "standaloneSiblingRuntimeDependency": false
+  },
+  "runtimeObservation": {
+    "host": "coordinator-run Node process, not a fresh AI host",
+    "prepare": {
+      "status": "PREPARED",
+      "decisionSha256": "ffebba973ca4bf511ca3cc9367aed6ca9e0a2112f62bf1f6f1d50aed6ad2f239",
+      "observedFactIds": ["audience-input", "decision-output", "document-id", "draft-input"],
+      "packetUsesDomainAnswerContract": true,
+      "packetContainsCardId": false,
+      "answerSkeletonKeys": ["documentId", "issues", "schemaVersion", "summary", "unknowns", "verdict"]
+    },
+    "invalidAnswer": {
+      "code": "ANSWER_INVALID",
+      "nextAction": "Correct only answer.json in the same exchange.",
+      "outputBeforeAndAfterSha256": "d38499aeae089705695bd67b52817674bb8ce1bdc8297488b22a7a3e74b65d31",
+      "noWrite": true
+    },
+    "validRecord": {
+      "status": "APPLIED",
+      "output": "review/decisions.md",
+      "bytes": 614,
+      "sha256": "3f4f0ec12c4c8572acbb091bdf7f12a18f9986ce58b2e0c25744957ed88929e5",
+      "effectAuthority": "observed file-reread",
+      "humanPrefixPreserved": true,
+      "draftInputUnchangedSha256": "d21f39c5baf55a5dbcf268d28bd4334b06e817496ddc2a23096f02dda68ac6a2",
+      "audienceInputUnchangedSha256": "f6b8b638b09666e42e147bd81f499d9f7401dc0664b76eff757e47cb40d067cf"
+    },
+    "idempotentRetry": {
+      "status": "APPLIED_ALREADY",
+      "effect": "none",
+      "currentSha256": "3f4f0ec12c4c8572acbb091bdf7f12a18f9986ce58b2e0c25744957ed88929e5"
+    }
+  },
+  "claims": {
+    "proven": [
+      "The platform core no longer names card, cardId, brief, or verification semantics; stage remains only a generic temporary filesystem variable.",
+      "One non-Devflow package declared and built a standalone target with an exact source graph, domain observer, domain renderer, domain answer contract, and declared input/output without a second core change.",
+      "The named machine run observed PREPARED, generic ANSWER_INVALID with no output write, APPLIED with reread authority and preserved human prefix, and APPLIED_ALREADY with no effect."
+    ],
+    "failed": [
+      "The initial frozen M7 dependency check failed before extraction because the core prepare packet hardcoded cardId and the Verify answer shape."
+    ],
+    "unproven": [
+      "Fresh Codex or Claude discovery, semantic judgment, answer authoring, and actual editorial quality",
+      "Other fixtures, error scenes, renderers, domains, hosts, models, versions, or repeated use",
+      "Production adoption of prepare, observer, packet, or fallback; this M7 target is bounded generalization evidence, not a reversal of the M4/M5 renderer-only product decision",
+      "Remote install, release identity, latest cutover, or any M8 outcome"
+    ]
+  },
+  "nextAction": "Close M7 at the named machine-generalization boundary. Before M8, perform the frozen fresh audit and obtain the user approvals for each release, identity, publish, global replacement, and archive action; do not infer them from this receipt."
+}

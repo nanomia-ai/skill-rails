@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "m5-framework-lanes-v1",
+  "lane": "L0",
+  "task": "recovery",
+  "host": "codex",
+  "seed": 1,
+  "projectRoot": "C:\\Users\\joinj\\AppData\\Local\\Temp\\skill-rails-m5-l0-recovery-codex-seed1-TvTY48",
+  "startedAt": "2026-09-13T14:28:28.140Z",
+  "command": [
+    "codex",
+    "exec",
+    "--skip-git-repo-check",
+    "--ephemeral",
+    "--ignore-user-config",
+    "--approve-for-me",
+    "--sandbox",
+    "workspace-write",
+    "--json",
+    "--model",
+    "gpt-5.6-sol",
+    "--config",
+    "model_reasoning_effort=high",
+    "-"
+  ],
+  "hostResult": {
+    "exitCode": 2,
+    "signal": null,
+    "wallClockMs": 60
+  },
+  "transcript": {
+    "stdoutPath": "evals/m5/results/framework/raw/l0-recovery-codex-seed1.stdout.jsonl",
+    "stdoutBytes": 0,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrPath": "evals/m5/results/framework/raw/l0-recovery-codex-seed1.stderr.txt",
+    "stderrBytes": 245,
+    "stderrSha256": "d36606cdaa9070c8f34eaf8c1108e425756376a1da1f8f16f08d85b180671d21"
+  },
+  "changes": [],
+  "machineChecks": [
+    {
+      "name": "authoring-current",
+      "exitCode": 1,
+      "wallClockMs": 107,
+      "stdout": "{\"schemaVersion\":1,\"status\":\"ERROR\",\"code\":\"GENERATED_ARTIFACT_MODIFIED\",\"message\":\"SKILL.md differs from the receipt.\",\"nextAction\":\"Rebuild the target from canonical source; do not merge generated edits.\",\"details\":{\"path\":\"SKILL.md\",\"expected\":\"4fbd66479d876f924ec96bdba6037c530f8f19673f08f92cdb1c22fe33cbfe6e\",\"actual\":\"d6ab3070b31b1cc9f458451046883606f6a492ab4e6abb9811579d3b31f5ee10\"}}\n",
+      "stderr": ""
+    },
+    {
+      "name": "authoring-intact",
+      "exitCode": 1,
+      "wallClockMs": 99,
+      "stdout": "{\"schemaVersion\":1,\"status\":\"ERROR\",\"code\":\"GENERATED_ARTIFACT_MODIFIED\",\"message\":\"SKILL.md differs from the receipt.\",\"nextAction\":\"Rebuild the target from canonical source; do not merge generated edits.\",\"details\":{\"path\":\"SKILL.md\",\"expected\":\"4fbd66479d876f924ec96bdba6037c530f8f19673f08f92cdb1c22fe33cbfe6e\",\"actual\":\"d6ab3070b31b1cc9f458451046883606f6a492ab4e6abb9811579d3b31f5ee10\"}}\n",
+      "stderr": ""
+    }
+  ],
+  "metrics": {
+    "acceptance": "machine-fail",
+    "safetyViolations": null,
+    "criticalOmissions": null,
+    "purposeScopeOwnerRealignments": null,
+    "unsupportedRulesChecksExceptions": null,
+    "rework": null,
+    "fixedReadBytes": 3810,
+    "conditionalReadBytes": null,
+    "toolCalls": 0,
+    "inputTokens": null,
+    "outputTokens": null,
+    "userRoundtrips": 0,
+    "wallClockMs": 60,
+    "machineRuntimeMs": 206,
+    "routingErrors": null,
+    "fallbacks": 0,
+    "indexMaintenanceCost": 0,
+    "afterMachineCheckChangeCount": 0
+  },
+  "interpretation": null,
+  "claimPolicy": "Machine checks establish delivery or structural safety only. Framework benefit, semantic quality, fresh behavior, and actual effect remain unproven until transcript and changed artifacts are independently reviewed."
+}

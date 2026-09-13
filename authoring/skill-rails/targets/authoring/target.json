@@ -1,7 +1,9 @@
 {
   "schemaVersion": 1,
-  "targetId": "skill-rails-next",
+  "targetId": "skill-rails",
   "mode": "prose",
   "entry": "../../SKILL.source.md",
-  "imports": []
+  "imports": ["universalFrameworkOriginal"],
+  "headingIndex": "universalFrameworkOriginal",
+  "embeddedCoreTooling": "authoring-cli-v1"
 }

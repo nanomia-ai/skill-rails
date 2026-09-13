@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "targetId": "devflow-work-pressure-next",
+  "mode": "prose",
+  "entry": "entry.md",
+  "imports": [
+    "workEntrySource",
+    "commonPrinciples",
+    "statePredicates"
+  ]
+}

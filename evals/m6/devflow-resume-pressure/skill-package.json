@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "packageId": "devflow-resume-pressure",
+  "packageVersion": "0.0.1",
+  "modules": {
+    "resumeEntrySource": "modules/resume-entry-source.md",
+    "productEntrySource": "modules/product-entry-source.md",
+    "workEntrySource": "modules/work-entry-source.md",
+    "commonPrinciples": "modules/common-principles.md",
+    "planningEvidence": "modules/planning-evidence.md",
+    "statePredicates": "modules/state-predicates.md",
+    "verificationPredicates": "modules/verification-predicates.md",
+    "baselinePredicates": "modules/baseline-predicates.md"
+  },
+  "targets": {
+    "product-pressure-next": "targets/product/target.json",
+    "resume-pressure-next": "targets/resume/target.json",
+    "work-pressure-next": "targets/work/target.json"
+  }
+}

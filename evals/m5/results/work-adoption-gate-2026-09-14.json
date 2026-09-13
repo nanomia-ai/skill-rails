@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 1,
+  "gate": "m5-work-adoption",
+  "recordedAt": "2026-09-14",
+  "status": "PASSED_TARGET_WITH_BOUNDED_TWO_MODEL_OBSERVATION_AND_PROCESS_LIMITS",
+  "decision": "Adopt the prose-only Work target for this pilot because the user-authorized Codex Sol medium primary observation and Claude Opus medium comparison both completed the installed-skill implementation, exact test, reread, and progress effect. Preserve the author command-discipline failure, Codex setup command failures, and the untested concurrent-writer path; do not generalize this result to Verify or Resume.",
+  "fixedBoundary": {
+    "semanticRuns": 4,
+    "allowedRuns": [
+      "one fresh Codex author",
+      "one preliminary Claude Fable unfamiliar consumer that predated the model-allocation correction",
+      "one user-authorized Codex Sol medium primary consumer",
+      "one user-authorized Claude Opus medium comparison consumer"
+    ],
+    "consumerRunsStarted": 3,
+    "retryPolicy": "The Sol/Opus pair was a user-authorized practical model correction, not a semantic retry. No additional Work author, consumer, evaluator, or repair run is allowed.",
+    "prohibitedGrowth": [
+      "additional verifier or counterexample agent",
+      "additional cell",
+      "new protocol, receipt schema, or harness",
+      "new product core or durable workflow state",
+      "renderer or record-only machinery without an observed prose failure"
+    ]
+  },
+  "candidate": {
+    "targetId": "natural-language-pilot-work-next",
+    "mode": "prose",
+    "canonicalFiles": [
+      "domains/natural-language-pilot/skill-package.json",
+      "domains/natural-language-pilot/targets/work/target.json",
+      "domains/natural-language-pilot/targets/work/entry.md"
+    ],
+    "fixtureFiles": [
+      "fixtures/work-v1/project/pilot/brief.md",
+      "fixtures/work-v1/project/pilot/plan.md",
+      "fixtures/work-v1/project/package.json",
+      "fixtures/work-v1/project/test/run.mjs"
+    ],
+    "generatedTreeSha256": "3d9022408aa74d95a642a2be032964ab765fe76ad347a22b26a3cb50179824de",
+    "doubleBuildMatched": true,
+    "artifactIntact": true,
+    "sourceCurrent": true,
+    "mechanisms": {
+      "observer": false,
+      "packet": false,
+      "prepare": false,
+      "fallback": false,
+      "renderer": false,
+      "durableSemanticState": false
+    }
+  },
+  "runs": [
+    {
+      "role": "author",
+      "host": "Codex",
+      "model": "gpt-5.6-sol",
+      "effort": "high",
+      "taskId": "task_2b069b7edf10",
+      "dispatchId": "ctx_16dc78d07a58",
+      "taskDelivery": "accepted",
+      "hostOutcome": "succeeded-with-command-discipline-failure",
+      "observedEffect": {
+        "filesModified": [
+          "domains/natural-language-pilot/skill-package.json",
+          "domains/natural-language-pilot/targets/work/target.json",
+          "domains/natural-language-pilot/targets/work/entry.md",
+          "fixtures/work-v1/project/pilot/brief.md",
+          "fixtures/work-v1/project/pilot/plan.md",
+          "fixtures/work-v1/project/package.json",
+          "fixtures/work-v1/project/test/run.mjs"
+        ],
+        "standaloneBuild": "BUILT",
+        "artifactIntact": true,
+        "sourceCurrent": true
+      },
+      "failures": [
+        "The author repeatedly bundled independent shell commands and used semicolon-separated PowerShell despite the repository and task command discipline; a coordinator correction was sent, but the worker completed without demonstrating corrected command behavior.",
+        "The author broadened read-only searches after expected Product/Direct output fixtures were not stored under their source fixture paths; no unintended repository write resulted."
+      ]
+    },
+    {
+      "role": "unfamiliar-consumer",
+      "evidenceRole": "preliminary-misallocated-model-observation",
+      "host": "Claude Code 2.1.270",
+      "model": "claude-fable-5-1",
+      "effort": "high",
+      "sessionId": "4e246e85-f37e-49ca-9178-db60130db568",
+      "rawTask": "Implement the bookmark-storage card from pilot/plan.md and record progress.",
+      "hostCommandBoundary": {
+        "interactive": false,
+        "permissionMode": "bypassPermissions",
+        "permissionPrompts": "none",
+        "trustDialog": "skipped by documented --print behavior",
+        "codexYoloApplied": false
+      },
+      "taskDelivery": "accepted",
+      "hostOutcome": "succeeded",
+      "hostDurationMs": 34206,
+      "apiTimeMs": 22810,
+      "toolCalls": 4,
+      "readBytes": 6340,
+      "readByteBasis": {
+        "generatedEntry": 3617,
+        "initialProjectInputs": 1709,
+        "sourceReread": 618,
+        "progressReread": 396
+      },
+      "costUsd": 0.47886325,
+      "usage": {
+        "inputTokens": 100,
+        "cacheCreationInputTokens": 18249,
+        "cacheReadInputTokens": 140817,
+        "outputTokens": 1534,
+        "thinkingTokens": 126
+      },
+      "fixtureRoot": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m5-work-consumer-yyvNBG",
+      "installedSkillPath": ".claude/skills/natural-language-pilot-work-next",
+      "installedTreeSha256": "3d9022408aa74d95a642a2be032964ab765fe76ad347a22b26a3cb50179824de",
+      "observedBehavior": {
+        "installedSkillDiscovered": true,
+        "entryRead": true,
+        "progressAbsenceChecked": true,
+        "sourceAbsenceChecked": true,
+        "allFourDeclaredInputsRead": true,
+        "sourceExclusiveCreateUsed": true,
+        "exactTestCommandRunOnce": true,
+        "sourceReread": true,
+        "progressExclusiveCreateUsed": true,
+        "progressReread": true,
+        "observerUsed": false,
+        "packetUsed": false,
+        "prepareUsed": false,
+        "fallbackUsed": false
+      },
+      "observedEffect": {
+        "sourceExistsAfterRun": true,
+        "sourceBytes": 618,
+        "sourceSha256": "dfc6cd0f00ea8f1c055cdce462a91d41385abfa62a82bea024d41a6c82e88dfe",
+        "testCommand": "npm test -- bookmark-storage",
+        "testExitCode": 0,
+        "testsPassed": 1,
+        "progressExistsAfterRun": true,
+        "progressBytes": 396,
+        "progressSha256": "30c4232a628c8c39e8fafc5cb8057a442f48185013b9f5877a70888bb1b2de94",
+        "cardIdExact": true,
+        "statusImplemented": true,
+        "processLocalNonProductionBoundaryExplicit": true,
+        "storageLocationUnknown": true,
+        "retentionPeriodUnknown": true,
+        "importSupportUnknown": true,
+        "unchangedInputHashes": true,
+        "changedProjectFiles": [
+          "src/bookmark-storage.mjs",
+          "pilot/progress.md"
+        ],
+        "effectAuthority": "The host reported command output; the coordinator independently reread source, progress, input bytes, hashes, and the installed tree after completion."
+      },
+      "rawEvidence": "evals/m5/results/raw/claude-work-adoption-captured.json"
+    },
+    {
+      "role": "unfamiliar-consumer-primary",
+      "host": "Codex CLI 0.148.0",
+      "model": "gpt-5.6-sol",
+      "effort": "medium",
+      "rawTask": "Implement the bookmark-storage card from pilot/plan.md and record progress.",
+      "hostCommandBoundary": {
+        "interactive": false,
+        "permissionMode": "dangerously-bypass-approvals-and-sandbox",
+        "sessionPersistence": false
+      },
+      "taskDelivery": "accepted",
+      "hostOutcome": "succeeded-with-setup-command-failures",
+      "hostDurationMs": "unknown",
+      "toolCalls": "unknown",
+      "readBytes": 6202,
+      "readByteBasis": {
+        "generatedEntry": 3617,
+        "initialProjectInputs": 1709,
+        "sourceReread": 462,
+        "progressReread": 414
+      },
+      "costUsd": "unknown",
+      "usage": {
+        "inputTokens": 274828,
+        "cachedInputTokens": 256768,
+        "outputTokens": 2776,
+        "reasoningOutputTokens": 971
+      },
+      "fixtureRoot": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m5-work-sol-0Vbr3z",
+      "installedSkillPath": ".agents/skills/natural-language-pilot-work-next",
+      "installedTreeSha256": "3d9022408aa74d95a642a2be032964ab765fe76ad347a22b26a3cb50179824de",
+      "observedBehavior": {
+        "installedSkillDiscovered": true,
+        "entryRead": true,
+        "progressAbsenceChecked": true,
+        "sourceAbsenceChecked": true,
+        "allFourDeclaredInputsRead": true,
+        "sourceCreateUsed": "Codex file_change add after immediate absence check",
+        "exactTestCommandRunOnce": true,
+        "sourceReread": true,
+        "progressCreateUsed": "Codex file_change add after initial absence check",
+        "progressReread": true,
+        "observerUsed": false,
+        "packetUsed": false,
+        "prepareUsed": false,
+        "fallbackUsed": false
+      },
+      "observedEffect": {
+        "sourceExistsAfterRun": true,
+        "sourceBytes": 462,
+        "sourceSha256": "cd22b4ef22a5380a1b9e82188e42353d8ff9b043ba839ca007ec88df56bedc86",
+        "testCommand": "npm test -- bookmark-storage",
+        "testExitCode": 0,
+        "testsPassed": 1,
+        "progressExistsAfterRun": true,
+        "progressBytes": 414,
+        "progressSha256": "1dcc153b9ae934394a63b469f104a6cab7ce4475321be24352adb348c0a90ea3",
+        "cardIdExact": true,
+        "statusImplemented": true,
+        "processLocalNonProductionBoundaryExplicit": true,
+        "storageLocationUnknown": true,
+        "retentionPeriodUnknown": true,
+        "importSupportUnknown": true,
+        "unchangedInputHashes": true,
+        "changedProjectFiles": [
+          "src/bookmark-storage.mjs",
+          "pilot/progress.md"
+        ],
+        "effectAuthority": "The host reported command output; the coordinator independently reread source, progress, input hashes, project file set, and installed tree after completion."
+      },
+      "failures": [
+        "The host attempted one incorrect RTK instruction path and two malformed PowerShell read commands before completing the required input reads."
+      ],
+      "limits": [
+        "The normal-path no-clobber effect was observed, but no concurrent writer was injected; atomic race behavior remains unproven.",
+        "Wall time and complete tool-call count were absent from the retained terminal tail and remain unknown."
+      ],
+      "rawEvidence": "evals/m5/results/raw/codex-sol-work-adoption-captured.json"
+    },
+    {
+      "role": "unfamiliar-consumer-comparison",
+      "host": "Claude Code 2.1.270",
+      "model": "claude-opus-5",
+      "effort": "medium",
+      "sessionId": "c726f93c-72ee-422b-9bfa-2e658e9e9f68",
+      "rawTask": "Implement the bookmark-storage card from pilot/plan.md and record progress.",
+      "hostCommandBoundary": {
+        "interactive": false,
+        "permissionMode": "bypassPermissions",
+        "permissionPrompts": "none",
+        "trustDialog": "skipped by documented --print behavior",
+        "codexYoloApplied": false
+      },
+      "taskDelivery": "accepted",
+      "hostOutcome": "succeeded",
+      "hostDurationMs": 37931,
+      "apiTimeMs": 23525,
+      "toolCalls": 4,
+      "readBytes": 6302,
+      "readByteBasis": {
+        "generatedEntry": 3617,
+        "initialProjectInputs": 1709,
+        "sourceReread": 580,
+        "progressReread": 396
+      },
+      "costUsd": 0.28867300000000007,
+      "usage": {
+        "inputTokens": 132,
+        "cacheCreationInputTokens": 16325,
+        "cacheReadInputTokens": 164518,
+        "outputTokens": 1661,
+        "thinkingTokens": 202
+      },
+      "fixtureRoot": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m5-work-opus-P3DG9E",
+      "installedSkillPath": ".claude/skills/natural-language-pilot-work-next",
+      "installedTreeSha256": "3d9022408aa74d95a642a2be032964ab765fe76ad347a22b26a3cb50179824de",
+      "observedBehavior": {
+        "installedSkillDiscovered": true,
+        "entryRead": true,
+        "progressAbsenceChecked": true,
+        "sourceAbsenceChecked": true,
+        "allFourDeclaredInputsRead": true,
+        "sourceExclusiveCreateUsed": true,
+        "exactTestCommandRunOnce": true,
+        "sourceReread": true,
+        "progressExclusiveCreateUsed": true,
+        "progressReread": true,
+        "observerUsed": false,
+        "packetUsed": false,
+        "prepareUsed": false,
+        "fallbackUsed": false
+      },
+      "observedEffect": {
+        "sourceExistsAfterRun": true,
+        "sourceBytes": 580,
+        "sourceSha256": "0f102f45f8169f0eb18308f7d1dd52b5ce3f7ead92050a2d757ce367641f9c54",
+        "testCommand": "npm test -- bookmark-storage",
+        "testExitCode": 0,
+        "testsPassed": 1,
+        "progressExistsAfterRun": true,
+        "progressBytes": 396,
+        "progressSha256": "30c4232a628c8c39e8fafc5cb8057a442f48185013b9f5877a70888bb1b2de94",
+        "cardIdExact": true,
+        "statusImplemented": true,
+        "processLocalNonProductionBoundaryExplicit": true,
+        "storageLocationUnknown": true,
+        "retentionPeriodUnknown": true,
+        "importSupportUnknown": true,
+        "unchangedInputHashes": true,
+        "changedProjectFiles": [
+          "src/bookmark-storage.mjs",
+          "pilot/progress.md"
+        ],
+        "effectAuthority": "The host reported command output; the coordinator independently reread source, progress, input hashes, project file set, and installed tree after completion."
+      },
+      "rawEvidence": "evals/m5/results/raw/claude-opus-work-adoption-captured.json"
+    }
+  ],
+  "claims": {
+    "proven": [
+      "The prose-only Work candidate double-builds deterministically and was source-current and artifact-intact before and after the host run.",
+      "The user-authorized Codex Sol medium primary consumer and Claude Opus medium comparison consumer each discovered the same installed Work skill, read the four fixed project inputs, created a dependency-free process-local implementation, ran the exact project test once with exit 0, reread the source, and created and reread progress.",
+      "Both independently reread effects changed only source and progress, preserved the fixed input hashes, recorded the exact card and passing command, and left production storage location, retention, and import support unknown.",
+      "The Claude Opus observation used explicit OS-level exclusive creation for both outputs; the Codex observation used add-only file changes after absence checks and produced the intended normal-path no-clobber effect."
+    ],
+    "failed": [
+      "The fresh Codex author did not follow the one-command-per-exec and no-semicolon repository discipline.",
+      "The Codex Sol consumer incurred one incorrect instruction-path read and two PowerShell quoting failures before completing the intended flow.",
+      "Claude Fable high was used as a routine consumer before the user corrected model allocation; that run is retained as preliminary evidence but is not the adoption baseline."
+    ],
+    "unproven": [
+      "repeatability beyond the bounded observations",
+      "pre-existing-progress no-write behavior in a fresh host observation",
+      "interrupted pre-existing-source recovery in a fresh host observation",
+      "concurrent-writer race behavior for Codex file_change add and stale progress replacement behavior beyond observed normal-path no-clobber",
+      "Work behavior on another fixture, model, or version beyond the named Sol and Opus runs",
+      "Skill Rails authority over source code effects; source edits remain ordinary host effects",
+      "adoption of Verify, Resume, or any other stage"
+    ]
+  },
+  "nextAction": "Run the existing Verify target as its own adoption gate on this exact chain project. Do not create Resume before Verify closes."
+}

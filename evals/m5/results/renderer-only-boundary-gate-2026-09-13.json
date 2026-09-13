@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "status": "renderer-only-boundary-gate-passed",
+  "scope": "One fixed normal fixture on each supported host; no Framework lane or Product target is included.",
+  "source": {
+    "package": "domains/natural-language-pilot/skill-package.json",
+    "targetId": "natural-language-pilot-verify-next",
+    "mode": "record-only",
+    "skillTreeSha256": "cf9ad62da45c925f12c63142dcf45d7603a1c591b020379c3739af6909c829cf",
+    "artifacts": 14,
+    "artifactBytesExcludingReceipt": 42059,
+    "runtimeAndContractFiles": 8,
+    "runtimeAndContractBytes": 31809
+  },
+  "installation": {
+    "commandKind": "skills@latest global copy install for Codex and Claude Code",
+    "installerReportedHash": "b33dc9d53cecf5eb53634a4a30d0b9e4fd0011183be254a91bd25d588cd7cc04",
+    "codexCheck": "ARTIFACT_INTACT",
+    "claudeCodeCheck": "ARTIFACT_INTACT",
+    "codeHomeChanged": false,
+    "existingSkillRails": {
+      "path": "C:/Users/joinj/.agents/skills/skill-rails",
+      "filesBefore": 63,
+      "filesAfter": 63,
+      "beforeAndAfterRawPathPlusContentSha256": "367dc53fad3c5b35e23dbbe5fab294663f31072778891ec6b93165efe1b588ea",
+      "note": "This task-local before/after algorithm hashes sorted Windows relative-path bytes followed by raw file bytes. The established M0-M4 invariant remains the separately recorded 0deda167... value under its original algorithm."
+    }
+  },
+  "declaredReadSurface": {
+    "entryBytes": 2051,
+    "initialDeclaredInputBytes": 597,
+    "domainConfigBytes": 174,
+    "answerContractBytes": 1800,
+    "initialAnswerScratchBytes": 101,
+    "totalBytes": 4723,
+    "estimatedTokensAtFourBytesPerToken": 1181,
+    "packetBytes": 0,
+    "observerCalls": 0,
+    "decisionFiles": 0,
+    "fallbackBytes": 0
+  },
+  "runs": [
+    {
+      "runId": "codex-record-only-normal",
+      "host": {
+        "adapter": "codex",
+        "cliVersion": "0.148.0",
+        "model": "gpt-5.6-sol",
+        "effort": "high",
+        "permission": "approve-for-me/workspace-write",
+        "freshContext": true
+      },
+      "result": {
+        "acceptance": true,
+        "verdict": "pass",
+        "recordStatus": "APPLIED",
+        "effectAuthority": "observed",
+        "outputSha256": "3eccbd3d364c144f0137463ea9d6463b649b9caed80ad525baabf294bfb449bc",
+        "outsideMarkerPrefixPreserved": true,
+        "prepareUsed": false,
+        "fallbackUsed": false
+      },
+      "cost": {
+        "wallClockMs": 121139,
+        "inputTokens": 234580,
+        "cachedInputTokens": 206976,
+        "outputTokens": 3063,
+        "reasoningTokens": 1285,
+        "toolCalls": 13,
+        "stdoutBytes": 20969,
+        "stderrBytes": 39,
+        "userRoundTrips": 0,
+        "usd": null
+      },
+      "rawCapture": "evals/m5/results/raw/codex-record-only-normal-captured.json",
+      "unknowns": [
+        "Exact USD cost was not reported by Codex CLI.",
+        "The standard host loaded the user's ordinary configuration, so this is not an isolated causal cost estimate."
+      ]
+    },
+    {
+      "runId": "claude-record-only-normal",
+      "host": {
+        "adapter": "claude-code",
+        "cliVersion": "2.1.270",
+        "model": "claude-fable-5-1",
+        "effort": "high",
+        "permission": "auto/no-prompt",
+        "freshContext": true
+      },
+      "result": {
+        "acceptance": true,
+        "verdict": "pass",
+        "recordStatus": "APPLIED",
+        "effectAuthority": "observed",
+        "outputSha256": "cb500296245b5b219644c59ef0860d31900fe2c3af58cb53ddc446593eceb2b5",
+        "outsideMarkerPrefixPreserved": true,
+        "prepareUsed": false,
+        "fallbackUsed": false
+      },
+      "cost": {
+        "wallClockMs": 63408,
+        "apiDurationMs": 42961,
+        "inputTokens": 132,
+        "cacheCreationInputTokens": 18960,
+        "cacheReadInputTokens": 173383,
+        "outputTokens": 1892,
+        "thinkingTokens": 228,
+        "toolCalls": 5,
+        "stdoutBytes": 39718,
+        "stderrBytes": 0,
+        "userRoundTrips": 0,
+        "usd": 0.51947175
+      },
+      "rawCapture": "evals/m5/results/raw/claude-record-only-normal-captured.json",
+      "unknowns": [
+        "The standard host loaded the user's ordinary hooks and plugins, so this is not an isolated causal cost estimate.",
+        "Claude grouped answer writing and record invocation in one shell call; no response-loss was injected in this normal scene."
+      ]
+    }
+  ],
+  "machineEvidence": {
+    "tests": "38/38 pass",
+    "proves": [
+      "Deterministic standalone record-only delivery and an exact check/initialize/record public surface",
+      "Closed source, target, answer, exchange, basis, identity and path checks",
+      "Normal apply, APPLIED_ALREADY, stale/conflict/lock/marker/renderer/non-UTF8/reread no-silent-loss behavior",
+      "Preservation of bytes outside the managed region and of another card",
+      "Prepare-record runtime compatibility remains reproducible from an explicit M4 evidence fixture"
+    ],
+    "doesNotProve": [
+      "Fresh AI behavior on any scene other than the two captured normal runs",
+      "Host effects not observed by the recorder reread",
+      "Statistical cost improvement or prose-baseline superiority",
+      "Framework lane or Product-target adoption"
+    ]
+  },
+  "comparison": {
+    "m4PrepareRecordNormal": "M4 normal treatment used an eight-block packet and observer/decision/fallback surface. Codex used 16 tools, 285182 input tokens, and 90700 ms; Claude used 7 tools, USD 0.63906025, and 80369 ms.",
+    "narrowDecision": "The minimum boundary is materially renderer-only: neither host used an observer, packet, decision hash, fallback, or prepare command, and both produced a canonical record with reread-observed effect. Tool count and Claude cost fell relative to the M4 normal treatment, while Codex wall time rose; therefore the gate supports proceeding to the Framework experiment but does not prove a general cost win or that this flow is cheaper than prose."
+  },
+  "unknowns": [
+    "Response-loss recovery is specified in the canonical entry and machine-tested through idempotent record, but this gate did not inject response loss into both hosts.",
+    "All non-normal record safety branches are machine evidence or retained M4 evidence, not fresh M5 host runs.",
+    "The two runs used byte-identical fixture inputs and the same operational request, but their raw prompt wording was not byte-identical; no cross-host causal cost comparison is claimed.",
+    "No L0/L1/L2 Framework behavior, unfamiliar authoring AI, or Product target is proven yet."
+  ]
+}

@@ -16,11 +16,11 @@ test("repository exposes exactly one active generated skill and no active legacy
   const discovered = spawnSync("rg", ["--files", "skills", "-g", "SKILL.md"], { cwd: repositoryRoot, encoding: "utf8" });
   assert.equal(discovered.status, 0, discovered.stderr);
   assert.deepEqual(discovered.stdout.trim().replaceAll("\\", "/").split(/\r?\n/u), ["skills/skill-rails/SKILL.md"]);
-  assert.match(await readFile(resolve(repositoryRoot, "skills/skill-rails/SKILL.md"), "utf8"), /^name: skill-rails-next$/m);
+  assert.match(await readFile(resolve(repositoryRoot, "skills/skill-rails/SKILL.md"), "utf8"), /^name: skill-rails$/m);
 });
 
 test("authoring generated target is source-current and npm payload excludes implementation roots", async (t) => {
-  const checked = coreCli("check", "--source", "authoring-package.json", "--target", "skill-rails-next", "--out", "skills/skill-rails");
+  const checked = coreCli("check", "--source", "authoring-package.json", "--target", "skill-rails", "--out", "skills/skill-rails");
   assert.equal(checked.status, 0, checked.stdout);
   assert.equal(checked.json.sourceCurrent, true);
   const cache = await temporary(t, "npm-cache");

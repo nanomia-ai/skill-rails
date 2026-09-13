@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-rails-next/framework-evaluation-receipt/2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "protocolId", "fixtureRevision", "cellId", "lane", "task", "host", "seed", "projectRoot", "startedAt", "protocolSha256", "workspace", "hostIdentity", "command", "hostResult", "transcript", "usageRaw", "cost", "tokens", "reads", "index", "artifactMaintenance", "tools", "execution", "changes", "machineChecks", "validity", "delivery", "linkedEvaluation", "claimPolicy"],
+  "properties": {
+    "schemaVersion": {"const": 2},
+    "protocolId": {"const": "m5-framework-lanes-v2"},
+    "fixtureRevision": {"type": "integer", "minimum": 1},
+    "cellId": {"type": "string", "pattern": "^l[0-2]-(product|bounded|recovery)-(codex|claude)(-r[0-9]+)?-seed[0-9]+$"},
+    "lane": {"enum": ["L0", "L1", "L2"]},
+    "task": {"enum": ["product", "bounded", "recovery"]},
+    "host": {"enum": ["codex", "claude"]},
+    "seed": {"type": "integer", "minimum": 1},
+    "projectRoot": {"type": "string", "minLength": 1},
+    "startedAt": {"type": "string", "minLength": 1},
+    "protocolSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["copiedEntries", "excludedEntries", "preconditions", "treeSha256Before"],
+      "properties": {
+        "copiedEntries": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "excludedEntries": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "preconditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "ok", "evidence"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "ok": {"type": "boolean"},
+              "evidence": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "treeSha256Before": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "hostIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "model", "version", "effort", "permission", "freshness"],
+      "properties": {
+        "name": {"enum": ["codex", "claude"]},
+        "model": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "effort": {"type": "string", "minLength": 1},
+        "permission": {"type": "string", "minLength": 1},
+        "freshness": {"type": "string", "minLength": 1}
+      }
+    },
+    "command": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "hostResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exitCode", "signal", "wallClockMs"],
+      "properties": {
+        "exitCode": {"oneOf": [{"type": "integer"}, {"type": "null"}]},
+        "signal": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "wallClockMs": {"type": "integer", "minimum": 0}
+      }
+    },
+    "transcript": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stdoutPath", "stdoutBytes", "stdoutSha256", "stderrPath", "stderrBytes", "stderrSha256"],
+      "properties": {
+        "stdoutPath": {"type": "string", "minLength": 1},
+        "stdoutBytes": {"type": "integer", "minimum": 0},
+        "stdoutSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "stderrPath": {"type": "string", "minLength": 1},
+        "stderrBytes": {"type": "integer", "minimum": 0},
+        "stderrSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "usageRaw": {"oneOf": [{"type": "object"}, {"type": "null"}]},
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claudeTotalCostUsd"],
+      "properties": {"claudeTotalCostUsd": {"oneOf": [{"type": "number", "minimum": 0}, {"type": "null"}]}}
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claude", "codex", "billedInputTokens", "comparabilityScope"],
+      "properties": {
+        "claude": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["uncachedInput", "cacheCreate", "cacheRead", "output", "thinking"],
+              "properties": {
+                "uncachedInput": {"type": "integer", "minimum": 0},
+                "cacheCreate": {"type": "integer", "minimum": 0},
+                "cacheRead": {"type": "integer", "minimum": 0},
+                "output": {"type": "integer", "minimum": 0},
+                "thinking": {"type": "integer", "minimum": 0}
+              }
+            }
+          ]
+        },
+        "codex": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["inputTotal", "cachedInput", "output", "reasoning"],
+              "properties": {
+                "inputTotal": {"type": "integer", "minimum": 0},
+                "cachedInput": {"type": "integer", "minimum": 0},
+                "output": {"type": "integer", "minimum": 0},
+                "reasoning": {"type": "integer", "minimum": 0}
+              }
+            }
+          ]
+        },
+        "billedInputTokens": {"oneOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]},
+        "comparabilityScope": {"const": "same-host-only"}
+      }
+    },
+    "reads": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["promptBytes", "entryBytes", "taskBytes", "laneMandatedBytes", "fixedReadBytes", "toolResultBytes", "frameworkBytesReadApprox", "conditionalReadBytesApprox", "frameworkReadSourceLeak", "frameworkReads"],
+      "properties": {
+        "promptBytes": {"type": "integer", "minimum": 0},
+        "entryBytes": {"type": "integer", "minimum": 0},
+        "taskBytes": {"type": "integer", "minimum": 0},
+        "laneMandatedBytes": {"type": "integer", "minimum": 0},
+        "fixedReadBytes": {"type": "integer", "minimum": 0},
+        "toolResultBytes": {"type": "integer", "minimum": 0},
+        "frameworkBytesReadApprox": {"type": "integer", "minimum": 0},
+        "conditionalReadBytesApprox": {"type": "integer", "minimum": 0},
+        "frameworkReadSourceLeak": {"type": "boolean"},
+        "frameworkReads": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "primitive", "rangeKind", "returnedBytes"],
+            "properties": {
+              "source": {"enum": ["package-reference", "repository-original"]},
+              "primitive": {"type": "string", "minLength": 1},
+              "rangeKind": {"enum": ["lines", "bytes", "whole", "search", "unknown"]},
+              "returnedBytes": {"type": "integer", "minimum": 0}
+            }
+          }
+        }
+      }
+    },
+    "index": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["present", "bytes", "namedInEntry", "consulted", "returnedBytes", "boundedReadObserved"],
+      "properties": {
+        "present": {"type": "boolean"},
+        "bytes": {"type": "integer", "minimum": 0},
+        "namedInEntry": {"type": "boolean"},
+        "consulted": {"type": "boolean"},
+        "returnedBytes": {"type": "integer", "minimum": 0},
+        "boundedReadObserved": {"enum": ["lines", "bytes", "whole-only", "none", "not-applicable"]}
+      }
+    },
+    "artifactMaintenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["laneBuildMs", "generatedReferenceBytes", "generatedIndexBytes", "currentnessCheckMs", "afterMachineCheckChangeCount", "indexMaintenanceCost"],
+      "properties": {
+        "laneBuildMs": {"type": "integer", "minimum": 0},
+        "generatedReferenceBytes": {"type": "integer", "minimum": 0},
+        "generatedIndexBytes": {"type": "integer", "minimum": 0},
+        "currentnessCheckMs": {"oneOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]},
+        "afterMachineCheckChangeCount": {"type": "integer", "minimum": 0},
+        "indexMaintenanceCost": {"type": "null"}
+      }
+    },
+    "tools": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "byKind", "comparabilityScope"],
+      "properties": {
+        "count": {"type": "integer", "minimum": 0},
+        "byKind": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["read", "search", "shell", "write", "edit", "other"],
+          "properties": {
+            "read": {"type": "integer", "minimum": 0},
+            "search": {"type": "integer", "minimum": 0},
+            "shell": {"type": "integer", "minimum": 0},
+            "write": {"type": "integer", "minimum": 0},
+            "edit": {"type": "integer", "minimum": 0},
+            "other": {"type": "integer", "minimum": 0}
+          }
+        },
+        "comparabilityScope": {"const": "same-host-only"}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["userRoundtrips", "wallClockMs", "preflightRuntimeMs", "machineRuntimeMs", "fallbackToolCalls"],
+      "properties": {
+        "userRoundtrips": {"type": "integer", "minimum": 0},
+        "wallClockMs": {"type": "integer", "minimum": 0},
+        "preflightRuntimeMs": {"type": "integer", "minimum": 0},
+        "machineRuntimeMs": {"type": "integer", "minimum": 0},
+        "fallbackToolCalls": {"type": "integer", "minimum": 0}
+      }
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "before", "after"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "before": {"oneOf": [{"type": "null"}, {"type": "object"}]},
+          "after": {"oneOf": [{"type": "null"}, {"type": "object"}]}
+        }
+      }
+    },
+    "machineChecks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "exitCode", "wallClockMs", "stdout", "stderr"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "exitCode": {"oneOf": [{"type": "integer"}, {"type": "null"}]},
+          "wallClockMs": {"type": "integer", "minimum": 0},
+          "stdout": {"type": "string"},
+          "stderr": {"type": "string"}
+        }
+      }
+    },
+    "validity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {
+        "status": {"enum": ["valid", "harness-defect", "aborted-precondition"]},
+        "reason": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": {"enum": ["pass", "fail", "not-run"]},
+        "evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "linkedEvaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["semanticReviewReceiptPath", "usingAiReceiptPath"],
+      "properties": {
+        "semanticReviewReceiptPath": {"type": "string", "minLength": 1},
+        "usingAiReceiptPath": {"type": "string", "minLength": 1}
+      }
+    },
+    "claimPolicy": {"type": "string", "minLength": 1}
+  }
+}

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { repositoryRoot, runNode, temporary } from "./helpers.mjs";
+import { repositoryRoot, runNode, temporary } from "../../tests/helpers.mjs";
 
 const harness = resolve(repositoryRoot, "src/evaluation/harness.mjs");
 
@@ -76,7 +76,7 @@ test("response-loss proxy swallows exactly one successful record response", asyn
 test("prepare-failure variant is a valid built target with the canonical fallback source", async (t) => {
   const root = await temporary(t, "evaluation-prepare-failure");
   const packageRoot = resolve(root, "package");
-  const built = runNode(["src/evaluation/build-prepare-failure-target.mjs", packageRoot]);
+  const built = runNode(["evals/m4/build-prepare-failure-target.mjs", packageRoot]);
   assert.equal(built.status, 0, built.stderr);
   assert.equal(built.json.status, "BUILT_PREPARE_FAILURE_VARIANT");
   assert.notEqual(built.json.originalObserverSha256, built.json.faultObserverSha256);
@@ -87,6 +87,7 @@ test("prepare-failure variant is a valid built target with the canonical fallbac
   ]);
   assert.equal(checked.status, 0, checked.stderr);
   assert.equal(checked.json.status, "ARTIFACT_INTACT");
+  assert.match(await readFile(resolve(packageRoot, "skills/natural-language-pilot-verify-next/SKILL.md"), "utf8"), /run\.mjs prepare --project/u);
 });
 
 test("capture sanitizer removes unrelated host hook payloads but keeps evidence events", async (t) => {

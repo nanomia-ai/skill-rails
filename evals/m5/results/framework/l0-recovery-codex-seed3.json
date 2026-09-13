@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "m5-framework-lanes-v1",
+  "lane": "L0",
+  "task": "recovery",
+  "host": "codex",
+  "seed": 3,
+  "projectRoot": "C:\\Users\\joinj\\AppData\\Local\\Temp\\skill-rails-m5-l0-recovery-codex-seed3-2KykP9",
+  "startedAt": "2026-09-13T14:30:52.509Z",
+  "command": [
+    "C:\\Users\\joinj\\AppData\\Local\\Volta\\tools\\image\\node\\24.18.0\\node.exe",
+    "C:\\Users\\joinj\\AppData\\Local\\Volta\\tools\\image\\node\\24.18.0\\node_modules\\@openai\\codex\\bin\\codex.js",
+    "exec",
+    "--skip-git-repo-check",
+    "--ephemeral",
+    "--ignore-user-config",
+    "--approve-for-me",
+    "--json",
+    "--model",
+    "gpt-5.6-sol",
+    "--config",
+    "model_reasoning_effort=high",
+    "-"
+  ],
+  "hostResult": {
+    "exitCode": 0,
+    "signal": null,
+    "wallClockMs": 321561
+  },
+  "transcript": {
+    "stdoutPath": "evals/m5/results/framework/raw/l0-recovery-codex-seed3.stdout.jsonl",
+    "stdoutBytes": 88795,
+    "stdoutSha256": "cfb8ca65815dc3cbf1b4115abf401593e4e4fcf0e1a28281e323afbae65aa09e",
+    "stderrPath": "evals/m5/results/framework/raw/l0-recovery-codex-seed3.stderr.txt",
+    "stderrBytes": 0,
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "changes": [
+    {
+      "path": "authoring/skill-rails/SKILL.source.md",
+      "before": {
+        "bytes": 3476,
+        "sha256": "203efd4c3dd19075b845995b835508ac28bdbdd8e30c459dd35bae4eb89c5e19",
+        "utf8": "---\nname: skill-rails-next\ndescription: Create and maintain standalone AI skills from canonical source packages when deterministic build, provenance, bounded inspection, or behavior-versus-effect evidence is required. Do not use archived Skill Rails or Devflow as a template or fallback.\n---\n\n# Skill Rails Next\n\nBuild one standalone skill from a small canonical source graph while leaving genuine meaning judgments with the AI or user.\n\nBefore making an authoring or maintenance judgment, read §0 and §0.1 of `references/universalFrameworkOriginal.md`. Use its routing table and the decision's uncertainty, reach, and reversal cost to choose any additional original sections. The generated `references/universalFrameworkOriginal.index.json` is only a byte-range navigation aid; it does not define meaning or a closed task taxonomy.\n\n## Author one smallest sufficient target\n\n1. Start from the user's purpose, representative failure, preserved wording, prohibitions, evidence, and unknowns. Put domain meaning in one canonical domain source rather than in generated output or runtime state.\n2. Compare `prose-only`, a domain-owned observer or renderer, a core-generic mechanism, and one genuinely independent alternative. Adopt machinery only when the concrete use-and-recovery cost is lower than prose while quality and safety do not regress.\n3. Assign every observation, judgment, format, state coordinate, effect, and evidence claim to exactly one owner: AI meaning, domain code, generic core, host, or user. A structural check does not prove fresh behavior or an external effect.\n4. Declare only exact source modules, target imports, current inputs, output, contract, and mechanism files that the selected target consumes. Unknown fields, undeclared paths, root escapes, and unsupported combinations must fail closed.\n5. Build one standalone target, inspect the generated diff and receipt, double-build for deterministic bytes, and check artifact integrity separately from source currentness. Exercise the smallest fresh unfamiliar-AI flow and reread any claimed effect.\n6. Keep failures and `unproven` evidence. If a proposed fix adds semantic state, routing, fallback, projection, or compatibility machinery, first show the observed repeated cost it removes.\n\n## Work from canonical source\n\n- Change the source package, target, modules, domain adapter, or contract that owns the behavior. Never hand-edit a generated target carrying `.skill-rails-build.json`.\n- Use exact identifiers and paths. Do not infer requirement, check, effect, or causal relationships that the source graph does not declare.\n- Treat missing behavioral or host evidence as `unproven`; build and integrity checks prove delivery only.\n- Do not import archived Skill Rails or Devflow as an implementation baseline, compatibility layer, or runtime fallback.\n\n## Repository operations\n\nIn a Skill Rails Next source repository:\n\n1. Inspect a known node with `node src/core/cli.mjs inspect --source <manifest> --id <exact-id> --json` or the exact `--path` form.\n2. Build all targets with `node src/core/cli.mjs build --source <manifest> --out-root <dist-root>`, or one target with the documented `--target` and `--out` form.\n3. Check artifact integrity separately from source currentness. Neither check establishes fresh-agent behavior or external effect.\n\nThis alpha entry covers the source/build boundary. Runtime adoption and broader authoring guidance remain gated by the recorded pilot evidence.\n"
+      },
+      "after": {
+        "bytes": 3468,
+        "sha256": "110e4cc685ad067f59ccdd77761a46d615779cfb193ff295f20bb4733286a801",
+        "utf8": "---\nname: skill-rails-next\ndescription: Create and maintain standalone AI skills from canonical source packages when deterministic build, provenance, bounded inspection, or behavior-versus-effect evidence is required. Do not use archived Skill Rails or Devflow as a template or fallback.\n---\n\n# Skill Rails Next\n\nBuild one standalone skill from a small canonical source graph while leaving genuine meaning judgments with the AI or user.\n\nBefore making an authoring or maintenance judgment, read §0 and §0.1 of `references/universalFrameworkOriginal.md`. Use its routing table and the decision's uncertainty, reach, and reversal cost to choose any additional original sections. The generated `references/universalFrameworkOriginal.index.json` is only a byte-range navigation aid; it does not define meaning or a closed task taxonomy.\n\n## Author one smallest sufficient target\n\n1. Start from the user's purpose, representative failure, preserved wording, prohibitions, evidence, and unknowns. Put domain meaning in one canonical domain source rather than in generated output or runtime state.\n2. Compare `prose-only`, a domain-owned observer or renderer, a core-generic mechanism, and one genuinely independent alternative. Adopt machinery only when the concrete use-and-recovery cost is lower than prose while quality and safety do not regress.\n3. Assign every observation, judgment, format, state coordinate, effect, and evidence claim to exactly one owner: AI meaning, domain code, generic core, host, or user. A structural check does not prove fresh behavior or an external effect.\n4. Declare only exact source modules, target imports, current inputs, output, contract, and mechanism files that the selected target consumes. Unknown fields, undeclared paths, root escapes, and unsupported combinations must fail closed.\n5. Build one standalone target, inspect the generated diff and receipt, double-build for deterministic bytes, and check artifact integrity separately from source currentness. Exercise the smallest fresh unfamiliar-AI flow and reread any claimed effect.\n6. Keep failures and `unproven` evidence. If a proposed fix adds semantic state, routing, fallback, projection, or compatibility machinery, first show the observed repeated cost it removes.\n\n## Work from canonical source\n\n- Change the source package, target, modules, domain adapter, or contract that owns the behavior. Never hand-edit a generated target carrying `.skill-rails-build.json`.\n- Use exact IDs and paths. Do not infer requirement, check, effect, or causal relationships that the source graph does not declare.\n- Treat missing behavioral or host evidence as `unproven`; build and integrity checks prove delivery only.\n- Do not import archived Skill Rails or Devflow as an implementation baseline, compatibility layer, or runtime fallback.\n\n## Repository operations\n\nIn a Skill Rails Next source repository:\n\n1. Inspect a known node with `node src/core/cli.mjs inspect --source <manifest> --id <exact-id> --json` or the exact `--path` form.\n2. Build all targets with `node src/core/cli.mjs build --source <manifest> --out-root <dist-root>`, or one target with the documented `--target` and `--out` form.\n3. Check artifact integrity separately from source currentness. Neither check establishes fresh-agent behavior or external effect.\n\nThis alpha entry covers the source/build boundary. Runtime adoption and broader authoring guidance remain gated by the recorded pilot evidence.\n"
+      }
+    },
+    {
+      "path": "fixture/author-report.json",
+      "before": null,
+      "after": {
+        "bytes": 3527,
+        "sha256": "e2143165f14597ee2f0f7ff8ebbafd84e433f5e4eb528d1b484d24aadef59d79",
+        "utf8": "{\n  \"schemaVersion\": 1,\n  \"lane\": \"L0\",\n  \"failedLayer\": {\n    \"path\": \"skills/skill-rails/SKILL.md\",\n    \"kind\": \"generated target\",\n    \"evidence\": \"Before recovery, both the artifact-only check and the source-current check failed with GENERATED_ARTIFACT_MODIFIED because SKILL.md differed from its build receipt.\"\n  },\n  \"actualOwner\": {\n    \"path\": \"authoring/skill-rails/SKILL.source.md\",\n    \"kind\": \"canonical authoring entry source\",\n    \"evidence\": \"authoring-package.json selects the authoring target, its target.json declares ../../SKILL.source.md as the entry, and the rebuilt receipt records this path with source id entry.\"\n  },\n  \"frameworkSectionsRead\": [],\n  \"frameworkReadReason\": \"None. The project-local lane-L0 SKILL.md explicitly says not to read or use the Universal Framework in this baseline lane.\",\n  \"checksRun\": [\n    {\n      \"name\": \"canonical owner inspection\",\n      \"command\": \"node src/core/cli.mjs inspect --source authoring-package.json --path authoring/skill-rails/SKILL.source.md --json\",\n      \"outcome\": \"pass\",\n      \"evidence\": \"The source graph resolved target skill-rails-next and artifact SKILL.md from the canonical package.\"\n    },\n    {\n      \"name\": \"pre-rebuild artifact integrity\",\n      \"command\": \"node src/core/cli.mjs check --out skills/skill-rails\",\n      \"outcome\": \"fail-as-expected\",\n      \"evidence\": \"GENERATED_ARTIFACT_MODIFIED; receipt expected SKILL.md sha256 4fbd66479d876f924ec96bdba6037c530f8f19673f08f92cdb1c22fe33cbfe6e but found d6ab3070b31b1cc9f458451046883606f6a492ab4e6abb9811579d3b31f5ee10.\"\n    },\n    {\n      \"name\": \"canonical build\",\n      \"command\": \"node src/core/cli.mjs build --source authoring-package.json --target skill-rails-next --out skills/skill-rails\",\n      \"outcome\": \"pass\",\n      \"evidence\": \"BUILT with treeSha256 ddbaebf7cc2ea8ec1c833cf97a63fc6a355eedf558565428cb9d7bc5143ffd2e.\"\n    },\n    {\n      \"name\": \"deterministic second build\",\n      \"command\": \"node src/core/cli.mjs build --source authoring-package.json --target skill-rails-next --out skills/skill-rails\",\n      \"outcome\": \"pass\",\n      \"evidence\": \"The second build produced the same treeSha256 ddbaebf7cc2ea8ec1c833cf97a63fc6a355eedf558565428cb9d7bc5143ffd2e.\"\n    },\n    {\n      \"name\": \"post-rebuild artifact integrity\",\n      \"command\": \"node src/core/cli.mjs check --out skills/skill-rails\",\n      \"outcome\": \"pass\",\n      \"evidence\": \"status CHECKED, artifactIntact true, sourceCurrent null.\"\n    },\n    {\n      \"name\": \"post-rebuild source currentness\",\n      \"command\": \"node src/core/cli.mjs check --source authoring-package.json --target skill-rails-next --out skills/skill-rails\",\n      \"outcome\": \"pass\",\n      \"evidence\": \"status CHECKED, artifactIntact true, sourceCurrent true.\"\n    },\n    {\n      \"name\": \"requested wording ownership\",\n      \"command\": \"Select-String on canonical source and generated SKILL.md\",\n      \"outcome\": \"pass\",\n      \"evidence\": \"The exact sentence 'Use exact IDs and paths.' appears in authoring/skill-rails/SKILL.source.md and in the rebuilt skills/skill-rails/SKILL.md.\"\n    }\n  ],\n  \"unknowns\": [\n    \"Fresh unfamiliar-agent behavior and any external effect are unproven; the completed checks establish source delivery, deterministic build output, source currentness, and artifact integrity only.\",\n    \"The fixture states that maintainers made the wrong-layer edit twice; prior-run and repository-history content were outside the allowed evidence boundary, so that historical count was not independently verified.\"\n  ]\n}\n"
+      }
+    },
+    {
+      "path": "skills/skill-rails/.skill-rails-build.json",
+      "before": {
+        "bytes": 2457,
+        "sha256": "7ab426b62487bc87a90c79fec1b9388f9dea5b6fe4df27ffd402f567dfd03cae",
+        "utf8": "{\"artifacts\":[{\"path\":\"SKILL.md\",\"sha256\":\"4fbd66479d876f924ec96bdba6037c530f8f19673f08f92cdb1c22fe33cbfe6e\"},{\"path\":\"config/target.json\",\"sha256\":\"c313c7aa97c927d1fa2319a8838562268acff33e2c85bbc139c233e5350c7e22\"},{\"path\":\"contracts/build-receipt.schema.json\",\"sha256\":\"2ecf54ae8be8ca56089067fcda0f3ebf55a9879386d27baf9a59118b3397f849\"},{\"path\":\"references/universalFrameworkOriginal.index.json\",\"sha256\":\"9441a9880a9501a3315dad04397a9aef09c59c2317f4f73f2265978499a7b5ed\"},{\"path\":\"references/universalFrameworkOriginal.md\",\"sha256\":\"17879eb8f94dde7ea0fe14b03258eebf94fd0efb92bb014dae2c902bcc7654d7\"},{\"path\":\"scripts/run.mjs\",\"sha256\":\"9679534ff91d95407c35f99209e22228110260e275a1465decaca290d7102e94\"},{\"path\":\"scripts/runtime/common.mjs\",\"sha256\":\"65402c4a721d10734656b730fc23dca23c950cb1d696484501cde86212308845\"},{\"path\":\"scripts/runtime/integrity.mjs\",\"sha256\":\"075231d93940189d1a2d508cdbe1dc1caaf60f8f0986a2390c79cb68e026b018\"}],\"coreVersion\":\"1.0.0-alpha.1\",\"imports\":[\"universalFrameworkOriginal\"],\"packageId\":\"skill-rails-authoring\",\"packageVersion\":\"1.0.0-alpha.1\",\"schemaVersion\":1,\"sources\":[{\"id\":\"source-package\",\"path\":\"authoring-package.json\",\"sha256\":\"afc4d9787e0d7f7ac904ac49ef00eee9f2777a8aec978e1589597c1d9a0c7123\"},{\"id\":\"entry\",\"path\":\"authoring/skill-rails/SKILL.source.md\",\"sha256\":\"203efd4c3dd19075b845995b835508ac28bdbdd8e30c459dd35bae4eb89c5e19\"},{\"id\":\"target:skill-rails-next\",\"path\":\"authoring/skill-rails/targets/authoring/target.json\",\"sha256\":\"bc80af5b4d9dbc41446f2243d6155db9a88ac2ffbc3e81c4f8a8d920597cbf48\"},{\"id\":\"contract:build-receipt.schema.json\",\"path\":\"contracts/build-receipt.schema.json\",\"sha256\":\"2ecf54ae8be8ca56089067fcda0f3ebf55a9879386d27baf9a59118b3397f849\"},{\"id\":\"module:universalFrameworkOriginal\",\"path\":\"docs/guide/universal-ai-skill-inquiry-framework.md\",\"sha256\":\"17879eb8f94dde7ea0fe14b03258eebf94fd0efb92bb014dae2c902bcc7654d7\"},{\"id\":\"runtime:scripts/runtime/common.mjs\",\"path\":\"src/runtime/common.mjs\",\"sha256\":\"65402c4a721d10734656b730fc23dca23c950cb1d696484501cde86212308845\"},{\"id\":\"runtime:scripts/runtime/integrity.mjs\",\"path\":\"src/runtime/integrity.mjs\",\"sha256\":\"075231d93940189d1a2d508cdbe1dc1caaf60f8f0986a2390c79cb68e026b018\"},{\"id\":\"runtime:scripts/run.mjs\",\"path\":\"src/runtime/run-check.mjs\",\"sha256\":\"9679534ff91d95407c35f99209e22228110260e275a1465decaca290d7102e94\"}],\"targetId\":\"skill-rails-next\",\"treeSha256\":\"8285d6264c083c616df4cd030a49a63e82da1af60bc364a654293a6e8ad04018\"}\n"
+      },
+      "after": {
+        "bytes": 2457,
+        "sha256": "12ddbf5137edf57057357d568b03287a3da9666e1801a03fc492ae10c8df5227",
+        "utf8": "{\"artifacts\":[{\"path\":\"SKILL.md\",\"sha256\":\"d6ab3070b31b1cc9f458451046883606f6a492ab4e6abb9811579d3b31f5ee10\"},{\"path\":\"config/target.json\",\"sha256\":\"c313c7aa97c927d1fa2319a8838562268acff33e2c85bbc139c233e5350c7e22\"},{\"path\":\"contracts/build-receipt.schema.json\",\"sha256\":\"2ecf54ae8be8ca56089067fcda0f3ebf55a9879386d27baf9a59118b3397f849\"},{\"path\":\"references/universalFrameworkOriginal.index.json\",\"sha256\":\"9441a9880a9501a3315dad04397a9aef09c59c2317f4f73f2265978499a7b5ed\"},{\"path\":\"references/universalFrameworkOriginal.md\",\"sha256\":\"17879eb8f94dde7ea0fe14b03258eebf94fd0efb92bb014dae2c902bcc7654d7\"},{\"path\":\"scripts/run.mjs\",\"sha256\":\"9679534ff91d95407c35f99209e22228110260e275a1465decaca290d7102e94\"},{\"path\":\"scripts/runtime/common.mjs\",\"sha256\":\"65402c4a721d10734656b730fc23dca23c950cb1d696484501cde86212308845\"},{\"path\":\"scripts/runtime/integrity.mjs\",\"sha256\":\"075231d93940189d1a2d508cdbe1dc1caaf60f8f0986a2390c79cb68e026b018\"}],\"coreVersion\":\"1.0.0-alpha.1\",\"imports\":[\"universalFrameworkOriginal\"],\"packageId\":\"skill-rails-authoring\",\"packageVersion\":\"1.0.0-alpha.1\",\"schemaVersion\":1,\"sources\":[{\"id\":\"source-package\",\"path\":\"authoring-package.json\",\"sha256\":\"afc4d9787e0d7f7ac904ac49ef00eee9f2777a8aec978e1589597c1d9a0c7123\"},{\"id\":\"entry\",\"path\":\"authoring/skill-rails/SKILL.source.md\",\"sha256\":\"110e4cc685ad067f59ccdd77761a46d615779cfb193ff295f20bb4733286a801\"},{\"id\":\"target:skill-rails-next\",\"path\":\"authoring/skill-rails/targets/authoring/target.json\",\"sha256\":\"bc80af5b4d9dbc41446f2243d6155db9a88ac2ffbc3e81c4f8a8d920597cbf48\"},{\"id\":\"contract:build-receipt.schema.json\",\"path\":\"contracts/build-receipt.schema.json\",\"sha256\":\"2ecf54ae8be8ca56089067fcda0f3ebf55a9879386d27baf9a59118b3397f849\"},{\"id\":\"module:universalFrameworkOriginal\",\"path\":\"docs/guide/universal-ai-skill-inquiry-framework.md\",\"sha256\":\"17879eb8f94dde7ea0fe14b03258eebf94fd0efb92bb014dae2c902bcc7654d7\"},{\"id\":\"runtime:scripts/runtime/common.mjs\",\"path\":\"src/runtime/common.mjs\",\"sha256\":\"65402c4a721d10734656b730fc23dca23c950cb1d696484501cde86212308845\"},{\"id\":\"runtime:scripts/runtime/integrity.mjs\",\"path\":\"src/runtime/integrity.mjs\",\"sha256\":\"075231d93940189d1a2d508cdbe1dc1caaf60f8f0986a2390c79cb68e026b018\"},{\"id\":\"runtime:scripts/run.mjs\",\"path\":\"src/runtime/run-check.mjs\",\"sha256\":\"9679534ff91d95407c35f99209e22228110260e275a1465decaca290d7102e94\"}],\"targetId\":\"skill-rails-next\",\"treeSha256\":\"ddbaebf7cc2ea8ec1c833cf97a63fc6a355eedf558565428cb9d7bc5143ffd2e\"}\n"
+      }
+    }
+  ],
+  "machineChecks": [
+    {
+      "name": "authoring-current",
+      "exitCode": 0,
+      "wallClockMs": 105,
+      "stdout": "{\"schemaVersion\":1,\"status\":\"CHECKED\",\"targetId\":\"skill-rails-next\",\"artifactIntact\":true,\"sourceCurrent\":true,\"remoteLatest\":null,\"treeSha256\":\"ddbaebf7cc2ea8ec1c833cf97a63fc6a355eedf558565428cb9d7bc5143ffd2e\"}\n",
+      "stderr": ""
+    },
+    {
+      "name": "authoring-intact",
+      "exitCode": 0,
+      "wallClockMs": 96,
+      "stdout": "{\"schemaVersion\":1,\"status\":\"CHECKED\",\"targetId\":\"skill-rails-next\",\"artifactIntact\":true,\"sourceCurrent\":null,\"remoteLatest\":null,\"treeSha256\":\"ddbaebf7cc2ea8ec1c833cf97a63fc6a355eedf558565428cb9d7bc5143ffd2e\"}\n",
+      "stderr": ""
+    }
+  ],
+  "metrics": {
+    "acceptance": "machine-pass-semantic-review-pending",
+    "safetyViolations": null,
+    "criticalOmissions": null,
+    "purposeScopeOwnerRealignments": null,
+    "unsupportedRulesChecksExceptions": null,
+    "rework": null,
+    "fixedReadBytes": 3810,
+    "conditionalReadBytes": null,
+    "toolCalls": 34,
+    "inputTokens": 793793,
+    "outputTokens": 9350,
+    "userRoundtrips": 0,
+    "wallClockMs": 321561,
+    "machineRuntimeMs": 201,
+    "routingErrors": null,
+    "fallbacks": 0,
+    "indexMaintenanceCost": 0,
+    "afterMachineCheckChangeCount": 0
+  },
+  "interpretation": null,
+  "claimPolicy": "Machine checks establish delivery or structural safety only. Framework benefit, semantic quality, fresh behavior, and actual effect remain unproven until transcript and changed artifacts are independently reviewed."
+}

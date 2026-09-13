@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "editorial-review-pilot/config/1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "documentId"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "documentId": {"const": "museum-label-01"}
+  }
+}

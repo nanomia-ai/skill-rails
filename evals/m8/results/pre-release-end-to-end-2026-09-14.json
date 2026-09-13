@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "gate": "m8-pre-release-end-to-end",
+  "observedAt": "2026-09-14T07:38:34+09:00",
+  "decision": "RELEASE_CANDIDATE_ACCEPTED",
+  "producedSkillAccepted": true,
+  "productionCutoverReady": true,
+  "project": {
+    "path": "D:/Projects/Private/nanomia/skill-rails-m8-release-acceptance-20260914-6f27a1b5",
+    "kind": "ordinary-separate-git-project",
+    "sourceFixture": "inputs/workshop.md",
+    "sourceFixtureBytes": 495,
+    "sourceFixtureSha256": "e7de157a8fa01d370b86a3ff2a3c7fdd6b510f8da3179f2528eeccbef52d93c5"
+  },
+  "installer": {
+    "commandShape": "npx skills@latest add <local-current-repository> --skill <exact-name> --agent codex claude-code --copy -y",
+    "currentUnpublishedBytesAccepted": true,
+    "authoringInstallPaths": [
+      ".agents/skills/skill-rails-next",
+      ".claude/skills/skill-rails-next"
+    ],
+    "authoringTree": {
+      "files": 36,
+      "bytes": 201697,
+      "treeSha256": "baea9a37b0b2c3c1983791a593bb418308414405ad83ffdeb8abe795e8dda88c",
+      "artifactIntact": true,
+      "sourceCurrent": true
+    },
+    "failedSetupAttempt": {
+      "commandShape": "npx skills@latest add . --list --json",
+      "result": "installer rejected the incompatible flags before installation",
+      "retryCount": 0
+    }
+  },
+  "environmentInvariants": {
+    "codeHome": "C:/Users/joinj/AppData/Roaming/orca/codex-runtime-home/home",
+    "codeHomeChanged": false,
+    "existingUserSkillRails": [
+      {
+        "path": "C:/Users/joinj/.agents/skills/skill-rails",
+        "files": 63,
+        "bytes": 1028325,
+        "rawPathPlusContentSha256": "367dc53fad3c5b35e23dbbe5fab294663f31072778891ec6b93165efe1b588ea"
+      },
+      {
+        "path": "C:/Users/joinj/.claude/skills/skill-rails",
+        "files": 63,
+        "bytes": 1028325,
+        "rawPathPlusContentSha256": "367dc53fad3c5b35e23dbbe5fab294663f31072778891ec6b93165efe1b588ea"
+      }
+    ],
+    "frozenPlansAndReadmesModifiedByThisGate": false
+  },
+  "freshAuthor": {
+    "host": "Codex CLI",
+    "model": "gpt-5.6-sol",
+    "reasoningEffort": "medium",
+    "mode": "dangerously-bypass-approvals-and-sandbox",
+    "ephemeral": true,
+    "threadId": "01a09ce4-003d-7241-b991-7a260cf4",
+    "result": "PASS_WITH_NON_BLOCKING_DX_CONCERN",
+    "created": {
+      "packageId": "community-workshop-communications",
+      "targetIds": [
+        "community-workshop-accessibility-review",
+        "community-workshop-announcement"
+      ],
+      "sharedModuleId": "fidelity-and-audience-safety",
+      "sourceGraphSha256BeforeMaintenance": "c546db4a2d49b883c143cf2d7a05277731290a0ea3bbf65e912154219f18c07b",
+      "projectionInputSha256": "1d82a94833d4d01e06f6b78e74cbc06538572538cc3710007f7733331b7a0cc9",
+      "modes": ["prose", "prose"],
+      "observer": null,
+      "renderer": null,
+      "answerContract": null,
+      "durableRuntimeState": null
+    },
+    "deterministicBuilds": [
+      {
+        "targetId": "community-workshop-accessibility-review",
+        "treeSha256": "239baddab2cc02f1972be32736dfca7be04c501cfba10e2b98dbc5595414a786",
+        "doubleBuildEqual": true,
+        "artifactIntact": true,
+        "sourceCurrent": true
+      },
+      {
+        "targetId": "community-workshop-announcement",
+        "treeSha256": "f908bb795b1b19aaa0f6f93c07c35f3703e17006c2d0a33a76a1477078c47062",
+        "doubleBuildEqual": true,
+        "artifactIntact": true,
+        "sourceCurrent": true
+      }
+    ],
+    "usage": {
+      "inputTokens": 468994,
+      "cachedInputTokens": 424448,
+      "outputTokens": 8489,
+      "reasoningOutputTokens": 3801,
+      "exactToolRoundTrips": null,
+      "exactWallTimeMs": null,
+      "measurementGap": "The ephemeral JSON stream was observed but not written as a durable raw transcript, so exact tool-call and wall-time totals cannot be reconstructed without rerunning, which this bounded gate forbids."
+    },
+    "observedProcessConcerns": [
+      "The agent probed the embedded CLI with unsupported --help and received ARGUMENT_INVALID before using the documented operations.",
+      "The agent combined independent shell operations in some commands despite the repository command discipline."
+    ],
+    "frameworkNavigation": {
+      "observed": "The agent opened the installed authoring skill and Framework sections 0/0.1 plus decision-selected sections before authoring.",
+      "benefit": "unproven"
+    }
+  },
+  "maintenance": {
+    "singleOwnerEdit": {
+      "path": "modules/fidelity-and-audience-safety.md",
+      "beforeSha256": "f9fdfb6b4d74c360bfb0d2ef6e3aca99fa9661e8f8ea3931f403105a9da44016",
+      "afterSha256": "3bba4bb47d00a1377527edc1c106eaf43098a997ee1ac5df048666a6a42f047e",
+      "afterBytes": 1534
+    },
+    "staleObservation": [
+      {
+        "targetId": "community-workshop-announcement",
+        "artifactIntact": true,
+        "sourceCurrent": false
+      },
+      {
+        "targetId": "community-workshop-accessibility-review",
+        "artifactIntact": true,
+        "sourceCurrent": false
+      }
+    ],
+    "affectedOnlyRebuild": [
+      {
+        "targetId": "community-workshop-announcement",
+        "treeSha256": "4aaeae4264d2f7de61c5e765a0d62bd0360cf37bf21ec7fd77843770e714684e",
+        "artifactIntact": true,
+        "sourceCurrent": true
+      },
+      {
+        "targetId": "community-workshop-accessibility-review",
+        "treeSha256": "a7a4d72a3a138592a1f7f80552e84ce1de9a57457d1a6f5fe392ed2c0f686a6c",
+        "artifactIntact": true,
+        "sourceCurrent": true
+      }
+    ],
+    "reinstalledPaths": [
+      ".agents/skills/community-workshop-announcement",
+      ".claude/skills/community-workshop-announcement",
+      ".agents/skills/community-workshop-accessibility-review",
+      ".claude/skills/community-workshop-accessibility-review"
+    ],
+    "installedArtifactChecks": {
+      "community-workshop-announcement": {
+        "treeSha256": "4aaeae4264d2f7de61c5e765a0d62bd0360cf37bf21ec7fd77843770e714684e",
+        "artifactIntact": true
+      },
+      "community-workshop-accessibility-review": {
+        "treeSha256": "a7a4d72a3a138592a1f7f80552e84ce1de9a57457d1a6f5fe392ed2c0f686a6c",
+        "artifactIntact": true
+      }
+    },
+    "sourceGraphSha256AfterMaintenance": "9e3dfbad309fd1c6165a772df4bb3bd2014402baef68af314f78f3ff9337bdcb",
+    "sevenQuestions": [
+      {
+        "question": 1,
+        "answer": "Each target entry owns its product purpose; source-package.json owns package identity and declared relations; inputs/workshop.md owns event facts."
+      },
+      {
+        "question": 2,
+        "answer": "modules/fidelity-and-audience-safety.md is the common owner; each targets/*/SKILL.source.md owns target-specific instructions."
+      },
+      {
+        "question": 3,
+        "answer": "Exact inspect reports both community-workshop-accessibility-review and community-workshop-announcement as consumers."
+      },
+      {
+        "question": 4,
+        "answer": "Each consumer materializes SKILL.md and references/fidelity-and-audience-safety.md; its .skill-rails-build.json owns source/artifact hashes and the target tree hash."
+      },
+      {
+        "question": 5,
+        "answer": "Both targets are prose-only with no observer, renderer, answer contract, or declared runtime state. Input/output paths live in each canonical entry; v1 inspect accurately reports no schema-declared input/output."
+      },
+      {
+        "question": 6,
+        "answer": "Build receipt checks own artifact integrity/currentness; this M8 receipt owns the single fresh author, stale/rebuild, installer, Claude behavior, and coordinator-reread observations."
+      },
+      {
+        "question": 7,
+        "answer": "The source graph cannot prove workshop facts, semantic quality, host discovery, or filesystem effect. The input owner, Claude host execution, and coordinator reread own those separate boundaries."
+      }
+    ],
+    "boundedReadBytes": {
+      "manifest": 351,
+      "sharedModule": 1534,
+      "targetDescriptors": 364,
+      "targetEntries": 2286,
+      "receipts": 4686,
+      "total": 9221
+    }
+  },
+  "freshConsumer": {
+    "host": "Claude Code 2.1.270",
+    "modelRequested": "opus",
+    "modelResolved": "claude-opus-5",
+    "reasoningEffort": "medium",
+    "permissionMode": "bypassPermissions",
+    "sessionId": "7a56f789-3067-4197-8b5b-d8febd72d735",
+    "result": "PASS",
+    "subagentsSpawned": 0,
+    "permissionDenials": 0,
+    "numTurns": 14,
+    "toolRoundTrips": 11,
+    "filesAndSteps": {
+      "filesReadBeforeWrite": 5,
+      "writes": 2,
+      "filesRereadForCompletion": 3,
+      "skillRailsInternalFilesRead": 0,
+      "skillRailsInternalCommandsUsed": 0,
+      "summary": "Two installed entries, two materialized copies of their one shared domain module, and the current input were sufficient before writing; completion reread the input and both effects."
+    },
+    "fileReadBytes": {
+      "alwaysRead": 6081,
+      "conditionalCompletionReread": 1986,
+      "total": 8067,
+      "basis": "two installed entries, their two materialized shared-module copies, one initial input read, then input plus both output rereads"
+    },
+    "usage": {
+      "inputTokens": 130,
+      "cacheCreationInputTokens": 17941,
+      "cacheReadInputTokens": 136203,
+      "outputTokens": 2267,
+      "thinkingTokens": 226,
+      "wallTimeMs": 41990,
+      "apiTimeMs": 29849,
+      "costUsd": 0.3058675
+    },
+    "effects": [
+      {
+        "path": "outputs/announcement.md",
+        "bytes": 570,
+        "sha256": "c4c3681294994cc4e8bd2aba9eebc9fa7ee9d1f523e5d39c38271d822a86e9e5",
+        "utf8": true,
+        "coordinatorReread": true
+      },
+      {
+        "path": "outputs/accessibility-review.md",
+        "bytes": 921,
+        "sha256": "c4fe91b6c4de28c47f8ed719323ba0a9880ed9aa6b66eb55ae3e5be313ea9551",
+        "utf8": true,
+        "coordinatorReread": true
+      }
+    ],
+    "semanticObservation": "The announcement preserved every operational restriction and the unconfirmed interpretation status. The review separated confirmed accommodations from explicitly unconfirmed and absent information without converting absence into unavailability.",
+    "effectAuthority": "The files and hashes above were reread from disk by the coordinator after the host completed. This proves only this observed project effect."
+  },
+  "producedSkillScorecard": {
+    "packageFootprint": [
+      {
+        "targetId": "community-workshop-announcement",
+        "files": 8,
+        "totalBytes": 19103,
+        "domainProseBytes": 2667,
+        "embeddedExecutableBytes": 12206,
+        "metadataAndReceiptBytes": 4230
+      },
+      {
+        "targetId": "community-workshop-accessibility-review",
+        "files": 8,
+        "totalBytes": 19395,
+        "domainProseBytes": 2919,
+        "embeddedExecutableBytes": 12206,
+        "metadataAndReceiptBytes": 4270
+      }
+    ],
+    "runtimeReadBoundary": "The using AI read no embedded executable, config, receipt, schema, or Skill Rails internals. The 12206-byte executable closure is installation payload for standalone artifact checking, not model context.",
+    "sharedOwnership": "One canonical module source owns the common rule. Each standalone target contains a byte-identical generated copy tied to that source by its receipt; the copies are artifacts, not editable owners.",
+    "combinedInvocationSharedReadDuplicationBytes": 1534,
+    "combinedInvocationTradeoff": "Because the one request intentionally invoked two independently installable targets, the same 1534-byte generated shared module was read twice. This is bounded artifact duplication, not a second owner; removing it would require coupling standalone targets and is not justified by this single small observation.",
+    "maintenanceBehavior": "One canonical common edit staled both and only the two real consumers; rebuilding both affected targets restored currentness and preserved independent installability.",
+    "realUse": "One unfamiliar Claude found both project-local targets, needed no Skill Rails internals, and created and reread both intended effects.",
+    "rigidity": "No observer, renderer, answer contract, packet, workflow state, or domain executable constrained these semantic prose tasks.",
+    "bloatAssessment": "The installed footprint includes 12206 bytes of generic standalone integrity runtime per target, but it was outside the AI read path and supported artifact checks. At roughly 19 KB and eight files per target, no observed causal path made use or maintenance rigid or impractical.",
+    "authoringCostCausalPathToBadOutput": null
+  },
+  "conceptRegressionScorecard": [
+    {
+      "sections": "2.7-2.10",
+      "result": "PASS",
+      "evidence": "The package is a new non-Devflow domain with no legacy baseline, fallback, vocabulary, or answer key; it preserves the original split between useful deterministic mechanics and AI meaning."
+    },
+    {
+      "sections": "4.2-5.4",
+      "result": "PASS",
+      "evidence": "The consumer interpreted 6081 always-read bytes while integrity/currentness stayed mechanical. Meaning remained in target prose and the shared domain module; no packet, state, renderer, or semantic schema was introduced."
+    },
+    {
+      "sections": "10",
+      "result": "PASS_WITH_SECONDARY_DX_CONCERN",
+      "evidence": "The using AI needed only the two installed entries, their shared rule, current input, two writes, and completion rereads, with no Skill Rails internals. The authoring CLI worked but the author host reported high input usage and one unsupported help probe."
+    },
+    {
+      "sections": "12",
+      "result": "PASS_FOR_OBSERVED_SCOPE",
+      "evidence": "Delivery hashes, fresh behavior, and coordinator-reread effects are separate claims. One successful run is treated as possibility evidence, not a broad guarantee."
+    },
+    {
+      "sections": "13",
+      "result": "PASS_FOR_SMALL_NON_DEVFLOW_CONSUMER_ONLY",
+      "evidence": "The real small consumer exercises source ownership and standalone use without claiming Devflow acceptance or importing its structure."
+    },
+    {
+      "sections": "15",
+      "result": "PASS",
+      "evidence": "No duplicate rule owner, AI-submitted state, recovery manual, evaluation machinery, or workflow vocabulary was added. Generated module copies are receipt-bound artifacts; the fresh consumer did not read executable payload."
+    },
+    {
+      "sections": "19",
+      "result": "PASS_FOR_THIS_RELEASE_CAPABILITY",
+      "evidence": "The observed skill keeps natural language, deterministic calculation, conditional mechanisms, non-Devflow generality, and one-owner changes distinct; broader Devflow and repeated-host claims remain outside this gate."
+    },
+    {
+      "sections": "22",
+      "result": "PASS_BOUNDARY_UNPROVEN_BENEFIT",
+      "evidence": "The Framework was used as a selective authoring/audit reference rather than shipped as the generated target's runtime workflow. Its causal benefit remains unproven."
+    }
+  ],
+  "finalCandidateAudit": {
+    "postConsumerInput": {
+      "path": "inputs/workshop.md",
+      "bytes": 495,
+      "sha256": "e7de157a8fa01d370b86a3ff2a3c7fdd6b510f8da3179f2528eeccbef52d93c5",
+      "matchesPreConsumerReceipt": true
+    },
+    "claudeRawSessionAuthority": {
+      "sessionId": "7a56f789-3067-4197-8b5b-d8febd72d735",
+      "durableRawSessionAvailable": false,
+      "reason": "The host was run with --no-session-persistence and no raw session file exists in the exact project session directory.",
+      "availableAuthority": "Direct CLI result metadata retained by the prior dispatch plus coordinator-reread effect bytes and hashes; no raw transcript is claimed."
+    },
+    "generatedAuthoringCandidate": {
+      "targetId": "skill-rails",
+      "packageVersion": "1.0.0",
+      "treeSha256": "cab9710da8105611dbb56e8d5e4b8ca4c1721378feec1a30f646ed96690b4fc7",
+      "artifactIntact": true,
+      "sourceCurrent": true
+    },
+    "packagePayload": {
+      "identity": "@nanomia/skill-rails@1.0.0",
+      "private": true,
+      "deliveryRoute": "repository-based npx skills@latest; no @nanomia/skill-rails registry package exists",
+      "entries": 39,
+      "packedBytes": 63826,
+      "unpackedBytes": 227085,
+      "includesLegacyOrEvaluationRoots": false
+    },
+    "releaseVerification": {
+      "command": "npm run verify",
+      "tests": 31,
+      "passed": 31,
+      "failed": 0
+    },
+    "readmeAndFrozenPlansChanged": false,
+    "legacyRuntimeReferences": 0
+  },
+  "claims": {
+    "proven": [
+      "The official npx skills local-source flow installed the current unpublished generated authoring tree project-locally for Codex and Claude without CODEX_HOME changes.",
+      "One fresh Codex used that installed entry and its embedded CLI to author a two-target non-Devflow prose package with one genuine shared owner and deterministic standalone builds.",
+      "One shared owner edit made exactly both real consumers stale; rebuilding those affected targets restored currentness and the normal installer updated both project-local host trees.",
+      "One fresh unfamiliar Claude bypass run discovered both installed targets, wrote two semantically acceptable effects, and reread the input and effects; coordinator reread confirmed bytes."
+    ],
+    "failed": [],
+    "nonBlockingConcerns": [
+      "The fresh author reported 468994 input tokens for this small two-target task, but the produced skills remained small, prose-first, independently installable, and easy for the fresh consumer to use; no causal output defect was observed.",
+      "The author violated the one-command shell discipline and made one unsupported CLI-help probe, but recovered through the documented interface without changing the package contract or generated target behavior."
+    ],
+    "unproven": [
+      "Exact fresh-author tool round trips and wall time because the ephemeral raw stream was not durably captured and the run was not repeated.",
+      "Whether Framework navigation improved authoring quality or reduced cost.",
+      "Authoring-process efficiency and causal attribution of the reported host input tokens, repeatability, broader hosts/models/domains, concurrent maintenance, release identity, remote install, and public latest cutover.",
+      "Human overview comprehension benefit beyond the bounded relation lookup recorded here."
+    ]
+  },
+  "nextAction": "Create and push the coherent non-force production candidate, verify the exact remote candidate, then use the repository-based nanomia-ai/skill-rails installer route for the authorized production replacement and lightweight two-host discovery/CLI smoke; do not rerun authoring for telemetry or delete the legacy capsule."
+}

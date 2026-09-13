@@ -19,6 +19,8 @@ try {
 const sourceRoot = resolve(packageRoot, "_evaluation-source");
 await mkdir(packageRoot, { recursive: true });
 await cp(resolve(repositoryRoot, "domains/natural-language-pilot"), sourceRoot, { recursive: true, force: false, errorOnExist: true });
+await cp(resolve(repositoryRoot, "fixtures/verify-v1/prepare-record-target.json"), resolve(sourceRoot, "targets/verify/target.json"), { force: true });
+await cp(resolve(repositoryRoot, "fixtures/verify-v1/prepare-record-entry.md"), resolve(sourceRoot, "targets/verify/entry.md"), { force: true });
 const originalObserver = await readFile(resolve(sourceRoot, "targets/verify/observer.mjs"));
 const faultObserverPath = resolve(repositoryRoot, "fixtures/verify-v1/faults/observer-prepare-failure.mjs");
 const faultObserver = await readFile(faultObserverPath);

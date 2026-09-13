@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "gate": "m5-resume-adoption",
+  "recordedAt": "2026-09-14",
+  "status": "PASSED_BOUNDED_TWO_MODEL_READ_ONLY_OBSERVATION",
+  "decision": "Adopt the prose-only Resume target for this pilot. It reconstructs current position and one next action from the four artifacts without durable state or project writes; do not generalize beyond the named complete-chain fixture.",
+  "fixedBoundary": {
+    "semanticRuns": 2,
+    "allowedRuns": [
+      "one fresh Codex Sol medium primary consumer",
+      "one fresh Claude Opus medium comparison consumer"
+    ],
+    "runsStarted": 2,
+    "retryPolicy": "No additional Resume consumer, evaluator, protocol, schema, harness, or matrix run is allowed."
+  },
+  "candidate": {
+    "targetId": "natural-language-pilot-resume-next",
+    "mode": "prose",
+    "canonicalFiles": [
+      "domains/natural-language-pilot/skill-package.json",
+      "domains/natural-language-pilot/targets/resume/target.json",
+      "domains/natural-language-pilot/targets/resume/entry.md"
+    ],
+    "generatedTreeSha256": "5c9ec7a14982b97559b8613be2c7058fc2db8d14dedbef6d0f72b54d7be5ae9f",
+    "codexArtifactIntact": true,
+    "codexSourceCurrent": true,
+    "claudeArtifactIntact": true,
+    "claudeSourceCurrent": true,
+    "installerReportedHash": "5e39893ce4f3ff2286efcb28f189c5008462a83bb356c17d51a2e43e5adc31ce",
+    "existingSkillRailsUnchanged": true,
+    "mechanisms": {
+      "observer": false,
+      "packet": false,
+      "prepare": false,
+      "fallback": false,
+      "renderer": false,
+      "durableSemanticState": false
+    }
+  },
+  "fixture": {
+    "root": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m5-work-sol-0Vbr3z",
+    "basis": "The accepted Product, Direct, Codex Work, and current-tree Verify effects in one realistic chain root.",
+    "projectHashListingUnchangedBeforeAfter": true,
+    "verificationSha256": "7c6e3ce666036a04f2c3042dab44b979e630af4e46f30f1813d8d6f1c9d5d844"
+  },
+  "runs": [
+    {
+      "host": "Codex CLI 0.148.0",
+      "model": "gpt-5.6-sol",
+      "effort": "medium",
+      "hostOutcome": "succeeded-with-command-process-failures",
+      "installedSkillDiscovered": true,
+      "allFourArtifactsRead": true,
+      "currentPositionCorrect": true,
+      "nextAction": "maintain",
+      "unknownsPreserved": true,
+      "nonProductionBoundaryPreserved": true,
+      "allFourPathsCited": true,
+      "sourceOrTestRead": false,
+      "projectWrite": false,
+      "processFailures": [
+        "The host bundled the RTK and skill-entry reads in one PowerShell command.",
+        "One PowerShell batch-read attempt failed to parse before individual reads succeeded."
+      ],
+      "rawEvidence": "evals/m5/results/raw/codex-sol-resume-adoption-captured.json"
+    },
+    {
+      "host": "Claude Code 2.1.270",
+      "model": "claude-opus-5",
+      "effort": "medium",
+      "sessionId": "a69e8a78-1cf2-4794-86fc-894013389372",
+      "hostOutcome": "succeeded",
+      "installedSkillDiscovered": true,
+      "allFourArtifactsRead": true,
+      "currentPositionCorrect": true,
+      "nextAction": "maintain",
+      "unknownsPreserved": true,
+      "nonProductionBoundaryPreserved": true,
+      "allFourPathsCited": true,
+      "sourceOrTestRead": false,
+      "projectWrite": false,
+      "hostDurationMs": 26613,
+      "apiDurationMs": 18750,
+      "costUsd": 0.23035299999999997,
+      "rawEvidence": "evals/m5/results/raw/claude-opus-resume-adoption-captured.json"
+    }
+  ],
+  "claims": {
+    "proven": [
+      "The prose-only Resume target built and installed artifact-intact/source-current for both normal host locations.",
+      "On the same complete-chain artifact bytes, both fresh medium consumers selected the installed skill, read exactly the four declared pilot artifacts, identified the verified non-production position, chose maintain, cited all four paths, and preserved all three unknowns.",
+      "The coordinator's full project path/hash listing was byte-identical before and after both runs, so no project file effect occurred."
+    ],
+    "failed": [
+      "The Codex consumer repeated shell bundling and had one PowerShell parse failure before completing individual read-only commands."
+    ],
+    "unproven": [
+      "Resume behavior on missing, failed, unproven, conflicting, or stale artifacts",
+      "repeatability and another fixture/model/version",
+      "whether prose Resume reduces total recovery cost relative to an unguided consumer",
+      "M5 end-to-end completion and fresh maintain traversal beyond the earlier partial maintainer gate"
+    ]
+  },
+  "nextAction": "Close M5 only after shared-source differential currentness, the existing maintainer evidence boundary, full target build/currentness, and one coherent npm test are reconciled. Do not start M6 automatically."
+}

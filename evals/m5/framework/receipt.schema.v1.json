@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-rails-next/framework-evaluation-receipt/1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "protocolId", "lane", "task", "host", "seed", "projectRoot", "startedAt", "command", "hostResult", "transcript", "changes", "machineChecks", "metrics", "interpretation", "claimPolicy"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "protocolId": {"const": "m5-framework-lanes-v1"},
+    "lane": {"enum": ["L0", "L1", "L2"]},
+    "task": {"enum": ["product", "bounded", "recovery"]},
+    "host": {"enum": ["codex", "claude"]},
+    "seed": {"type": "integer", "minimum": 1},
+    "projectRoot": {"type": "string", "minLength": 1},
+    "startedAt": {"type": "string", "minLength": 1},
+    "command": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "hostResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exitCode", "signal", "wallClockMs"],
+      "properties": {
+        "exitCode": {"type": "integer"},
+        "signal": {},
+        "wallClockMs": {"type": "integer", "minimum": 0}
+      }
+    },
+    "transcript": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stdoutPath", "stdoutBytes", "stdoutSha256", "stderrPath", "stderrBytes", "stderrSha256"],
+      "properties": {
+        "stdoutPath": {"type": "string", "minLength": 1},
+        "stdoutBytes": {"type": "integer", "minimum": 0},
+        "stdoutSha256": {"type": "string", "minLength": 64},
+        "stderrPath": {"type": "string", "minLength": 1},
+        "stderrBytes": {"type": "integer", "minimum": 0},
+        "stderrSha256": {"type": "string", "minLength": 64}
+      }
+    },
+    "changes": {"type": "array", "items": {"type": "object"}},
+    "machineChecks": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acceptance", "safetyViolations", "criticalOmissions", "purposeScopeOwnerRealignments", "unsupportedRulesChecksExceptions", "rework", "fixedReadBytes", "conditionalReadBytes", "toolCalls", "inputTokens", "outputTokens", "userRoundtrips", "wallClockMs", "machineRuntimeMs", "routingErrors", "fallbacks", "indexMaintenanceCost", "afterMachineCheckChangeCount"],
+      "properties": {
+        "acceptance": {"type": "string", "minLength": 1},
+        "safetyViolations": {},
+        "criticalOmissions": {},
+        "purposeScopeOwnerRealignments": {},
+        "unsupportedRulesChecksExceptions": {},
+        "rework": {},
+        "fixedReadBytes": {"type": "integer", "minimum": 0},
+        "conditionalReadBytes": {},
+        "toolCalls": {"type": "integer", "minimum": 0},
+        "inputTokens": {},
+        "outputTokens": {},
+        "userRoundtrips": {"type": "integer", "minimum": 0},
+        "wallClockMs": {"type": "integer", "minimum": 0},
+        "machineRuntimeMs": {"type": "integer", "minimum": 0},
+        "routingErrors": {},
+        "fallbacks": {"type": "integer", "minimum": 0},
+        "indexMaintenanceCost": {"type": "integer", "minimum": 0},
+        "afterMachineCheckChangeCount": {"type": "integer", "minimum": 0}
+      }
+    },
+    "interpretation": {},
+    "claimPolicy": {"type": "string", "minLength": 1}}
+  }

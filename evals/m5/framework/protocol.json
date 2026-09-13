@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "m5-framework-lanes-v2",
+  "fixtureRevision": 3,
+  "fixture": {
+    "copiedEntries": [
+      "package.json",
+      "package-lock.json",
+      "authoring-package.json",
+      "contracts",
+      "src",
+      "authoring",
+      "domains",
+      "fixtures",
+      "tests",
+      "skills",
+      "docs/guide"
+    ],
+    "excludedEntries": [
+      "tests/framework-harness.test.mjs"
+    ],
+    "reason": "The framework harness self-test depends on the lane protocol, which must not be copied into L0 or leak other lane and task definitions."
+  },
+  "lanes": {
+    "L0": {
+      "frameworkExposure": "none",
+      "instruction": "Do not read or use the Universal Framework reference in this lane."
+    },
+    "L1": {
+      "frameworkExposure": "self-routed",
+      "instruction": "Before making an authoring or maintenance judgment, read §0 and §0.1 of `references/universalFrameworkOriginal.md`, then choose any further original sections yourself from its routing table and the decision's uncertainty, reach, and reversal cost. `references/universalFrameworkOriginal.index.json` is an optional navigation aid listing section IDs and byte ranges; it defines no meaning. Report each section ID you opened and why."
+    },
+    "L2": {
+      "frameworkExposure": "whole-original",
+      "instruction": "Before making an authoring or maintenance judgment, read all of `references/universalFrameworkOriginal.md` and report that whole-original read."
+    }
+  },
+  "tasks": {
+    "product": {
+      "rawTask": "Add a Product target to the existing natural-language-pilot source package. The user needs an AI to turn pilot/product-request.md into pilot/brief.md while preserving stated wording, representing missing decisions as unknown, and never inventing scope. Compare prose-only, domain renderer, core mechanism, and an independent alternative, then implement the smallest safe target. Do not introduce prepare, observer, packet, fallback, semantic durable state, auto-merge, or multi-output transactions. Change canonical source only, build the target into fixture/dist-product, inspect its generated diff/receipt, and write fixture/author-report.json with the selected option, rejected options, Framework sections read, unknowns, and checks run.",
+      "successCondition": "A valid Product target is added to the real pilot package, its standalone build succeeds without prepare/observer/packet/fallback, and the report preserves unknowns and names evidence without claiming fresh use or effect."
+    },
+    "bounded": {
+      "rawTask": "Make one bounded change to the existing Verify target: rendered records must label the summary line exactly 'Finding:' instead of 'Summary:' while the answer JSON field remains summary. Find the canonical owner, update only the smallest owning source and targeted evidence, rebuild fixture/dist-verify, and write fixture/author-report.json with owner, consumers, artifacts, Framework sections read, files changed, checks run, and unknowns. Do not edit generated files directly or add schema/state/routing/fallback machinery.",
+      "successCondition": "The canonical renderer and its targeted tests own the label change, the semantic answer schema stays unchanged, a built target renders Finding:, and unrelated behavior is preserved."
+    },
+    "recovery": {
+      "rawTask": "Recover a repeated wrong-layer repair. Twice, a maintainer changed the generated skills/skill-rails/SKILL.md sentence to 'Use exact IDs and paths.' and the next build restored 'Use exact identifiers and paths.' Fix the actual canonical owner so rebuild preserves the requested sentence. Use source/currentness evidence rather than adding a guard, copy, fallback, or compatibility layer. Rebuild the canonical authoring target, verify source-current and artifact-intact separately, and write fixture/author-report.json with the failed layer, actual owner, Framework sections read, checks run, and unknowns.",
+      "successCondition": "The canonical authoring source owns the requested sentence, the generated target is rebuilt rather than hand-patched, and separate currentness/integrity checks pass without new machinery."
+    }
+  },
+  "hosts": {
+    "codex": {
+      "model": "gpt-5.6-sol",
+      "effort": "high",
+      "permission": "workspace-write automatic review",
+      "freshness": "ephemeral, ignore user config"
+    },
+    "claude": {
+      "model": "claude-fable-5",
+      "effort": "high",
+      "permission": "auto with no interactive prompts",
+      "freshness": "no session persistence, project settings only"
+    }
+  },
+  "fixedPrompt": "This is one isolated M5 evaluation cell. Use only the project-local skill path stated below and the files inside this workspace; do not read parent, sibling, global skill, prior-run, or network content. Read the complete local SKILL.md before the raw task. Do not ask the user; keep genuinely missing meaning as unknown. Do not commit, publish, install, or change README/frozen plans. Finish the requested workspace changes and report, then stop.",
+  "metrics": [
+    "acceptance",
+    "safetyViolations",
+    "criticalOmissions",
+    "purposeScopeOwnerRealignments",
+    "unsupportedRulesChecksExceptions",
+    "rework",
+    "fixedReadBytes",
+    "conditionalReadBytes",
+    "toolCalls",
+    "userRoundtrips",
+    "wallClockMs",
+    "machineRuntimeMs",
+    "routingErrors",
+    "fallbacks",
+    "indexMaintenanceCost"
+  ]
+}

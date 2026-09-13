@@ -21,7 +21,7 @@ export function canonicalJson(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
   return `{${Object.keys(value).sort(compareCodePoint).map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
 }
-export function decodeUtf8(bytes, label) { try { return decoder.decode(bytes); } catch { fail("PREPARE_FAILED", `${label} is not valid UTF-8.`, "Correct the declared text input and run prepare again."); } }
+export function decodeUtf8(bytes, label, failure = {}) { try { return decoder.decode(bytes); } catch { fail(failure.code ?? "PREPARE_FAILED", `${label} is not valid UTF-8.`, failure.nextAction ?? "Correct the declared text input and run prepare again."); } }
 export async function readJson(path, code = "ARTIFACT_INTEGRITY_FAILED") {
   try { return JSON.parse(await readFile(path, "utf8")); } catch { fail(code, `${path} is missing or invalid JSON.`, "Restore the generated target or exchange from its canonical owner."); }
 }

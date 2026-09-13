@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "classificationId": "m5-framework-v1-preflight-classification",
+  "protocolId": "m5-framework-lanes-v1",
+  "replacementProtocolId": "m5-framework-lanes-v2",
+  "entries": [
+    {
+      "cellId": "l0-bounded-claude-seed3",
+      "classification": "harness-defect",
+      "reason": "The isolated workspace omitted tests/record.test.mjs, so the fixed bounded check could not run.",
+      "receiptPath": "evals/m5/results/framework/l0-bounded-claude-seed3.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l0-bounded-claude-seed3.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l0-bounded-claude-seed3.stderr.txt"
+    },
+    {
+      "cellId": "l0-bounded-claude-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l0-bounded-claude-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l0-bounded-claude-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l0-bounded-claude-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l0-bounded-codex-seed3",
+      "classification": "harness-defect",
+      "reason": "The isolated workspace omitted tests/record.test.mjs, so the fixed bounded check could not run.",
+      "receiptPath": "evals/m5/results/framework/l0-bounded-codex-seed3.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l0-bounded-codex-seed3.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l0-bounded-codex-seed3.stderr.txt"
+    },
+    {
+      "cellId": "l0-bounded-codex-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l0-bounded-codex-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l0-bounded-codex-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l0-bounded-codex-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l0-product-claude-seed3",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l0-product-claude-seed3.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l0-product-claude-seed3.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l0-product-claude-seed3.stderr.txt"
+    },
+    {
+      "cellId": "l0-product-codex-seed3",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l0-product-codex-seed3.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l0-product-codex-seed3.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l0-product-codex-seed3.stderr.txt"
+    },
+    {
+      "cellId": "l0-recovery-claude-seed3",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l0-recovery-claude-seed3.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l0-recovery-claude-seed3.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l0-recovery-claude-seed3.stderr.txt"
+    },
+    {
+      "cellId": "l0-recovery-codex-seed1",
+      "classification": "harness-defect",
+      "reason": "The Codex CLI rejected --approve-for-me before any AI tool call.",
+      "receiptPath": "evals/m5/results/framework/l0-recovery-codex-seed1.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l0-recovery-codex-seed1.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l0-recovery-codex-seed1.stderr.txt"
+    },
+    {
+      "cellId": "l0-recovery-codex-seed2",
+      "classification": "harness-defect",
+      "reason": "The Codex CLI rejected the incompatible approval and sandbox arguments before any AI tool call.",
+      "receiptPath": "evals/m5/results/framework/l0-recovery-codex-seed2.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l0-recovery-codex-seed2.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l0-recovery-codex-seed2.stderr.txt"
+    },
+    {
+      "cellId": "l0-recovery-codex-seed3",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l0-recovery-codex-seed3.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l0-recovery-codex-seed3.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l0-recovery-codex-seed3.stderr.txt"
+    },
+    {
+      "cellId": "l1-bounded-claude-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l1-bounded-claude-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l1-bounded-claude-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l1-bounded-claude-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l1-bounded-codex-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l1-bounded-codex-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l1-bounded-codex-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l1-bounded-codex-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l1-product-claude-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l1-product-claude-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l1-product-claude-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l1-product-claude-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l1-product-codex-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l1-product-codex-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l1-product-codex-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l1-product-codex-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l1-recovery-claude-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l1-recovery-claude-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l1-recovery-claude-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l1-recovery-claude-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l1-recovery-codex-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l1-recovery-codex-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l1-recovery-codex-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l1-recovery-codex-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l2-bounded-claude-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l2-bounded-claude-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l2-bounded-claude-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l2-bounded-claude-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l2-bounded-codex-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l2-bounded-codex-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l2-bounded-codex-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l2-bounded-codex-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l2-product-claude-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l2-product-claude-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l2-product-claude-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l2-product-claude-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l2-product-codex-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l2-product-codex-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l2-product-codex-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l2-product-codex-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l2-recovery-claude-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l2-recovery-claude-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l2-recovery-claude-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l2-recovery-claude-seed4.stderr.txt"
+    },
+    {
+      "cellId": "l2-recovery-codex-seed4",
+      "classification": "superseded-by-protocol-v2",
+      "reason": "The entry, fixture, preconditions, and cost accounting changed under protocol v2, so this cell is pre-gate evidence only.",
+      "receiptPath": "evals/m5/results/framework/l2-recovery-codex-seed4.json",
+      "stdoutPath": "evals/m5/results/framework/raw/l2-recovery-codex-seed4.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/raw/l2-recovery-codex-seed4.stderr.txt"
+    }
+  ],
+  "claimPolicy": "Protocol-v1 cells are pre-gate evidence only. Harness defects are not AI failures, and every other v1 cell is non-comparable with protocol v2."
+}

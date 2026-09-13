@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-rails-next/build-receipt/1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "coreVersion", "packageId", "packageVersion", "targetId", "sources", "artifacts", "imports", "treeSha256"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "coreVersion": {"type": "string", "minLength": 1},
+    "packageId": {"type": "string", "minLength": 1},
+    "packageVersion": {"type": "string", "minLength": 1},
+    "targetId": {"type": "string", "minLength": 1},
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "sha256"],
+        "properties": {
+          "id": {"type": "string"},
+          "path": {"type": "string"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "imports": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "treeSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

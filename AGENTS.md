@@ -28,6 +28,8 @@ This repository is rebuilding Skill Rails from a clean greenfield source. The pr
 
 Do not preload every document. Open another owner when the task crosses its boundary.
 
+After a handoff, resume, or context compaction/reconstruction, reopen this file from disk and repeat Maintainer entry steps 1–3 before acting. A coordinator continuing through that boundary must pass the refreshed current milestone, one pending decision, evidence boundary, and exact next action to any active worker; inherited conversation context is not a substitute.
+
 ## Change and verification discipline
 
 - Preserve user changes. README files are not implementation authorities and must not be updated unless the user explicitly asks.
@@ -36,6 +38,7 @@ Do not preload every document. Open another owner when the task crosses its boun
 - Use final source/package paths from the frozen plan; do not create an incubator or a second active implementation.
 - Keep code-near comments to one non-obvious why, invariant, or risk plus the most stable test/contract pointer. Do not duplicate graph relations or exact behavior in prose.
 - Run checks proportional to the change. Record meaning, delivery, fresh behavior, and effect evidence separately.
+- Before an evaluation gate has changed a product decision, a second revision or additional evaluator-only protocol, schema, harness, matrix, agent path, or verification workflow serving that same decision is a proliferation signal, regardless of its filename or label. Stop that expansion, record the drift in `docs/plan/implementation-evolution-plan_ko.md`, and obtain user direction before continuing; leaving the claim `unproven` is preferable to building a validator for the validator.
 - Do not commit, publish, push, install globally, or deploy unless the user has explicitly authorized that action. Published identity and `latest` cutover always require a separate decision.
 - Before removing or overwriting material, resolve exact paths, verify recovery evidence, and respect the approval boundary recorded in the frozen plan and Evolution document.
 

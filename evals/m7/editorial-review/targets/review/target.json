@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "targetId": "editorial-review-next",
+  "mode": "prepare-record",
+  "entry": "entry.md",
+  "imports": ["purpose"],
+  "fallbackModule": "fallback",
+  "domainConfig": "config.json",
+  "domainConfigSchema": "config.schema.json",
+  "packet": "packet.json",
+  "observer": "observer.mjs",
+  "renderer": "renderer.mjs",
+  "answerContract": "contracts/semantic-answer.editorial-review.schema.json",
+  "declaredInputs": [
+    "review/audience.md",
+    "review/decisions.md",
+    "review/draft.md"
+  ],
+  "declaredOutput": "review/decisions.md",
+  "outputMode": "managed-region",
+  "regionBootstrap": "append-managed-region"
+}

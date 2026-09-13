@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "gate": "m5-direct-adoption",
+  "recordedAt": "2026-09-14",
+  "status": "PASSED_SINGLE_OBSERVATION",
+  "decision": "Adopt the prose-only Direct target for this pilot and proceed to the next stage-specific M5 dependency without generalizing this result to Work, Verify, or Resume.",
+  "fixedBoundary": {
+    "semanticRuns": 2,
+    "allowedRuns": [
+      "one fresh Codex author",
+      "one fresh Claude unfamiliar consumer"
+    ],
+    "consumerRunsStarted": 1,
+    "retryPolicy": "No additional Direct consumer run is allowed.",
+    "prohibitedGrowth": [
+      "additional verifier or counterexample agent",
+      "additional cell",
+      "new protocol, receipt schema, or harness",
+      "new product core layer",
+      "renderer or record-only machinery for Direct without an observed prose failure"
+    ]
+  },
+  "candidate": {
+    "targetId": "natural-language-pilot-direct-next",
+    "mode": "prose",
+    "canonicalFiles": [
+      "domains/natural-language-pilot/skill-package.json",
+      "domains/natural-language-pilot/targets/direct/target.json",
+      "domains/natural-language-pilot/targets/direct/entry.md"
+    ],
+    "fixture": "fixtures/direct-v1/project/pilot/brief.md",
+    "fixtureInputBytes": 555,
+    "fixtureInputSha256": "c034188c8fb0de1a74d388ab7279dfb30325e782514df65e7eaa3212c1919e80",
+    "generatedTreeSha256": "7182f869abb896dfc6ed160f7cd5c94687289cf793bd4542a8f030f74f0b2606",
+    "artifactIntact": true,
+    "sourceCurrent": true,
+    "mechanisms": {
+      "observer": false,
+      "packet": false,
+      "prepare": false,
+      "fallback": false,
+      "renderer": false,
+      "durableSemanticState": false
+    }
+  },
+  "runs": [
+    {
+      "role": "author",
+      "host": "Codex",
+      "model": "gpt-5.6-sol",
+      "effort": "high",
+      "taskId": "task_b6f9bb19104a",
+      "dispatchId": "ctx_e1d0e11a5ef8",
+      "taskDelivery": "accepted",
+      "hostOutcome": "succeeded-with-coordinator-review-correction",
+      "observedEffect": {
+        "filesModified": [
+          "domains/natural-language-pilot/skill-package.json",
+          "domains/natural-language-pilot/targets/direct/target.json",
+          "domains/natural-language-pilot/targets/direct/entry.md",
+          "fixtures/direct-v1/project/pilot/brief.md"
+        ],
+        "reviewCorrection": "The author used a display label instead of the exact capability id; the canonical entry was narrowed to bookmark-storage before consumer installation.",
+        "standaloneBuild": "BUILT",
+        "artifactIntact": true,
+        "sourceCurrent": true
+      }
+    },
+    {
+      "role": "unfamiliar-consumer",
+      "host": "Claude Code 2.1.270",
+      "model": "claude-fable-5-1",
+      "effort": "high",
+      "sessionId": "28900f62-6882-44ce-b1fe-a9e8cee51121",
+      "rawTask": "Create the Direct plan from pilot/brief.md.",
+      "hostCommandBoundary": {
+        "interactive": false,
+        "permissionMode": "bypassPermissions",
+        "permissionPrompts": "none",
+        "trustDialog": "skipped by documented --print behavior",
+        "codexYoloApplied": false
+      },
+      "taskDelivery": "accepted",
+      "hostOutcome": "succeeded",
+      "wallTimeMs": 26733,
+      "hostDurationMs": 23221,
+      "apiTimeMs": 14438,
+      "toolCalls": 3,
+      "readBytes": 2504,
+      "readByteBasis": {
+        "generatedEntry": 1949,
+        "productBrief": 555
+      },
+      "costUsd": 0.3978415,
+      "usage": {
+        "inputTokens": 68,
+        "cacheCreationInputTokens": 16201,
+        "cacheReadInputTokens": 106454,
+        "outputTokens": 911,
+        "thinkingTokens": 107
+      },
+      "fixtureRoot": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m5-direct-consumer-5MHDCp",
+      "installedSkillPath": ".claude/skills/natural-language-pilot-direct-next",
+      "installedTreeSha256": "7182f869abb896dfc6ed160f7cd5c94687289cf793bd4542a8f030f74f0b2606",
+      "observedBehavior": {
+        "installedSkillDiscovered": true,
+        "entryRead": true,
+        "outputAbsenceCheckedBeforeInputRead": true,
+        "observerUsed": false,
+        "packetUsed": false,
+        "prepareUsed": false,
+        "fallbackUsed": false,
+        "exclusiveCreateUsed": true
+      },
+      "observedEffect": {
+        "planExistsAfterRun": true,
+        "outputBytes": 395,
+        "outputSha256": "46ae192293d9c07a790e0052d66c6c5d825d2c2a87375514495c6f983005da29",
+        "cardCount": 1,
+        "cardIdExact": true,
+        "oneUserPreserved": true,
+        "stableIdStorePreserved": true,
+        "sameHttpsUrlRetrievalPreserved": true,
+        "unknownIdNoValuePreserved": true,
+        "exactPhrasePreserved": true,
+        "httpsOnlyBoundaryExplicit": true,
+        "storageLocationUnknown": true,
+        "retentionPeriodUnknown": true,
+        "importSupportUnknown": true,
+        "inventedScopeObserved": false,
+        "changedProjectFiles": [
+          "pilot/plan.md"
+        ],
+        "effectAuthority": "coordinator reread bytes and SHA-256 after host completion"
+      },
+      "rawEvidence": "evals/m5/results/raw/claude-direct-adoption-captured.json"
+    }
+  ],
+  "setupDiagnostics": [
+    "A predictable consumer path collided before any semantic task began. Per user correction, that path and its added .claude subtree were left untouched; a new root was created atomically with mkdtemp, verified empty and owned by JMP-DESKTOP/joinj, and received only the reviewed skill tree and fixed fixture."
+  ],
+  "claims": {
+    "proven": [
+      "The prose-only Direct candidate builds as a standalone target and was source-current and artifact-intact before and after the host run.",
+      "The isolated consumer used the reviewed Direct tree and the fixed Product output bytes as its sole project input.",
+      "In one fresh Claude observation, the installed Direct skill was discovered and produced exactly one bookmark-storage card with the fixed behaviors, phrase, boundary, and unknowns.",
+      "The observed write used exclusive creation and the coordinator reread the resulting bytes and SHA-256."
+    ],
+    "failed": [],
+    "unproven": [
+      "repeatability beyond this one author/consumer observation",
+      "pre-existing-plan no-write behavior in a fresh host observation",
+      "Direct behavior in interactive Claude mode",
+      "Direct behavior on another fixture, model, or version",
+      "whether Direct prose is cheaper than a renderer across repeated maintenance",
+      "adoption of Work, Verify, Resume, or any other stage"
+    ]
+  },
+  "nextAction": "Resume M5 at the next stage-specific dependency. Do not repeat the Direct gate or create Work and Resume together."
+}

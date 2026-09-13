@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "m5-framework-lanes-v1",
+  "lane": "L0",
+  "task": "product",
+  "host": "codex",
+  "seed": 3,
+  "projectRoot": "C:\\Users\\joinj\\AppData\\Local\\Temp\\skill-rails-m5-l0-product-codex-seed3-ADKYaR",
+  "startedAt": "2026-09-13T14:40:16.020Z",
+  "command": [
+    "C:\\Users\\joinj\\AppData\\Local\\Volta\\tools\\image\\node\\24.18.0\\node.exe",
+    "C:\\Users\\joinj\\AppData\\Local\\Volta\\tools\\image\\node\\24.18.0\\node_modules\\@openai\\codex\\bin\\codex.js",
+    "exec",
+    "--skip-git-repo-check",
+    "--ephemeral",
+    "--ignore-user-config",
+    "--approve-for-me",
+    "--json",
+    "--model",
+    "gpt-5.6-sol",
+    "--config",
+    "model_reasoning_effort=high",
+    "-"
+  ],
+  "hostResult": {
+    "exitCode": 0,
+    "signal": null,
+    "wallClockMs": 329936
+  },
+  "transcript": {
+    "stdoutPath": "evals/m5/results/framework/raw/l0-product-codex-seed3.stdout.jsonl",
+    "stdoutBytes": 108405,
+    "stdoutSha256": "44116f3c00f97a9c9c3abd8def89909409a66fcddf01a75151e45f10b102300b",
+    "stderrPath": "evals/m5/results/framework/raw/l0-product-codex-seed3.stderr.txt",
+    "stderrBytes": 0,
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "changes": [
+    {
+      "path": "domains/natural-language-pilot/modules/product-brief.md",
+      "before": null,
+      "after": {
+        "bytes": 1070,
+        "sha256": "05003bd0dc12f60a4b779584e1101d1dfe302878c45f46d1fea036884eda0153",
+        "utf8": "# Product brief rules\n\nTurn the current contents of `pilot/product-request.md` into the single output `pilot/brief.md`.\n\nThe request is the only authority for product meaning. Preserve wording that the request explicitly says to preserve exactly, including punctuation and casing. State every explicitly undecided or missing decision as `unknown`. Do not resolve an unknown from convention, nearby files, prior knowledge, or a plausible product choice.\n\nThe brief may organize explicit request content under concise headings, but it must not add users, features, platforms, interfaces, storage behavior, retention behavior, import behavior, acceptance boundaries, or other scope that the request does not state. A representative failure is turning an undecided storage location into a local file or database choice; the correct result keeps the storage location `unknown`.\n\nUse only evidence present in the current request. The existence or shape of files is structural evidence, not evidence that the brief is semantically correct or that any external effect occurred.\n"
+      }
+    },
+    {
+      "path": "domains/natural-language-pilot/skill-package.json",
+      "before": {
+        "bytes": 271,
+        "sha256": "c1db77e6c6063dc6e540f13ff60cdfde3cfae63d97891b7f7c0dc1a1a9ef5eee",
+        "utf8": "{\n  \"schemaVersion\": 1,\n  \"packageId\": \"natural-language-pilot\",\n  \"packageVersion\": \"0.0.1\",\n  \"modules\": {\n    \"purpose\": \"modules/purpose.md\",\n    \"verifyBaseline\": \"modules/verify-baseline.md\"\n  },\n  \"targets\": {\n    \"verify-next\": \"targets/verify/target.json\"\n  }\n}\n"
+      },
+      "after": {
+        "bytes": 370,
+        "sha256": "8bd64d69ec3be1bc79fe1e79526dafc05bc45fd6c8fb083e5821faaba44ed0a2",
+        "utf8": "{\n  \"schemaVersion\": 1,\n  \"packageId\": \"natural-language-pilot\",\n  \"packageVersion\": \"0.0.1\",\n  \"modules\": {\n    \"productBrief\": \"modules/product-brief.md\",\n    \"purpose\": \"modules/purpose.md\",\n    \"verifyBaseline\": \"modules/verify-baseline.md\"\n  },\n  \"targets\": {\n    \"product-next\": \"targets/product/target.json\",\n    \"verify-next\": \"targets/verify/target.json\"\n  }\n}\n"
+      }
+    },
+    {
+      "path": "domains/natural-language-pilot/targets/product/entry.md",
+      "before": null,
+      "after": {
+        "bytes": 1237,
+        "sha256": "168015c7dd03baae1b499953694842593e05bb90cbd4787dc8901d2b8e123663",
+        "utf8": "---\nname: natural-language-pilot-product-next\ndescription: Turn the natural-language pilot product request into one bounded brief while preserving required wording and keeping missing decisions unknown.\n---\n\n# Create the product brief\n\nRead `references/productBrief.md` completely, then read the current `pilot/product-request.md` from the project root.\n\nCreate only `pilot/brief.md` from that request:\n\n1. Include only product meaning explicitly stated in the request.\n2. Copy wording marked for preservation exactly.\n3. State each explicitly undecided or missing decision as `unknown`; do not choose or infer a value.\n4. State every acceptance boundary exactly as given without broadening it.\n5. Use concise headings to distinguish the request, acceptance boundary, and unknowns without adding scope.\n\nDo not read other project files for product meaning. Do not prepare a packet, call an observer or renderer, use a fallback, create semantic durable state, auto-merge content, or write any second output. If the input is missing or cannot be read, stop without writing the output and report that the input is unavailable. Do not treat writing the file as proof that its meaning is correct or that any external product effect occurred.\n"
+      }
+    },
+    {
+      "path": "domains/natural-language-pilot/targets/product/target.json",
+      "before": null,
+      "after": {
+        "bytes": 159,
+        "sha256": "43c0a475959c2132e2d623abe7e2c5b76612559a9941b72450dc4ad1ad1e52d5",
+        "utf8": "{\n  \"schemaVersion\": 1,\n  \"targetId\": \"natural-language-pilot-product-next\",\n  \"mode\": \"prose\",\n  \"entry\": \"entry.md\",\n  \"imports\": [\n    \"productBrief\"\n  ]\n}\n"
+      }
+    },
+    {
+      "path": "fixture/author-report.json",
+      "before": null,
+      "after": {
+        "bytes": 3514,
+        "sha256": "acc91d9b80c9daaa2029f1b689b4d587871e1c412914c56ae6498f2037ec14a5",
+        "utf8": "{\n  \"selectedOption\": \"prose-only\",\n  \"selectedOptionReason\": \"The work is a bounded meaning-preserving transformation from one request to one brief. AI judgment can preserve explicit wording and unknowns directly, while the current task provides no repeated formatting or recovery cost that would justify domain or core machinery.\",\n  \"rejectedOptions\": [\n    {\n      \"option\": \"domain renderer\",\n      \"reason\": \"A renderer would require configuration, an answer contract, runtime recording, and durable semantic state for a transformation that has no demonstrated deterministic rendering or recovery need. That cost is higher than the selected prose target and semantic durable state is prohibited.\"\n    },\n    {\n      \"option\": \"core mechanism\",\n      \"reason\": \"No repeated cross-domain requirement supports changing the generic core. A core feature would broaden ownership and compatibility surface without reducing an observed use or recovery cost.\"\n    },\n    {\n      \"option\": \"independent alternative\",\n      \"alternative\": \"A project-local one-off template or conversion script\",\n      \"reason\": \"A fixed script would either encode product meaning and defaults or discard request wording it did not anticipate. It would add a second execution path without stronger safety evidence.\"\n    }\n  ],\n  \"frameworkSectionsRead\": [],\n  \"unknowns\": [\n    \"storage location\",\n    \"retention period\",\n    \"import support\"\n  ],\n  \"checksRun\": [\n    {\n      \"check\": \"canonical target inspection by exact target ID and entry path\",\n      \"status\": \"passed\",\n      \"evidence\": \"The source graph resolves natural-language-pilot-product-next to targets/product/target.json, imports only productBrief, and reports observer, renderer, and contract as null.\"\n    },\n    {\n      \"check\": \"standalone build\",\n      \"status\": \"passed\",\n      \"evidence\": \"Two builds into fixture/dist-product returned BUILT with treeSha256 c1377006a60c6cea1bcab8d39d5a3d985a599fb7622b5a698d7526fdc5667798.\"\n    },\n    {\n      \"check\": \"deterministic bytes\",\n      \"status\": \"passed\",\n      \"evidence\": \"The first and second builds returned the same treeSha256.\"\n    },\n    {\n      \"check\": \"generated diff and receipt inspection\",\n      \"status\": \"passed\",\n      \"evidence\": \"The generated SKILL.md differs from its canonical entry only by the generated-source marker, the generated productBrief reference is byte-identical to its canonical module, and the receipt lists one imported module with no domain mechanism artifacts.\"\n    },\n    {\n      \"check\": \"artifact integrity\",\n      \"status\": \"passed\",\n      \"evidence\": \"The artifact-only check returned artifactIntact true.\"\n    },\n    {\n      \"check\": \"source currentness\",\n      \"status\": \"passed\",\n      \"evidence\": \"The source-aware check returned artifactIntact true and sourceCurrent true for the Product target.\"\n    },\n    {\n      \"check\": \"forbidden mechanism artifact scan\",\n      \"status\": \"passed\",\n      \"evidence\": \"No generated artifact path contains prepare, observer, packet, fallback, renderer, record, or exchange.\"\n    },\n    {\n      \"check\": \"fresh unfamiliar-AI use\",\n      \"status\": \"unproven\",\n      \"evidence\": \"No fresh AI execution of the generated target was run in this authoring cell.\"\n    },\n    {\n      \"check\": \"brief write or external product effect\",\n      \"status\": \"unproven\",\n      \"evidence\": \"pilot/brief.md remains absent; build and integrity evidence do not establish a file write, semantic correctness, or an external product effect.\"\n    }\n  ]\n}\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/.skill-rails-build.json",
+      "before": null,
+      "after": {
+        "bytes": 2243,
+        "sha256": "23899c2358b2bfca0bfa67f789843d74dc0962bcdc412da84f0e6e52f757041b",
+        "utf8": "{\"artifacts\":[{\"path\":\"SKILL.md\",\"sha256\":\"de1daa398ca2f7750b78503e99cb5c9f20351e3775a18c633f0c60132bc960c0\"},{\"path\":\"config/target.json\",\"sha256\":\"50b9431284130ee55a70a49fad91370e4b475c01042b48265e198e6af3f6d4a4\"},{\"path\":\"contracts/build-receipt.schema.json\",\"sha256\":\"2ecf54ae8be8ca56089067fcda0f3ebf55a9879386d27baf9a59118b3397f849\"},{\"path\":\"references/productBrief.md\",\"sha256\":\"05003bd0dc12f60a4b779584e1101d1dfe302878c45f46d1fea036884eda0153\"},{\"path\":\"scripts/run.mjs\",\"sha256\":\"9679534ff91d95407c35f99209e22228110260e275a1465decaca290d7102e94\"},{\"path\":\"scripts/runtime/common.mjs\",\"sha256\":\"65402c4a721d10734656b730fc23dca23c950cb1d696484501cde86212308845\"},{\"path\":\"scripts/runtime/integrity.mjs\",\"sha256\":\"075231d93940189d1a2d508cdbe1dc1caaf60f8f0986a2390c79cb68e026b018\"}],\"coreVersion\":\"1.0.0-alpha.1\",\"imports\":[\"productBrief\"],\"packageId\":\"natural-language-pilot\",\"packageVersion\":\"0.0.1\",\"schemaVersion\":1,\"sources\":[{\"id\":\"contract:build-receipt.schema.json\",\"path\":\"contracts/build-receipt.schema.json\",\"sha256\":\"2ecf54ae8be8ca56089067fcda0f3ebf55a9879386d27baf9a59118b3397f849\"},{\"id\":\"module:productBrief\",\"path\":\"modules/product-brief.md\",\"sha256\":\"05003bd0dc12f60a4b779584e1101d1dfe302878c45f46d1fea036884eda0153\"},{\"id\":\"source-package\",\"path\":\"skill-package.json\",\"sha256\":\"8bd64d69ec3be1bc79fe1e79526dafc05bc45fd6c8fb083e5821faaba44ed0a2\"},{\"id\":\"runtime:scripts/runtime/common.mjs\",\"path\":\"src/runtime/common.mjs\",\"sha256\":\"65402c4a721d10734656b730fc23dca23c950cb1d696484501cde86212308845\"},{\"id\":\"runtime:scripts/runtime/integrity.mjs\",\"path\":\"src/runtime/integrity.mjs\",\"sha256\":\"075231d93940189d1a2d508cdbe1dc1caaf60f8f0986a2390c79cb68e026b018\"},{\"id\":\"runtime:scripts/run.mjs\",\"path\":\"src/runtime/run-check.mjs\",\"sha256\":\"9679534ff91d95407c35f99209e22228110260e275a1465decaca290d7102e94\"},{\"id\":\"entry\",\"path\":\"targets/product/entry.md\",\"sha256\":\"168015c7dd03baae1b499953694842593e05bb90cbd4787dc8901d2b8e123663\"},{\"id\":\"target:natural-language-pilot-product-next\",\"path\":\"targets/product/target.json\",\"sha256\":\"43c0a475959c2132e2d623abe7e2c5b76612559a9941b72450dc4ad1ad1e52d5\"}],\"targetId\":\"natural-language-pilot-product-next\",\"treeSha256\":\"c1377006a60c6cea1bcab8d39d5a3d985a599fb7622b5a698d7526fdc5667798\"}\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/SKILL.md",
+      "before": null,
+      "after": {
+        "bytes": 1337,
+        "sha256": "de1daa398ca2f7750b78503e99cb5c9f20351e3775a18c633f0c60132bc960c0",
+        "utf8": "---\nname: natural-language-pilot-product-next\ndescription: Turn the natural-language pilot product request into one bounded brief while preserving required wording and keeping missing decisions unknown.\n---\n<!-- generated; do not edit; source: targets/product/entry.md; receipt: .skill-rails-build.json -->\n\n# Create the product brief\n\nRead `references/productBrief.md` completely, then read the current `pilot/product-request.md` from the project root.\n\nCreate only `pilot/brief.md` from that request:\n\n1. Include only product meaning explicitly stated in the request.\n2. Copy wording marked for preservation exactly.\n3. State each explicitly undecided or missing decision as `unknown`; do not choose or infer a value.\n4. State every acceptance boundary exactly as given without broadening it.\n5. Use concise headings to distinguish the request, acceptance boundary, and unknowns without adding scope.\n\nDo not read other project files for product meaning. Do not prepare a packet, call an observer or renderer, use a fallback, create semantic durable state, auto-merge content, or write any second output. If the input is missing or cannot be read, stop without writing the output and report that the input is unavailable. Do not treat writing the file as proof that its meaning is correct or that any external product effect occurred.\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/config/target.json",
+      "before": null,
+      "after": {
+        "bytes": 458,
+        "sha256": "50b9431284130ee55a70a49fad91370e4b475c01042b48265e198e6af3f6d4a4",
+        "utf8": "{\"answerContract\":null,\"declaredInputs\":[],\"declaredOutput\":null,\"domainConfig\":null,\"domainConfigSchema\":null,\"fallbackReference\":null,\"headingIndex\":null,\"imports\":[{\"id\":\"productBrief\",\"path\":\"references/productBrief.md\"}],\"mode\":\"prose\",\"observer\":null,\"outputMode\":null,\"packageId\":\"natural-language-pilot\",\"packageVersion\":\"0.0.1\",\"packet\":null,\"regionBootstrap\":null,\"renderer\":null,\"schemaVersion\":1,\"targetId\":\"natural-language-pilot-product-next\"}\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/contracts/build-receipt.schema.json",
+      "before": null,
+      "after": {
+        "bytes": 1406,
+        "sha256": "2ecf54ae8be8ca56089067fcda0f3ebf55a9879386d27baf9a59118b3397f849",
+        "utf8": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"skill-rails-next/build-receipt/1\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\"schemaVersion\", \"coreVersion\", \"packageId\", \"packageVersion\", \"targetId\", \"sources\", \"artifacts\", \"imports\", \"treeSha256\"],\n  \"properties\": {\n    \"schemaVersion\": {\"const\": 1},\n    \"coreVersion\": {\"type\": \"string\", \"minLength\": 1},\n    \"packageId\": {\"type\": \"string\", \"minLength\": 1},\n    \"packageVersion\": {\"type\": \"string\", \"minLength\": 1},\n    \"targetId\": {\"type\": \"string\", \"minLength\": 1},\n    \"sources\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"additionalProperties\": false,\n        \"required\": [\"id\", \"path\", \"sha256\"],\n        \"properties\": {\n          \"id\": {\"type\": \"string\"},\n          \"path\": {\"type\": \"string\"},\n          \"sha256\": {\"type\": \"string\", \"pattern\": \"^[0-9a-f]{64}$\"}\n        }\n      }\n    },\n    \"artifacts\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"additionalProperties\": false,\n        \"required\": [\"path\", \"sha256\"],\n        \"properties\": {\n          \"path\": {\"type\": \"string\"},\n          \"sha256\": {\"type\": \"string\", \"pattern\": \"^[0-9a-f]{64}$\"}\n        }\n      }\n    },\n    \"imports\": {\"type\": \"array\", \"items\": {\"type\": \"string\"}, \"uniqueItems\": true},\n    \"treeSha256\": {\"type\": \"string\", \"pattern\": \"^[0-9a-f]{64}$\"}\n  }\n}\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/references/productBrief.md",
+      "before": null,
+      "after": {
+        "bytes": 1070,
+        "sha256": "05003bd0dc12f60a4b779584e1101d1dfe302878c45f46d1fea036884eda0153",
+        "utf8": "# Product brief rules\n\nTurn the current contents of `pilot/product-request.md` into the single output `pilot/brief.md`.\n\nThe request is the only authority for product meaning. Preserve wording that the request explicitly says to preserve exactly, including punctuation and casing. State every explicitly undecided or missing decision as `unknown`. Do not resolve an unknown from convention, nearby files, prior knowledge, or a plausible product choice.\n\nThe brief may organize explicit request content under concise headings, but it must not add users, features, platforms, interfaces, storage behavior, retention behavior, import behavior, acceptance boundaries, or other scope that the request does not state. A representative failure is turning an undecided storage location into a local file or database choice; the correct result keeps the storage location `unknown`.\n\nUse only evidence present in the current request. The existence or shape of files is structural evidence, not evidence that the brief is semantically correct or that any external effect occurred.\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/scripts/run.mjs",
+      "before": null,
+      "after": {
+        "bytes": 1648,
+        "sha256": "9679534ff91d95407c35f99209e22228110260e275a1465decaca290d7102e94",
+        "utf8": "#!/usr/bin/env node\nimport { dirname, resolve } from \"node:path\";\nimport { fileURLToPath } from \"node:url\";\nimport { fail, RuntimeError } from \"./runtime/common.mjs\";\nimport { assertIntegrity } from \"./runtime/integrity.mjs\";\n\nconst targetRoot = resolve(dirname(fileURLToPath(import.meta.url)), \"..\");\nfunction parse(argv) { const [command, ...rest] = argv; const values = {}; for (let i = 0; i < rest.length; i += 2) { if (!rest[i]?.startsWith(\"--\") || i + 1 >= rest.length || Object.hasOwn(values, rest[i])) fail(\"ARGUMENT_INVALID\", \"Invalid or duplicate runtime argument.\", \"Use the check command without arguments.\"); values[rest[i]] = rest[i + 1]; } return { command, values }; }\nasync function main() {\n  const { command, values } = parse(process.argv.slice(2));\n  const receipt = await assertIntegrity(targetRoot);\n  if (command === \"check\" && Object.keys(values).length === 0) return { schemaVersion: 1, status: \"ARTIFACT_INTACT\", targetId: receipt.targetId, treeSha256: receipt.treeSha256, sourceCurrent: null, remoteLatest: null };\n  fail(\"ARGUMENT_INVALID\", \"Unknown check-only runtime command.\", \"Use check without arguments.\");\n}\ntry { process.stdout.write(`${JSON.stringify(await main())}\\n`); }\ncatch (error) { const known = error instanceof RuntimeError; process.stdout.write(`${JSON.stringify({ schemaVersion: 1, status: \"ERROR\", code: known ? error.code : \"INTERNAL_ERROR\", message: error instanceof Error ? error.message : String(error), nextAction: known ? error.nextAction : \"Inspect the generated target and retry.\", ...(known && error.details !== undefined ? { details: error.details } : {}) })}\\n`); process.exitCode = 1; }\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/scripts/runtime/common.mjs",
+      "before": null,
+      "after": {
+        "bytes": 8500,
+        "sha256": "65402c4a721d10734656b730fc23dca23c950cb1d696484501cde86212308845",
+        "utf8": "import { createHash, randomUUID } from \"node:crypto\";\nimport { spawn } from \"node:child_process\";\nimport { lstat, mkdir, readFile, realpath, stat } from \"node:fs/promises\";\nimport { dirname, isAbsolute, relative, resolve, sep } from \"node:path\";\nimport { TextDecoder } from \"node:util\";\n\nconst decoder = new TextDecoder(\"utf-8\", { fatal: true });\n\nexport class RuntimeError extends Error {\n  constructor(code, message, nextAction, details) { super(message); this.code = code; this.nextAction = nextAction; this.details = details; }\n}\nexport function fail(code, message, nextAction, details) { throw new RuntimeError(code, message, nextAction, details); }\nexport function sha256(bytes) { return createHash(\"sha256\").update(bytes).digest(\"hex\"); }\nexport function compareCodePoint(a, b) {\n  const left = Array.from(a); const right = Array.from(b);\n  for (let i = 0; i < Math.min(left.length, right.length); i += 1) { const d = left[i].codePointAt(0) - right[i].codePointAt(0); if (d) return d; }\n  return left.length - right.length;\n}\nexport function canonicalJson(value) {\n  if (value === null || typeof value !== \"object\") return JSON.stringify(value);\n  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(\",\")}]`;\n  return `{${Object.keys(value).sort(compareCodePoint).map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(\",\")}}`;\n}\nexport function decodeUtf8(bytes, label, failure = {}) { try { return decoder.decode(bytes); } catch { fail(failure.code ?? \"PREPARE_FAILED\", `${label} is not valid UTF-8.`, failure.nextAction ?? \"Correct the declared text input and run prepare again.\"); } }\nexport async function readJson(path, code = \"ARTIFACT_INTEGRITY_FAILED\") {\n  try { return JSON.parse(await readFile(path, \"utf8\")); } catch { fail(code, `${path} is missing or invalid JSON.`, \"Restore the generated target or exchange from its canonical owner.\"); }\n}\nexport function normalizeRelativePath(input, label) {\n  if (typeof input !== \"string\" || !input || isAbsolute(input) || input.includes(\"\\\\\")) fail(\"PATH_OUTSIDE_ROOT\", `${label} must be a relative path with forward slashes.`, \"Correct the target manifest and rebuild.\");\n  const parts = input.split(\"/\");\n  if (parts.some((part) => !part || part === \".\" || part === \"..\")) fail(\"PATH_OUTSIDE_ROOT\", `${label} has a forbidden segment.`, \"Correct the target manifest and rebuild.\");\n  return input;\n}\nexport async function resolveProjectPath(projectRoot, logicalPath) {\n  const normalized = normalizeRelativePath(logicalPath, \"project path\");\n  const candidate = resolve(projectRoot, ...normalized.split(\"/\"));\n  const lexical = relative(projectRoot, candidate);\n  if (lexical === \"..\" || lexical.startsWith(`..${sep}`) || isAbsolute(lexical)) fail(\"PATH_OUTSIDE_ROOT\", `${logicalPath} escapes the project root.`, \"Correct the target manifest and rebuild.\");\n  let probe = candidate;\n  while (true) {\n    try { probe = await realpath(probe); break; } catch (error) { if (error?.code !== \"ENOENT\") throw error; const parent = dirname(probe); if (parent === probe) throw error; probe = parent; }\n  }\n  const physicalRelative = relative(projectRoot, probe);\n  if (physicalRelative === \"..\" || physicalRelative.startsWith(`..${sep}`) || isAbsolute(physicalRelative)) fail(\"PATH_OUTSIDE_ROOT\", `${logicalPath} resolves outside the project root.`, \"Remove the escaping link or correct the target manifest.\");\n  return candidate;\n}\nexport async function fileBasis(projectRoot, logicalPath) {\n  const physical = await resolveProjectPath(projectRoot, logicalPath);\n  try { const info = await lstat(physical); if (!info.isFile()) fail(\"PATH_OUTSIDE_ROOT\", `${logicalPath} is not a regular file.`, \"Use a regular declared input.\"); const bytes = await readFile(physical); return { path: logicalPath, state: \"present\", sha256: sha256(bytes), bytes }; }\n  catch (error) { if (error?.code === \"ENOENT\") return { path: logicalPath, state: \"absent\", sha256: null, bytes: null }; throw error; }\n}\nexport function basisPublic(item) { return { path: item.path, state: item.state, sha256: item.sha256 }; }\nexport async function ensureProject(project) { try { return await realpath(resolve(project)); } catch { fail(\"PATH_OUTSIDE_ROOT\", \"Project root does not exist.\", \"Provide an existing project directory.\"); } }\nexport async function runChild(program, args, input, failureCode) {\n  return new Promise((resolvePromise, rejectPromise) => {\n    const child = spawn(program, args, { stdio: [\"pipe\", \"pipe\", \"pipe\"], windowsHide: true });\n    const stdout = []; const stderr = []; let stdoutSize = 0; let settled = false;\n    const finish = (fn, value) => { if (!settled) { settled = true; clearTimeout(timer); fn(value); } };\n    const timer = setTimeout(() => { child.kill(); finish(rejectPromise, new RuntimeError(failureCode, `${program} timed out.`, \"Inspect the domain adapter and retry.\")); }, 10000);\n    child.stdout.on(\"data\", (chunk) => { stdoutSize += chunk.length; if (stdoutSize > 4 * 1024 * 1024) { child.kill(); finish(rejectPromise, new RuntimeError(failureCode, `${program} output exceeded the limit.`, \"Reduce domain adapter output.\")); } else stdout.push(chunk); });\n    child.stderr.on(\"data\", (chunk) => stderr.push(chunk));\n    child.on(\"error\", (error) => finish(rejectPromise, new RuntimeError(failureCode, error.message, \"Inspect the domain adapter and retry.\")));\n    child.on(\"close\", (code) => finish(resolvePromise, { code, stdout: Buffer.concat(stdout), stderr: Buffer.concat(stderr) }));\n    child.stdin.end(input);\n  });\n}\nexport function validate(value, schema, path = \"$\") {\n  const errors = [];\n  const visit = (current, rule, at) => {\n    if (rule.$ref) {\n      if (!rule.$ref.startsWith(\"#/$defs/\")) { errors.push(`${at} uses an unsupported schema reference`); return; }\n      const referenced = schema.$defs?.[rule.$ref.slice(\"#/$defs/\".length)];\n      if (!referenced) { errors.push(`${at} references a missing schema definition`); return; }\n      visit(current, referenced, at);\n      return;\n    }\n    if (rule.$ref?.startsWith(\"#/$defs/\")) {\n      const resolved = schema.$defs?.[rule.$ref.slice(\"#/$defs/\".length)];\n      if (!resolved) { errors.push(`${at} uses an unresolved schema reference`); return; }\n      visit(current, resolved, at);\n      return;\n    }\n    if (rule.oneOf) { const results = rule.oneOf.map((candidate) => { const local = []; const saved = errors.splice(0); visit(current, candidate, at); local.push(...errors.splice(0)); errors.push(...saved); return local; }); if (results.filter((x) => x.length === 0).length !== 1) errors.push(`${at} must match exactly one shape`); return; }\n    if (Object.hasOwn(rule, \"const\") && canonicalJson(current) !== canonicalJson(rule.const)) errors.push(`${at} must equal ${JSON.stringify(rule.const)}`);\n    if (rule.enum && !rule.enum.some((x) => canonicalJson(x) === canonicalJson(current))) errors.push(`${at} is not allowed`);\n    if (rule.type) { const actual = current === null ? \"null\" : Array.isArray(current) ? \"array\" : Number.isInteger(current) ? \"integer\" : typeof current; if (actual !== rule.type) { errors.push(`${at} must be ${rule.type}`); return; } }\n    if (typeof current === \"string\") { if (rule.minLength !== undefined && current.length < rule.minLength) errors.push(`${at} is too short`); if (rule.pattern && !new RegExp(rule.pattern, \"u\").test(current)) errors.push(`${at} has invalid format`); }\n    if (Array.isArray(current)) { if (rule.minItems !== undefined && current.length < rule.minItems) errors.push(`${at} has too few items`); if (rule.uniqueItems && new Set(current.map(canonicalJson)).size !== current.length) errors.push(`${at} has duplicates`); if (rule.items) current.forEach((x, i) => visit(x, rule.items, `${at}[${i}]`)); }\n    if (current && typeof current === \"object\" && !Array.isArray(current)) { for (const key of rule.required ?? []) if (!Object.hasOwn(current, key)) errors.push(`${at}.${key} is required`); for (const key of Object.keys(current)) { if (rule.properties?.[key]) visit(current[key], rule.properties[key], `${at}.${key}`); else if (rule.additionalProperties === false) errors.push(`${at}.${key} is not allowed`); } }\n  };\n  visit(value, schema, path); return errors;\n}\nexport function nonce() { return randomUUID(); }\nexport async function pathExists(path) { try { await stat(path); return true; } catch (error) { if (error?.code === \"ENOENT\") return false; throw error; } }\nexport async function ensureDirectory(path) { await mkdir(path, { recursive: true }); }\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/scripts/runtime/integrity.mjs",
+      "before": null,
+      "after": {
+        "bytes": 2058,
+        "sha256": "075231d93940189d1a2d508cdbe1dc1caaf60f8f0986a2390c79cb68e026b018",
+        "utf8": "import { readFile, readdir } from \"node:fs/promises\";\nimport { relative, resolve } from \"node:path\";\nimport { canonicalJson, compareCodePoint, fail, readJson, sha256 } from \"./common.mjs\";\n\nasync function walk(root, current = root) {\n  const result = [];\n  for (const entry of await readdir(current, { withFileTypes: true })) {\n    const path = resolve(current, entry.name);\n    if (entry.isSymbolicLink()) fail(\"ARTIFACT_INTEGRITY_FAILED\", \"The target contains a symbolic link.\", \"Reinstall the generated target.\");\n    if (entry.isDirectory()) result.push(...await walk(root, path));\n    else if (entry.isFile()) result.push(relative(root, path).replaceAll(\"\\\\\", \"/\"));\n    else fail(\"ARTIFACT_INTEGRITY_FAILED\", \"The target contains a non-regular artifact.\", \"Reinstall the generated target.\");\n  }\n  return result.sort(compareCodePoint);\n}\n\nexport async function assertIntegrity(targetRoot) {\n  const receipt = await readJson(resolve(targetRoot, \".skill-rails-build.json\"));\n  if (receipt.schemaVersion !== 1) fail(\"UNSUPPORTED_VERSION\", \"The target receipt version is unsupported.\", \"Install a compatible target.\");\n  const expected = receipt.artifacts.map((x) => x.path).sort(compareCodePoint);\n  const actual = (await walk(targetRoot)).filter((x) => x !== \".skill-rails-build.json\");\n  if (canonicalJson(actual) !== canonicalJson(expected)) fail(\"ARTIFACT_INTEGRITY_FAILED\", \"Artifact paths differ from the receipt.\", \"Reinstall the generated target.\");\n  const rows = [];\n  for (const item of receipt.artifacts) { const actualHash = sha256(await readFile(resolve(targetRoot, ...item.path.split(\"/\")))); if (actualHash !== item.sha256) fail(\"ARTIFACT_INTEGRITY_FAILED\", `${item.path} differs from the receipt.`, \"Reinstall the generated target.\"); rows.push(`${item.path}\\0${actualHash}\\n`); }\n  const tree = sha256(Buffer.from(rows.sort(compareCodePoint).join(\"\"), \"utf8\"));\n  if (tree !== receipt.treeSha256) fail(\"ARTIFACT_INTEGRITY_FAILED\", \"The target tree hash differs from its receipt.\", \"Reinstall the generated target.\");\n  return receipt;\n}\n"
+      }
+    }
+  ],
+  "machineChecks": [
+    {
+      "name": "build-product-package",
+      "exitCode": 0,
+      "wallClockMs": 158,
+      "stdout": "{\"schemaVersion\":1,\"status\":\"BUILT\",\"outputs\":[{\"targetId\":\"natural-language-pilot-product-next\",\"output\":\"C:\\\\Users\\\\joinj\\\\AppData\\\\Local\\\\Temp\\\\skill-rails-m5-l0-product-codex-seed3-ADKYaR\\\\fixture\\\\machine-dist-product\\\\skills\\\\natural-language-pilot-product-next\",\"treeSha256\":\"c1377006a60c6cea1bcab8d39d5a3d985a599fb7622b5a698d7526fdc5667798\"},{\"targetId\":\"natural-language-pilot-verify-next\",\"output\":\"C:\\\\Users\\\\joinj\\\\AppData\\\\Local\\\\Temp\\\\skill-rails-m5-l0-product-codex-seed3-ADKYaR\\\\fixture\\\\machine-dist-product\\\\skills\\\\natural-language-pilot-verify-next\",\"treeSha256\":\"30908b05d9647a6c4281fe71444d283e2d44382f762c5c986f2260e554582050\"}]}\n",
+      "stderr": ""
+    }
+  ],
+  "metrics": {
+    "acceptance": "machine-pass-semantic-review-pending",
+    "safetyViolations": null,
+    "criticalOmissions": null,
+    "purposeScopeOwnerRealignments": null,
+    "unsupportedRulesChecksExceptions": null,
+    "rework": null,
+    "fixedReadBytes": 3802,
+    "conditionalReadBytes": null,
+    "toolCalls": 43,
+    "inputTokens": 536459,
+    "outputTokens": 9854,
+    "userRoundtrips": 0,
+    "wallClockMs": 329936,
+    "machineRuntimeMs": 158,
+    "routingErrors": null,
+    "fallbacks": 0,
+    "indexMaintenanceCost": 0,
+    "afterMachineCheckChangeCount": 23
+  },
+  "interpretation": null,
+  "claimPolicy": "Machine checks establish delivery or structural safety only. Framework benefit, semantic quality, fresh behavior, and actual effect remain unproven until transcript and changed artifacts are independently reviewed."
+}

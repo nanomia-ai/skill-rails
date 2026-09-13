@@ -1,0 +1,355 @@
+{
+  "schemaVersion": 1,
+  "gate": "m6-three-target-common-specific-pressure-step-2",
+  "recordedAt": "2026-09-14",
+  "status": "SOURCE_GRAPH_AND_CHANGED_COMMON_COHORT_PASSED_MINIMAL_READ_NOT_MET_TOTAL_COST_UNPROVEN",
+  "decision": "At three real targets, one canonical source graph expresses and rebuilds the common/specific boundary correctly, and a changed common source makes all three existing targets stale before one rebuild restores currentness. Whole-module delivery is therefore proven at this pressure, while the frozen minimal-read condition is not met for the historical source granularity and prose-relative total cost remains unproven. Do not add a fourth target or inverse impact because neither can reduce the observed fixed reads and source-to-consumer tracing did not fail.",
+  "scope": {
+    "frozenMilestoneStep": "M6 step 2",
+    "targetsMaterialized": 3,
+    "newTargetsInThisStep": [
+      "devflow-product-pressure-next",
+      "devflow-work-pressure-next"
+    ],
+    "existingTarget": "devflow-resume-pressure-next",
+    "syntheticPadding": false,
+    "inverseImpactAdded": false,
+    "evaluationSchemaOrHarnessAdded": false,
+    "agentRetryAdded": false,
+    "productionIntegration": false
+  },
+  "frozenAdoptionConditions": {
+    "independentInstall": "passed at the named standalone targets",
+    "minimalRead": "not met for the observed historical source granularity",
+    "oneCommonSourceAndAllStaleConsumersDetected": "passed at three real targets in one isolated machine observation",
+    "totalCostLowerThanProseIncludingRebuildAndRedeploy": "unproven",
+    "gatePassed": false,
+    "stepsThreeThroughFiveEntered": false,
+    "m7Entered": false,
+    "m7NonEntryReason": "user sequencing decision; frozen M7 depends only on confirming that core contains no Devflow vocabulary, not on passing this M6 adoption gate"
+  },
+  "source": {
+    "role": "byte-identical historical pressure evidence only; not an architecture baseline, fallback, runtime, live import, compatibility layer, or answer key",
+    "repository": "D:/Projects/Private/nanomia/nanomia-skills/devflow",
+    "commit": "fa05d8269cf8dda8035f2a48aaa95b6aef7641be",
+    "addedFiles": [
+      {
+        "logicalSource": "skills/product/SKILL.md",
+        "materializedAs": "modules/product-entry-source.md",
+        "bytes": 10058,
+        "sha256": "ae80886293bae926a96346d97d9577ed4265d16e90a25f402e610c88316c1aae",
+        "byteIdenticalToGitObject": true
+      },
+      {
+        "logicalSource": "skills/work/SKILL.md",
+        "materializedAs": "modules/work-entry-source.md",
+        "bytes": 29634,
+        "sha256": "0dbeaefc1982deb980aab21f1f3d9ae40cc44e7038cbacf24f1c3e7e2d45437d",
+        "byteIdenticalToGitObject": true
+      },
+      {
+        "logicalSource": "skills/principles/planning-evidence.md",
+        "materializedAs": "modules/planning-evidence.md",
+        "bytes": 7909,
+        "sha256": "3229316fc898045037f4bd5e3cbe417627f7f810ba91ad8be828aa3125585322",
+        "byteIdenticalToGitObject": true
+      }
+    ]
+  },
+  "selection": {
+    "reason": "Product is meaning-first planning with planning-only evidence, while Work is an implementation/effect stage sharing state predicates with Resume. Together with Resume they expose a module common to all targets, a module shared by two targets, and target-specific modules without inventing dummy consumers.",
+    "targetReads": {
+      "devflow-product-pressure-next": [
+        "productEntrySource",
+        "commonPrinciples",
+        "planningEvidence"
+      ],
+      "devflow-resume-pressure-next": [
+        "resumeEntrySource",
+        "commonPrinciples",
+        "statePredicates",
+        "verificationPredicates",
+        "baselinePredicates"
+      ],
+      "devflow-work-pressure-next": [
+        "workEntrySource",
+        "commonPrinciples",
+        "statePredicates"
+      ]
+    }
+  },
+  "sourceGraph": {
+    "sha256": "dba4c274e404cddee6665b8215408fce5984d0c87f78abc29819c6bfc703c147",
+    "observedConsumers": {
+      "commonPrinciples": [
+        "devflow-product-pressure-next",
+        "devflow-resume-pressure-next",
+        "devflow-work-pressure-next"
+      ],
+      "statePredicates": [
+        "devflow-resume-pressure-next",
+        "devflow-work-pressure-next"
+      ],
+      "planningEvidence": [
+        "devflow-product-pressure-next"
+      ]
+    },
+    "manualTracingFailureObserved": false,
+    "inspectGapPreserved": "requirement/check/external-boundary semantic edges are not declared in v1"
+  },
+  "delivery": {
+    "buildWallMs": 146.6147,
+    "unchangedRebuildWallMs": 161.4289,
+    "initialAndRebuildTreesEqual": true,
+    "targets": [
+      {
+        "targetId": "devflow-product-pressure-next",
+        "treeSha256": "421ecf239d4d791f2f104cc2525f82803bf86fcb007a37fcee3c3296b2a3884a",
+        "installerReportedHash": "33a1d86219479341d1c69c3f30e472f1234de15fc705edaaa8942c7532a42033",
+        "fixedInitialReadBytes": 86154,
+        "approximateTokensAtFourBytesPerToken": 21539,
+        "artifactIntactAndSourceCurrentBeforeAndAfter": true
+      },
+      {
+        "targetId": "devflow-resume-pressure-next",
+        "treeSha256": "42e9b038127475b675179419ae021eba836c8bd4abbaccc9c4344d932396363e",
+        "fixedInitialReadBytes": 154345,
+        "approximateTokensAtFourBytesPerToken": 38587,
+        "artifactIntactAndSourceCurrent": true
+      },
+      {
+        "targetId": "devflow-work-pressure-next",
+        "treeSha256": "12bfb4a64f5631e72cce688893ddb754552ffd63b5af630e0dd4aa0ff39ca055",
+        "installerReportedHash": "f5facd1f14f09ebebb39d100d00b50e857581a970542b6708b2aef3b6106321a",
+        "fixedInitialReadBytes": 99916,
+        "approximateTokensAtFourBytesPerToken": 24979,
+        "artifactIntactAndSourceCurrentBeforeAndAfter": true
+      }
+    ],
+    "standaloneSiblingRuntimeDependency": false,
+    "changedCommonCohort": {
+      "scope": "One machine-only currentness observation in an isolated temporary copy using the existing build and check commands; no host consumer, schema, harness, projection, or retry was added.",
+      "temporaryRoot": "C:/Users/joinj/AppData/Local/Temp/skill-rails-m6-currentness-ws3akA",
+      "change": {
+        "module": "commonPrinciples",
+        "operation": "append one newline byte to the temporary copy only",
+        "canonicalRepositorySourceChanged": false,
+        "beforeBytes": 67205,
+        "beforeSha256": "17e36d14c9277aeb93c7034125cfeeac77bb88786e4fda89cce5d7426c33abca",
+        "afterBytes": 67206,
+        "afterSha256": "0d88618ac3df04a2c1e92ab21fbd35b5590bcb8b7032c70b0ac18e74e7c231a3"
+      },
+      "staleChecks": [
+        {
+          "targetId": "devflow-product-pressure-next",
+          "artifactIntact": true,
+          "sourceCurrent": false,
+          "treeSha256": "421ecf239d4d791f2f104cc2525f82803bf86fcb007a37fcee3c3296b2a3884a"
+        },
+        {
+          "targetId": "devflow-resume-pressure-next",
+          "artifactIntact": true,
+          "sourceCurrent": false,
+          "treeSha256": "42e9b038127475b675179419ae021eba836c8bd4abbaccc9c4344d932396363e"
+        },
+        {
+          "targetId": "devflow-work-pressure-next",
+          "artifactIntact": true,
+          "sourceCurrent": false,
+          "treeSha256": "12bfb4a64f5631e72cce688893ddb754552ffd63b5af630e0dd4aa0ff39ca055"
+        }
+      ],
+      "rebuildWallMs": 214.8074,
+      "rebuiltChecks": [
+        {
+          "targetId": "devflow-product-pressure-next",
+          "artifactIntact": true,
+          "sourceCurrent": true,
+          "treeSha256": "e6f8c58e2d7672a05ec6cac54455aceac44597e54c622d30ae37c27cfcd22e90"
+        },
+        {
+          "targetId": "devflow-resume-pressure-next",
+          "artifactIntact": true,
+          "sourceCurrent": true,
+          "treeSha256": "659de81fb2f298d9e2452692d74ca75fd894aa5c6b85eedbe4f4ef064ede6930"
+        },
+        {
+          "targetId": "devflow-work-pressure-next",
+          "artifactIntact": true,
+          "sourceCurrent": true,
+          "treeSha256": "99ccbd7cac98e2c440ae00d2fd14f6efcee53188076631ab56c5ee9c1016e72a"
+        }
+      ]
+    }
+  },
+  "hostRuns": [
+    {
+      "targetId": "devflow-product-pressure-next",
+      "host": "Codex CLI 0.148.0",
+      "model": "gpt-5.6-sol",
+      "effort": "medium",
+      "threadId": "01a09c78-1fbf-7630-9b3e-c468c8afe7fd",
+      "outcome": "passed-natural-product-effect",
+      "installedSkillDiscovered": true,
+      "referencesReportedReadInFull": true,
+      "inputTokens": 473029,
+      "cachedInputTokens": 436096,
+      "outputTokens": 3580,
+      "reasoningOutputTokens": 924,
+      "wallTimeMs": "unknown",
+      "toolCalls": "unknown",
+      "effect": {
+        "output": "pilot/brief.md",
+        "bytes": 1486,
+        "sha256": "46e24eabbf421d7e83f2db5873cb16611e4f605ead5e9d2c5668e876602c89ac",
+        "requestInputUnchanged": true,
+        "requestParagraphVerbatim": true,
+        "httpsOnlyBoundary": true,
+        "threeUnknownsPreserved": true
+      },
+      "processNotes": [
+        "The host read commonPrinciples in bounded chunks and made an unnecessary git-status check in the non-Git fixture.",
+        "A console rendering showed mojibake in the first draft display; the host rewrote and reread the output as valid ASCII/UTF-8 within the same run."
+      ]
+    },
+    {
+      "targetId": "devflow-product-pressure-next",
+      "host": "Claude Code 2.1.270",
+      "model": "claude-opus-5",
+      "effort": "medium",
+      "sessionId": "b6365dbb-226c-47db-b93d-cd358dfeb76e",
+      "outcome": "passed-natural-product-effect",
+      "installedSkillDiscovered": true,
+      "referencesReportedReadInFull": true,
+      "inputTokens": 100,
+      "cacheCreationInputTokens": 44289,
+      "cacheReadInputTokens": 189200,
+      "outputTokens": 1837,
+      "thinkingTokens": 44,
+      "turns": 9,
+      "durationMs": 38098,
+      "apiDurationMs": 28772,
+      "costUsd": 0.584953,
+      "permissionDenials": 0,
+      "subagents": 0,
+      "effect": {
+        "output": "pilot/brief.md",
+        "bytes": 2062,
+        "sha256": "8412898f8b3d95ed65038ee62debe87ff53281a74853918be985de8419e22ad4",
+        "requestInputUnchanged": true,
+        "requestParagraphVerbatim": true,
+        "httpsOnlyBoundary": true,
+        "threeUnknownsPreserved": true
+      }
+    },
+    {
+      "targetId": "devflow-work-pressure-next",
+      "host": "Codex CLI 0.148.0",
+      "model": "gpt-5.6-sol",
+      "effort": "medium",
+      "threadId": "01a09c7a-af92-7a81-8320-c471a12a8db1",
+      "outcome": "passed-natural-work-effect-with-read-process-failures",
+      "installedSkillDiscovered": true,
+      "referencesReportedReadInFull": true,
+      "inputTokens": 1175256,
+      "cachedInputTokens": 1109248,
+      "outputTokens": 5076,
+      "reasoningOutputTokens": 1715,
+      "wallTimeMs": "unknown",
+      "toolCalls": "unknown",
+      "effect": {
+        "sourceBytes": 475,
+        "sourceSha256": "9cfd77bcdaa7b6d68a8cf476509e09984be39a94169520c6a1251639289c4911",
+        "progressBytes": 600,
+        "progressSha256": "71d6d12bf5017c4abe1d304a56db5c05c31743bf61182546e9267cf6b29e94f1",
+        "fixedInputsUnchanged": true,
+        "exactTestReported": "npm test -- bookmark-storage: 1 pass, 0 fail",
+        "processLocalBoundary": true,
+        "threeUnknownsPreserved": true
+      },
+      "processFailures": [
+        "The first installed-skill path was malformed and failed before the correct project-local path was read.",
+        "One combined historical read was truncated by the output channel.",
+        "Two attempted PowerShell chunk reads failed to parse before later bounded reads delivered the remaining common source."
+      ]
+    },
+    {
+      "targetId": "devflow-work-pressure-next",
+      "host": "Claude Code 2.1.270",
+      "model": "claude-opus-5",
+      "effort": "medium",
+      "sessionId": "55f9a804-a493-429d-a2b6-9a6805884137",
+      "outcome": "passed-natural-work-effect",
+      "installedSkillDiscovered": true,
+      "referencesReportedReadInFull": true,
+      "inputTokens": 196,
+      "cacheCreationInputTokens": 51859,
+      "cacheReadInputTokens": 401525,
+      "outputTokens": 2592,
+      "thinkingTokens": 266,
+      "turns": 16,
+      "durationMs": 55638,
+      "apiDurationMs": 36697,
+      "costUsd": 0.7862125,
+      "permissionDenials": 0,
+      "subagents": 0,
+      "effect": {
+        "sourceBytes": 413,
+        "sourceSha256": "3eb4b0f9cd19c2e5ef6672aa6caffb37fc71037413f497d9e214b6005f77af0a",
+        "progressBytes": 716,
+        "progressSha256": "1313c5bd65b36042090cadf434ee89f88f082842f3ab88430b8c34aff3255c15",
+        "fixedInputsUnchanged": true,
+        "exactTestReported": "npm test -- bookmark-storage: 1 pass, 0 fail",
+        "processLocalBoundary": true,
+        "threeUnknownsPreserved": true
+      }
+    }
+  ],
+  "claims": {
+    "proven": [
+      "At three real historical targets, one source graph correctly exposes an all-target common module, a two-target shared module, and target-specific modules without dummy imports.",
+      "The three-target standalone build completed in 146.6147ms, an unchanged rebuild completed in 161.4289ms with identical tree hashes, and all generated and installed trees checked artifact-intact/source-current.",
+      "In one isolated machine-only observation, a one-byte change to the common source made Product, Resume, and Work all source-stale while their artifacts remained intact; one 214.8074ms rebuild restored artifact-intact/source-current for all three.",
+      "Both medium hosts completed one natural Product effect and one natural Work effect from installed skills; coordinator reread confirmed unchanged inputs and the recorded output bytes.",
+      "No source-to-consumer tracing failure occurred, so inverse impact has no admission evidence."
+    ],
+    "failed": [
+      "The frozen minimal-read condition is not met for this historical source granularity: fixed reads were 86154B for Product, 99916B for Work, and 154345B for Resume, while host usage included substantial repeated/cached context.",
+      "Codex Work reading encountered a malformed local path, output truncation, and two failed chunk commands before succeeding inside the single run; the earlier Resume Codex semantic-read failure remains unretried."
+    ],
+    "unproven": [
+      "Exact source-only token attribution because host usage includes system, discovery, caching, tool conversation, and repeated reads",
+      "Whole-module quality or total cost relative to unchanged historical prose or a future greenfield source boundary; the historical prose bytes and materialized source bytes are identical by construction",
+      "Repeatability beyond the four named step-2 observations",
+      "Selective stale detection for a module consumed by only one or two targets; the changed-common observation made all three targets stale",
+      "Manual tracing failure, inverse impact, a fourth target, nine-target integration, or production Devflow behavior",
+      "Duplicate-id replacement versus rejection because the fixed Work fixture does not specify that behavior"
+    ]
+  },
+  "reconciliation": {
+    "reviewer": "actual retained Claude Fable 5.1 high read-only M6 gate audit, independently reconciled with Codex judgment",
+    "orca": {
+      "runId": "run_4816c4afff3e",
+      "taskId": "task_7fb63040ace3",
+      "dispatchId": "ctx_d0c35bc1240c",
+      "messageId": "msg_a0b6f2a053df"
+    },
+    "agreedBoundary": [
+      "Do not describe whole-module materialization itself as failed when it delivers byte-identical historical prose through one canonical graph.",
+      "Record the minimal-read condition as not met at the observed historical granularity and prose-relative total cost as unproven.",
+      "A fourth target cannot reduce the fixed common read and is not decision-changing evidence.",
+      "Inverse impact remains closed because no manual source-to-consumer tracing failure occurred.",
+      "A smaller boundary is a future greenfield authoring decision and must not be manufactured by semantically slicing historical evidence.",
+      "The changed-common observation proves all-consumer stale detection, not selective stale detection.",
+      "Not entering M7 is the current user sequencing decision; it is not an automatic consequence of this M6 gate because frozen M7 has its own core-vocabulary dependency."
+    ],
+    "productBoundaryOrAllowedCostChanged": false,
+    "newMachineryAdded": false
+  },
+  "setupDiagnostics": [
+    "The first currentness-probe temporary-root command lost its PowerShell variable to outer-shell expansion and failed before creating a fixture; one corrected atomic Node mkdtemp command created the unique root.",
+    "The first temporary-root setup command used a PowerShell-sensitive JavaScript template literal and failed before creating a fixture; the corrected atomic mkdtemp command created four unique empty roots before fixture copy.",
+    "The installed-skill tree checks were run before and after host execution; no global skill or CODEX_HOME change was made."
+  ],
+  "nextAction": "Close this M6 adoption decision at three targets. Under the current user sequencing decision, do not enter frozen step 3, add a fourth target, open inverse impact, or start M7. M7 remains a separate future user decision under its own frozen dependency that core contain no Devflow vocabulary. Reopen the source-boundary question only when a greenfield author observes repeated loading of an unneeded whole module; that future decision must preserve one canonical owner and standalone targets without treating historical Devflow as an architecture baseline."
+}

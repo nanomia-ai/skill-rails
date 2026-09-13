@@ -1,14 +1,11 @@
 {
   "schemaVersion": 1,
   "targetId": "natural-language-pilot-verify-next",
-  "mode": "prepare-record",
+  "mode": "record-only",
   "entry": "entry.md",
-  "imports": ["purpose"],
-  "fallbackModule": "verifyBaseline",
+  "imports": [],
   "domainConfig": "config.json",
   "domainConfigSchema": "config.schema.json",
-  "packet": "packet.json",
-  "observer": "observer.mjs",
   "renderer": "renderer.mjs",
   "answerContract": "contracts/semantic-answer.verify.schema.json",
   "declaredInputs": [

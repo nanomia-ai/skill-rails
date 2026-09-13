@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { createHash } from "node:crypto";
-import { repositoryRoot } from "./helpers.mjs";
+import { repositoryRoot } from "../../tests/helpers.mjs";
 
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 

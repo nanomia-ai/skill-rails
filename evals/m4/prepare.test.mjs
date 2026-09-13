@@ -1,14 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { cp, readFile, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
-import { coreCli, repositoryRoot, runNode, temporary } from "./helpers.mjs";
+import { dirname, join, resolve } from "node:path";
+import { coreCli, repositoryRoot, runNode, temporary } from "../../tests/helpers.mjs";
 
 const source = "domains/natural-language-pilot/skill-package.json";
 
 async function setup(t, name) {
   const root = await temporary(t, name);
-  const built = coreCli("build", "--source", source, "--out-root", join(root, "dist"));
+  const sourceRoot = join(root, "prepare-record-source");
+  await cp(resolve(repositoryRoot, "domains", "natural-language-pilot"), sourceRoot, { recursive: true });
+  await cp(resolve(repositoryRoot, "fixtures", "verify-v1", "prepare-record-target.json"), join(sourceRoot, "targets", "verify", "target.json"), { force: true });
+  await cp(resolve(repositoryRoot, "fixtures", "verify-v1", "prepare-record-entry.md"), join(sourceRoot, "targets", "verify", "entry.md"), { force: true });
+  const built = coreCli("build", "--source", join(sourceRoot, "skill-package.json"), "--out-root", join(root, "dist"));
   assert.equal(built.status, 0, built.stdout);
   const target = join(root, "installed", "natural-language-pilot-verify-next");
   await cp(join(root, "dist", "skills", "natural-language-pilot-verify-next"), target, { recursive: true });
@@ -66,6 +70,23 @@ test("two project copies with identical bytes produce the same semantic hash", a
   assert.equal(first.status, 0, first.stdout);
   assert.equal(second.status, 0, second.stdout);
   assert.equal(first.json.decisionSha256, second.json.decisionSha256);
+});
+
+test("preserved prepare-record exchange remains record-compatible", async (t) => {
+  const { target, project } = await setup(t, "prepare-record-compatible");
+  const prepared = prepare(target, project);
+  assert.equal(prepared.status, 0, prepared.stdout);
+  await writeFile(prepared.json.answer, `${JSON.stringify({
+    schemaVersion: 1,
+    cardId: "bookmark-storage",
+    verdict: "pass",
+    summary: "The targeted acceptance test passed.",
+    checks: [{ name: "targeted-tests", outcome: "pass", evidence: [{ authority: "ai-reported", reference: "npm test -- bookmark-storage exited 0" }] }],
+    unknowns: [],
+  })}\n`);
+  const recorded = runNode([join(target, "scripts", "run.mjs"), "record", "--exchange", dirname(prepared.json.packet)], { cwd: project });
+  assert.equal(recorded.status, 0, recorded.stdout);
+  assert.equal(recorded.json.status, "APPLIED");
 });
 
 test("fixture verification command has fixed success and failure evidence", async () => {

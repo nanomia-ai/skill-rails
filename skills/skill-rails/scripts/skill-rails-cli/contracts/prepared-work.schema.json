@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-rails-next/prepared-work/1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "target", "basis", "observed", "purpose", "purposeSha256", "action", "judgment", "reads", "returnContract", "returnContractSha256", "completionCriteria", "authority", "fallbackEligible", "decisionSha256"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "target": {"type": "object"},
+    "basis": {"type": "object"},
+    "observed": {"type": "object"},
+    "purpose": {"type": "string"},
+    "purposeSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "action": {"type": "string"},
+    "judgment": {"type": "object"},
+    "reads": {"type": "array"},
+    "returnContract": {"type": "string"},
+    "returnContractSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "completionCriteria": {"type": "array"},
+    "authority": {"type": "object"},
+    "fallbackEligible": {"type": "boolean"},
+    "decisionSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

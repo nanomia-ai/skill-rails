@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "targetId": "devflow-resume-pressure-next",
+  "mode": "prose",
+  "entry": "entry.md",
+  "imports": [
+    "resumeEntrySource",
+    "commonPrinciples",
+    "statePredicates",
+    "verificationPredicates",
+    "baselinePredicates"
+  ]
+}

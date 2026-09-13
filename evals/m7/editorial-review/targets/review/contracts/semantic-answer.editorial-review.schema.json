@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "editorial-review-pilot/semantic-answer/1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "documentId", "verdict", "summary", "issues", "unknowns"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "documentId": {"const": "museum-label-01"},
+    "verdict": {"enum": ["accept", "revise", "unproven"]},
+    "summary": {"type": "string", "minLength": 1, "pattern": "^[^\\r\\n]+$"},
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "note"],
+        "properties": {
+          "kind": {"enum": ["clarity", "tone", "factual-uncertainty"]},
+          "note": {"type": "string", "minLength": 1, "pattern": "^[^\\r\\n]+$"}
+        }
+      }
+    },
+    "unknowns": {"type": "array", "items": {"type": "string", "minLength": 1, "pattern": "^[^\\r\\n]+$"}}
+  }
+}

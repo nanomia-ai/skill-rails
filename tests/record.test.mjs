@@ -41,8 +41,8 @@ async function setupWithRenderer(t, name, rendererSource) {
   return { target, project };
 }
 
-function prepare(target, project) {
-  const result = runNode([join(target, "scripts", "run.mjs"), "prepare", "--project", project], { cwd: project });
+function initialize(target, project) {
+  const result = runNode([join(target, "scripts", "run.mjs"), "initialize", "--project", project], { cwd: project });
   assert.equal(result.status, 0, result.stdout);
   return result.json;
 }
@@ -52,13 +52,13 @@ async function answer(envelope, value = passAnswer) {
 }
 
 function record(target, envelope) {
-  return runNode([join(target, "scripts", "run.mjs"), "record", "--exchange", dirname(envelope.packet)]);
+  return runNode([join(target, "scripts", "run.mjs"), "record", "--exchange", envelope.exchange]);
 }
 
 test("record preserves human bytes, applies one card, and retries idempotently", async (t) => {
   const { target, project } = await setup(t, "record");
   const before = await readFile(join(project, "pilot", "verification.md"));
-  const envelope = prepare(target, project);
+  const envelope = initialize(target, project);
   await answer(envelope);
   const applied = record(target, envelope);
   assert.equal(applied.status, 0, applied.stdout);
@@ -77,7 +77,7 @@ test("record preserves human bytes, applies one card, and retries idempotently",
 
 test("input stale and output conflict are distinct no-write results", async (t) => {
   const first = await setup(t, "input-stale");
-  const firstEnvelope = prepare(first.target, first.project);
+  const firstEnvelope = initialize(first.target, first.project);
   await answer(firstEnvelope);
   await writeFile(join(first.project, "pilot", "plan.md"), "changed plan\n");
   const beforeInputRecord = await readFile(join(first.project, "pilot", "verification.md"));
@@ -86,7 +86,7 @@ test("input stale and output conflict are distinct no-write results", async (t) 
   assert.deepEqual(await readFile(join(first.project, "pilot", "verification.md")), beforeInputRecord);
 
   const second = await setup(t, "output-conflict");
-  const secondEnvelope = prepare(second.target, second.project);
+  const secondEnvelope = initialize(second.target, second.project);
   await answer(secondEnvelope);
   const changed = Buffer.from("# changed by another session\n");
   await writeFile(join(second.project, "pilot", "verification.md"), changed);
@@ -98,12 +98,33 @@ test("input stale and output conflict are distinct no-write results", async (t) 
 test("answer unknown fields and pass without evidence fail before output write", async (t) => {
   const { target, project } = await setup(t, "answer-invalid");
   const original = await readFile(join(project, "pilot", "verification.md"));
-  const unknownField = prepare(target, project);
+  const unknownField = initialize(target, project);
   await answer(unknownField, { ...passAnswer, outputPath: "elsewhere.md" });
   assert.equal(record(target, unknownField).json.code, "ANSWER_INVALID");
-  const emptyEvidence = prepare(target, project);
+  const emptyEvidence = initialize(target, project);
   await answer(emptyEvidence, { ...passAnswer, checks: [{ name: "targeted-tests", outcome: "pass", evidence: [] }] });
   assert.equal(record(target, emptyEvidence).json.code, "ANSWER_INVALID");
+  assert.deepEqual(await readFile(join(project, "pilot", "verification.md")), original);
+});
+
+test("record-only initializer and exchange fail closed on non-UTF-8 and unknown state", async (t) => {
+  const invalidInput = await setup(t, "input-non-utf8");
+  await writeFile(join(invalidInput.project, "pilot", "plan.md"), Buffer.from([0xff]));
+  const rejected = runNode([join(invalidInput.target, "scripts", "run.mjs"), "initialize", "--project", invalidInput.project], { cwd: invalidInput.project });
+  assert.notEqual(rejected.status, 0);
+  assert.equal(rejected.json.code, "INITIALIZE_FAILED");
+
+  const { target, project } = await setup(t, "exchange-unknown");
+  const original = await readFile(join(project, "pilot", "verification.md"));
+  const envelope = initialize(target, project);
+  await answer(envelope);
+  const exchangePath = join(envelope.exchange, "exchange.json");
+  const exchange = JSON.parse(await readFile(exchangePath, "utf8"));
+  exchange.semanticDecision = "pass";
+  await writeFile(exchangePath, JSON.stringify(exchange));
+  const result = record(target, envelope);
+  assert.notEqual(result.status, 0);
+  assert.equal(result.json.code, "ANSWER_INVALID");
   assert.deepEqual(await readFile(join(project, "pilot", "verification.md")), original);
 });
 
@@ -118,7 +139,7 @@ test("managed-region bootstrap follows absent, empty, LF, and non-LF byte rules"
     const output = join(project, "pilot", "verification.md");
     if (initial === null) await rm(output);
     else await writeFile(output, initial);
-    const envelope = prepare(target, project);
+    const envelope = initialize(target, project);
     await answer(envelope);
     assert.equal(record(target, envelope).json.status, "APPLIED");
     const bytes = await readFile(output, "utf8");
@@ -140,7 +161,7 @@ test("renderer preserves another card and updates only the selected card", async
   const prefix = Buffer.from("human prefix without LF");
   const withOther = invokeRenderer(target, prefix, other);
   await writeFile(join(project, "pilot", "verification.md"), withOther);
-  const envelope = prepare(target, project);
+  const envelope = initialize(target, project);
   await answer(envelope);
   assert.equal(record(target, envelope).json.status, "APPLIED");
   const output = await readFile(join(project, "pilot", "verification.md"), "utf8");
@@ -158,7 +179,7 @@ test("malformed and duplicate markers are no-write", async (t) => {
     const { target, project } = await setup(t, `marker-${name}`);
     const output = join(project, "pilot", "verification.md");
     await writeFile(output, content);
-    const envelope = prepare(target, project);
+    const envelope = initialize(target, project);
     await answer(envelope);
     const result = record(target, envelope);
     assert.equal(result.json.code, "MANAGED_REGION_INVALID", result.stdout);
@@ -174,7 +195,7 @@ test("duplicate card records are rejected without changing output", async (t) =>
   assert.ok(hiddenRecord);
   const duplicate = valid.replace("<!-- skill-rails-next:verify-records:end -->", `${hiddenRecord}\n<!-- skill-rails-next:verify-records:end -->`);
   await writeFile(outputPath, duplicate);
-  const envelope = prepare(target, project);
+  const envelope = initialize(target, project);
   await answer(envelope);
   const result = record(target, envelope);
   assert.equal(result.json.code, "MANAGED_REGION_INVALID", result.stdout);
@@ -189,7 +210,7 @@ test("renderer failure and non-UTF-8 output are no-write failures", async (t) =>
     const { target, project } = await setupWithRenderer(t, `renderer-${name}`, rendererSource);
     const outputPath = join(project, "pilot", "verification.md");
     const before = await readFile(outputPath);
-    const envelope = prepare(target, project);
+    const envelope = initialize(target, project);
     await answer(envelope);
     const result = record(target, envelope);
     assert.equal(result.json.code, "RENDER_FAILED", result.stdout);
@@ -199,8 +220,8 @@ test("renderer failure and non-UTF-8 output are no-write failures", async (t) =>
 
 test("output lock rejects a second record without silent loss", async (t) => {
   const { target, project } = await setup(t, "lock");
-  const firstEnvelope = prepare(target, project);
-  const secondEnvelope = prepare(target, project);
+  const firstEnvelope = initialize(target, project);
+  const secondEnvelope = initialize(target, project);
   await answer(firstEnvelope);
   await answer(secondEnvelope);
   const receipt = JSON.parse(await readFile(join(target, ".skill-rails-build.json"), "utf8"));
@@ -209,9 +230,9 @@ test("output lock rejects a second record without silent loss", async (t) => {
   let locked;
   const lockedPromise = new Promise((resolveLocked) => { locked = resolveLocked; });
   const releasePromise = new Promise((resolveRelease) => { release = resolveRelease; });
-  const first = directRecord(target, receipt, dirname(firstEnvelope.packet), { afterLock: async () => { locked(); await releasePromise; } });
+  const first = directRecord(target, receipt, firstEnvelope.exchange, { afterLock: async () => { locked(); await releasePromise; } });
   await lockedPromise;
-  await assert.rejects(() => directRecord(target, receipt, dirname(secondEnvelope.packet)), (error) => error.code === "OUTPUT_BUSY");
+  await assert.rejects(() => directRecord(target, receipt, secondEnvelope.exchange), (error) => error.code === "OUTPUT_BUSY");
   release();
   assert.equal((await first).status, "APPLIED");
   assert.match(await readFile(join(project, "pilot", "verification.md"), "utf8"), /bookmark-storage — pass/u);
@@ -219,29 +240,29 @@ test("output lock rejects a second record without silent loss", async (t) => {
 
 test("exchange transplant and cross-basis reuse fail closed", async (t) => {
   const { root, target, project } = await setup(t, "transplant");
-  const oldEnvelope = prepare(target, project);
+  const oldEnvelope = initialize(target, project);
   await answer(oldEnvelope);
   await writeFile(join(project, "pilot", "plan.md"), "# changed\n");
-  const newEnvelope = prepare(target, project);
+  const newEnvelope = initialize(target, project);
   await answer(newEnvelope, { ...passAnswer, verdict: "unproven", summary: "Current plan format is unknown.", checks: [{ name: "targeted-tests", outcome: "unproven", evidence: [] }], unknowns: ["plan format"] });
   assert.equal(record(target, oldEnvelope).json.code, "INPUT_STALE");
   const otherProject = join(root, "other-project");
   await cp(project, otherProject, { recursive: true });
   const transplanted = join(otherProject, ".skill-rails-next", "exchanges", "transplanted");
   await mkdir(dirname(transplanted), { recursive: true });
-  await cp(dirname(newEnvelope.packet), transplanted, { recursive: true });
+  await cp(newEnvelope.exchange, transplanted, { recursive: true });
   const result = runNode([join(target, "scripts", "run.mjs"), "record", "--exchange", transplanted]);
   assert.equal(result.json.code, "PATH_OUTSIDE_ROOT");
 });
 
 test("post-write reread mismatch never claims observed effect", async (t) => {
   const { target, project } = await setup(t, "reread");
-  const envelope = prepare(target, project);
+  const envelope = initialize(target, project);
   await answer(envelope);
   const receipt = JSON.parse(await readFile(join(target, ".skill-rails-build.json"), "utf8"));
   const { record: directRecord } = await import(`${pathToFileURL(join(target, "scripts", "runtime", "record.mjs")).href}?fault`);
   await assert.rejects(
-    () => directRecord(target, receipt, dirname(envelope.packet), { afterReplace: ({ output }) => writeFile(output, "fault-injected\n") }),
+    () => directRecord(target, receipt, envelope.exchange, { afterReplace: ({ output }) => writeFile(output, "fault-injected\n") }),
     (error) => error.code === "APPLY_NOT_OBSERVED" && error.details.authority === "attempted",
   );
   assert.equal(await readFile(join(project, "pilot", "verification.md"), "utf8"), "fault-injected\n");
@@ -249,13 +270,13 @@ test("post-write reread mismatch never claims observed effect", async (t) => {
 
 test("CRLF-converted managed frame is updated without creating a second region", async (t) => {
   const { target, project } = await setup(t, "crlf");
-  const first = prepare(target, project);
+  const first = initialize(target, project);
   await answer(first);
   assert.equal(record(target, first).json.status, "APPLIED");
   const outputPath = join(project, "pilot", "verification.md");
   const converted = (await readFile(outputPath, "utf8")).replace(/\n/g, "\r\n");
   await writeFile(outputPath, converted);
-  const second = prepare(target, project);
+  const second = initialize(target, project);
   await answer(second, { ...passAnswer, summary: "The targeted acceptance test passed again." });
   const secondResult = record(target, second);
   assert.equal(secondResult.json.status, "APPLIED", JSON.stringify(secondResult.json));

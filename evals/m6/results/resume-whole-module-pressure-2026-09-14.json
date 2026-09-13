@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "gate": "m6-resume-whole-module-pressure-first-unit",
+  "recordedAt": "2026-09-14",
+  "status": "MIXED_PRESSURE_OBSERVATION_NO_ARCHITECTURE_ADOPTION",
+  "decision": "Keep whole-module materialization as the M6 candidate under test, but do not add another target or claim context economy. Claude received the full historical source while Codex counted bytes without putting the source text into model context.",
+  "scope": {
+    "capability": "historical Devflow Resume cold entry",
+    "targetsMaterialized": 1,
+    "syntheticPadding": false,
+    "inverseImpactAdded": false,
+    "evaluationSchemaOrHarnessAdded": false,
+    "productionIntegration": false
+  },
+  "source": {
+    "role": "pressure evidence only; not an architecture baseline, fallback, live import, runtime dependency, or answer key",
+    "repository": "D:/Projects/Private/nanomia/nanomia-skills/devflow",
+    "commit": "fa05d8269cf8dda8035f2a48aaa95b6aef7641be",
+    "files": [
+      {
+        "logicalSource": "skills/resume/SKILL.md",
+        "materializedAs": "references/resumeEntrySource.md",
+        "bytes": 30540,
+        "sha256": "ffe15f1b15941a0b61e665735b69a6d5e40d7c1c4a78e6ecd0613405437e13d6",
+        "byteIdenticalToGitObject": true
+      },
+      {
+        "logicalSource": "skills/principles/SKILL.md",
+        "materializedAs": "references/commonPrinciples.md",
+        "bytes": 67205,
+        "sha256": "17e36d14c9277aeb93c7034125cfeeac77bb88786e4fda89cce5d7426c33abca",
+        "byteIdenticalToGitObject": true
+      },
+      {
+        "logicalSource": "skills/principles/state-predicates.md",
+        "materializedAs": "references/statePredicates.md",
+        "bytes": 2114,
+        "sha256": "67a6d49e13e5e53489b59fb10fd86ecaf3e3bd29f596bf1847c5501422e9a756",
+        "byteIdenticalToGitObject": true
+      },
+      {
+        "logicalSource": "skills/principles/verification-predicates.md",
+        "materializedAs": "references/verificationPredicates.md",
+        "bytes": 3495,
+        "sha256": "0d6e61c9dd3b4c8b7ce0a0604720f95cd19c45d795a525d24094c466e7fd5269",
+        "byteIdenticalToGitObject": true
+      },
+      {
+        "logicalSource": "skills/principles/baseline-predicates.md",
+        "materializedAs": "references/baselinePredicates.md",
+        "bytes": 49948,
+        "sha256": "f2670ab0229bc6135299bcd423ee48af7021e33523ae722ddb38f1325115b3ba",
+        "byteIdenticalToGitObject": true
+      }
+    ],
+    "historicalSourceBytes": 153302,
+    "generatedEntryBytes": 1043,
+    "fixedInitialReadBytes": 154345,
+    "approximateTokensAtFourBytesPerToken": 38587
+  },
+  "delivery": {
+    "targetId": "devflow-resume-pressure-next",
+    "mode": "prose",
+    "treeSha256": "42e9b038127475b675179419ae021eba836c8bd4abbaccc9c4344d932396363e",
+    "installerReportedHash": "2328722139c2844a914eab2107acaee3eed5239f5bfd13759a6bb00e5ad8a130",
+    "codexArtifactIntact": true,
+    "codexSourceCurrent": true,
+    "claudeArtifactIntact": true,
+    "claudeSourceCurrent": true,
+    "standaloneSiblingDependency": false,
+    "note": "Historical path strings remain quoted inside byte-identical evidence files, but the active entry forbids executing them and all five read dependencies are local materialized references."
+  },
+  "machineCost": {
+    "initialBuildMs": 114.674,
+    "unchangedCurrentnessCheckMs": 105.8857,
+    "unchangedRebuildMs": 125.9657,
+    "initialTreeEqualsRebuildTree": true
+  },
+  "hostRuns": [
+    {
+      "host": "Codex CLI 0.148.0",
+      "model": "gpt-5.6-sol",
+      "effort": "medium",
+      "threadId": "01a09c5c-d549-73e0-a6fb-bfc254bf288d",
+      "outcome": "failed-semantic-context-read",
+      "installedSkillDiscovered": true,
+      "entryRead": true,
+      "referenceFilesystemBytesRead": 153302,
+      "referenceTextDeliveredToModel": false,
+      "inputTokens": 57854,
+      "cachedInputTokens": 44032,
+      "outputTokens": 2265,
+      "reasoningOutputTokens": 1428,
+      "projectWrite": false,
+      "processFailures": [
+        "The host used ReadAllBytes and printed only byte counts, so the model did not receive the historical source text.",
+        "Optional SHA256.HashData and Convert.ToHexString calls were unavailable in Windows PowerShell; the command still exited 0 after printing repeated method errors."
+      ]
+    },
+    {
+      "host": "Claude Code 2.1.270",
+      "model": "claude-opus-5",
+      "effort": "medium",
+      "sessionId": "4cbc654b-831d-4a17-a89c-3179743b990b",
+      "outcome": "passed-full-text-read-with-attribution-limit",
+      "installedSkillDiscovered": true,
+      "entryRead": true,
+      "allFiveReferenceTextsDeliveredWithoutToolCutoff": true,
+      "reportedReferenceBytes": 153302,
+      "inputTokens": 100,
+      "cacheCreationInputTokens": 68458,
+      "cacheReadInputTokens": 173877,
+      "outputTokens": 1718,
+      "thinkingTokens": 233,
+      "turns": 9,
+      "durationMs": 44893,
+      "apiDurationMs": 30581,
+      "costUsd": 0.8160395,
+      "permissionDenials": 0,
+      "subagents": 0,
+      "projectWrite": false,
+      "attributionLimit": "Host usage includes system, skill discovery, repeated cached context, and tool conversation; it does not isolate the five references' token cost."
+    }
+  ],
+  "claims": {
+    "proven": [
+      "One standalone target deterministically materialized five whole historical source files totaling 153302 byte-identical bytes, including the documented 67205-byte common rules.",
+      "Both normal project-local installations remained artifact-intact and source-current before and after the runs.",
+      "Claude Opus medium received all five reference texts without a tool cutoff and made no project change.",
+      "Initial build, unchanged currentness check, and unchanged rebuild completed in approximately 115ms, 106ms, and 126ms on this machine."
+    ],
+    "failed": [
+      "Codex Sol medium did not place the reference text into model context; a filesystem byte-count operation cannot prove semantic reading.",
+      "The Codex hashing attempt used APIs absent from the host PowerShell and emitted process errors."
+    ],
+    "unproven": [
+      "Whole-module context economy or behavior quality relative to the historical prose baseline",
+      "A source-only token attribution for either host",
+      "A changed-source rebuild and stale-consumer cohort cost",
+      "Any second target, manual consumer-tracing failure, inverse impact, nine-target integration, or production Devflow behavior"
+    ]
+  },
+  "nextAction": "Stop this first unit here. Before adding the two most different targets, decide from this mixed observation whether another actual target can test common/specific pressure without adding evaluator machinery; do not add inverse impact until a real manual-tracing failure occurs."
+}

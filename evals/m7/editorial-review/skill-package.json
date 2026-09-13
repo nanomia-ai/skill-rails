@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "packageId": "editorial-review-pilot",
+  "packageVersion": "0.0.1",
+  "modules": {
+    "fallback": "modules/fallback.md",
+    "purpose": "modules/purpose.md"
+  },
+  "targets": {
+    "reviewNext": "targets/review/target.json"
+  }
+}

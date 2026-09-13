@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "m5-framework-lanes-v2",
+  "entries": [
+    {
+      "cellId": "l0-bounded-codex-seed1",
+      "fixtureRevision": 2,
+      "classification": "superseded-by-fixture-revision",
+      "reason": "The task-specific delivery checks passed and the author reported the missing harness protocol truthfully, but the copied test set included a harness self-test whose protocol source was intentionally absent. Fixture revision 3 excludes that self-test without exposing other lane or task definitions.",
+      "receiptPath": "evals/m5/results/framework/v2/l0-bounded-codex-seed1.json",
+      "stdoutPath": "evals/m5/results/framework/v2/raw/l0-bounded-codex-seed1.stdout.jsonl",
+      "stderrPath": "evals/m5/results/framework/v2/raw/l0-bounded-codex-seed1.stderr.txt",
+      "replacementFixtureRevision": 3
+    }
+  ],
+  "claimPolicy": "This revision-2 cell remains behavioral evidence for its own fixture, but it is excluded from the homogeneous revision-3 lane matrix and is not an AI or product failure."
+}

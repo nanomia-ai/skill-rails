@@ -1,0 +1,58 @@
+{
+  "capturePolicy": "Relevant Claude JSON events retained; unrelated startup inventory and hidden reasoning omitted under E-018.",
+  "sessionId": "28900f62-6882-44ce-b1fe-a9e8cee51121",
+  "host": {
+    "product": "Claude Code",
+    "version": "2.1.270",
+    "model": "claude-fable-5-1",
+    "effort": "high",
+    "permissionMode": "bypassPermissions",
+    "permissionPrompts": "none",
+    "interactive": false,
+    "trustDialog": "skipped-by-documented-print-mode"
+  },
+  "task": "Create the Direct plan from pilot/brief.md.",
+  "events": [
+    {
+      "type": "skill",
+      "skill": "natural-language-pilot-direct-next",
+      "success": true
+    },
+    {
+      "type": "read",
+      "paths": [
+        "pilot/plan.md",
+        "pilot/brief.md"
+      ],
+      "planExisted": false,
+      "entryBytes": 1949,
+      "inputBytes": 555
+    },
+    {
+      "type": "write",
+      "path": "pilot/plan.md",
+      "exclusiveCreate": "bash noclobber",
+      "exitCode": 0,
+      "created": true,
+      "outputBytes": 395,
+      "outputSha256": "46ae192293d9c07a790e0052d66c6c5d825d2c2a87375514495c6f983005da29"
+    }
+  ],
+  "result": {
+    "subtype": "success",
+    "terminalReason": "completed",
+    "durationMs": 23221,
+    "apiDurationMs": 14438,
+    "toolCalls": 3,
+    "permissionDenials": 0,
+    "subagentsSpawned": 0,
+    "costUsd": 0.3978415,
+    "usage": {
+      "inputTokens": 68,
+      "cacheCreationInputTokens": 16201,
+      "cacheReadInputTokens": 106454,
+      "outputTokens": 911,
+      "thinkingTokens": 107
+    }
+  }
+}

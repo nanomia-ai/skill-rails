@@ -1,0 +1,4 @@
+2026-09-13T15:25:21.791602Z ERROR codex_skills_extension::host_service: failed to install system skills: io error while remove existing system skills dir: 액세스가 거부되었습니다. (os error 5)
+2026-09-13T15:25:21.792161Z ERROR codex_skills_extension::host_service: failed to install system skills: io error while remove existing system skills dir: 액세스가 거부되었습니다. (os error 5)
+2026-09-13T15:25:21.857035Z ERROR codex_skills_extension::host_service: failed to install system skills: io error while remove existing system skills dir: 액세스가 거부되었습니다. (os error 5)
+2026-09-13T15:25:21.903874Z ERROR codex_skills_extension::host_service: failed to install system skills: io error while remove existing system skills dir: 디렉터리가 비어 있지 않습니다. (os error 145)

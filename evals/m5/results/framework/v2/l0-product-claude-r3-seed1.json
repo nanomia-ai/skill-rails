@@ -1,0 +1,345 @@
+{
+  "schemaVersion": 2,
+  "protocolId": "m5-framework-lanes-v2",
+  "fixtureRevision": 3,
+  "cellId": "l0-product-claude-r3-seed1",
+  "lane": "L0",
+  "task": "product",
+  "host": "claude",
+  "seed": 1,
+  "projectRoot": "C:\\Users\\joinj\\AppData\\Local\\Temp\\skill-rails-m5-l0-product-claude-r3-seed1-gczBRH",
+  "startedAt": "2026-09-13T16:10:49.524Z",
+  "protocolSha256": "80303a1e6e13d2532bae0cf20f2e8ea927f05230d4a26b4dd925f5dbb4e8db91",
+  "workspace": {
+    "copiedEntries": [
+      "package.json",
+      "package-lock.json",
+      "authoring-package.json",
+      "contracts",
+      "src",
+      "authoring",
+      "domains",
+      "fixtures",
+      "tests",
+      "skills",
+      "docs/guide"
+    ],
+    "excludedEntries": [
+      "tests/framework-harness.test.mjs"
+    ],
+    "preconditions": [
+      {
+        "name": "fixture:domains/natural-language-pilot/skill-package.json",
+        "ok": true,
+        "evidence": "domains/natural-language-pilot/skill-package.json"
+      },
+      {
+        "name": "fixture:pilot/product-request.md",
+        "ok": true,
+        "evidence": "pilot/product-request.md"
+      },
+      {
+        "name": "harness-self-test-excluded",
+        "ok": true,
+        "evidence": "tests/framework-harness.test.mjs"
+      },
+      {
+        "name": "framework-original-hash",
+        "ok": true,
+        "evidence": "17879eb8f94dde7ea0fe14b03258eebf94fd0efb92bb014dae2c902bcc7654d7"
+      },
+      {
+        "name": "lane-source-current",
+        "ok": true,
+        "evidence": "0:{\"schemaVersion\":1,\"status\":\"CHECKED\",\"targetId\":\"skill-rails-next\",\"artifactIntact\":true,\"sourceCurrent\":true,\"remoteLatest\":null,\"treeSha256\":\"80c699bf6efe69e7f9dcd27b156348ed4dc496a0b88f75dee816a3aa7c057b2f\"}:"
+      },
+      {
+        "name": "host-version",
+        "ok": true,
+        "evidence": "0:2.1.270 (Claude Code):"
+      },
+      {
+        "name": "host-command-surface",
+        "ok": true,
+        "evidence": "help-exit:0"
+      },
+      {
+        "name": "fixture-test-suite",
+        "ok": true,
+        "evidence": "0:> @nanomia/skill-rails-next@1.0.0-alpha.1 test\n> node --test tests/*.test.mjs\n\n✔ same source builds byte-identical standalone target trees (377.9551ms)\n✔ authoring target materializes the Framework original and a semantic-free deterministic heading index (338.4828ms)\n✔ copied target checks integrity without repository or sibling skill access (409.0803ms)\n✔ record-only target materializes only its public runtime commands (484.0842ms)\n✔ authoring check and installed check distinguish a hand-edited artifact (400.9977ms)\n✔ record-only target does not materialize the preserved M4 fallback (181.162ms)\n✔ source freshness is separate from intact installed bytes (356.933ms)\n✔ schema, import, duplicate key, case collision and path escape fail closed (629.7679ms)\n✔ record-only mode rejects prepare-only fields (145.9798ms)\n✔ a symlink or junction escape is rejected when the host permits it (124.6121ms)\n✔ evaluation harness materializes unknown and other-card scenes without overwriting (568.8503ms)\n✔ evaluation harness injects input stale only after an exchange appears and captures the host (620.6601ms)\n✔ response-loss proxy swallows exactly one successful record response (482.9032ms)\n✔ prepare-failure variant is a valid built target with the canonical fallback source (533.4459ms)\n✔ capture sanitizer removes unrelated host hook payloads but keeps evidence events (113.2155ms)\n✔ M4 protocol fixes paired lanes, hosts, scenes, prompt, and canonical control source (7.2295ms)\n✔ inspect returns only graph-derived package, module, target and mechanism relations (467.0227ms)\n✔ inspect rejects fuzzy, case-only, missing and ambiguous forms (557.148ms)\n✔ standalone prepare returns a locator and an eight-block bounded packet (652.5008ms)\n✔ semantic decision hash is deterministic while exchanges remain nonce-isolated (967.2909ms)\n✔ observer reports unfamiliar prose as unknown instead of inferring meaning (603.7375ms)\n✔ two project copies with identical bytes produce the same semantic hash (807.4617ms)\n✔ preserved prepare-record exchange remains record-compatible (710.831ms)\n✔ fixture verification command has fixed success and failure evidence (1148.4173ms)\n✔ record preserves human bytes, applies one card, and retries idempotently (1038.9489ms)\n✔ input stale and output conflict are distinct no-write results (1196.3002ms)\n✔ answer unknown fields and pass without evidence fail before output write (690.802ms)\n✔ record-only initializer and exchange fail closed on non-UTF-8 and unknown state (748.9194ms)\n✔ managed-region bootstrap follows absent, empty, LF, and non-LF byte rules (2082.2ms)\n✔ renderer preserves another card and updates only the selected card (541.5983ms)\n✔ malformed and duplicate markers are no-write (1013.0108ms)\n✔ duplicate card records are rejected without changing output (574.8924ms)\n✔ renderer failure and non-UTF-8 output are no-write failures (1008.2102ms)\n✔ output lock rejects a second record without silent loss (500.4054ms)\n✔ exchange transplant and cross-basis reuse fail closed (776.306ms)\n✔ post-write reread mismatch never claims observed effect (406.7039ms)\n✔ CRLF-converted managed frame is updated without creating a second region (842.4567ms)\n✔ repository exposes exactly one active generated skill and no active legacy import (64.1537ms)\n✔ authoring generated target is source-current and npm payload excludes implementation roots (1338.101ms)\nℹ tests 39\nℹ suites 0\nℹ pass 39\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 11685.8185:"
+      }
+    ],
+    "treeSha256Before": "7f1a9ff1f54e3a6166788cc778050e663926986df0e5e6d0c7f3a75d6f1f3cc2"
+  },
+  "hostIdentity": {
+    "name": "claude",
+    "model": "claude-fable-5",
+    "version": "2.1.270 (Claude Code)",
+    "effort": "high",
+    "permission": "auto with no interactive prompts",
+    "freshness": "no session persistence, project settings only"
+  },
+  "command": [
+    "claude",
+    "--print",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--no-session-persistence",
+    "--model",
+    "claude-fable-5",
+    "--effort",
+    "high",
+    "--permission-mode",
+    "auto",
+    "--permission-prompts",
+    "none",
+    "--setting-sources",
+    "project"
+  ],
+  "hostResult": {
+    "exitCode": 0,
+    "signal": null,
+    "wallClockMs": 217842
+  },
+  "transcript": {
+    "stdoutPath": "evals/m5/results/framework/v2/raw/l0-product-claude-r3-seed1.stdout.jsonl",
+    "stdoutBytes": 291832,
+    "stdoutSha256": "71f70bd8fc42082fc1806f6d58598c77a141b24f71e77dcb522ceb1af5a77dfd",
+    "stderrPath": "evals/m5/results/framework/v2/raw/l0-product-claude-r3-seed1.stderr.txt",
+    "stderrBytes": 0,
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "usageRaw": {
+    "input_tokens": 36,
+    "cache_creation_input_tokens": 51133,
+    "cache_read_input_tokens": 831207,
+    "output_tokens": 14007,
+    "output_tokens_details": {
+      "thinking_tokens": 6782
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 51133,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 882,
+        "cache_read_input_tokens": 63887,
+        "cache_creation_input_tokens": 2695,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 2695
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "cost": {
+    "claudeTotalCostUsd": 2.5556819999999996
+  },
+  "tokens": {
+    "claude": {
+      "uncachedInput": 36,
+      "cacheCreate": 51133,
+      "cacheRead": 831207,
+      "output": 14007,
+      "thinking": 6782
+    },
+    "codex": null,
+    "billedInputTokens": 882376,
+    "comparabilityScope": "same-host-only"
+  },
+  "reads": {
+    "promptBytes": 581,
+    "entryBytes": 2241,
+    "taskBytes": 997,
+    "laneMandatedBytes": 0,
+    "fixedReadBytes": 3819,
+    "toolResultBytes": 65494,
+    "frameworkBytesReadApprox": 207,
+    "conditionalReadBytesApprox": 207,
+    "frameworkReadSourceLeak": false,
+    "frameworkReads": [
+      {
+        "source": "package-reference",
+        "primitive": "Write",
+        "rangeKind": "unknown",
+        "returnedBytes": 207
+      }
+    ]
+  },
+  "index": {
+    "present": false,
+    "bytes": 0,
+    "namedInEntry": false,
+    "consulted": false,
+    "returnedBytes": 0,
+    "boundedReadObserved": "not-applicable"
+  },
+  "artifactMaintenance": {
+    "laneBuildMs": 125,
+    "generatedReferenceBytes": 0,
+    "generatedIndexBytes": 0,
+    "currentnessCheckMs": 119,
+    "afterMachineCheckChangeCount": 22,
+    "indexMaintenanceCost": null
+  },
+  "tools": {
+    "count": 27,
+    "byKind": {
+      "read": 20,
+      "search": 0,
+      "shell": 3,
+      "write": 3,
+      "edit": 1,
+      "other": 0
+    },
+    "comparabilityScope": "same-host-only"
+  },
+  "execution": {
+    "userRoundtrips": 0,
+    "wallClockMs": 217842,
+    "preflightRuntimeMs": 12409,
+    "machineRuntimeMs": 163,
+    "fallbackToolCalls": 1
+  },
+  "changes": [
+    {
+      "path": "domains/natural-language-pilot/skill-package.json",
+      "before": {
+        "bytes": 271,
+        "sha256": "c1db77e6c6063dc6e540f13ff60cdfde3cfae63d97891b7f7c0dc1a1a9ef5eee",
+        "utf8": "{\n  \"schemaVersion\": 1,\n  \"packageId\": \"natural-language-pilot\",\n  \"packageVersion\": \"0.0.1\",\n  \"modules\": {\n    \"purpose\": \"modules/purpose.md\",\n    \"verifyBaseline\": \"modules/verify-baseline.md\"\n  },\n  \"targets\": {\n    \"verify-next\": \"targets/verify/target.json\"\n  }\n}\n"
+      },
+      "after": {
+        "bytes": 317,
+        "sha256": "091b270135dd67ec8e16be48d3b0956eb6e09ca609f72b3cb6ffa6819fcebb0f",
+        "utf8": "{\n  \"schemaVersion\": 1,\n  \"packageId\": \"natural-language-pilot\",\n  \"packageVersion\": \"0.0.1\",\n  \"modules\": {\n    \"purpose\": \"modules/purpose.md\",\n    \"verifyBaseline\": \"modules/verify-baseline.md\"\n  },\n  \"targets\": {\n    \"product\": \"targets/product/target.json\",\n    \"verify-next\": \"targets/verify/target.json\"\n  }\n}\n"
+      }
+    },
+    {
+      "path": "domains/natural-language-pilot/targets/product/entry.md",
+      "before": null,
+      "after": {
+        "bytes": 1670,
+        "sha256": "8c182a5b3d0e5900830412ed7d3ec3427d68b14ab25c4e74fdd8b21abe0f6170",
+        "utf8": "---\nname: natural-language-pilot-product\ndescription: Turn pilot/product-request.md into pilot/brief.md while preserving stated wording, keeping every undecided decision unknown, and never inventing scope. Use only for the natural-language pilot product-brief contract.\n---\n\n# Write the product brief\n\nRun `node <target-root>/scripts/run.mjs check` first and proceed only on `ARTIFACT_INTACT`.\n\n- Read `pilot/product-request.md` from the project root. It is the only source of product meaning; do not consult runtime state, generated files, prior briefs, or memory of other pilots.\n- Write `pilot/brief.md` stating only what the request states: the product intent, each requirement the request declares, and every phrase the request requires preserved copied exactly, character for character.\n- List each decision the request leaves undecided under an explicit `## Unknown` heading, marked `unknown`. Do not resolve, default, estimate, or narrow an undecided item.\n- Never add scope: no features, constraints, platforms, tools, schedules, or acceptance criteria beyond those the request states.\n- If the request is missing or a statement is genuinely ambiguous, record that gap as `unknown` in the brief instead of choosing an interpretation.\n- If `pilot/brief.md` already exists, do not overwrite or merge it; report the conflict and stop.\n\nDone means `pilot/brief.md` exists and every statement in it traces to the request or is marked `unknown`. The integrity check proves artifact delivery only; fresh-agent behavior, semantic fidelity of a produced brief, and observed file effect are separate evidence lanes and remain `unproven` until observed in their own lane.\n"
+      }
+    },
+    {
+      "path": "domains/natural-language-pilot/targets/product/target.json",
+      "before": null,
+      "after": {
+        "bytes": 132,
+        "sha256": "9b0252043f17043df59353032d9ec9d0833ac4ea2d94ed912d461560277fffc3",
+        "utf8": "{\n  \"schemaVersion\": 1,\n  \"targetId\": \"natural-language-pilot-product\",\n  \"mode\": \"prose\",\n  \"entry\": \"entry.md\",\n  \"imports\": []\n}\n"
+      }
+    },
+    {
+      "path": "fixture/author-report.json",
+      "before": null,
+      "after": {
+        "bytes": 5815,
+        "sha256": "c52fdf3674c698ac6de57d76457cf34f80785f11d2e8038c8557914b0d6186ca",
+        "utf8": "{\n  \"schemaVersion\": 1,\n  \"task\": \"Add a Product target to the natural-language-pilot source package that lets an AI turn pilot/product-request.md into pilot/brief.md while preserving stated wording, keeping undecided decisions unknown, and never inventing scope.\",\n  \"selectedOption\": {\n    \"id\": \"prose-only\",\n    \"targetId\": \"natural-language-pilot-product\",\n    \"mode\": \"prose\",\n    \"canonicalSourceChanged\": [\n      \"domains/natural-language-pilot/skill-package.json\",\n      \"domains/natural-language-pilot/targets/product/target.json\",\n      \"domains/natural-language-pilot/targets/product/entry.md\"\n    ],\n    \"rationale\": \"Smallest safe target. The brief is a new whole document whose content requires genuine meaning judgments (which wording is stated, which decisions are undecided, what counts as invented scope); those judgments must stay with the AI, so no mechanism removes them. A prose entry carries the domain contract in canonical source, the generated target ships only the check-only runtime, and the build uses none of the forbidden pieces (prepare, observer, packet, fallback, semantic durable state, auto-merge, multi-output transactions).\"\n  },\n  \"rejectedOptions\": [\n    {\n      \"id\": \"domain-renderer-record-only\",\n      \"reason\": \"record-only mode requires a renderer, domain config, answer contract, and managed-region append output. That machinery exists to safely update records inside shared files; the brief is a fresh standalone document, so the renderer would move domain meaning into mechanism code and add an answer-contract surface without removing any of the meaning judgments the AI must still make. Larger, not safer, for this behavior.\"\n    },\n    {\n      \"id\": \"core-mechanism-prepare-record\",\n      \"reason\": \"prepare-record mode requires packet, observer, fallbackModule, and the prepare runtime, all of which the task explicitly forbids. Rejected on the constraint alone.\"\n    },\n    {\n      \"id\": \"independent-alternative\",\n      \"reason\": \"An implementation outside the Skill Rails Next package (a hand-rolled standalone skill or a deterministic template-filling script) either loses the deterministic build, receipt, and provenance the package provides, or, in the deterministic-script form, cannot make the required meaning judgments about wording, unknowns, and scope. It would also duplicate pilot domain meaning outside the one canonical domain source.\"\n    }\n  ],\n  \"frameworkSectionsRead\": [],\n  \"frameworkSectionsReadNote\": \"None. This lane (L0) forbids reading or using the Universal Framework reference, per the local SKILL.md; no section of docs/guide/universal-ai-skill-inquiry-framework.md or skills/skill-rails/references/universalFrameworkOriginal.md was read.\",\n  \"unknowns\": [\n    \"Fresh-agent behavior: whether a fresh agent given fixture/dist-product actually produces a conforming pilot/brief.md is unproven; no fresh-agent run was performed.\",\n    \"External effect: no pilot/brief.md was created or modified in this task; any file effect of the target remains unproven.\",\n    \"Semantic fidelity: whether a produced brief would preserve `save once, retrieve exactly` byte-for-byte and state the HTTPS-only acceptance boundary is behavioral evidence in its own lane and remains unproven.\",\n    \"Product decisions left undecided by pilot/product-request.md (storage location, retention period, import support) are unknown by design; the target instructs that they remain unknown and this task did not resolve them.\",\n    \"Runtime adoption and broader authoring guidance remain gated by the recorded pilot evidence, per the alpha entry.\"\n  ],\n  \"checksRun\": [\n    {\n      \"check\": \"inspect --source domains/natural-language-pilot/skill-package.json --id natural-language-pilot-product --json\",\n      \"result\": \"Node found; kind=target, no observer/renderer/contract mechanisms, sourceGraphSha256=90ee81f30ca839fb6e4c14eb9c93e9b654c70e2537fe9ef33dfd26c949d65a00.\"\n    },\n    {\n      \"check\": \"build --source domains/natural-language-pilot/skill-package.json --target natural-language-pilot-product --out fixture/dist-product\",\n      \"result\": \"BUILT, treeSha256=3c99defbd31b70d0e996515a5b49d6a31b412c26f1f400e66d0f1c6a26bfd0b9; whole-package validation passed, so the existing verify-next target still loads.\"\n    },\n    {\n      \"check\": \"double-build to a second directory and compare tree hashes\",\n      \"result\": \"Identical treeSha256=3c99defbd31b70d0e996515a5b49d6a31b412c26f1f400e66d0f1c6a26bfd0b9; temporary directory removed.\"\n    },\n    {\n      \"check\": \"check --out fixture/dist-product (artifact integrity only)\",\n      \"result\": \"CHECKED, artifactIntact=true, sourceCurrent=null.\"\n    },\n    {\n      \"check\": \"check --source ... --target natural-language-pilot-product --out fixture/dist-product (source currentness)\",\n      \"result\": \"CHECKED, artifactIntact=true, sourceCurrent=true.\"\n    },\n    {\n      \"check\": \"node fixture/dist-product/scripts/run.mjs check (standalone runtime self-check)\",\n      \"result\": \"ARTIFACT_INTACT with matching treeSha256.\"\n    },\n    {\n      \"check\": \"review generated diff and receipt\",\n      \"result\": \"fixture/dist-product is new; it contains only SKILL.md (generated from targets/product/entry.md with the generated marker), config/target.json, contracts/build-receipt.schema.json, the check-only runtime (scripts/run.mjs, scripts/runtime/common.mjs, scripts/runtime/integrity.mjs), and .skill-rails-build.json naming exact sources. No packet, observer, renderer, fallback, prepare, exchange, or record artifacts are present.\"\n    }\n  ],\n  \"evidenceScope\": \"Build, double-build determinism, artifact integrity, and source currentness prove delivery of the generated target only. No fresh-agent use, AI behavior, semantic correctness, or external file effect is claimed; those lanes remain unproven.\"\n}\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/.skill-rails-build.json",
+      "before": null,
+      "after": {
+        "bytes": 1966,
+        "sha256": "258336bfde33c594fb4c3f98c181db5c2c379302c523bf7efd1e094adcf03a4f",
+        "utf8": "{\"artifacts\":[{\"path\":\"SKILL.md\",\"sha256\":\"47ec97a0e6520b2ca979af1821fa609abc78a2c3475b3e0ae9c635a28e4d975a\"},{\"path\":\"config/target.json\",\"sha256\":\"27721085017f6e1897a61704cba355877fa47dae100b2ad87e818b992e64f605\"},{\"path\":\"contracts/build-receipt.schema.json\",\"sha256\":\"2ecf54ae8be8ca56089067fcda0f3ebf55a9879386d27baf9a59118b3397f849\"},{\"path\":\"scripts/run.mjs\",\"sha256\":\"9679534ff91d95407c35f99209e22228110260e275a1465decaca290d7102e94\"},{\"path\":\"scripts/runtime/common.mjs\",\"sha256\":\"65402c4a721d10734656b730fc23dca23c950cb1d696484501cde86212308845\"},{\"path\":\"scripts/runtime/integrity.mjs\",\"sha256\":\"075231d93940189d1a2d508cdbe1dc1caaf60f8f0986a2390c79cb68e026b018\"}],\"coreVersion\":\"1.0.0-alpha.1\",\"imports\":[],\"packageId\":\"natural-language-pilot\",\"packageVersion\":\"0.0.1\",\"schemaVersion\":1,\"sources\":[{\"id\":\"contract:build-receipt.schema.json\",\"path\":\"contracts/build-receipt.schema.json\",\"sha256\":\"2ecf54ae8be8ca56089067fcda0f3ebf55a9879386d27baf9a59118b3397f849\"},{\"id\":\"source-package\",\"path\":\"skill-package.json\",\"sha256\":\"091b270135dd67ec8e16be48d3b0956eb6e09ca609f72b3cb6ffa6819fcebb0f\"},{\"id\":\"runtime:scripts/runtime/common.mjs\",\"path\":\"src/runtime/common.mjs\",\"sha256\":\"65402c4a721d10734656b730fc23dca23c950cb1d696484501cde86212308845\"},{\"id\":\"runtime:scripts/runtime/integrity.mjs\",\"path\":\"src/runtime/integrity.mjs\",\"sha256\":\"075231d93940189d1a2d508cdbe1dc1caaf60f8f0986a2390c79cb68e026b018\"},{\"id\":\"runtime:scripts/run.mjs\",\"path\":\"src/runtime/run-check.mjs\",\"sha256\":\"9679534ff91d95407c35f99209e22228110260e275a1465decaca290d7102e94\"},{\"id\":\"entry\",\"path\":\"targets/product/entry.md\",\"sha256\":\"8c182a5b3d0e5900830412ed7d3ec3427d68b14ab25c4e74fdd8b21abe0f6170\"},{\"id\":\"target:natural-language-pilot-product\",\"path\":\"targets/product/target.json\",\"sha256\":\"9b0252043f17043df59353032d9ec9d0833ac4ea2d94ed912d461560277fffc3\"}],\"targetId\":\"natural-language-pilot-product\",\"treeSha256\":\"3c99defbd31b70d0e996515a5b49d6a31b412c26f1f400e66d0f1c6a26bfd0b9\"}\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/SKILL.md",
+      "before": null,
+      "after": {
+        "bytes": 1770,
+        "sha256": "47ec97a0e6520b2ca979af1821fa609abc78a2c3475b3e0ae9c635a28e4d975a",
+        "utf8": "---\nname: natural-language-pilot-product\ndescription: Turn pilot/product-request.md into pilot/brief.md while preserving stated wording, keeping every undecided decision unknown, and never inventing scope. Use only for the natural-language pilot product-brief contract.\n---\n<!-- generated; do not edit; source: targets/product/entry.md; receipt: .skill-rails-build.json -->\n\n# Write the product brief\n\nRun `node <target-root>/scripts/run.mjs check` first and proceed only on `ARTIFACT_INTACT`.\n\n- Read `pilot/product-request.md` from the project root. It is the only source of product meaning; do not consult runtime state, generated files, prior briefs, or memory of other pilots.\n- Write `pilot/brief.md` stating only what the request states: the product intent, each requirement the request declares, and every phrase the request requires preserved copied exactly, character for character.\n- List each decision the request leaves undecided under an explicit `## Unknown` heading, marked `unknown`. Do not resolve, default, estimate, or narrow an undecided item.\n- Never add scope: no features, constraints, platforms, tools, schedules, or acceptance criteria beyond those the request states.\n- If the request is missing or a statement is genuinely ambiguous, record that gap as `unknown` in the brief instead of choosing an interpretation.\n- If `pilot/brief.md` already exists, do not overwrite or merge it; report the conflict and stop.\n\nDone means `pilot/brief.md` exists and every statement in it traces to the request or is marked `unknown`. The integrity check proves artifact delivery only; fresh-agent behavior, semantic fidelity of a produced brief, and observed file effect are separate evidence lanes and remain `unproven` until observed in their own lane.\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/config/target.json",
+      "before": null,
+      "after": {
+        "bytes": 396,
+        "sha256": "27721085017f6e1897a61704cba355877fa47dae100b2ad87e818b992e64f605",
+        "utf8": "{\"answerContract\":null,\"declaredInputs\":[],\"declaredOutput\":null,\"domainConfig\":null,\"domainConfigSchema\":null,\"fallbackReference\":null,\"headingIndex\":null,\"imports\":[],\"mode\":\"prose\",\"observer\":null,\"outputMode\":null,\"packageId\":\"natural-language-pilot\",\"packageVersion\":\"0.0.1\",\"packet\":null,\"regionBootstrap\":null,\"renderer\":null,\"schemaVersion\":1,\"targetId\":\"natural-language-pilot-product\"}\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/contracts/build-receipt.schema.json",
+      "before": null,
+      "after": {
+        "bytes": 1406,
+        "sha256": "2ecf54ae8be8ca56089067fcda0f3ebf55a9879386d27baf9a59118b3397f849",
+        "utf8": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"$id\": \"skill-rails-next/build-receipt/1\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\"schemaVersion\", \"coreVersion\", \"packageId\", \"packageVersion\", \"targetId\", \"sources\", \"artifacts\", \"imports\", \"treeSha256\"],\n  \"properties\": {\n    \"schemaVersion\": {\"const\": 1},\n    \"coreVersion\": {\"type\": \"string\", \"minLength\": 1},\n    \"packageId\": {\"type\": \"string\", \"minLength\": 1},\n    \"packageVersion\": {\"type\": \"string\", \"minLength\": 1},\n    \"targetId\": {\"type\": \"string\", \"minLength\": 1},\n    \"sources\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"additionalProperties\": false,\n        \"required\": [\"id\", \"path\", \"sha256\"],\n        \"properties\": {\n          \"id\": {\"type\": \"string\"},\n          \"path\": {\"type\": \"string\"},\n          \"sha256\": {\"type\": \"string\", \"pattern\": \"^[0-9a-f]{64}$\"}\n        }\n      }\n    },\n    \"artifacts\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"additionalProperties\": false,\n        \"required\": [\"path\", \"sha256\"],\n        \"properties\": {\n          \"path\": {\"type\": \"string\"},\n          \"sha256\": {\"type\": \"string\", \"pattern\": \"^[0-9a-f]{64}$\"}\n        }\n      }\n    },\n    \"imports\": {\"type\": \"array\", \"items\": {\"type\": \"string\"}, \"uniqueItems\": true},\n    \"treeSha256\": {\"type\": \"string\", \"pattern\": \"^[0-9a-f]{64}$\"}\n  }\n}\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/scripts/run.mjs",
+      "before": null,
+      "after": {
+        "bytes": 1648,
+        "sha256": "9679534ff91d95407c35f99209e22228110260e275a1465decaca290d7102e94",
+        "utf8": "#!/usr/bin/env node\nimport { dirname, resolve } from \"node:path\";\nimport { fileURLToPath } from \"node:url\";\nimport { fail, RuntimeError } from \"./runtime/common.mjs\";\nimport { assertIntegrity } from \"./runtime/integrity.mjs\";\n\nconst targetRoot = resolve(dirname(fileURLToPath(import.meta.url)), \"..\");\nfunction parse(argv) { const [command, ...rest] = argv; const values = {}; for (let i = 0; i < rest.length; i += 2) { if (!rest[i]?.startsWith(\"--\") || i + 1 >= rest.length || Object.hasOwn(values, rest[i])) fail(\"ARGUMENT_INVALID\", \"Invalid or duplicate runtime argument.\", \"Use the check command without arguments.\"); values[rest[i]] = rest[i + 1]; } return { command, values }; }\nasync function main() {\n  const { command, values } = parse(process.argv.slice(2));\n  const receipt = await assertIntegrity(targetRoot);\n  if (command === \"check\" && Object.keys(values).length === 0) return { schemaVersion: 1, status: \"ARTIFACT_INTACT\", targetId: receipt.targetId, treeSha256: receipt.treeSha256, sourceCurrent: null, remoteLatest: null };\n  fail(\"ARGUMENT_INVALID\", \"Unknown check-only runtime command.\", \"Use check without arguments.\");\n}\ntry { process.stdout.write(`${JSON.stringify(await main())}\\n`); }\ncatch (error) { const known = error instanceof RuntimeError; process.stdout.write(`${JSON.stringify({ schemaVersion: 1, status: \"ERROR\", code: known ? error.code : \"INTERNAL_ERROR\", message: error instanceof Error ? error.message : String(error), nextAction: known ? error.nextAction : \"Inspect the generated target and retry.\", ...(known && error.details !== undefined ? { details: error.details } : {}) })}\\n`); process.exitCode = 1; }\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/scripts/runtime/common.mjs",
+      "before": null,
+      "after": {
+        "bytes": 8500,
+        "sha256": "65402c4a721d10734656b730fc23dca23c950cb1d696484501cde86212308845",
+        "utf8": "import { createHash, randomUUID } from \"node:crypto\";\nimport { spawn } from \"node:child_process\";\nimport { lstat, mkdir, readFile, realpath, stat } from \"node:fs/promises\";\nimport { dirname, isAbsolute, relative, resolve, sep } from \"node:path\";\nimport { TextDecoder } from \"node:util\";\n\nconst decoder = new TextDecoder(\"utf-8\", { fatal: true });\n\nexport class RuntimeError extends Error {\n  constructor(code, message, nextAction, details) { super(message); this.code = code; this.nextAction = nextAction; this.details = details; }\n}\nexport function fail(code, message, nextAction, details) { throw new RuntimeError(code, message, nextAction, details); }\nexport function sha256(bytes) { return createHash(\"sha256\").update(bytes).digest(\"hex\"); }\nexport function compareCodePoint(a, b) {\n  const left = Array.from(a); const right = Array.from(b);\n  for (let i = 0; i < Math.min(left.length, right.length); i += 1) { const d = left[i].codePointAt(0) - right[i].codePointAt(0); if (d) return d; }\n  return left.length - right.length;\n}\nexport function canonicalJson(value) {\n  if (value === null || typeof value !== \"object\") return JSON.stringify(value);\n  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(\",\")}]`;\n  return `{${Object.keys(value).sort(compareCodePoint).map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(\",\")}}`;\n}\nexport function decodeUtf8(bytes, label, failure = {}) { try { return decoder.decode(bytes); } catch { fail(failure.code ?? \"PREPARE_FAILED\", `${label} is not valid UTF-8.`, failure.nextAction ?? \"Correct the declared text input and run prepare again.\"); } }\nexport async function readJson(path, code = \"ARTIFACT_INTEGRITY_FAILED\") {\n  try { return JSON.parse(await readFile(path, \"utf8\")); } catch { fail(code, `${path} is missing or invalid JSON.`, \"Restore the generated target or exchange from its canonical owner.\"); }\n}\nexport function normalizeRelativePath(input, label) {\n  if (typeof input !== \"string\" || !input || isAbsolute(input) || input.includes(\"\\\\\")) fail(\"PATH_OUTSIDE_ROOT\", `${label} must be a relative path with forward slashes.`, \"Correct the target manifest and rebuild.\");\n  const parts = input.split(\"/\");\n  if (parts.some((part) => !part || part === \".\" || part === \"..\")) fail(\"PATH_OUTSIDE_ROOT\", `${label} has a forbidden segment.`, \"Correct the target manifest and rebuild.\");\n  return input;\n}\nexport async function resolveProjectPath(projectRoot, logicalPath) {\n  const normalized = normalizeRelativePath(logicalPath, \"project path\");\n  const candidate = resolve(projectRoot, ...normalized.split(\"/\"));\n  const lexical = relative(projectRoot, candidate);\n  if (lexical === \"..\" || lexical.startsWith(`..${sep}`) || isAbsolute(lexical)) fail(\"PATH_OUTSIDE_ROOT\", `${logicalPath} escapes the project root.`, \"Correct the target manifest and rebuild.\");\n  let probe = candidate;\n  while (true) {\n    try { probe = await realpath(probe); break; } catch (error) { if (error?.code !== \"ENOENT\") throw error; const parent = dirname(probe); if (parent === probe) throw error; probe = parent; }\n  }\n  const physicalRelative = relative(projectRoot, probe);\n  if (physicalRelative === \"..\" || physicalRelative.startsWith(`..${sep}`) || isAbsolute(physicalRelative)) fail(\"PATH_OUTSIDE_ROOT\", `${logicalPath} resolves outside the project root.`, \"Remove the escaping link or correct the target manifest.\");\n  return candidate;\n}\nexport async function fileBasis(projectRoot, logicalPath) {\n  const physical = await resolveProjectPath(projectRoot, logicalPath);\n  try { const info = await lstat(physical); if (!info.isFile()) fail(\"PATH_OUTSIDE_ROOT\", `${logicalPath} is not a regular file.`, \"Use a regular declared input.\"); const bytes = await readFile(physical); return { path: logicalPath, state: \"present\", sha256: sha256(bytes), bytes }; }\n  catch (error) { if (error?.code === \"ENOENT\") return { path: logicalPath, state: \"absent\", sha256: null, bytes: null }; throw error; }\n}\nexport function basisPublic(item) { return { path: item.path, state: item.state, sha256: item.sha256 }; }\nexport async function ensureProject(project) { try { return await realpath(resolve(project)); } catch { fail(\"PATH_OUTSIDE_ROOT\", \"Project root does not exist.\", \"Provide an existing project directory.\"); } }\nexport async function runChild(program, args, input, failureCode) {\n  return new Promise((resolvePromise, rejectPromise) => {\n    const child = spawn(program, args, { stdio: [\"pipe\", \"pipe\", \"pipe\"], windowsHide: true });\n    const stdout = []; const stderr = []; let stdoutSize = 0; let settled = false;\n    const finish = (fn, value) => { if (!settled) { settled = true; clearTimeout(timer); fn(value); } };\n    const timer = setTimeout(() => { child.kill(); finish(rejectPromise, new RuntimeError(failureCode, `${program} timed out.`, \"Inspect the domain adapter and retry.\")); }, 10000);\n    child.stdout.on(\"data\", (chunk) => { stdoutSize += chunk.length; if (stdoutSize > 4 * 1024 * 1024) { child.kill(); finish(rejectPromise, new RuntimeError(failureCode, `${program} output exceeded the limit.`, \"Reduce domain adapter output.\")); } else stdout.push(chunk); });\n    child.stderr.on(\"data\", (chunk) => stderr.push(chunk));\n    child.on(\"error\", (error) => finish(rejectPromise, new RuntimeError(failureCode, error.message, \"Inspect the domain adapter and retry.\")));\n    child.on(\"close\", (code) => finish(resolvePromise, { code, stdout: Buffer.concat(stdout), stderr: Buffer.concat(stderr) }));\n    child.stdin.end(input);\n  });\n}\nexport function validate(value, schema, path = \"$\") {\n  const errors = [];\n  const visit = (current, rule, at) => {\n    if (rule.$ref) {\n      if (!rule.$ref.startsWith(\"#/$defs/\")) { errors.push(`${at} uses an unsupported schema reference`); return; }\n      const referenced = schema.$defs?.[rule.$ref.slice(\"#/$defs/\".length)];\n      if (!referenced) { errors.push(`${at} references a missing schema definition`); return; }\n      visit(current, referenced, at);\n      return;\n    }\n    if (rule.$ref?.startsWith(\"#/$defs/\")) {\n      const resolved = schema.$defs?.[rule.$ref.slice(\"#/$defs/\".length)];\n      if (!resolved) { errors.push(`${at} uses an unresolved schema reference`); return; }\n      visit(current, resolved, at);\n      return;\n    }\n    if (rule.oneOf) { const results = rule.oneOf.map((candidate) => { const local = []; const saved = errors.splice(0); visit(current, candidate, at); local.push(...errors.splice(0)); errors.push(...saved); return local; }); if (results.filter((x) => x.length === 0).length !== 1) errors.push(`${at} must match exactly one shape`); return; }\n    if (Object.hasOwn(rule, \"const\") && canonicalJson(current) !== canonicalJson(rule.const)) errors.push(`${at} must equal ${JSON.stringify(rule.const)}`);\n    if (rule.enum && !rule.enum.some((x) => canonicalJson(x) === canonicalJson(current))) errors.push(`${at} is not allowed`);\n    if (rule.type) { const actual = current === null ? \"null\" : Array.isArray(current) ? \"array\" : Number.isInteger(current) ? \"integer\" : typeof current; if (actual !== rule.type) { errors.push(`${at} must be ${rule.type}`); return; } }\n    if (typeof current === \"string\") { if (rule.minLength !== undefined && current.length < rule.minLength) errors.push(`${at} is too short`); if (rule.pattern && !new RegExp(rule.pattern, \"u\").test(current)) errors.push(`${at} has invalid format`); }\n    if (Array.isArray(current)) { if (rule.minItems !== undefined && current.length < rule.minItems) errors.push(`${at} has too few items`); if (rule.uniqueItems && new Set(current.map(canonicalJson)).size !== current.length) errors.push(`${at} has duplicates`); if (rule.items) current.forEach((x, i) => visit(x, rule.items, `${at}[${i}]`)); }\n    if (current && typeof current === \"object\" && !Array.isArray(current)) { for (const key of rule.required ?? []) if (!Object.hasOwn(current, key)) errors.push(`${at}.${key} is required`); for (const key of Object.keys(current)) { if (rule.properties?.[key]) visit(current[key], rule.properties[key], `${at}.${key}`); else if (rule.additionalProperties === false) errors.push(`${at}.${key} is not allowed`); } }\n  };\n  visit(value, schema, path); return errors;\n}\nexport function nonce() { return randomUUID(); }\nexport async function pathExists(path) { try { await stat(path); return true; } catch (error) { if (error?.code === \"ENOENT\") return false; throw error; } }\nexport async function ensureDirectory(path) { await mkdir(path, { recursive: true }); }\n"
+      }
+    },
+    {
+      "path": "fixture/dist-product/scripts/runtime/integrity.mjs",
+      "before": null,
+      "after": {
+        "bytes": 2058,
+        "sha256": "075231d93940189d1a2d508cdbe1dc1caaf60f8f0986a2390c79cb68e026b018",
+        "utf8": "import { readFile, readdir } from \"node:fs/promises\";\nimport { relative, resolve } from \"node:path\";\nimport { canonicalJson, compareCodePoint, fail, readJson, sha256 } from \"./common.mjs\";\n\nasync function walk(root, current = root) {\n  const result = [];\n  for (const entry of await readdir(current, { withFileTypes: true })) {\n    const path = resolve(current, entry.name);\n    if (entry.isSymbolicLink()) fail(\"ARTIFACT_INTEGRITY_FAILED\", \"The target contains a symbolic link.\", \"Reinstall the generated target.\");\n    if (entry.isDirectory()) result.push(...await walk(root, path));\n    else if (entry.isFile()) result.push(relative(root, path).replaceAll(\"\\\\\", \"/\"));\n    else fail(\"ARTIFACT_INTEGRITY_FAILED\", \"The target contains a non-regular artifact.\", \"Reinstall the generated target.\");\n  }\n  return result.sort(compareCodePoint);\n}\n\nexport async function assertIntegrity(targetRoot) {\n  const receipt = await readJson(resolve(targetRoot, \".skill-rails-build.json\"));\n  if (receipt.schemaVersion !== 1) fail(\"UNSUPPORTED_VERSION\", \"The target receipt version is unsupported.\", \"Install a compatible target.\");\n  const expected = receipt.artifacts.map((x) => x.path).sort(compareCodePoint);\n  const actual = (await walk(targetRoot)).filter((x) => x !== \".skill-rails-build.json\");\n  if (canonicalJson(actual) !== canonicalJson(expected)) fail(\"ARTIFACT_INTEGRITY_FAILED\", \"Artifact paths differ from the receipt.\", \"Reinstall the generated target.\");\n  const rows = [];\n  for (const item of receipt.artifacts) { const actualHash = sha256(await readFile(resolve(targetRoot, ...item.path.split(\"/\")))); if (actualHash !== item.sha256) fail(\"ARTIFACT_INTEGRITY_FAILED\", `${item.path} differs from the receipt.`, \"Reinstall the generated target.\"); rows.push(`${item.path}\\0${actualHash}\\n`); }\n  const tree = sha256(Buffer.from(rows.sort(compareCodePoint).join(\"\"), \"utf8\"));\n  if (tree !== receipt.treeSha256) fail(\"ARTIFACT_INTEGRITY_FAILED\", \"The target tree hash differs from its receipt.\", \"Reinstall the generated target.\");\n  return receipt;\n}\n"
+      }
+    }
+  ],
+  "machineChecks": [
+    {
+      "name": "build-product-package",
+      "exitCode": 0,
+      "wallClockMs": 163,
+      "stdout": "{\"schemaVersion\":1,\"status\":\"BUILT\",\"outputs\":[{\"targetId\":\"natural-language-pilot-product\",\"output\":\"C:\\\\Users\\\\joinj\\\\AppData\\\\Local\\\\Temp\\\\skill-rails-m5-l0-product-claude-r3-seed1-gczBRH\\\\fixture\\\\machine-dist-product\\\\skills\\\\natural-language-pilot-product\",\"treeSha256\":\"3c99defbd31b70d0e996515a5b49d6a31b412c26f1f400e66d0f1c6a26bfd0b9\"},{\"targetId\":\"natural-language-pilot-verify-next\",\"output\":\"C:\\\\Users\\\\joinj\\\\AppData\\\\Local\\\\Temp\\\\skill-rails-m5-l0-product-claude-r3-seed1-gczBRH\\\\fixture\\\\machine-dist-product\\\\skills\\\\natural-language-pilot-verify-next\",\"treeSha256\":\"30908b05d9647a6c4281fe71444d283e2d44382f762c5c986f2260e554582050\"}]}\n",
+      "stderr": ""
+    }
+  ],
+  "validity": {
+    "status": "valid",
+    "reason": null
+  },
+  "delivery": {
+    "status": "pass",
+    "evidence": [
+      "host-exit:0",
+      "machine-check:build-product-package:exit-0"
+    ]
+  },
+  "linkedEvaluation": {
+    "semanticReviewReceiptPath": "evals/m5/results/framework/v2/reviews/l0-product-claude-r3-seed1.json",
+    "usingAiReceiptPath": "evals/m5/results/framework/v2/using-ai/l0-product-claude-r3-seed1.json"
+  },
+  "claimPolicy": "Machine checks establish delivery or structural safety only. Framework benefit, semantic quality, fresh behavior, and actual effect remain unproven until transcript and changed artifacts are independently reviewed."
+}

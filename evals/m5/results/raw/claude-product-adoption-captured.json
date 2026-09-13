@@ -1,0 +1,56 @@
+{
+  "capturePolicy": "Relevant Claude stream-json events retained; unrelated startup hook bodies omitted under E-018.",
+  "sessionId": "8441a755-74d2-4ed3-857a-ed77f5ab5370",
+  "host": {
+    "product": "Claude Code",
+    "version": "2.1.270",
+    "model": "claude-fable-5-1",
+    "effort": "high",
+    "permissionMode": "bypassPermissions",
+    "interactive": false,
+    "trustDialog": "skipped-by-documented-print-mode"
+  },
+  "task": "Write the product brief for this project from pilot/product-request.md.",
+  "events": [
+    {
+      "type": "skill",
+      "skill": "natural-language-pilot-product-next",
+      "success": true
+    },
+    {
+      "type": "read",
+      "paths": [
+        "pilot/brief.md",
+        "pilot/product-request.md"
+      ],
+      "briefExisted": false,
+      "inputBytes": 364
+    },
+    {
+      "type": "write",
+      "path": "pilot/brief.md",
+      "exclusiveCreate": "bash noclobber",
+      "exitCode": 0,
+      "created": true,
+      "outputBytes": 555,
+      "outputSha256": "c034188c8fb0de1a74d388ab7279dfb30325e782514df65e7eaa3212c1919e80"
+    }
+  ],
+  "result": {
+    "subtype": "success",
+    "terminalReason": "completed",
+    "durationMs": 25691,
+    "apiDurationMs": 15546,
+    "toolCalls": 3,
+    "permissionDenials": 0,
+    "subagentsSpawned": 0,
+    "costUsd": 0.402299,
+    "usage": {
+      "inputTokens": 68,
+      "cacheCreationInputTokens": 16296,
+      "cacheReadInputTokens": 106604,
+      "outputTokens": 961,
+      "thinkingTokens": 144
+    }
+  }
+}
