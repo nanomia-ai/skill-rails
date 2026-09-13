@@ -1,5 +1,7 @@
 node_modules/
 .npm-cache/
+.skill-rails-next/
+.tmp/
 coverage/
-.skill-rails/
+dist/
 *.tmp

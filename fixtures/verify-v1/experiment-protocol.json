@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "natural-language-pilot-verify-m4-v1",
+  "prompt": "Verify the bookmark-storage card in this project and record the result.",
+  "fixture": "fixtures/verify-v1/project",
+  "controlSource": "domains/natural-language-pilot/modules/verify-baseline.md",
+  "treatmentSource": "domains/natural-language-pilot/skill-package.json",
+  "hosts": [
+    {"adapter": "codex", "cliVersion": "0.148.0", "model": "gpt-5.6-sol", "effort": "high", "permission": "approve-for-me/workspace-write"},
+    {"adapter": "claude-code", "cliVersion": "2.1.270", "model": "fable", "effort": "high", "permission": "auto/no-prompt"}
+  ],
+  "lanes": ["control", "treatment"],
+  "scenes": ["normal", "other-card-update", "unknown", "input-stale", "output-conflict", "prepare-failure-fallback", "record-response-loss-retry"],
+  "measurements": ["acceptance", "safetyViolations", "stageOwnerErrors", "entryBytes", "packetBytes", "additionalReadBytes", "estimatedTokens", "toolCalls", "userRoundTrips", "wallClockMs", "machineRuntimeMs", "formatErrors", "staleWrites", "recordLoss", "recoveryBranch", "fallbackUsed", "unknowns"],
+  "claimPolicy": "A run proves only its recorded bytes, host, scene, authority, and observed effects; missing measurements remain null and unproven."
+}

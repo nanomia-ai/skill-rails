@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 1,
+  "status": "observed-machine-cost-not-economic-win",
+  "measuredAt": "2026-09-13T12:02:40.766Z",
+  "node": "v24.18.0",
+  "implementation": {
+    "M1": {
+      "files": 17,
+      "bytes": 56932,
+      "rows": [
+        {
+          "path": "contracts/source-package.schema.json",
+          "bytes": 823,
+          "sha256": "45b23961c6dc835776890a2e2ee2ff1639ff90ba216caf08aefa35c9732fd76b"
+        },
+        {
+          "path": "contracts/target.schema.json",
+          "bytes": 3251,
+          "sha256": "1830992869e92275ca56f83cb7c488f004bfc2f00d688687ca7ec5af6e0e5f68"
+        },
+        {
+          "path": "contracts/build-receipt.schema.json",
+          "bytes": 1406,
+          "sha256": "2ecf54ae8be8ca56089067fcda0f3ebf55a9879386d27baf9a59118b3397f849"
+        },
+        {
+          "path": "src/core/errors.mjs",
+          "bytes": 957,
+          "sha256": "1d0b268e810bc5087ae8e5c12856b604e39d5e44eb7edd30d4af2e68ffeb7724"
+        },
+        {
+          "path": "src/core/canonicalize.mjs",
+          "bytes": 1847,
+          "sha256": "5203b0afafcf38ce864015a03b8482f21ec213a3e390608dd11b5ed88bf2eb51"
+        },
+        {
+          "path": "src/core/paths.mjs",
+          "bytes": 3010,
+          "sha256": "c772af098f3e31a4d74fa2f2af6843063b4665661e65b4b1eb769206594e1f24"
+        },
+        {
+          "path": "src/core/validate.mjs",
+          "bytes": 12212,
+          "sha256": "b932f9d718303c8dce3d0eb566886d7b324b2ac1a8a4eff80cb5a56b270d716f"
+        },
+        {
+          "path": "src/core/build.mjs",
+          "bytes": 8477,
+          "sha256": "1fbd423318e136a48686754cc041ab27a5e41b5f3a75e4ce8a35f69977df4d95"
+        },
+        {
+          "path": "src/core/check.mjs",
+          "bytes": 3851,
+          "sha256": "69387ec82bb4bff2887e96e997dfb73646ed59ce490f6bb92c8959e4b505ef9f"
+        },
+        {
+          "path": "src/core/inspect.mjs",
+          "bytes": 3532,
+          "sha256": "6de66e3da99f459536a0592fbdeb3d14959659c06325eed91cba69d7f1f7ab76"
+        },
+        {
+          "path": "src/core/cli.mjs",
+          "bytes": 3433,
+          "sha256": "f93662ef7818d036517daa5919195151232d33637b0e6f01dbaea87732eff537"
+        },
+        {
+          "path": "src/runtime/common.mjs",
+          "bytes": 8448,
+          "sha256": "2a7647ba6f11dc25353ef63bc4df22bcd26dcf305bfbeb92aabbbba1437d639b"
+        },
+        {
+          "path": "src/runtime/integrity.mjs",
+          "bytes": 2058,
+          "sha256": "075231d93940189d1a2d508cdbe1dc1caaf60f8f0986a2390c79cb68e026b018"
+        },
+        {
+          "path": "src/runtime/run-check.mjs",
+          "bytes": 1648,
+          "sha256": "9679534ff91d95407c35f99209e22228110260e275a1465decaca290d7102e94"
+        },
+        {
+          "path": "authoring-package.json",
+          "bytes": 210,
+          "sha256": "ca538e1c6341290c23bf32120d52ccdacce9fa19ac84be665d5cb2dd00337304"
+        },
+        {
+          "path": "authoring/skill-rails/SKILL.source.md",
+          "bytes": 1638,
+          "sha256": "26ed9540715b4bfe8927bc664f4d29df8d40ad401bce6ddba3a099f139a830c9"
+        },
+        {
+          "path": "authoring/skill-rails/targets/authoring/target.json",
+          "bytes": 131,
+          "sha256": "2d5b6047317cc2658e7c0ec9d949efc8ebfe5b1d82b66ce2feb0ee752a4c3874"
+        }
+      ]
+    },
+    "M2": {
+      "files": 14,
+      "bytes": 22796,
+      "rows": [
+        {
+          "path": "contracts/packet-kernel.schema.json",
+          "bytes": 1169,
+          "sha256": "1d0d859d6826959b1b29be5c75a83d718ef4c9949b55d23d050aba75b22ef22a"
+        },
+        {
+          "path": "contracts/observed-facts.schema.json",
+          "bytes": 1160,
+          "sha256": "8c8a4513ea05e8b60d30054b9da7870febf917dcef72eec9ba03fc9b8a8d959a"
+        },
+        {
+          "path": "contracts/prepared-work.schema.json",
+          "bytes": 1084,
+          "sha256": "1e20ddc447bebc1bbbf7e155dabe70bdaf86810cb4f28b8d44912f0b8f5823a9"
+        },
+        {
+          "path": "src/runtime/prepare.mjs",
+          "bytes": 9013,
+          "sha256": "1ed8a964420ff9e8b72ab5037e75b5990fb624a346b00f54c0860ac38d0dc74f"
+        },
+        {
+          "path": "src/runtime/run.mjs",
+          "bytes": 2256,
+          "sha256": "c571d68409408b26af5227a824cc3c79c17808afe2ad6cdc2b9123e97f445394"
+        },
+        {
+          "path": "domains/natural-language-pilot/skill-package.json",
+          "bytes": 271,
+          "sha256": "c1db77e6c6063dc6e540f13ff60cdfde3cfae63d97891b7f7c0dc1a1a9ef5eee"
+        },
+        {
+          "path": "domains/natural-language-pilot/modules/purpose.md",
+          "bytes": 255,
+          "sha256": "53d4b5fb48ec86de491ec6c08d60b7c298da0d6e9880cb9b56ab584993dbf6df"
+        },
+        {
+          "path": "domains/natural-language-pilot/modules/verify-baseline.md",
+          "bytes": 1078,
+          "sha256": "dde7f3f8ee23044a8102c49e2d8e381ea8aaf236d4126f03e8f24f5a75a6ecfb"
+        },
+        {
+          "path": "domains/natural-language-pilot/targets/verify/target.json",
+          "bytes": 674,
+          "sha256": "7bc42e0f76f49933ebd38f7bd67450fe18ddc5e2abe9e7881b9778009cde3be7"
+        },
+        {
+          "path": "domains/natural-language-pilot/targets/verify/entry.md",
+          "bytes": 1308,
+          "sha256": "4ef48df0b73fa62ace655d989d574d3f874037c2015e335d321314507573cbeb"
+        },
+        {
+          "path": "domains/natural-language-pilot/targets/verify/packet.json",
+          "bytes": 1423,
+          "sha256": "9700885debfd6083864428dcdc850110b6bbbc65c1e6364eeeb1ce0bd44e3bdf"
+        },
+        {
+          "path": "domains/natural-language-pilot/targets/verify/config.json",
+          "bytes": 174,
+          "sha256": "807b74760d4dca2103820f16e8660d4f473bcc0db282edfba86515958fb0eb2d"
+        },
+        {
+          "path": "domains/natural-language-pilot/targets/verify/config.schema.json",
+          "bytes": 639,
+          "sha256": "503e227c7f9f7d90b63e453f897a8f8629b7a3c78310f654ad5b99467951b5b6"
+        },
+        {
+          "path": "domains/natural-language-pilot/targets/verify/observer.mjs",
+          "bytes": 2292,
+          "sha256": "aef50f4fd13be21f88ae983f9d85fb2d3b8477b187dfeb6a1cf078e2f9428a7a"
+        }
+      ]
+    },
+    "M3": {
+      "files": 3,
+      "bytes": 15668,
+      "rows": [
+        {
+          "path": "src/runtime/record.mjs",
+          "bytes": 9390,
+          "sha256": "37fd8f49e912efa365093a3ad7660008ca37f6fdb6e4621db2f3fe2f605b821f"
+        },
+        {
+          "path": "domains/natural-language-pilot/targets/verify/renderer.mjs",
+          "bytes": 4478,
+          "sha256": "76794640b450a5e48f07c8f49041c6663bc05f20ff62c88c788d102ba8d3c437"
+        },
+        {
+          "path": "domains/natural-language-pilot/targets/verify/contracts/semantic-answer.verify.schema.json",
+          "bytes": 1800,
+          "sha256": "2d4a127d87be4031ce0e7a130c1966ad14419581b9c834f37b8c06194ec5bfd9"
+        }
+      ]
+    }
+  },
+  "generated": {
+    "authoringTarget": {
+      "files": 7,
+      "bytes": 17666
+    },
+    "pilotTarget": {
+      "files": 20,
+      "bytes": 55653
+    },
+    "pilotRuntimeAndContracts": {
+      "files": 12,
+      "bytes": 44554
+    }
+  },
+  "machineRuntime": {
+    "buildMs": [
+      121.277,
+      109.745,
+      121.65
+    ],
+    "prepareMs": [
+      185.476,
+      198.2,
+      201.473
+    ],
+    "recordApplied": {
+      "wallClockMs": 183.779,
+      "status": "APPLIED"
+    },
+    "recordRetry": {
+      "wallClockMs": 198.69,
+      "status": "APPLIED_ALREADY"
+    },
+    "inputStale": {
+      "wallClockMs": 102.08,
+      "status": "ERROR",
+      "code": "INPUT_STALE",
+      "wroteOutput": false,
+      "outputBefore": {
+        "bytes": 60,
+        "sha256": "0bdfb021e7a57d56b978cfc9f787821f4e63ff2c22ae5fa6bcd3edc9000cbccf"
+      },
+      "outputAfter": {
+        "bytes": 60,
+        "sha256": "0bdfb021e7a57d56b978cfc9f787821f4e63ff2c22ae5fa6bcd3edc9000cbccf"
+      }
+    },
+    "outputConflict": {
+      "wallClockMs": 190.366,
+      "status": "ERROR",
+      "code": "OUTPUT_CONFLICT",
+      "wroteOutput": false,
+      "outputBefore": {
+        "bytes": 91,
+        "sha256": "ad6cec18825e9bb4a4b9d5b85bb06e2580e385ee5518d960e55409b6128d668a"
+      },
+      "outputAfter": {
+        "bytes": 91,
+        "sha256": "ad6cec18825e9bb4a4b9d5b85bb06e2580e385ee5518d960e55409b6128d668a"
+      }
+    }
+  },
+  "errorRecoveryCost": {
+    "inputStaleRequiresFreshPrepareAndReevaluation": true,
+    "outputConflictRequiresFreshPrepareAndReevaluation": true,
+    "appliedAlreadyRequiresNoWrite": true,
+    "freshAgentCost": null
+  },
+  "claimPolicy": "Counts and local process timings are observed for these exact files and this host. They do not prove fresh-agent behavior, semantic correctness, cross-host performance, or an economic win."
+}

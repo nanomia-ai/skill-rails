@@ -1,0 +1,2661 @@
+{
+  "schemaVersion": 1,
+  "checkpointCommit": "9d35b75372b541b3494c0c237aac2754ad26f4c4",
+  "publishedTag": {
+    "name": "v0.4.3",
+    "commit": "f9ba22f6e498a43f166c6ef0e10a36d0c8e9e463"
+  },
+  "capsule": {
+    "path": "legacy/archive/v0.4.3/legacy-source.tar",
+    "sha256": "c79dcf45dc9ab520aa100e19ecf6ef95102d1a423c89c5090cadd40293db31fc",
+    "memberCount": 257
+  },
+  "classificationCounts": {
+    "retain": 7,
+    "replace-owner": 7,
+    "archive-remove": 250
+  },
+  "inventoryRowsSha256": "73005d3adcb86b697e79cc775ae2ca541b94c4da15824cea4481aa7306d6e0b0",
+  "rows": [
+    {
+      "path": ".gitattributes",
+      "classification": "replace-owner",
+      "mode": "100644",
+      "gitObject": "8dc751808a5bd1c406ef5b45da34c3f0472f5cbc",
+      "baseBytes": 215,
+      "baseSha256": "42684f211e8190ae8cac0943c54063559f365ebbb365320a9372b8a666a7849d",
+      "workingBytes": 218,
+      "workingSha256": "deb44667a12dc0473857c9968408b08b84ed61a22c5884cecb105d8904897151"
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "d477dcaff068964968117c06a16279103ec8be35",
+      "baseBytes": 2520,
+      "baseSha256": "055969e956af9ebfa78e9ea222e01d33ad8c20543fbc52f8839572bd2eb3900c",
+      "workingBytes": 2520,
+      "workingSha256": "055969e956af9ebfa78e9ea222e01d33ad8c20543fbc52f8839572bd2eb3900c"
+    },
+    {
+      "path": ".gitignore",
+      "classification": "replace-owner",
+      "mode": "100644",
+      "gitObject": "188d4f35928ac2e8a0387226e65268e2526fc293",
+      "baseBytes": 56,
+      "baseSha256": "1c514a3da7e56ab59d54c9615001d80faa0f5eae518c161b3bc0fad4163a25dc",
+      "workingBytes": 61,
+      "workingSha256": "08905234003f86c966dfb488824dab0f0c65c58f37237f5119f3b4be2926e635"
+    },
+    {
+      "path": "AGENTS.md",
+      "classification": "replace-owner",
+      "mode": "100644",
+      "gitObject": "4cc094d5461b386ec172defce88033a5ce9e505e",
+      "baseBytes": 7050,
+      "baseSha256": "eac685658a5bc1fe0608ec2d291a6f6f159e0ead6e81884332b8f38e9c92a544",
+      "workingBytes": 7080,
+      "workingSha256": "a460319b45b75308c167b63704149853d1b42d6b6eea93ba82c7f026de50cb8a"
+    },
+    {
+      "path": "CLAUDE.md",
+      "classification": "replace-owner",
+      "mode": "100644",
+      "gitObject": "def6dd2a830cf38184d84c49137f492063ad4213",
+      "baseBytes": 356,
+      "baseSha256": "5bdb3a4dc41716a196e6b09119e157012a4fab1c65a7a7abd62c6cf852d08e82",
+      "workingBytes": 356,
+      "workingSha256": "5bdb3a4dc41716a196e6b09119e157012a4fab1c65a7a7abd62c6cf852d08e82"
+    },
+    {
+      "path": "README.ko.md",
+      "classification": "retain",
+      "mode": "100644",
+      "gitObject": "f677ab712a37488078e4291c587830c726436218",
+      "baseBytes": 13017,
+      "baseSha256": "7f47877720df1566aacb99618f502aec016c7529f11d7fd43a81f5e6c2bdcaef",
+      "workingBytes": 13017,
+      "workingSha256": "7f47877720df1566aacb99618f502aec016c7529f11d7fd43a81f5e6c2bdcaef"
+    },
+    {
+      "path": "README.md",
+      "classification": "retain",
+      "mode": "100644",
+      "gitObject": "9427d742a3a1aadcfd353e02e313f5a63fef6710",
+      "baseBytes": 11952,
+      "baseSha256": "40683b5bb41fe1fe163cb608e15a4c20a4ed3dac13fbdea587cdfbe52b2d4331",
+      "workingBytes": 11952,
+      "workingSha256": "40683b5bb41fe1fe163cb608e15a4c20a4ed3dac13fbdea587cdfbe52b2d4331"
+    },
+    {
+      "path": "docs/assets/readme-rule.svg",
+      "classification": "retain",
+      "mode": "100644",
+      "gitObject": "25c3166c126c979f2be79e05d90c8f1a678b9e5d",
+      "baseBytes": 188,
+      "baseSha256": "c4e4b03bf0c00b6bb9a56cf1c84543722f0087125d70a4b5bff8b3d2595d0ca3",
+      "workingBytes": 188,
+      "workingSha256": "c4e4b03bf0c00b6bb9a56cf1c84543722f0087125d70a4b5bff8b3d2595d0ca3"
+    },
+    {
+      "path": "docs/assets/skillrails-wordmark.svg",
+      "classification": "retain",
+      "mode": "100644",
+      "gitObject": "efb201bd4ee40b923ca674df4e26c496e0bf30d2",
+      "baseBytes": 2037,
+      "baseSha256": "deb73d701480551cc811ce2dfe2cf02bbddcc11a827f1efb0f048f092da25697",
+      "workingBytes": 2037,
+      "workingSha256": "deb73d701480551cc811ce2dfe2cf02bbddcc11a827f1efb0f048f092da25697"
+    },
+    {
+      "path": "docs/authoring-lessons_ko.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "9cc804a163dd2d4dcfab953a274d95e133e61ee6",
+      "baseBytes": 16681,
+      "baseSha256": "20dc183c08aff50fe44ff05c7c58a0b03fb4cd0f9cadcf0470bf885deb5210a9",
+      "workingBytes": 16795,
+      "workingSha256": "62ffa0d9e79cb3bdef3dab5515e476b852078665cfb5187bccd2245826c931b6"
+    },
+    {
+      "path": "docs/evidence/proof-03-cold-behavior_ko.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "f1ad3d994313921facdf20d7946386ad1a18b720",
+      "baseBytes": 2484,
+      "baseSha256": "e05cbac6acea34d5c03d7ad1d5ce2e2865bb53369314663590250f7903f3ffaa",
+      "workingBytes": 2522,
+      "workingSha256": "db31b6d596997b1ffd5980c48195c02e51b9567974f58b06889a49cf455b8060"
+    },
+    {
+      "path": "docs/evidence/proof-04-sibling-pointer-behavior_ko.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "8e627ca578c5868304b81c4efab5ef63a71e6aa5",
+      "baseBytes": 7433,
+      "baseSha256": "1b01cc01f38405080fca7aef82343f942835d5244dd9de776a4f1abc3d700900",
+      "workingBytes": 7526,
+      "workingSha256": "6894b7cbf40f516c6584f49635f9622556ae38f753aa4e1b04f3e2a400dd4e50"
+    },
+    {
+      "path": "docs/guide/universal-ai-skill-inquiry-framework.md",
+      "classification": "retain",
+      "mode": "100644",
+      "gitObject": "685a15c0e628c40a109af34521aa4508ce66f29b",
+      "baseBytes": 59785,
+      "baseSha256": "17879eb8f94dde7ea0fe14b03258eebf94fd0efb92bb014dae2c902bcc7654d7",
+      "workingBytes": 59785,
+      "workingSha256": "17879eb8f94dde7ea0fe14b03258eebf94fd0efb92bb014dae2c902bcc7654d7"
+    },
+    {
+      "path": "docs/implementation-verification_ko.md",
+      "classification": "replace-owner",
+      "mode": "100644",
+      "gitObject": "829bd80912be1189cca392575c827754b6f81e13",
+      "baseBytes": 173556,
+      "baseSha256": "3b0be609f2ec01f9c5fe26bfd72a72ecec04ae9fd1f5fa14895ed5b2a18b1ded",
+      "workingBytes": 174313,
+      "workingSha256": "39f51c9e47e6dbd0a0de9c0ed053d83fa5a17e6966efc69b72c80fb8e221c10b"
+    },
+    {
+      "path": "docs/maintenance-status_ko.md",
+      "classification": "replace-owner",
+      "mode": "100644",
+      "gitObject": "6391a77dca5e786b6b37e106880ee2176cce4b91",
+      "baseBytes": 36081,
+      "baseSha256": "101da9a23fd8556bdda1fd7348a9948e8cb925f97d9a76207c4b00db1284412b",
+      "workingBytes": 36160,
+      "workingSha256": "bbc26337b1a9ac06a56aa2e25021a21a8ded00a0e67237c93f2fe7c09d30a4fc"
+    },
+    {
+      "path": "docs/plan/implementation-ready-development-plan_ko.md",
+      "classification": "retain",
+      "mode": "100644",
+      "gitObject": "c44a7f4613826e48d4eac6ee298acd83ae4bdcbb",
+      "baseBytes": 123499,
+      "baseSha256": "631e1fbbe6be1e48ec4d944531e3d47214c2c67671fa2731fdcec4d26d893b71",
+      "workingBytes": 123499,
+      "workingSha256": "631e1fbbe6be1e48ec4d944531e3d47214c2c67671fa2731fdcec4d26d893b71"
+    },
+    {
+      "path": "docs/plan/initial-ai-first-skill-system-concept_ko.md",
+      "classification": "retain",
+      "mode": "100644",
+      "gitObject": "71d06450ee619786262454cd1e8d7b013ed09a90",
+      "baseBytes": 79754,
+      "baseSha256": "d1223770f81ca01ffaa6ec3fddd081ae9b279ae40e93f9af2d3fc2af3599c1ea",
+      "workingBytes": 79754,
+      "workingSha256": "d1223770f81ca01ffaa6ec3fddd081ae9b279ae40e93f9af2d3fc2af3599c1ea"
+    },
+    {
+      "path": "docs/readme-authoring.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e68cbf6981543d62b776432b7e18bf54d73e3e56",
+      "baseBytes": 14340,
+      "baseSha256": "be86997e7e53ba975ebc69841582a11a73c968ca4311f6f644b0ecfbe8410eb7",
+      "workingBytes": 14340,
+      "workingSha256": "be86997e7e53ba975ebc69841582a11a73c968ca4311f6f644b0ecfbe8410eb7"
+    },
+    {
+      "path": "docs/skill-rails_ko.md",
+      "classification": "replace-owner",
+      "mode": "100644",
+      "gitObject": "74d2236732234ca765f4d23ad9d414debdeae3e5",
+      "baseBytes": 48553,
+      "baseSha256": "461d1325d49cf8a3285404c76f84791e76771bb908f151fcd83b947f3b808457",
+      "workingBytes": 49300,
+      "workingSha256": "81662620f405b0e1b752684619c59b582654645e37a9c3d778d3a738bce440fb"
+    },
+    {
+      "path": "docs/upgrade-from-v0.1.9_ko.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "fc2e834beaaf30aea3a63d82a08cb12a334494ab",
+      "baseBytes": 8267,
+      "baseSha256": "894f7183101351c81780e29e104431a33ed76f07c70b4f898f1bdc2735555bce",
+      "workingBytes": 8323,
+      "workingSha256": "0b6366343eb46ec41addc1727839d890c4e9f03f13a1228a8a7eed43af3dfa2a"
+    },
+    {
+      "path": "evals/g0/corpus.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "08d61775d263309c6e7f86d8a471fcbcf066dc90",
+      "baseBytes": 1500,
+      "baseSha256": "99855ec77b29e79bd7b044b144ff3f67a37a5960034b8e84cc37820787232d0c",
+      "workingBytes": 1500,
+      "workingSha256": "99855ec77b29e79bd7b044b144ff3f67a37a5960034b8e84cc37820787232d0c"
+    },
+    {
+      "path": "evals/g0/resource-probe.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "cd0608b42a7cfdcbb1c707e1272eefcc662f1a11",
+      "baseBytes": 959,
+      "baseSha256": "531eeefc8b4be47a07c6e99d9d9a8e8be8cec6f6d747b61974fd83e1e287625d",
+      "workingBytes": 959,
+      "workingSha256": "531eeefc8b4be47a07c6e99d9d9a8e8be8cec6f6d747b61974fd83e1e287625d"
+    },
+    {
+      "path": "evals/g0/thresholds.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "f7fba51e1130e1d1dac0e669d5530d103e5a7149",
+      "baseBytes": 1257,
+      "baseSha256": "2b89db2ccec02fd6b14905c2f2fcb3e322be343a0d14823c466b940ab8f94b00",
+      "workingBytes": 1257,
+      "workingSha256": "2b89db2ccec02fd6b14905c2f2fcb3e322be343a0d14823c466b940ab8f94b00"
+    },
+    {
+      "path": "evals/g0_5/a-prose/clean-v3.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b902cd1f73757c2fbfc06ff63651870a4589ece4",
+      "baseBytes": 1368,
+      "baseSha256": "14ab1bbb5c0a84e6e22ba1a6674ce6887c5454516007dae7085bd284b32589e0",
+      "workingBytes": 1368,
+      "workingSha256": "14ab1bbb5c0a84e6e22ba1a6674ce6887c5454516007dae7085bd284b32589e0"
+    },
+    {
+      "path": "evals/g0_5/a-prose/clean.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "69de6683ad665acc2c70f76844e625b019192c0c",
+      "baseBytes": 1206,
+      "baseSha256": "943d52eda20fec82ffab11ac594c8bd7b52d2f5be26054b3b0e2011ed007efc0",
+      "workingBytes": 1206,
+      "workingSha256": "943d52eda20fec82ffab11ac594c8bd7b52d2f5be26054b3b0e2011ed007efc0"
+    },
+    {
+      "path": "evals/g0_5/a-prose/mutated-v3.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "de401d48ebf770cbeb7b5c072baf75ffdfdd0634",
+      "baseBytes": 1210,
+      "baseSha256": "9406f68850ae5d3c8bd85e8f82592238d9e29cb7b1779eb49068890886bfb88c",
+      "workingBytes": 1210,
+      "workingSha256": "9406f68850ae5d3c8bd85e8f82592238d9e29cb7b1779eb49068890886bfb88c"
+    },
+    {
+      "path": "evals/g0_5/a-prose/mutated.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "03c4929b33445140e41cb3b5d18af726f6c62a31",
+      "baseBytes": 1124,
+      "baseSha256": "0625b4f0305c448644b9d5a8d26a804a6d4ef44c5edf697caee66105dca8ac9d",
+      "workingBytes": 1124,
+      "workingSha256": "0625b4f0305c448644b9d5a8d26a804a6d4ef44c5edf697caee66105dca8ac9d"
+    },
+    {
+      "path": "evals/g0_5/b-v5-clean/body.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "047e81726f8438f5438238074e75563777ef4296",
+      "baseBytes": 885,
+      "baseSha256": "03621c23d73fef5a8bd82f805d9f47cb7972a872c8f5d7176d87f2d5d6d86ce6",
+      "workingBytes": 885,
+      "workingSha256": "03621c23d73fef5a8bd82f805d9f47cb7972a872c8f5d7176d87f2d5d6d86ce6"
+    },
+    {
+      "path": "evals/g0_5/b-v5-clean/collectors/index.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "415162f5cc0e282efe40df3de9d688a40b14c704",
+      "baseBytes": 488,
+      "baseSha256": "b56b47014f8391704965bc5e1ef75e9c24a0f8663bafd56715016f0f872cfcd3",
+      "workingBytes": 488,
+      "workingSha256": "b56b47014f8391704965bc5e1ef75e9c24a0f8663bafd56715016f0f872cfcd3"
+    },
+    {
+      "path": "evals/g0_5/b-v5-clean/fixtures/formats.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b20ff869fc4cec4183ac215d66d5da9688363f80",
+      "baseBytes": 476,
+      "baseSha256": "14eef47603ba8c633790b46ad247dcc8936ef3bf449cfb1779682546bad57add",
+      "workingBytes": 476,
+      "workingSha256": "14eef47603ba8c633790b46ad247dcc8936ef3bf449cfb1779682546bad57add"
+    },
+    {
+      "path": "evals/g0_5/b-v5-clean/fixtures/lint/manifest.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "06a06c6ea1bc2303ebaf02145befec062aa13df1",
+      "baseBytes": 1991,
+      "baseSha256": "c5f2e5bfea199f914611062f003d80dcb56fbbb2fbbcf14dc858abbd9a9e0c1e",
+      "workingBytes": 1991,
+      "workingSha256": "c5f2e5bfea199f914611062f003d80dcb56fbbb2fbbcf14dc858abbd9a9e0c1e"
+    },
+    {
+      "path": "evals/g0_5/b-v5-clean/fixtures/scenarios.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "37dab175bccba54502b191c28d67bd0ab04590ef",
+      "baseBytes": 3612,
+      "baseSha256": "753006f89bf6b41d1c1b1dc6f5c68e2ea04029944720e9b13ba5089187bd831e",
+      "workingBytes": 3612,
+      "workingSha256": "753006f89bf6b41d1c1b1dc6f5c68e2ea04029944720e9b13ba5089187bd831e"
+    },
+    {
+      "path": "evals/g0_5/b-v5-clean/references/purpose.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "1aca45d8580cd65d66ad3eec34692a3d5c5cc5fa",
+      "baseBytes": 90,
+      "baseSha256": "7021bca081cc1672a5b9ba6011f0b0cfeb09c6ed3b89625a90a7f80b0f288b49",
+      "workingBytes": 90,
+      "workingSha256": "7021bca081cc1672a5b9ba6011f0b0cfeb09c6ed3b89625a90a7f80b0f288b49"
+    },
+    {
+      "path": "evals/g0_5/b-v5-clean/spec.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "a03a4313e39e5fde450524175354981ba157b1af",
+      "baseBytes": 4635,
+      "baseSha256": "e85cc25eefd06de87ecc1db6bfa702234dffa042e6ec9d2a4adde9df6ce2fda1",
+      "workingBytes": 4635,
+      "workingSha256": "e85cc25eefd06de87ecc1db6bfa702234dffa042e6ec9d2a4adde9df6ce2fda1"
+    },
+    {
+      "path": "evals/g0_5/b-v5-clean/templates/review-report.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "dbea418538b3b5e43a023002924a9a397c460b10",
+      "baseBytes": 55,
+      "baseSha256": "792d45d5ad2f975125d23d2e04a83d88cd179f5acfefd91d71a621ae5939a10c",
+      "workingBytes": 55,
+      "workingSha256": "792d45d5ad2f975125d23d2e04a83d88cd179f5acfefd91d71a621ae5939a10c"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v2/body.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "047e81726f8438f5438238074e75563777ef4296",
+      "baseBytes": 885,
+      "baseSha256": "03621c23d73fef5a8bd82f805d9f47cb7972a872c8f5d7176d87f2d5d6d86ce6",
+      "workingBytes": 885,
+      "workingSha256": "03621c23d73fef5a8bd82f805d9f47cb7972a872c8f5d7176d87f2d5d6d86ce6"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v2/collectors/index.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "415162f5cc0e282efe40df3de9d688a40b14c704",
+      "baseBytes": 488,
+      "baseSha256": "b56b47014f8391704965bc5e1ef75e9c24a0f8663bafd56715016f0f872cfcd3",
+      "workingBytes": 488,
+      "workingSha256": "b56b47014f8391704965bc5e1ef75e9c24a0f8663bafd56715016f0f872cfcd3"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v2/fixtures/lint/manifest.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "06a06c6ea1bc2303ebaf02145befec062aa13df1",
+      "baseBytes": 1991,
+      "baseSha256": "c5f2e5bfea199f914611062f003d80dcb56fbbb2fbbcf14dc858abbd9a9e0c1e",
+      "workingBytes": 1991,
+      "workingSha256": "c5f2e5bfea199f914611062f003d80dcb56fbbb2fbbcf14dc858abbd9a9e0c1e"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v2/fixtures/scenarios.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "37dab175bccba54502b191c28d67bd0ab04590ef",
+      "baseBytes": 3612,
+      "baseSha256": "753006f89bf6b41d1c1b1dc6f5c68e2ea04029944720e9b13ba5089187bd831e",
+      "workingBytes": 3612,
+      "workingSha256": "753006f89bf6b41d1c1b1dc6f5c68e2ea04029944720e9b13ba5089187bd831e"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v2/references/purpose.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "1aca45d8580cd65d66ad3eec34692a3d5c5cc5fa",
+      "baseBytes": 90,
+      "baseSha256": "7021bca081cc1672a5b9ba6011f0b0cfeb09c6ed3b89625a90a7f80b0f288b49",
+      "workingBytes": 90,
+      "workingSha256": "7021bca081cc1672a5b9ba6011f0b0cfeb09c6ed3b89625a90a7f80b0f288b49"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v2/spec.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "cf695f043e4dff44620859f875499a6536f614b9",
+      "baseBytes": 4481,
+      "baseSha256": "12d02191cd36e6931059722404bcebf7e43c817a04c5d7c6976081dd18e25f6c",
+      "workingBytes": 4481,
+      "workingSha256": "12d02191cd36e6931059722404bcebf7e43c817a04c5d7c6976081dd18e25f6c"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v2/templates/review-report.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "dbea418538b3b5e43a023002924a9a397c460b10",
+      "baseBytes": 55,
+      "baseSha256": "792d45d5ad2f975125d23d2e04a83d88cd179f5acfefd91d71a621ae5939a10c",
+      "workingBytes": 55,
+      "workingSha256": "792d45d5ad2f975125d23d2e04a83d88cd179f5acfefd91d71a621ae5939a10c"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v3/body.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "047e81726f8438f5438238074e75563777ef4296",
+      "baseBytes": 885,
+      "baseSha256": "03621c23d73fef5a8bd82f805d9f47cb7972a872c8f5d7176d87f2d5d6d86ce6",
+      "workingBytes": 885,
+      "workingSha256": "03621c23d73fef5a8bd82f805d9f47cb7972a872c8f5d7176d87f2d5d6d86ce6"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v3/collectors/index.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "415162f5cc0e282efe40df3de9d688a40b14c704",
+      "baseBytes": 488,
+      "baseSha256": "b56b47014f8391704965bc5e1ef75e9c24a0f8663bafd56715016f0f872cfcd3",
+      "workingBytes": 488,
+      "workingSha256": "b56b47014f8391704965bc5e1ef75e9c24a0f8663bafd56715016f0f872cfcd3"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v3/fixtures/formats.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b20ff869fc4cec4183ac215d66d5da9688363f80",
+      "baseBytes": 476,
+      "baseSha256": "14eef47603ba8c633790b46ad247dcc8936ef3bf449cfb1779682546bad57add",
+      "workingBytes": 476,
+      "workingSha256": "14eef47603ba8c633790b46ad247dcc8936ef3bf449cfb1779682546bad57add"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v3/fixtures/lint/manifest.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "06a06c6ea1bc2303ebaf02145befec062aa13df1",
+      "baseBytes": 1991,
+      "baseSha256": "c5f2e5bfea199f914611062f003d80dcb56fbbb2fbbcf14dc858abbd9a9e0c1e",
+      "workingBytes": 1991,
+      "workingSha256": "c5f2e5bfea199f914611062f003d80dcb56fbbb2fbbcf14dc858abbd9a9e0c1e"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v3/fixtures/scenarios.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "37dab175bccba54502b191c28d67bd0ab04590ef",
+      "baseBytes": 3612,
+      "baseSha256": "753006f89bf6b41d1c1b1dc6f5c68e2ea04029944720e9b13ba5089187bd831e",
+      "workingBytes": 3612,
+      "workingSha256": "753006f89bf6b41d1c1b1dc6f5c68e2ea04029944720e9b13ba5089187bd831e"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v3/references/purpose.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "1aca45d8580cd65d66ad3eec34692a3d5c5cc5fa",
+      "baseBytes": 90,
+      "baseSha256": "7021bca081cc1672a5b9ba6011f0b0cfeb09c6ed3b89625a90a7f80b0f288b49",
+      "workingBytes": 90,
+      "workingSha256": "7021bca081cc1672a5b9ba6011f0b0cfeb09c6ed3b89625a90a7f80b0f288b49"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v3/spec.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "f279e698c814ea19f1122d1e0eefde338c4bdaa6",
+      "baseBytes": 4419,
+      "baseSha256": "996129e0a2e0ed1c51604b76e1a9e89d2d3edcb26621f7e6e5b5cbeb41d89860",
+      "workingBytes": 4419,
+      "workingSha256": "996129e0a2e0ed1c51604b76e1a9e89d2d3edcb26621f7e6e5b5cbeb41d89860"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated-v3/templates/review-report.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "dbea418538b3b5e43a023002924a9a397c460b10",
+      "baseBytes": 55,
+      "baseSha256": "792d45d5ad2f975125d23d2e04a83d88cd179f5acfefd91d71a621ae5939a10c",
+      "workingBytes": 55,
+      "workingSha256": "792d45d5ad2f975125d23d2e04a83d88cd179f5acfefd91d71a621ae5939a10c"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated/body.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "047e81726f8438f5438238074e75563777ef4296",
+      "baseBytes": 885,
+      "baseSha256": "03621c23d73fef5a8bd82f805d9f47cb7972a872c8f5d7176d87f2d5d6d86ce6",
+      "workingBytes": 885,
+      "workingSha256": "03621c23d73fef5a8bd82f805d9f47cb7972a872c8f5d7176d87f2d5d6d86ce6"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated/collectors/index.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "415162f5cc0e282efe40df3de9d688a40b14c704",
+      "baseBytes": 488,
+      "baseSha256": "b56b47014f8391704965bc5e1ef75e9c24a0f8663bafd56715016f0f872cfcd3",
+      "workingBytes": 488,
+      "workingSha256": "b56b47014f8391704965bc5e1ef75e9c24a0f8663bafd56715016f0f872cfcd3"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated/fixtures/formats.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b20ff869fc4cec4183ac215d66d5da9688363f80",
+      "baseBytes": 476,
+      "baseSha256": "14eef47603ba8c633790b46ad247dcc8936ef3bf449cfb1779682546bad57add",
+      "workingBytes": 476,
+      "workingSha256": "14eef47603ba8c633790b46ad247dcc8936ef3bf449cfb1779682546bad57add"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated/fixtures/lint/manifest.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "06a06c6ea1bc2303ebaf02145befec062aa13df1",
+      "baseBytes": 1991,
+      "baseSha256": "c5f2e5bfea199f914611062f003d80dcb56fbbb2fbbcf14dc858abbd9a9e0c1e",
+      "workingBytes": 1991,
+      "workingSha256": "c5f2e5bfea199f914611062f003d80dcb56fbbb2fbbcf14dc858abbd9a9e0c1e"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated/fixtures/scenarios.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "c3b43fb868cfe0e6e345ed86d08fbd34afe0ff0a",
+      "baseBytes": 1415,
+      "baseSha256": "7febd471a7fec1adad62c91bebf828b019f0b36be04e050d9f79c48740a53088",
+      "workingBytes": 1415,
+      "workingSha256": "7febd471a7fec1adad62c91bebf828b019f0b36be04e050d9f79c48740a53088"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated/references/purpose.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "1aca45d8580cd65d66ad3eec34692a3d5c5cc5fa",
+      "baseBytes": 90,
+      "baseSha256": "7021bca081cc1672a5b9ba6011f0b0cfeb09c6ed3b89625a90a7f80b0f288b49",
+      "workingBytes": 90,
+      "workingSha256": "7021bca081cc1672a5b9ba6011f0b0cfeb09c6ed3b89625a90a7f80b0f288b49"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated/spec.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "cf695f043e4dff44620859f875499a6536f614b9",
+      "baseBytes": 4481,
+      "baseSha256": "12d02191cd36e6931059722404bcebf7e43c817a04c5d7c6976081dd18e25f6c",
+      "workingBytes": 4481,
+      "workingSha256": "12d02191cd36e6931059722404bcebf7e43c817a04c5d7c6976081dd18e25f6c"
+    },
+    {
+      "path": "evals/g0_5/b-v5-mutated/templates/review-report.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "dbea418538b3b5e43a023002924a9a397c460b10",
+      "baseBytes": 55,
+      "baseSha256": "792d45d5ad2f975125d23d2e04a83d88cd179f5acfefd91d71a621ae5939a10c",
+      "workingBytes": 55,
+      "workingSha256": "792d45d5ad2f975125d23d2e04a83d88cd179f5acfefd91d71a621ae5939a10c"
+    },
+    {
+      "path": "evals/g0_5/experiment.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b744a971235b49c0270964fa404969eff7ad0cd2",
+      "baseBytes": 758,
+      "baseSha256": "187c1507695e8cb4f78ef4bd0e763d3a26b0a30b857a46c8cd389b32e7606694",
+      "workingBytes": 758,
+      "workingSha256": "187c1507695e8cb4f78ef4bd0e763d3a26b0a30b857a46c8cd389b32e7606694"
+    },
+    {
+      "path": "evals/g0_5/oracle.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e5fc38171a6f04a4fbb06a8bdf6b23f7eb101c68",
+      "baseBytes": 1220,
+      "baseSha256": "739c60e162d8520beb4edeeb6f8ad9d93fc4debd5d8c742efb21de20ba616409",
+      "workingBytes": 1220,
+      "workingSha256": "739c60e162d8520beb4edeeb6f8ad9d93fc4debd5d8c742efb21de20ba616409"
+    },
+    {
+      "path": "evals/g0_5/results/pilot-validity.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "33c01cffdf8cc97fd08d8877b5c0623f841f48bf",
+      "baseBytes": 677,
+      "baseSha256": "772dc0577cd516920bee3067be476caa09302a48b01d4324055dc21439cdfb50",
+      "workingBytes": 677,
+      "workingSha256": "772dc0577cd516920bee3067be476caa09302a48b01d4324055dc21439cdfb50"
+    },
+    {
+      "path": "evals/g0_5/results/raw/claude-a1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "0a7ab97285b47d6a2a95c5f34837cc7c7a395bfc",
+      "baseBytes": 18325,
+      "baseSha256": "7bfc078a063ac3febd9d21802cb37a61eedd0499a1e6d1a12f113e2d9e38c7e4",
+      "workingBytes": 18325,
+      "workingSha256": "7bfc078a063ac3febd9d21802cb37a61eedd0499a1e6d1a12f113e2d9e38c7e4"
+    },
+    {
+      "path": "evals/g0_5/results/raw/claude-a2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "8ca64f0e9c160a1455602edc3e9546c7fc795877",
+      "baseBytes": 13815,
+      "baseSha256": "c086efa1975e4c1a20b516221f6057808db67740f4e4acb98b3003f589bcf58e",
+      "workingBytes": 13815,
+      "workingSha256": "c086efa1975e4c1a20b516221f6057808db67740f4e4acb98b3003f589bcf58e"
+    },
+    {
+      "path": "evals/g0_5/results/raw/claude-b1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "aa7e929cac96caaabb5e783cf55084d012df9c22",
+      "baseBytes": 12972,
+      "baseSha256": "2940a8b077092e598f3f9bb43f86bd12cba9f76d89dc6e2aea9c9ba69383a06b",
+      "workingBytes": 12972,
+      "workingSha256": "2940a8b077092e598f3f9bb43f86bd12cba9f76d89dc6e2aea9c9ba69383a06b"
+    },
+    {
+      "path": "evals/g0_5/results/raw/claude-b2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "c5dec81229da2caecea9d94d96bf64110f76c2ff",
+      "baseBytes": 16387,
+      "baseSha256": "e59488e267c10b49b59d073e02e2c8f6afa8cbac019bfe3818fdbe40cc0b1ac6",
+      "workingBytes": 16387,
+      "workingSha256": "e59488e267c10b49b59d073e02e2c8f6afa8cbac019bfe3818fdbe40cc0b1ac6"
+    },
+    {
+      "path": "evals/g0_5/results/raw/codex-a1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "201e71463c7567b03b279645a44c349f1c453765",
+      "baseBytes": 4232,
+      "baseSha256": "7c915e0cfdbab487cfea68bb6ee72b2ae0cf338acd969594a9eea52f630b9d43",
+      "workingBytes": 4232,
+      "workingSha256": "7c915e0cfdbab487cfea68bb6ee72b2ae0cf338acd969594a9eea52f630b9d43"
+    },
+    {
+      "path": "evals/g0_5/results/raw/codex-a2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "8530de350fd9306d31fad4c909aba2647f643887",
+      "baseBytes": 5401,
+      "baseSha256": "7100616df95a82b7a840d2da6002b2bbfd9efd04f2ad3a3a4ef8470ddafbe8b4",
+      "workingBytes": 5401,
+      "workingSha256": "7100616df95a82b7a840d2da6002b2bbfd9efd04f2ad3a3a4ef8470ddafbe8b4"
+    },
+    {
+      "path": "evals/g0_5/results/raw/codex-b1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e1aa710a312f8ef60ffc162ece0f021ecad629c6",
+      "baseBytes": 3120,
+      "baseSha256": "00aa326a28d3e381850e6c0af9f1ff06484670c332d4c2ae50ec5be1bbcb52d6",
+      "workingBytes": 3120,
+      "workingSha256": "00aa326a28d3e381850e6c0af9f1ff06484670c332d4c2ae50ec5be1bbcb52d6"
+    },
+    {
+      "path": "evals/g0_5/results/raw/codex-b2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "65242dc03ecdb9a20f0ab44d4b169cde49e569fa",
+      "baseBytes": 2295,
+      "baseSha256": "974e09ff67aa0e9e692748480c477aeff94c2f013707e9dfda7693e94ddd591e",
+      "workingBytes": 2295,
+      "workingSha256": "974e09ff67aa0e9e692748480c477aeff94c2f013707e9dfda7693e94ddd591e"
+    },
+    {
+      "path": "evals/g0_5/results/v2/protocol-audit.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "acc5975bf13a638cb3ee14cef383c48363b807ee",
+      "baseBytes": 1539,
+      "baseSha256": "38ddca2f0fcd872649ac96970983d69b1b9025b17808d0ef99841825a0dd6520",
+      "workingBytes": 1539,
+      "workingSha256": "38ddca2f0fcd872649ac96970983d69b1b9025b17808d0ef99841825a0dd6520"
+    },
+    {
+      "path": "evals/g0_5/results/v2/raw/claude-a1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "4cd49ae2f6a418703f4c9455b1f96e4972c0ac84",
+      "baseBytes": 6049,
+      "baseSha256": "0aaf94a16708739adc93a722fd02c9e03cd7a855ca6958de240fd8b3e9b0f032",
+      "workingBytes": 6049,
+      "workingSha256": "0aaf94a16708739adc93a722fd02c9e03cd7a855ca6958de240fd8b3e9b0f032"
+    },
+    {
+      "path": "evals/g0_5/results/v2/raw/claude-a2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "5a6a22605fbc8cf45eebd994d6263ee5248b452c",
+      "baseBytes": 7429,
+      "baseSha256": "58ff1c3c5fe8f64f2f8de03469c7d155e3ebf748080a2c171feb903745b4bce9",
+      "workingBytes": 7429,
+      "workingSha256": "58ff1c3c5fe8f64f2f8de03469c7d155e3ebf748080a2c171feb903745b4bce9"
+    },
+    {
+      "path": "evals/g0_5/results/v2/raw/claude-b1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "7661d3d0c2120b462bd27b4d2c45cdf4ade621c0",
+      "baseBytes": 8177,
+      "baseSha256": "5202cc05a032fbb73ccb5270d60b7faac7d5c470ff437866546e3153027772b2",
+      "workingBytes": 8177,
+      "workingSha256": "5202cc05a032fbb73ccb5270d60b7faac7d5c470ff437866546e3153027772b2"
+    },
+    {
+      "path": "evals/g0_5/results/v2/raw/claude-b2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "a511ff7b9d390b9f4a0a77b46f689743c82924ee",
+      "baseBytes": 7320,
+      "baseSha256": "cb5f8b6421f0e698433cb5121e3902863107d9b96faf5c88c5bd8e19281318f3",
+      "workingBytes": 7320,
+      "workingSha256": "cb5f8b6421f0e698433cb5121e3902863107d9b96faf5c88c5bd8e19281318f3"
+    },
+    {
+      "path": "evals/g0_5/results/v2/raw/codex-a1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "eaea3699cee8381b602346d559f3d29d3e9e79cc",
+      "baseBytes": 2535,
+      "baseSha256": "d7c4e149010682550a686675f2e7f971d8dbab13ee7ca5a549329eabb271e4d2",
+      "workingBytes": 2535,
+      "workingSha256": "d7c4e149010682550a686675f2e7f971d8dbab13ee7ca5a549329eabb271e4d2"
+    },
+    {
+      "path": "evals/g0_5/results/v2/raw/codex-a2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "564200a123dfc94c5ae25a39d5399a2d4eb875ce",
+      "baseBytes": 2744,
+      "baseSha256": "8ad42ca255e2d9ad943d36888e2d3fc07e7b2d06886d915731249e06407acacb",
+      "workingBytes": 2744,
+      "workingSha256": "8ad42ca255e2d9ad943d36888e2d3fc07e7b2d06886d915731249e06407acacb"
+    },
+    {
+      "path": "evals/g0_5/results/v2/raw/codex-b1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "29f9bc8e2263fc2321a77949b7e0539367fe4131",
+      "baseBytes": 3657,
+      "baseSha256": "4a092753937581a0d0a4f513ebe51bfc2a6b255c8b0a75ae16b2caf126306e15",
+      "workingBytes": 3657,
+      "workingSha256": "4a092753937581a0d0a4f513ebe51bfc2a6b255c8b0a75ae16b2caf126306e15"
+    },
+    {
+      "path": "evals/g0_5/results/v2/raw/codex-b2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "c6b8813e1182d3e13fc6f61fcf47666637da9087",
+      "baseBytes": 3380,
+      "baseSha256": "acb3da0cc28bdfc13cdc96638922f11a2865b4f30bea1dca48a47d08f8ddf089",
+      "workingBytes": 3380,
+      "workingSha256": "acb3da0cc28bdfc13cdc96638922f11a2865b4f30bea1dca48a47d08f8ddf089"
+    },
+    {
+      "path": "evals/g0_5/results/v3/discarded/claude-b2-attempt1-audit.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "992aa7a5405b2dd1aef4c3a2d7a2309753a7eca6",
+      "baseBytes": 934,
+      "baseSha256": "4adbd7184350010e5110d7bd7d95b43475cfcd7281164c5c086132073c51e578",
+      "workingBytes": 934,
+      "workingSha256": "4adbd7184350010e5110d7bd7d95b43475cfcd7281164c5c086132073c51e578"
+    },
+    {
+      "path": "evals/g0_5/results/v3/discarded/transcripts/claude-b2-attempt1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "16eec2f500f7e92ea70b9dbbabcb411e51b085b0",
+      "baseBytes": 1670,
+      "baseSha256": "e42062a0e8157d5c06c3b55933336fc55f747e0ff4a9b51cb6ba314e26f08278",
+      "workingBytes": 1670,
+      "workingSha256": "e42062a0e8157d5c06c3b55933336fc55f747e0ff4a9b51cb6ba314e26f08278"
+    },
+    {
+      "path": "evals/g0_5/results/v3/protocol-audit.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "8e447cb8ca93e334bee97996cc86e14be66441ff",
+      "baseBytes": 1124,
+      "baseSha256": "674e9808290b0923ff56d86ba56b15e09b8f80e9654622147ba2ec3ec5f55987",
+      "workingBytes": 1124,
+      "workingSha256": "674e9808290b0923ff56d86ba56b15e09b8f80e9654622147ba2ec3ec5f55987"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/claude-a1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "047cd24765163b083555b0a57965443befec2aba",
+      "baseBytes": 4081,
+      "baseSha256": "c40aed8fddbfecf25cd252d813f58cd30c7c6bfe1cd608205c3aeafe9c895789",
+      "workingBytes": 4081,
+      "workingSha256": "c40aed8fddbfecf25cd252d813f58cd30c7c6bfe1cd608205c3aeafe9c895789"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/claude-a2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "f49b47f6060e9ab962a2c1e7c2cef5d25ded75cc",
+      "baseBytes": 3713,
+      "baseSha256": "4c1f224e3f1f9b1b8a8544b989fa7982092fd0fb1c4b90a691b3eb625b66b1d5",
+      "workingBytes": 3713,
+      "workingSha256": "4c1f224e3f1f9b1b8a8544b989fa7982092fd0fb1c4b90a691b3eb625b66b1d5"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/claude-b1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "2d9e3b8928ced842f8b8e5cbbee6a36ae47ced64",
+      "baseBytes": 3998,
+      "baseSha256": "7c4c4c708ff913221273d9fa8d133accd0b08db77c16d2cd91300be5a7277d48",
+      "workingBytes": 3998,
+      "workingSha256": "7c4c4c708ff913221273d9fa8d133accd0b08db77c16d2cd91300be5a7277d48"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/claude-b2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "2935e059e516cf848d7e61a6a2d0a09f65aefaaf",
+      "baseBytes": 4230,
+      "baseSha256": "ff88f36d119fb469a64deb2464c686ffcebf9471ac1eae83845ee753d4d11e4e",
+      "workingBytes": 4230,
+      "workingSha256": "ff88f36d119fb469a64deb2464c686ffcebf9471ac1eae83845ee753d4d11e4e"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/codex-a1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "2123c714730e4b2029ce46395b303900acaac2c1",
+      "baseBytes": 4506,
+      "baseSha256": "3d7b5d430c4d517583c9ac497f5d913c846aa1f1ee648f2c1203c34bd4c724c4",
+      "workingBytes": 4506,
+      "workingSha256": "3d7b5d430c4d517583c9ac497f5d913c846aa1f1ee648f2c1203c34bd4c724c4"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/codex-a2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "29804cbcdfdccc615c9ea98c5fff4ae56ed031e9",
+      "baseBytes": 4483,
+      "baseSha256": "66b4f4928b5807b73df1d9f1bb51e64eb6837308e428b14f8f581c759290877c",
+      "workingBytes": 4483,
+      "workingSha256": "66b4f4928b5807b73df1d9f1bb51e64eb6837308e428b14f8f581c759290877c"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/codex-b1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e53904bfac2b355e455be2dfb5cd1b4611efca52",
+      "baseBytes": 4003,
+      "baseSha256": "5ec61389a2ea01ddaca4849448e5a5f13329333bba38ddfcf1c3d217f9df96a7",
+      "workingBytes": 4003,
+      "workingSha256": "5ec61389a2ea01ddaca4849448e5a5f13329333bba38ddfcf1c3d217f9df96a7"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/codex-b2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "2b5cfdf107ac101c826512194c66f78dbbe622a8",
+      "baseBytes": 4372,
+      "baseSha256": "062505a4918364fa0b494e350428e6b0cae60afbde06d12c679a53111be9886b",
+      "workingBytes": 4372,
+      "workingSha256": "062505a4918364fa0b494e350428e6b0cae60afbde06d12c679a53111be9886b"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/execution-audit.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "235e718df43b38aeacebb3b0ee668dba6799e687",
+      "baseBytes": 3708,
+      "baseSha256": "02d179611d9cfa7f30a8cab6a418be162724395838d2da56018b244d3f139702",
+      "workingBytes": 3708,
+      "workingSha256": "02d179611d9cfa7f30a8cab6a418be162724395838d2da56018b244d3f139702"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/transcripts/claude-a1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "0163ba80b9ad807380fd8ddb0fa8c69bd05bd161",
+      "baseBytes": 706,
+      "baseSha256": "73912ca1a9a8db639267d2c7cdee4e46b1267dbacabc42ba145156c3a582baad",
+      "workingBytes": 706,
+      "workingSha256": "73912ca1a9a8db639267d2c7cdee4e46b1267dbacabc42ba145156c3a582baad"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/transcripts/claude-a2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "62fd403f28f95e8bd5e5796e4052d77e298053dd",
+      "baseBytes": 706,
+      "baseSha256": "4984e2a854aaa9e17a455506b61153dbaea11e6d73dfd8b59d8edebe09e05050",
+      "workingBytes": 706,
+      "workingSha256": "4984e2a854aaa9e17a455506b61153dbaea11e6d73dfd8b59d8edebe09e05050"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/transcripts/claude-b1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "bd3b3ce3142e0e2e9eafe6abdbd4847037c8a184",
+      "baseBytes": 1349,
+      "baseSha256": "73f167cb4031fcb54c1bf9ac6a2b5096ffa66355686760e2ca54ae03565aa1ee",
+      "workingBytes": 1349,
+      "workingSha256": "73f167cb4031fcb54c1bf9ac6a2b5096ffa66355686760e2ca54ae03565aa1ee"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/transcripts/claude-b2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "cbd0b8dfb7d572e7b53923a704adde100dafb118",
+      "baseBytes": 1642,
+      "baseSha256": "6c7d4df5d0dc67bbefc4b7fc06d3a9972c60a0d39be315f3ceb68c13ffc52216",
+      "workingBytes": 1642,
+      "workingSha256": "6c7d4df5d0dc67bbefc4b7fc06d3a9972c60a0d39be315f3ceb68c13ffc52216"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/transcripts/codex-a1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "800c5402a13c4b5cd3be5af98b9f1130c62b6d9b",
+      "baseBytes": 681,
+      "baseSha256": "cf73fd936fe5ca1424d8aae693dc139fdbeddaaa9aa3d950137b4f28314747f4",
+      "workingBytes": 681,
+      "workingSha256": "cf73fd936fe5ca1424d8aae693dc139fdbeddaaa9aa3d950137b4f28314747f4"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/transcripts/codex-a2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "43889a1efff5045432327049e1f47a310d65a24c",
+      "baseBytes": 585,
+      "baseSha256": "6eb2d54a41fbab013886d1a79b97d109c9e2dedee1dd5739e4391e87b94272ff",
+      "workingBytes": 585,
+      "workingSha256": "6eb2d54a41fbab013886d1a79b97d109c9e2dedee1dd5739e4391e87b94272ff"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/transcripts/codex-b1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "61586d58c05f274d63b08720b08337649020250c",
+      "baseBytes": 2032,
+      "baseSha256": "b3f2fa2a1e80b0f065db4cba245810632cb99681b1f3f4362499a31645b3efdd",
+      "workingBytes": 2032,
+      "workingSha256": "b3f2fa2a1e80b0f065db4cba245810632cb99681b1f3f4362499a31645b3efdd"
+    },
+    {
+      "path": "evals/g0_5/results/v3/raw/transcripts/codex-b2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "f0d1c13ddcc9c69e6d29393da570a1a1a31a9cfe",
+      "baseBytes": 2032,
+      "baseSha256": "34f86aefb69ceebb5fd42af78d7f236c6851027aed126ecc521eef7e722cabe2",
+      "workingBytes": 2032,
+      "workingSha256": "34f86aefb69ceebb5fd42af78d7f236c6851027aed126ecc521eef7e722cabe2"
+    },
+    {
+      "path": "evals/g0_5/results/v3/report.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "edaa7621c36d7bda03b5a6fb1ab9af8f40cec6f2",
+      "baseBytes": 5680,
+      "baseSha256": "4b6f09a013cfb8d9210f42953d5aac10b835f960cb7fc34c4ab4102fdd95e08c",
+      "workingBytes": 5680,
+      "workingSha256": "4b6f09a013cfb8d9210f42953d5aac10b835f960cb7fc34c4ab4102fdd95e08c"
+    },
+    {
+      "path": "evals/g0_5/review-brief.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "5b5eb40459bac379f60a2aad43abfa35380769db",
+      "baseBytes": 532,
+      "baseSha256": "2be086025bf0d00cb9da40b60f54c561394e3ace445d37373a97e21c6de836a9",
+      "workingBytes": 532,
+      "workingSha256": "2be086025bf0d00cb9da40b60f54c561394e3ace445d37373a97e21c6de836a9"
+    },
+    {
+      "path": "evals/g0_5/review-output.schema.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "0077d8110c0ee5f82e1b8e6707eea31fa1dd3b2e",
+      "baseBytes": 1347,
+      "baseSha256": "932673a1dc8f11363803401c8f852f45d17ce9c8ddc4e2d24dba5ee255df48a5",
+      "workingBytes": 1347,
+      "workingSha256": "932673a1dc8f11363803401c8f852f45d17ce9c8ddc4e2d24dba5ee255df48a5"
+    },
+    {
+      "path": "evals/g0_5/state-questions.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "f645cc66348a88331848cd9b1ca6464dadfa6de9",
+      "baseBytes": 1464,
+      "baseSha256": "874d2fb9d2c962cff6f9f5aad977a6aed35ceb3880b7e6e9cf696aa254a30822",
+      "workingBytes": 1464,
+      "workingSha256": "874d2fb9d2c962cff6f9f5aad977a6aed35ceb3880b7e6e9cf696aa254a30822"
+    },
+    {
+      "path": "evals/g0_5/v2-protocol.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "364b811f85a8e3b1fd6e23a33dfa8cd855fe4fca",
+      "baseBytes": 4171,
+      "baseSha256": "c69a83e8a206fdb2ca507909823610d301dfa155fb3eec3111ac09979a110600",
+      "workingBytes": 4171,
+      "workingSha256": "c69a83e8a206fdb2ca507909823610d301dfa155fb3eec3111ac09979a110600"
+    },
+    {
+      "path": "evals/g0_5/v2-review-brief.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "a64d89f9ea6279267892cc1a72192731d2966c9a",
+      "baseBytes": 987,
+      "baseSha256": "4d626d634f698aed4e47fe63b83c7758be2d5e142abcbdf0bdfb96dc4b865ae8",
+      "workingBytes": 987,
+      "workingSha256": "4d626d634f698aed4e47fe63b83c7758be2d5e142abcbdf0bdfb96dc4b865ae8"
+    },
+    {
+      "path": "evals/g0_5/v2-review-output.schema.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "6f8f43452c72a24e9311ab6172a36e834c54479a",
+      "baseBytes": 1933,
+      "baseSha256": "097fe5b8ef4c4c5d1c33e6a9d82443a4567a9c8c3ff206b56268351150cf6001",
+      "workingBytes": 1933,
+      "workingSha256": "097fe5b8ef4c4c5d1c33e6a9d82443a4567a9c8c3ff206b56268351150cf6001"
+    },
+    {
+      "path": "evals/g0_5/v2-state-questions.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "608443937ed44b7f35b815af6d08d5a284fa532f",
+      "baseBytes": 2609,
+      "baseSha256": "bba7fa7410f1820b2a5cd5db59120929fc67cfe30bf1e5670d8d789f80be5872",
+      "workingBytes": 2609,
+      "workingSha256": "bba7fa7410f1820b2a5cd5db59120929fc67cfe30bf1e5670d8d789f80be5872"
+    },
+    {
+      "path": "evals/g0_5/v3-oracle.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "adb6c4c1f0b476221aac66267e9f9f49d6b3a701",
+      "baseBytes": 2247,
+      "baseSha256": "2b48a33dcd3456edbb9214ffd961e32d9b669e4aee3f7aa08b13fee127835d79",
+      "workingBytes": 2247,
+      "workingSha256": "2b48a33dcd3456edbb9214ffd961e32d9b669e4aee3f7aa08b13fee127835d79"
+    },
+    {
+      "path": "evals/g0_5/v3-protocol.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "61d8f4c9ec7a40bffb52884df820a3914c0492da",
+      "baseBytes": 7479,
+      "baseSha256": "10ddd0e38392a1a84209d9bb67a0b5c7f8fe35ae0ddd78990a220f00e8e761b6",
+      "workingBytes": 7479,
+      "workingSha256": "10ddd0e38392a1a84209d9bb67a0b5c7f8fe35ae0ddd78990a220f00e8e761b6"
+    },
+    {
+      "path": "evals/g0_5/v3-review-brief.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "f8ae56f5d09e04fa99993abdceba209a937c3739",
+      "baseBytes": 1263,
+      "baseSha256": "cd302fdda62506963056b8c79a061e7e1264910a82d7dfdcf388e511f946ecd5",
+      "workingBytes": 1263,
+      "workingSha256": "cd302fdda62506963056b8c79a061e7e1264910a82d7dfdcf388e511f946ecd5"
+    },
+    {
+      "path": "evals/g0_5/v3-review-output.schema.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "ff88203292bde46e1cfd622d6630d08ed548d489",
+      "baseBytes": 2665,
+      "baseSha256": "74d6772724165909f434718f23164ff777c3de05a4342c55af58934c5b3e19b1",
+      "workingBytes": 2665,
+      "workingSha256": "74d6772724165909f434718f23164ff777c3de05a4342c55af58934c5b3e19b1"
+    },
+    {
+      "path": "evals/g0_5/v3-state-questions.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "2a6818580d8da8abb6ec0d896aa424420b43257e",
+      "baseBytes": 3480,
+      "baseSha256": "b91f5cfaaf7e27cf30049f860a6a07b401f9bb4f86b1ec90c3fb3e1a6c5cd014",
+      "workingBytes": 3480,
+      "workingSha256": "b91f5cfaaf7e27cf30049f860a6a07b401f9bb4f86b1ec90c3fb3e1a6c5cd014"
+    },
+    {
+      "path": "fixtures/intents/p0.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "9efde781516372ba8a87a19132120a4ff111135c",
+      "baseBytes": 695,
+      "baseSha256": "bd38ae93683ef159a28b3dd7de1b8998ccbe536c5d127aa92ca030b3d49afc84",
+      "workingBytes": 695,
+      "workingSha256": "bd38ae93683ef159a28b3dd7de1b8998ccbe536c5d127aa92ca030b3d49afc84"
+    },
+    {
+      "path": "fixtures/intents/p1.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "3d71094d5f132052420523453af359ea839bfa25",
+      "baseBytes": 731,
+      "baseSha256": "2ec3ae942dd368627af9c323b4a03e53b18518a09ba7e3beab1a5e3d93fdb517",
+      "workingBytes": 731,
+      "workingSha256": "2ec3ae942dd368627af9c323b4a03e53b18518a09ba7e3beab1a5e3d93fdb517"
+    },
+    {
+      "path": "fixtures/intents/p2.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "6c3a2b11a6b57829eff0cd8d2e990937d3f315c8",
+      "baseBytes": 892,
+      "baseSha256": "62ed46276080f176ae4fc7503c3466057811978ad88bba39c70be9ecb60db472",
+      "workingBytes": 892,
+      "workingSha256": "62ed46276080f176ae4fc7503c3466057811978ad88bba39c70be9ecb60db472"
+    },
+    {
+      "path": "fixtures/migration-nonmarkdown/SKILL.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "70490606635c8bb3324648f5a47444e19004e211",
+      "baseBytes": 171,
+      "baseSha256": "5928922f5426c8ba00521435e7fa6dea8eee924bcca319a7fa8b651b117fd051",
+      "workingBytes": 171,
+      "workingSha256": "5928922f5426c8ba00521435e7fa6dea8eee924bcca319a7fa8b651b117fd051"
+    },
+    {
+      "path": "fixtures/migration-nonmarkdown/agents/openai.yaml",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "0052423614d71d7d94dd72fafe9b8c3e4c7b9218",
+      "baseBytes": 64,
+      "baseSha256": "5777c954e630bc4afa39d2e83512a725582d73e0db2d55f106f9c42517a9cfdc",
+      "workingBytes": 64,
+      "workingSha256": "5777c954e630bc4afa39d2e83512a725582d73e0db2d55f106f9c42517a9cfdc"
+    },
+    {
+      "path": "fixtures/migration-nonmarkdown/assets/sample.bin",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "c33ea0100a1a918e5a81e4982a238ac2259ce96f",
+      "baseBytes": 9,
+      "baseSha256": "c846c949eb1beb5a9277c349ae8d15e92de3af6b2c8e1d9d89585dc897767e75",
+      "workingBytes": 9,
+      "workingSha256": "c846c949eb1beb5a9277c349ae8d15e92de3af6b2c8e1d9d89585dc897767e75"
+    },
+    {
+      "path": "fixtures/migration-nonmarkdown/empty.txt",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "baseBytes": 0,
+      "baseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "workingBytes": 0,
+      "workingSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "fixtures/migration-nonmarkdown/references/source-notes.txt",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "950ac823d9a912879e88a1d7183071b22ba97272",
+      "baseBytes": 50,
+      "baseSha256": "21f18a50fdeb551d29504386e75831258592a97246532e5afe9fd1583ea872b3",
+      "workingBytes": 50,
+      "workingSha256": "21f18a50fdeb551d29504386e75831258592a97246532e5afe9fd1583ea872b3"
+    },
+    {
+      "path": "fixtures/migration-nonmarkdown/scripts/run.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "32b6c2b1491d6dea1746e5fb86f0cb5c9c9905e1",
+      "baseBytes": 37,
+      "baseSha256": "ad17ae2e3746d2a03d6b16e7890463a5bb189b3955daf445c3a8062e419da43d",
+      "workingBytes": 37,
+      "workingSha256": "ad17ae2e3746d2a03d6b16e7890463a5bb189b3955daf445c3a8062e419da43d"
+    },
+    {
+      "path": "fixtures/migration-source/SKILL.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b92fbff3cb6c75e9e04b9809cfdfb274f9f0b37c",
+      "baseBytes": 421,
+      "baseSha256": "974979f802f70711519e612d2d7c4775db2f31c53ef34d4e377fce5a3887b7f0",
+      "workingBytes": 421,
+      "workingSha256": "974979f802f70711519e612d2d7c4775db2f31c53ef34d4e377fce5a3887b7f0"
+    },
+    {
+      "path": "fixtures/migration-structures/SKILL.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "4930646d53375652b0a61918e3ff27e9c67160ef",
+      "baseBytes": 825,
+      "baseSha256": "ceed816f0dd33113cee7294e6d7794ef3f16f662601c384e7c146292677c07e2",
+      "workingBytes": 825,
+      "workingSha256": "ceed816f0dd33113cee7294e6d7794ef3f16f662601c384e7c146292677c07e2"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/intent.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "8ba0f73d90d18c7a38aadcadb0080fd8ab43a289",
+      "baseBytes": 2460,
+      "baseSha256": "9bc59f90642296b9125d0bd1f16ed583b3690a65c017cdf656d77c377f02c710",
+      "workingBytes": 2499,
+      "workingSha256": "570dcae48150c5def53ccb63bf627d694b18b6bd24e56b5f98eaa3712ec3b413"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/pilot-report.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e45d0610d3b3af02366dd2917840a5d9c37cd838",
+      "baseBytes": 21130,
+      "baseSha256": "6b3a81325a94dabc05e66874ec6d832327e1c527c6ff0295a8a4056ce4b96bb0",
+      "workingBytes": 21263,
+      "workingSha256": "f2e1f5bde3f681db04328f5162a7442e28a81d28da90574a119da3810467d38e"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/real-state/e2e-host.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "2717be0f7790bd5fa164cecd9a92adecdece3025",
+      "baseBytes": 13045,
+      "baseSha256": "8e75c36d2e377c79e5ed710229b81c2ce29e9e72a1b59fdbb5747cc9414208ed",
+      "workingBytes": 13312,
+      "workingSha256": "22bf35e0b9241a4c68fbabd61242ad7a22433fc12701394c145da4ce3b55ec9a"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/real-state/e2e.test.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "a4fc70be50e069de30df7d4c8e1423669bbfcb5f",
+      "baseBytes": 12017,
+      "baseSha256": "ce8ad7f25f16908addcc0ccaa68ca31b4879996597211bdee7f843e06eb48ad1",
+      "workingBytes": 12207,
+      "workingSha256": "3330a0d09ce9d81d0968d5a3d9c247cb68d21e90f64bd688bf4965c0f1139682"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/real-state/verifier.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "9cd338dc928129e2aed9a0c446980cbcbb39c764",
+      "baseBytes": 3950,
+      "baseSha256": "444c57248ed0591791e63cb65b05b0b007388fb080f401a196accbc748113fe7",
+      "workingBytes": 4035,
+      "workingSha256": "21c039e3ec905b58e1289b9ce8be91c1847e49861965b1227eb9c6c1074df196"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/.generated.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e934bfdf08576b875a8603fa7ee881843446d7c1",
+      "baseBytes": 12643,
+      "baseSha256": "83e6a92573fc3cd0df18c584bb554988db3be712b0d115f101cc893ec733a524",
+      "workingBytes": 12643,
+      "workingSha256": "83e6a92573fc3cd0df18c584bb554988db3be712b0d115f101cc893ec733a524"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/.gitattributes",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "fa1385d99a319b43c06f5309d1aae9fdd3adea46",
+      "baseBytes": 8,
+      "baseSha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "workingBytes": 8,
+      "workingSha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/.skill-rails/eval-cases.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "7abb861caf7f233e960986e430142a545f636e76",
+      "baseBytes": 1115,
+      "baseSha256": "1899b518919b5c449d6cb1cae7531e653a512cebefbf13a11b5e602c0f5bff05",
+      "workingBytes": 1115,
+      "workingSha256": "1899b518919b5c449d6cb1cae7531e653a512cebefbf13a11b5e602c0f5bff05"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/.skill-rails/intent.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "8ba0f73d90d18c7a38aadcadb0080fd8ab43a289",
+      "baseBytes": 2460,
+      "baseSha256": "9bc59f90642296b9125d0bd1f16ed583b3690a65c017cdf656d77c377f02c710",
+      "workingBytes": 2460,
+      "workingSha256": "9bc59f90642296b9125d0bd1f16ed583b3690a65c017cdf656d77c377f02c710"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/.skill-rails/obligation-ledger.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "25bbc9f15f4a3cd3806ff88b87d33f35e42a5a0f",
+      "baseBytes": 8962,
+      "baseSha256": "014adbe204e6237a402d7549a6677adcef73a185d5971e2c02fd8bf011e9ac12",
+      "workingBytes": 8962,
+      "workingSha256": "014adbe204e6237a402d7549a6677adcef73a185d5971e2c02fd8bf011e9ac12"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/.skill-rails/profile-decision.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "89fae5d5a62037dde0eec721bf0aec6368274974",
+      "baseBytes": 495,
+      "baseSha256": "1c07cb17224d063efee0c24a680c35391e0e668efe1d6e652f56479a0a7fbe6c",
+      "workingBytes": 495,
+      "workingSha256": "1c07cb17224d063efee0c24a680c35391e0e668efe1d6e652f56479a0a7fbe6c"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/SKILL.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "66480040c647dfd6e6cbae1766c6687efe1f4632",
+      "baseBytes": 5254,
+      "baseSha256": "74a1328ced4b0622dc24ab4df1434d24b73409fc22376ddca0c22cab18cb003b",
+      "workingBytes": 5254,
+      "workingSha256": "74a1328ced4b0622dc24ab4df1434d24b73409fc22376ddca0c22cab18cb003b"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/agents/openai.yaml",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "3c1766bf0545bbbb09d43455d87061a87d7d1011",
+      "baseBytes": 470,
+      "baseSha256": "fd8a40379dcf6ae2c62cc69aec330c118980abc5246917b5a3abc290e4848758",
+      "workingBytes": 470,
+      "workingSha256": "fd8a40379dcf6ae2c62cc69aec330c118980abc5246917b5a3abc290e4848758"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/authoring-card.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "7dfcd980c2a69756d512c06f33bb90ca1acd5d57",
+      "baseBytes": 2130,
+      "baseSha256": "cb9abb62cc1c72b41abc9ff3649e7ee8ec428be750d494d3d6d5a7cc54d06c85",
+      "workingBytes": 2130,
+      "workingSha256": "cb9abb62cc1c72b41abc9ff3649e7ee8ec428be750d494d3d6d5a7cc54d06c85"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/body.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "78ada017ebfb37e84a2c292c6a1476f60b9934f2",
+      "baseBytes": 1808,
+      "baseSha256": "972021f0e44678054194092d86854af7af829d06941f4281dce625fa54b6d18c",
+      "workingBytes": 1808,
+      "workingSha256": "972021f0e44678054194092d86854af7af829d06941f4281dce625fa54b6d18c"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/collectors/index.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "44f62abde535a0f88db4b7dba14bdc6c576fd37e",
+      "baseBytes": 5999,
+      "baseSha256": "97b198a82f7c80034c47fbd52a3c29e639c3833d299109c02174355f443401af",
+      "workingBytes": 5999,
+      "workingSha256": "97b198a82f7c80034c47fbd52a3c29e639c3833d299109c02174355f443401af"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/fixtures/formats.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "76938081d2adaf5e6921ba6f3408d9397c143d5c",
+      "baseBytes": 656,
+      "baseSha256": "a636fb33dbb9b86378d26297ad2549065973753b7788913a6eff1a72d6d1fd1e",
+      "workingBytes": 656,
+      "workingSha256": "a636fb33dbb9b86378d26297ad2549065973753b7788913a6eff1a72d6d1fd1e"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/fixtures/lint/manifest.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "5502db0db73336027f7ea35043cd5728887e9ada",
+      "baseBytes": 2825,
+      "baseSha256": "7e63b4b60f9d85b72a2fb1e7040a3a28cffe59246ceedf69f0aee2290d826eed",
+      "workingBytes": 2825,
+      "workingSha256": "7e63b4b60f9d85b72a2fb1e7040a3a28cffe59246ceedf69f0aee2290d826eed"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/fixtures/scenarios.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "61678317eecc3cf8c14fc1c9e0f85f47e1357dbc",
+      "baseBytes": 7479,
+      "baseSha256": "ace7c9ee1fd6c93ca5c7b44d2aca673f7daeaaff58d059a57f69a3d79cf47d94",
+      "workingBytes": 7479,
+      "workingSha256": "ace7c9ee1fd6c93ca5c7b44d2aca673f7daeaaff58d059a57f69a3d79cf47d94"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/references/canon.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "dc2d59aefe7e56eafe8d20dd6d95854e7b3431fd",
+      "baseBytes": 2390,
+      "baseSha256": "9fd39b26d231cf84eb40a01652beacfa359908cf36fda6092a8e593db7d5cc17",
+      "workingBytes": 2390,
+      "workingSha256": "9fd39b26d231cf84eb40a01652beacfa359908cf36fda6092a8e593db7d5cc17"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/references/purpose.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "468b491572b788cf22351f243297292767742ab8",
+      "baseBytes": 179,
+      "baseSha256": "08aeafb1f5f4782429ac2c82530f1ad0c74077f868d7492114c963f6c01afb45",
+      "workingBytes": 179,
+      "workingSha256": "08aeafb1f5f4782429ac2c82530f1ad0c74077f868d7492114c963f6c01afb45"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/references/verify.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "2f44ab5eac90745475b134b2616f627ae3fb1816",
+      "baseBytes": 3997,
+      "baseSha256": "0d2a16d635876a9746d4765a392381ea5a2cfbecfb52c7eb26728e529c92e6af",
+      "workingBytes": 3997,
+      "workingSha256": "0d2a16d635876a9746d4765a392381ea5a2cfbecfb52c7eb26728e529c92e6af"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/references/work.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "dbf0a2a3f47a9f3b5ceb634fc2e25ff372a77c9e",
+      "baseBytes": 1414,
+      "baseSha256": "426f6e15e87dac5e0a57c281fb6e21c7239385b5af014a550959828a316c55a0",
+      "workingBytes": 1414,
+      "workingSha256": "426f6e15e87dac5e0a57c281fb6e21c7239385b5af014a550959828a316c55a0"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/schemas/decision.schema.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "183c3053e5fd804d8d1b2875fb212b07de16eaf1",
+      "baseBytes": 5285,
+      "baseSha256": "d475892037887713a110b9a3f9bd3207c033c53b9013cc4f2c3ea2e3bc15d353",
+      "workingBytes": 5285,
+      "workingSha256": "d475892037887713a110b9a3f9bd3207c033c53b9013cc4f2c3ea2e3bc15d353"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/schemas/trace-event.schema.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "98f9478288a2618f7590c0248cbe4a0eec32ee51",
+      "baseBytes": 1472,
+      "baseSha256": "8e59643b838b1da7a49220981f010767e1eff63248a9916b68138c736b615631",
+      "workingBytes": 1472,
+      "workingSha256": "8e59643b838b1da7a49220981f010767e1eff63248a9916b68138c736b615631"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/align.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "70c4a232c8f5e51f988c9ef925af0fe16654f642",
+      "baseBytes": 137,
+      "baseSha256": "71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a",
+      "workingBytes": 137,
+      "workingSha256": "71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/alignment.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b4fa985d60b7b97f72af03c3fcf0f2a6428c7c74",
+      "baseBytes": 7542,
+      "baseSha256": "1c50f5c27da56e71a0610ff896fc24e993a6956218c886bb7cd93246aefcd269",
+      "workingBytes": 7542,
+      "workingSha256": "1c50f5c27da56e71a0610ff896fc24e993a6956218c886bb7cd93246aefcd269"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/api.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "5b4ae085a587464ff7335ebad3e30f8d03523cc3",
+      "baseBytes": 23358,
+      "baseSha256": "8fa126794bfdebfda1e4cf92431e4b71eb2315da060425b931093172c91109b2",
+      "workingBytes": 23358,
+      "workingSha256": "8fa126794bfdebfda1e4cf92431e4b71eb2315da060425b931093172c91109b2"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/ast-policy.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "d6b38d8e7d1d3d182baa06d262799c6bc03b041d",
+      "baseBytes": 21319,
+      "baseSha256": "87c744ee25bdd3c3848b7b02dbb2a33ed4389603223fe5c515d3745cd8e11db1",
+      "workingBytes": 21319,
+      "workingSha256": "87c744ee25bdd3c3848b7b02dbb2a33ed4389603223fe5c515d3745cd8e11db1"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/authoring-ledger.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "5a3a5e8fe03beeed3ed7f371c06b049fabcd4fc5",
+      "baseBytes": 5606,
+      "baseSha256": "4c458373179300f64944dd70d92c4252530df00368c0794dd7b2efcf45239d75",
+      "workingBytes": 5606,
+      "workingSha256": "4c458373179300f64944dd70d92c4252530df00368c0794dd7b2efcf45239d75"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/body.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "c88e70f7e101eb3f389bc9c11f0643987f67de1d",
+      "baseBytes": 2660,
+      "baseSha256": "bbc1aad36940bfd690043d7a3c499f6e14eb0ef2b9f590cfacef1085db6d679c",
+      "workingBytes": 2660,
+      "workingSha256": "bbc1aad36940bfd690043d7a3c499f6e14eb0ef2b9f590cfacef1085db6d679c"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/cli.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "7a231ffad59371e31ef880dd5bcaface899d4c0e",
+      "baseBytes": 18997,
+      "baseSha256": "0a07e22c7fda8e84b08d715aca0b167c6e6798f3c7b027ada5c84339e7c2ed22",
+      "workingBytes": 18997,
+      "workingSha256": "0a07e22c7fda8e84b08d715aca0b167c6e6798f3c7b027ada5c84339e7c2ed22"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/collectors.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "49d81f949f999407d8ee519af485d06c7e1f7955",
+      "baseBytes": 2644,
+      "baseSha256": "611122b99caba24bbe52126159bf562a53c82fb3216a34993f1682c7cf4352f8",
+      "workingBytes": 2644,
+      "workingSha256": "611122b99caba24bbe52126159bf562a53c82fb3216a34993f1682c7cf4352f8"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/constants.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b4b46a2d88fb1cb267580e05b511eb802ce9e1b0",
+      "baseBytes": 1691,
+      "baseSha256": "e58a0fea3aea4f267f095ab4daaa168cde767bb4da4203922d1bddceee62f06f",
+      "workingBytes": 1691,
+      "workingSha256": "e58a0fea3aea4f267f095ab4daaa168cde767bb4da4203922d1bddceee62f06f"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/diagnostics.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "d51d0baa6dc7798d153de416428ebccb0bf16ebe",
+      "baseBytes": 1101,
+      "baseSha256": "f16aea5478acb2efb559da5a44bc7d66212c5e61e336b8803eacf5bfb30debe6",
+      "workingBytes": 1101,
+      "workingSha256": "f16aea5478acb2efb559da5a44bc7d66212c5e61e336b8803eacf5bfb30debe6"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/domains.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "4231dec32759b4c060782e03d71401a3a42f2f31",
+      "baseBytes": 4307,
+      "baseSha256": "2368ee30f7479489988849abbdf4bcbdb0d637eb25b3a170dbe607e6f541ea93",
+      "workingBytes": 4307,
+      "workingSha256": "2368ee30f7479489988849abbdf4bcbdb0d637eb25b3a170dbe607e6f541ea93"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/dsl.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "ce0627c58c8b8be288ec1d78546c4a9a36ee8946",
+      "baseBytes": 7290,
+      "baseSha256": "e8d77b180b886db5cf0474682c7ea2dfea19065561a015878c70efe1441694e6",
+      "workingBytes": 7290,
+      "workingSha256": "e8d77b180b886db5cf0474682c7ea2dfea19065561a015878c70efe1441694e6"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/evaluator.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "a76dbec0b0b4909fc27dae38cf3fc20291d8a7e0",
+      "baseBytes": 17378,
+      "baseSha256": "6852b125de8c563c1c5cdf3e2f4248d30d0f8d3de4464dfb07ae178c9ddd5791",
+      "workingBytes": 17378,
+      "workingSha256": "6852b125de8c563c1c5cdf3e2f4248d30d0f8d3de4464dfb07ae178c9ddd5791"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/format-checks.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "9dc97becf80967716bebe1260dd7d0a62c984dea",
+      "baseBytes": 2417,
+      "baseSha256": "0cb3fdb6d10252ca87cc90238e7fe0d86b3c12afd2d74450a1a648a9d129cbe8",
+      "workingBytes": 2417,
+      "workingSha256": "0cb3fdb6d10252ca87cc90238e7fe0d86b3c12afd2d74450a1a648a9d129cbe8"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/guide.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e467c90c92731b02edaa803d2e3a19fb03c3e859",
+      "baseBytes": 3521,
+      "baseSha256": "490d965b5e988319f6d806e870cd8e15f8ada0a0f1c70ed1aaa4a860112da280",
+      "workingBytes": 3521,
+      "workingSha256": "490d965b5e988319f6d806e870cd8e15f8ada0a0f1c70ed1aaa4a860112da280"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/hash.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "cfac469ad73579513b758f2fef57bad4ad44901e",
+      "baseBytes": 1189,
+      "baseSha256": "0bf625859470d72aa005efd49d60c09778afc1d1acc45f00a1ce9feeaa06c412",
+      "workingBytes": 1189,
+      "workingSha256": "0bf625859470d72aa005efd49d60c09778afc1d1acc45f00a1ce9feeaa06c412"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/lint.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "70c4a232c8f5e51f988c9ef925af0fe16654f642",
+      "baseBytes": 137,
+      "baseSha256": "71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a",
+      "workingBytes": 137,
+      "workingSha256": "71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/loader.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "369f10974a37fceff2ee4ed5f7ee442806027f44",
+      "baseBytes": 1270,
+      "baseSha256": "62dd7050fa2ef5bd5ddaf698ad8eed91b8ae96868f6ceb113388132fd234def7",
+      "workingBytes": 1270,
+      "workingSha256": "62dd7050fa2ef5bd5ddaf698ad8eed91b8ae96868f6ceb113388132fd234def7"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/manifest.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "41123fcd2b88c58c47e3b75e3fefa3625c5c3ce3",
+      "baseBytes": 8379,
+      "baseSha256": "9f09278de302de2744b9c4b8215237354e0807be271b3fa9edcb46d0f96407fd",
+      "workingBytes": 8379,
+      "workingSha256": "9f09278de302de2744b9c4b8215237354e0807be271b3fa9edcb46d0f96407fd"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/observations.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "36b4bf0fbc3f9082fde9d7eb6e41ad5cc6371d1b",
+      "baseBytes": 4721,
+      "baseSha256": "00dfb7fdf2979d463059750070c3fe5ac7ca5913ea80f46546ab21a3ce760bf0",
+      "workingBytes": 4721,
+      "workingSha256": "00dfb7fdf2979d463059750070c3fe5ac7ca5913ea80f46546ab21a3ce760bf0"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/path-policy.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "178b2bf8bf6f551f51c4759203c739e509db2293",
+      "baseBytes": 2550,
+      "baseSha256": "66896cbd5326d6cae8c8c718b31e32850d81f22d60fadba918c7f6359cfa993f",
+      "workingBytes": 2550,
+      "workingSha256": "66896cbd5326d6cae8c8c718b31e32850d81f22d60fadba918c7f6359cfa993f"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/run.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "70c4a232c8f5e51f988c9ef925af0fe16654f642",
+      "baseBytes": 137,
+      "baseSha256": "71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a",
+      "workingBytes": 137,
+      "workingSha256": "71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/scenario-checks.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "8819f8f2cc101189e47bcb4f353dd0f422067969",
+      "baseBytes": 3094,
+      "baseSha256": "3e7c5a0f23755fec9d44edd0af76bacd34a5adc6379d4bd30ac57c43d797a111",
+      "workingBytes": 3094,
+      "workingSha256": "3e7c5a0f23755fec9d44edd0af76bacd34a5adc6379d4bd30ac57c43d797a111"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/snapshot.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "7ebca4399ef00128e6a16c275e2edf18b044ba6f",
+      "baseBytes": 2401,
+      "baseSha256": "006d401a577ef0a3df75d3f34a5a7552fe351dfad325a97d423ac328e6e362b5",
+      "workingBytes": 2401,
+      "workingSha256": "006d401a577ef0a3df75d3f34a5a7552fe351dfad325a97d423ac328e6e362b5"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/templates.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "2b2516aae661f89f73fbf2a7f2cf953406101ee3",
+      "baseBytes": 4179,
+      "baseSha256": "f4ea78f43f72cd1f8d6e4751499c1077cc5b84eb34d2ac3249a2a363eab6a0b2",
+      "workingBytes": 4179,
+      "workingSha256": "f4ea78f43f72cd1f8d6e4751499c1077cc5b84eb34d2ac3249a2a363eab6a0b2"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/trace-core.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "29643ff96659f42f2f3637dc9d97cee6871996c8",
+      "baseBytes": 3280,
+      "baseSha256": "2f06af3254c3ecd42e410c013e33ec2f04b7f2bbe48d08319b48e9e8ac93e2fa",
+      "workingBytes": 3280,
+      "workingSha256": "2f06af3254c3ecd42e410c013e33ec2f04b7f2bbe48d08319b48e9e8ac93e2fa"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/trace-store.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "4ade0de0ee0432b266d441aed0229ddd1d871943",
+      "baseBytes": 6776,
+      "baseSha256": "f5af4e06730f600561ccc7608f4020d2ebe1956d903491bf7f555dc1bff0a9eb",
+      "workingBytes": 6776,
+      "workingSha256": "f5af4e06730f600561ccc7608f4020d2ebe1956d903491bf7f555dc1bff0a9eb"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/trace.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "70c4a232c8f5e51f988c9ef925af0fe16654f642",
+      "baseBytes": 137,
+      "baseSha256": "71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a",
+      "workingBytes": 137,
+      "workingSha256": "71dff5642e9cd0fa0fae651c5e249cf572d240b68f44d85f9875e81ba42c673a"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/validator.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "cb14cae15c849f622e9750bad46cb96e333a7f5a",
+      "baseBytes": 34650,
+      "baseSha256": "3e20da0af0668925bdadd41546bf912e53dbf09d8c98f9b593a7f8cd1196afcd",
+      "workingBytes": 34650,
+      "workingSha256": "3e20da0af0668925bdadd41546bf912e53dbf09d8c98f9b593a7f8cd1196afcd"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/vendor/ACORN-LICENSE",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "9d71cc63a35e7d878787e5159b5b163739486220",
+      "baseBytes": 1099,
+      "baseSha256": "76a876cf886ff9be2a8b5e2e86514fed06223c8c9f0c1e9ee9606e93841e00b7",
+      "workingBytes": 1099,
+      "workingSha256": "76a876cf886ff9be2a8b5e2e86514fed06223c8c9f0c1e9ee9606e93841e00b7"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/vendor/ACORN-WALK-LICENSE",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "d6be6db2cfff576dd96f97180707581bfb6b726c",
+      "baseBytes": 1099,
+      "baseSha256": "c2d8184ea9becd063aa40be243e8c6ec2c4f72828fdfe4b0752664ef73e96ed3",
+      "workingBytes": 1099,
+      "workingSha256": "c2d8184ea9becd063aa40be243e8c6ec2c4f72828fdfe4b0752664ef73e96ed3"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/vendor/acorn-walk.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "88f18bb616e1d9c523773c0fa31c622f77e1c1f4",
+      "baseBytes": 15271,
+      "baseSha256": "24bc7ea73dcc319360090f4849746b7493bf234f951ea99ae0b89105981b1b42",
+      "workingBytes": 15271,
+      "workingSha256": "24bc7ea73dcc319360090f4849746b7493bf234f951ea99ae0b89105981b1b42"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/scripts/skill-rails/vendor/acorn.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "3f4fc2f4df981df3c5e086297f778c91b0b7e4db",
+      "baseBytes": 233301,
+      "baseSha256": "953573b8fdab71599749ea5f2b33d3e760c2116178f9423ee7458dbe39d59453",
+      "workingBytes": 233301,
+      "workingSha256": "953573b8fdab71599749ea5f2b33d3e760c2116178f9423ee7458dbe39d59453"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/spec.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "cfcdba6b4df9743f628b4fa91afa17ead8f43dc9",
+      "baseBytes": 7224,
+      "baseSha256": "4b2b719f714ff52b83b06849de8afd84cb7ebb0319d4d8880df9e2ff6f8caafd",
+      "workingBytes": 7224,
+      "workingSha256": "4b2b719f714ff52b83b06849de8afd84cb7ebb0319d4d8880df9e2ff6f8caafd"
+    },
+    {
+      "path": "fixtures/next-core-single-skill-pilot/skill/templates/lane-report.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "148a33c2b8af78f3d2e7041381b237a6fbfa5d33",
+      "baseBytes": 72,
+      "baseSha256": "c0c219e6b61798154e50d5551e582b05dcb5cd02a1213c23a1f0ddca3290e362",
+      "workingBytes": 72,
+      "workingSha256": "c0c219e6b61798154e50d5551e582b05dcb5cd02a1213c23a1f0ddca3290e362"
+    },
+    {
+      "path": "fixtures/reject-external-runtime-dependencies-loader.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b8b174c451fc679c961838b2d8d84025b9ff6e87",
+      "baseBytes": 371,
+      "baseSha256": "63ef3366d5528fdd57771a025baa5be04f5e14180716aeff0d9d06f28031ff38",
+      "workingBytes": 371,
+      "workingSha256": "63ef3366d5528fdd57771a025baa5be04f5e14180716aeff0d9d06f28031ff38"
+    },
+    {
+      "path": "package-lock.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "604830566b4af4ec8ef093c97addb8c28e3b5b3f",
+      "baseBytes": 6578,
+      "baseSha256": "4fb966fee280c764baa60167f31737440500e46c308bd5d03cbfeb1feae1f6d6",
+      "workingBytes": 6773,
+      "workingSha256": "40d3b235aa2714e8352a20e892a3990ac1f46940ea41359232ea2f383e81640e"
+    },
+    {
+      "path": "package.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "411d8e6c090325210ae339e9a23f18fc125b64c5",
+      "baseBytes": 822,
+      "baseSha256": "747d77413f501a4d95251e7456b427d61283817abfcc105cb86c77fe866dd4b4",
+      "workingBytes": 846,
+      "workingSha256": "b8c3030e3f9fe71fb3cf3143d004346a08f2a73e5ea3ef32a8b6a12fea2b4806"
+    },
+    {
+      "path": "scripts/lib/args.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "552d4f52ed8ea438bf0e9e21d91c97fb2807ea41",
+      "baseBytes": 149,
+      "baseSha256": "5acb660e40e778e829d8e951924f26c8e6f872d43effef54e9121730f0f5ec7e",
+      "workingBytes": 149,
+      "workingSha256": "5acb660e40e778e829d8e951924f26c8e6f872d43effef54e9121730f0f5ec7e"
+    },
+    {
+      "path": "scripts/lib/build-core.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "8307fd6924cb5c98fbfaae934413e5beeba2d41f",
+      "baseBytes": 155,
+      "baseSha256": "5bf0706adfd837eee846175ca0bdf4686e757abe1bfc920ec25550ff079558bf",
+      "workingBytes": 155,
+      "workingSha256": "5bf0706adfd837eee846175ca0bdf4686e757abe1bfc920ec25550ff079558bf"
+    },
+    {
+      "path": "scripts/lib/g05-review-lint.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "4787ae9ed4639321b32f6653dfd58ebbe030bc59",
+      "baseBytes": 2043,
+      "baseSha256": "1010d6288d56804671395ab138f295a4e7f0a971a41ee2dafc56c8b36c9ff48e",
+      "workingBytes": 2043,
+      "workingSha256": "1010d6288d56804671395ab138f295a4e7f0a971a41ee2dafc56c8b36c9ff48e"
+    },
+    {
+      "path": "scripts/lib/g05-score-v3.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "ae63c6c9f454f7d6abfba6b5490e36913d802fab",
+      "baseBytes": 14357,
+      "baseSha256": "01520a6379c7e4dde40416521f184fec29364e3fb9d25b741001a18ad1e803d2",
+      "workingBytes": 14357,
+      "workingSha256": "01520a6379c7e4dde40416521f184fec29364e3fb9d25b741001a18ad1e803d2"
+    },
+    {
+      "path": "scripts/lib/io.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "75348f1da793c4785ba9dc7408b8606a22f77816",
+      "baseBytes": 147,
+      "baseSha256": "cb75fb6c1ef3c04b48700e1d3ab562fd09c828119cd3ceddf717411cf0dd02c2",
+      "workingBytes": 147,
+      "workingSha256": "cb75fb6c1ef3c04b48700e1d3ab562fd09c828119cd3ceddf717411cf0dd02c2"
+    },
+    {
+      "path": "scripts/lib/sync-vendor.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "7f36f16d72082e042e90a5ac643385bec6b6f19f",
+      "baseBytes": 2818,
+      "baseSha256": "72961eb936f3064fce52415c969f436f99bddcf436740d3bcfb5e4a9fcfca10c",
+      "workingBytes": 2818,
+      "workingSha256": "72961eb936f3064fce52415c969f436f99bddcf436740d3bcfb5e4a9fcfca10c"
+    },
+    {
+      "path": "scripts/runtime/hash.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "290bc73a478fb8ef39ed6fa4a8f48c51f773396c",
+      "baseBytes": 153,
+      "baseSha256": "4b227d38758c76d5d491f94ccd99f2e87841cc26f94970c0e07a034567f44272",
+      "workingBytes": 153,
+      "workingSha256": "4b227d38758c76d5d491f94ccd99f2e87841cc26f94970c0e07a034567f44272"
+    },
+    {
+      "path": "scripts/runtime/validator.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "7974a8df930733d23749381643b73896496539f9",
+      "baseBytes": 158,
+      "baseSha256": "8957e11a107d9dcd539476b0057d8cd7698032fd8c1764afdbbd05e2e0760d59",
+      "workingBytes": 158,
+      "workingSha256": "8957e11a107d9dcd539476b0057d8cd7698032fd8c1764afdbbd05e2e0760d59"
+    },
+    {
+      "path": "skills/skill-rails/SKILL.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "227a29e8d55c4939d986379f6736b222675d1678",
+      "baseBytes": 5255,
+      "baseSha256": "0dc2eb16aae9c8ea10aea57b9305dc5a571e9963ab377947ea7a2338a3f83bb9",
+      "workingBytes": 5255,
+      "workingSha256": "0dc2eb16aae9c8ea10aea57b9305dc5a571e9963ab377947ea7a2338a3f83bb9"
+    },
+    {
+      "path": "skills/skill-rails/agents/openai.yaml",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "25919cdf04b3b56686d1cef3d0cc4d878a39ac14",
+      "baseBytes": 264,
+      "baseSha256": "9603bd18bf3f48c862f622ebccf7223e7ac42be285ce2b1b57ecff039dcad31e",
+      "workingBytes": 264,
+      "workingSha256": "9603bd18bf3f48c862f622ebccf7223e7ac42be285ce2b1b57ecff039dcad31e"
+    },
+    {
+      "path": "skills/skill-rails/references/authoring-workflow.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "ad8e8a4e9a59ea4b2423d4f59127dd93736ceb5f",
+      "baseBytes": 36819,
+      "baseSha256": "ef10c6736f188c4f11647c88d762cde4c3bf907474a31dcfe009b59f35dfd243",
+      "workingBytes": 36929,
+      "workingSha256": "73b00c955adc25bfa4f6dc0d66850b4ff1a6b1431b1310b9137d0ca4f2967432"
+    },
+    {
+      "path": "skills/skill-rails/references/evaluation.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "47d22137c77ceff86c6a9bb226431774ef71a848",
+      "baseBytes": 5488,
+      "baseSha256": "ed5ebd48b87b9a7e1dc6680bbd613b91e756b2952866c5bbe4eab8fbcc5d7efa",
+      "workingBytes": 5539,
+      "workingSha256": "d83a6cd357d10644e5f882f3791b7824e1f48cd984ae7404610e1fb1ff1d8d1c"
+    },
+    {
+      "path": "skills/skill-rails/references/migration.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e263daa4bc429fbdc098fe5a5d630da89503a5c9",
+      "baseBytes": 3422,
+      "baseSha256": "2800851e4d9d761c3fc05541bee689d58c191a3a13b067b813073d6583d3a409",
+      "workingBytes": 3422,
+      "workingSha256": "2800851e4d9d761c3fc05541bee689d58c191a3a13b067b813073d6583d3a409"
+    },
+    {
+      "path": "skills/skill-rails/references/p2-contract.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e932aea08f1eb69af58de5e313c4b3bb6d554fe9",
+      "baseBytes": 15336,
+      "baseSha256": "c72cf9dfe606e65352e4fb905f6cf94fbcee6c12665a7319beec45ba610206c4",
+      "workingBytes": 15411,
+      "workingSha256": "3ade4fbb089dbfa24a2bac0c93fa4e11ec686b9a1c287bc55d4c41e0c4040791"
+    },
+    {
+      "path": "skills/skill-rails/schemas/decision.schema.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "183c3053e5fd804d8d1b2875fb212b07de16eaf1",
+      "baseBytes": 5285,
+      "baseSha256": "d475892037887713a110b9a3f9bd3207c033c53b9013cc4f2c3ea2e3bc15d353",
+      "workingBytes": 5398,
+      "workingSha256": "695e3f49468a657173e94e88f75a5c25f9fb1a7ce5c492c4d40b45365b8853a6"
+    },
+    {
+      "path": "skills/skill-rails/schemas/trace-event.schema.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "98f9478288a2618f7590c0248cbe4a0eec32ee51",
+      "baseBytes": 1472,
+      "baseSha256": "8e59643b838b1da7a49220981f010767e1eff63248a9916b68138c736b615631",
+      "workingBytes": 1472,
+      "workingSha256": "8e59643b838b1da7a49220981f010767e1eff63248a9916b68138c736b615631"
+    },
+    {
+      "path": "skills/skill-rails/scripts/build.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "c218e624ca408e69ec6b1f86506c549b47be4e44",
+      "baseBytes": 1238,
+      "baseSha256": "e71b8e59d18482820e24ab659e500944f471e125ecd81a55c48625ed36f5fabb",
+      "workingBytes": 1238,
+      "workingSha256": "e71b8e59d18482820e24ab659e500944f471e125ecd81a55c48625ed36f5fabb"
+    },
+    {
+      "path": "skills/skill-rails/scripts/eval.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "9f777966b1b9513f61bbb7c94cff0593af8503f9",
+      "baseBytes": 11828,
+      "baseSha256": "f756e2985c43f720ef305dfb55bf8373fd93ed4f6a13d5a954b7d0ce41505a48",
+      "workingBytes": 12019,
+      "workingSha256": "9342ea0fcbb555445e30cba6bbad334a71849ea9474b81c867dfad25c693c1f1"
+    },
+    {
+      "path": "skills/skill-rails/scripts/init.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e1f1fe959e66e4b2569135f514ff55eac3c2fc88",
+      "baseBytes": 1028,
+      "baseSha256": "e8f15409caa0dfc3f8fd0a737b935b0efcc81c2f20fbdf7458fecf12b8006d2e",
+      "workingBytes": 1028,
+      "workingSha256": "e8f15409caa0dfc3f8fd0a737b935b0efcc81c2f20fbdf7458fecf12b8006d2e"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/args.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "f0192bb5144ea87aab5b21704c50af4d5a23b403",
+      "baseBytes": 1870,
+      "baseSha256": "4338c796a024a727dab8047bc28717df304597f3e5539d796b2b99f689826ce4",
+      "workingBytes": 1870,
+      "workingSha256": "4338c796a024a727dab8047bc28717df304597f3e5539d796b2b99f689826ce4"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/build-core.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b40fdccf04f98eab5dc7b826cf2f6586de4631b3",
+      "baseBytes": 17802,
+      "baseSha256": "c3c34db26b5ffafed89f556c0cb65fc039278908c430342a28c2639adc1db324",
+      "workingBytes": 18137,
+      "workingSha256": "75192902107e13c9802477f96c549f33005ea53fc3a2bdd1f5eb8c9d1191dff6"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/context-surface.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "52b6f633807bdcb2de30cdbc7ea6cd833d88fb6c",
+      "baseBytes": 1775,
+      "baseSha256": "7578bf0620bd11b563a01783376bb8b3e7776e54ae16ce08317abb3e2668043f",
+      "workingBytes": 1775,
+      "workingSha256": "7578bf0620bd11b563a01783376bb8b3e7776e54ae16ce08317abb3e2668043f"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/frontmatter.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "a5c3090968ce60e2b4d79bb7fab30f899175eaea",
+      "baseBytes": 1502,
+      "baseSha256": "4579a8434d97574c3376e213cbe50e836e971794ee0427f5e639a093d6a71670",
+      "workingBytes": 1502,
+      "workingSha256": "4579a8434d97574c3376e213cbe50e836e971794ee0427f5e639a093d6a71670"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/generator.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "87bf39c3435f8d9d57f36812adbee51c07bdcb5d",
+      "baseBytes": 20274,
+      "baseSha256": "ad789ac7438db4d9ee53c4467e896a486d48839279f0d15e075f22085e4791d4",
+      "workingBytes": 20506,
+      "workingSha256": "c947ef18891ed271b95f54fb16cea0c5c5109c1735ebe9098b684fddd0b06399"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/guidance.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b26c6fb540da421c5a749e7462265565bc0e35f6",
+      "baseBytes": 3659,
+      "baseSha256": "b49492e452141f551340baf5f85a46e00f24a2e41a4e372673bd2bc53e9d2228",
+      "workingBytes": 3659,
+      "workingSha256": "b49492e452141f551340baf5f85a46e00f24a2e41a4e372673bd2bc53e9d2228"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/io.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "065f20d326758dc0d06d560916fe5285326b3015",
+      "baseBytes": 7797,
+      "baseSha256": "712d31fad53b006f5274e44d044e9d74551219fc4c2fbcc45e62d0fe6a170f55",
+      "workingBytes": 7797,
+      "workingSha256": "712d31fad53b006f5274e44d044e9d74551219fc4c2fbcc45e62d0fe6a170f55"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/maintenance-context.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "7262c3f5284f7657ebfea9d35ade6c496fe33f7a",
+      "baseBytes": 139130,
+      "baseSha256": "3cce3c9b042440cb57a259dbda20fb0e549f29a7efaad262b182f87e8b2169cb",
+      "workingBytes": 139130,
+      "workingSha256": "3cce3c9b042440cb57a259dbda20fb0e549f29a7efaad262b182f87e8b2169cb"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/maintenance.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e10a2ab5350e9fc555c6cd8b53e7c0196d9c0bee",
+      "baseBytes": 15690,
+      "baseSha256": "1acb5013438507877c7b62a041bb49e17148fa84b6b9344b355b5296d5025121",
+      "workingBytes": 15931,
+      "workingSha256": "af9a9fd5c52010314c5a4bc2a0ea5bb0db83299ec549919790719e71ec39b39b"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/migration.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "cd260436a8e5716d3eb3dbfc3471ce72062d3f5d",
+      "baseBytes": 14938,
+      "baseSha256": "9e91f0d38f96a55e8bb87375cc896869eb6d42b2c5bda0940135dd876afae7aa",
+      "workingBytes": 14938,
+      "workingSha256": "9e91f0d38f96a55e8bb87375cc896869eb6d42b2c5bda0940135dd876afae7aa"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/mutation-suite.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "c689329272457598adbf7cb58a269790a83aad74",
+      "baseBytes": 9182,
+      "baseSha256": "f84ba6178aeb613e3ace5b855cb4ab29f4e0fc3cabfdeebcc71b8aa7078e2f44",
+      "workingBytes": 9182,
+      "workingSha256": "f84ba6178aeb613e3ace5b855cb4ab29f4e0fc3cabfdeebcc71b8aa7078e2f44"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/obligations.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "2a2ae82b7125da3838418911470063a692ab501f",
+      "baseBytes": 5399,
+      "baseSha256": "9f16b384193d42359a5a5b4ba7e27d2f40eab9105e3c659b670842aa7d836961",
+      "workingBytes": 5399,
+      "workingSha256": "9f16b384193d42359a5a5b4ba7e27d2f40eab9105e3c659b670842aa7d836961"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/profiles.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "916f50d0ee9907c7f7faaeaa851da7106c3f76b9",
+      "baseBytes": 4181,
+      "baseSha256": "e9e4ee2fed68bb06341b5ed8c85c8b4039314f518362c5cf35224af2b5a99710",
+      "workingBytes": 4181,
+      "workingSha256": "e9e4ee2fed68bb06341b5ed8c85c8b4039314f518362c5cf35224af2b5a99710"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/regular-paths.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "7477eb374fcc07bffc4efd69f351ea7eed5849b2",
+      "baseBytes": 3250,
+      "baseSha256": "4a24a5775414733568a8febd073b5e5f51d40479783c89a346fdd10aa2e180d3",
+      "workingBytes": 3250,
+      "workingSha256": "4a24a5775414733568a8febd073b5e5f51d40479783c89a346fdd10aa2e180d3"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/semantic-diff.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b30e8d762cb620542858e97dde4e13e80f29d472",
+      "baseBytes": 5763,
+      "baseSha256": "31250e9c76eade32214d327d8407024c1b5dd5fc0644eb27ea3e977a2fcea968",
+      "workingBytes": 5848,
+      "workingSha256": "330f5e10421d4a49177fe15ef4cba9e2aaf1ea3737368f941c698a55cea48e44"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lib/simple-lint.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "20d8c5f941a7f290c0f9a5e1df969a887c253218",
+      "baseBytes": 18064,
+      "baseSha256": "7f540eb9767d85b972fb7870509790fa8dfab27954a1e8c41624452ea480a781",
+      "workingBytes": 18303,
+      "workingSha256": "f832168e071dfa1113d5f75e67ca97cde08f495db3a6a9aaed38ffc021eca9d7"
+    },
+    {
+      "path": "skills/skill-rails/scripts/lint.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "a2b2014a36e14ba72f3f7f96e4c21eae34449ea3",
+      "baseBytes": 1905,
+      "baseSha256": "b6b3205d9b7d97de90ba69c90229f6a7e0a29e5e5b372677d32316b20902e72b",
+      "workingBytes": 1934,
+      "workingSha256": "6cf5654119f326a92674efa733a0c1b5df9409ee19d9734b90b2f41f8b0ed7e3"
+    },
+    {
+      "path": "skills/skill-rails/scripts/maintain.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "8f69e06be21508f8e6abf0f5bcd306e1923c4933",
+      "baseBytes": 2856,
+      "baseSha256": "4ad643656f59c2b38d4457cedf91d348882271a8fee1d29fc8d34463cce0c2c4",
+      "workingBytes": 2856,
+      "workingSha256": "4ad643656f59c2b38d4457cedf91d348882271a8fee1d29fc8d34463cce0c2c4"
+    },
+    {
+      "path": "skills/skill-rails/scripts/migrate.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e771bcc311cbe953dac2b4ad3468470638820340",
+      "baseBytes": 1620,
+      "baseSha256": "f6491de3b05b9adae53b5e5b45f4a11f64aa754f5d37a58a2447de5f0104ceda",
+      "workingBytes": 1620,
+      "workingSha256": "f6491de3b05b9adae53b5e5b45f4a11f64aa754f5d37a58a2447de5f0104ceda"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/alignment.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b4fa985d60b7b97f72af03c3fcf0f2a6428c7c74",
+      "baseBytes": 7542,
+      "baseSha256": "1c50f5c27da56e71a0610ff896fc24e993a6956218c886bb7cd93246aefcd269",
+      "workingBytes": 7664,
+      "workingSha256": "ddb338679035f2afe7aef8e27c49b067ffb5212a6b3f47f78474bda7aae657e7"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/api.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "5b4ae085a587464ff7335ebad3e30f8d03523cc3",
+      "baseBytes": 23358,
+      "baseSha256": "8fa126794bfdebfda1e4cf92431e4b71eb2315da060425b931093172c91109b2",
+      "workingBytes": 23579,
+      "workingSha256": "053e2bb343aa0cb8c976e8411634e6d839eef7c742454d311f5a06b4da41e391"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/ast-policy.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "d6b38d8e7d1d3d182baa06d262799c6bc03b041d",
+      "baseBytes": 21319,
+      "baseSha256": "87c744ee25bdd3c3848b7b02dbb2a33ed4389603223fe5c515d3745cd8e11db1",
+      "workingBytes": 21671,
+      "workingSha256": "7700a8d644c259697e7938c6272583a9b88c00fe1c187d952efc0b43d714086a"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/authoring-ledger.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "5a3a5e8fe03beeed3ed7f371c06b049fabcd4fc5",
+      "baseBytes": 5606,
+      "baseSha256": "4c458373179300f64944dd70d92c4252530df00368c0794dd7b2efcf45239d75",
+      "workingBytes": 5660,
+      "workingSha256": "0c5b2989b7a1a4eb1cf2b54ec1c99369575b9131b1fe4fa13bd5f7a97a7298be"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/body.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "c88e70f7e101eb3f389bc9c11f0643987f67de1d",
+      "baseBytes": 2660,
+      "baseSha256": "bbc1aad36940bfd690043d7a3c499f6e14eb0ef2b9f590cfacef1085db6d679c",
+      "workingBytes": 2660,
+      "workingSha256": "bbc1aad36940bfd690043d7a3c499f6e14eb0ef2b9f590cfacef1085db6d679c"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/cli.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "7a231ffad59371e31ef880dd5bcaface899d4c0e",
+      "baseBytes": 18997,
+      "baseSha256": "0a07e22c7fda8e84b08d715aca0b167c6e6798f3c7b027ada5c84339e7c2ed22",
+      "workingBytes": 19115,
+      "workingSha256": "1e5dea35041ee5a2250360bdc30a0012eea931b7d20537318fef824f9168f894"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/collectors.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "49d81f949f999407d8ee519af485d06c7e1f7955",
+      "baseBytes": 2644,
+      "baseSha256": "611122b99caba24bbe52126159bf562a53c82fb3216a34993f1682c7cf4352f8",
+      "workingBytes": 2644,
+      "workingSha256": "611122b99caba24bbe52126159bf562a53c82fb3216a34993f1682c7cf4352f8"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/constants.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "b4b46a2d88fb1cb267580e05b511eb802ce9e1b0",
+      "baseBytes": 1691,
+      "baseSha256": "e58a0fea3aea4f267f095ab4daaa168cde767bb4da4203922d1bddceee62f06f",
+      "workingBytes": 1751,
+      "workingSha256": "5583a5d7f4d29030c98fa1da4ffb44598a8c9184cc3c23053f695b59f1ab2d40"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/diagnostics.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "d51d0baa6dc7798d153de416428ebccb0bf16ebe",
+      "baseBytes": 1101,
+      "baseSha256": "f16aea5478acb2efb559da5a44bc7d66212c5e61e336b8803eacf5bfb30debe6",
+      "workingBytes": 1101,
+      "workingSha256": "f16aea5478acb2efb559da5a44bc7d66212c5e61e336b8803eacf5bfb30debe6"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/domains.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "4231dec32759b4c060782e03d71401a3a42f2f31",
+      "baseBytes": 4307,
+      "baseSha256": "2368ee30f7479489988849abbdf4bcbdb0d637eb25b3a170dbe607e6f541ea93",
+      "workingBytes": 4410,
+      "workingSha256": "eaf7ea342c5e8945e8812ef253f74807eeb222aa8ceb3b52513f6bbd2859f0d4"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/dsl.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "ce0627c58c8b8be288ec1d78546c4a9a36ee8946",
+      "baseBytes": 7290,
+      "baseSha256": "e8d77b180b886db5cf0474682c7ea2dfea19065561a015878c70efe1441694e6",
+      "workingBytes": 7290,
+      "workingSha256": "e8d77b180b886db5cf0474682c7ea2dfea19065561a015878c70efe1441694e6"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/evaluator.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "a76dbec0b0b4909fc27dae38cf3fc20291d8a7e0",
+      "baseBytes": 17378,
+      "baseSha256": "6852b125de8c563c1c5cdf3e2f4248d30d0f8d3de4464dfb07ae178c9ddd5791",
+      "workingBytes": 17662,
+      "workingSha256": "a6990ef8b66954266757d10dd69eb710f011f1e99b780574e7b276bc08524b91"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/format-checks.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "9dc97becf80967716bebe1260dd7d0a62c984dea",
+      "baseBytes": 2417,
+      "baseSha256": "0cb3fdb6d10252ca87cc90238e7fe0d86b3c12afd2d74450a1a648a9d129cbe8",
+      "workingBytes": 2417,
+      "workingSha256": "0cb3fdb6d10252ca87cc90238e7fe0d86b3c12afd2d74450a1a648a9d129cbe8"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/guide.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "e467c90c92731b02edaa803d2e3a19fb03c3e859",
+      "baseBytes": 3521,
+      "baseSha256": "490d965b5e988319f6d806e870cd8e15f8ada0a0f1c70ed1aaa4a860112da280",
+      "workingBytes": 3556,
+      "workingSha256": "a8393bebaba5bab885aab2a318c0b59e413dc549362ee7538f57481925b669d5"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/hash.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "cfac469ad73579513b758f2fef57bad4ad44901e",
+      "baseBytes": 1189,
+      "baseSha256": "0bf625859470d72aa005efd49d60c09778afc1d1acc45f00a1ce9feeaa06c412",
+      "workingBytes": 1189,
+      "workingSha256": "0bf625859470d72aa005efd49d60c09778afc1d1acc45f00a1ce9feeaa06c412"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/loader.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "369f10974a37fceff2ee4ed5f7ee442806027f44",
+      "baseBytes": 1270,
+      "baseSha256": "62dd7050fa2ef5bd5ddaf698ad8eed91b8ae96868f6ceb113388132fd234def7",
+      "workingBytes": 1270,
+      "workingSha256": "62dd7050fa2ef5bd5ddaf698ad8eed91b8ae96868f6ceb113388132fd234def7"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/manifest.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "41123fcd2b88c58c47e3b75e3fefa3625c5c3ce3",
+      "baseBytes": 8379,
+      "baseSha256": "9f09278de302de2744b9c4b8215237354e0807be271b3fa9edcb46d0f96407fd",
+      "workingBytes": 8533,
+      "workingSha256": "e295f914285f4c0aff45d1a4957f10138229d7c6493281a09319dcbbbce2733b"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/observations.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "36b4bf0fbc3f9082fde9d7eb6e41ad5cc6371d1b",
+      "baseBytes": 4721,
+      "baseSha256": "00dfb7fdf2979d463059750070c3fe5ac7ca5913ea80f46546ab21a3ce760bf0",
+      "workingBytes": 4721,
+      "workingSha256": "00dfb7fdf2979d463059750070c3fe5ac7ca5913ea80f46546ab21a3ce760bf0"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/path-policy.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "178b2bf8bf6f551f51c4759203c739e509db2293",
+      "baseBytes": 2550,
+      "baseSha256": "66896cbd5326d6cae8c8c718b31e32850d81f22d60fadba918c7f6359cfa993f",
+      "workingBytes": 2596,
+      "workingSha256": "f70e7310c0d31de2f6aee1c05fb4dc9a87b71b44a05a6ad68fd2b0711ec1bbdb"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/scenario-checks.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "8819f8f2cc101189e47bcb4f353dd0f422067969",
+      "baseBytes": 3094,
+      "baseSha256": "3e7c5a0f23755fec9d44edd0af76bacd34a5adc6379d4bd30ac57c43d797a111",
+      "workingBytes": 3141,
+      "workingSha256": "305fbb9ba731ad4b2647b4b244deb32b1ce5a85c3f669d5f93221a406e1bbacd"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/snapshot.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "7ebca4399ef00128e6a16c275e2edf18b044ba6f",
+      "baseBytes": 2401,
+      "baseSha256": "006d401a577ef0a3df75d3f34a5a7552fe351dfad325a97d423ac328e6e362b5",
+      "workingBytes": 2462,
+      "workingSha256": "176e00006dea26358c60a252989c23c6c3e067ee499c5d0fde87c8b81cf0142a"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/templates.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "2b2516aae661f89f73fbf2a7f2cf953406101ee3",
+      "baseBytes": 4179,
+      "baseSha256": "f4ea78f43f72cd1f8d6e4751499c1077cc5b84eb34d2ac3249a2a363eab6a0b2",
+      "workingBytes": 4259,
+      "workingSha256": "cb2e1f733d7713550d327f4ed6243956fceb6877f989461989b130411b15fefc"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/trace-core.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "29643ff96659f42f2f3637dc9d97cee6871996c8",
+      "baseBytes": 3280,
+      "baseSha256": "2f06af3254c3ecd42e410c013e33ec2f04b7f2bbe48d08319b48e9e8ac93e2fa",
+      "workingBytes": 3331,
+      "workingSha256": "cc2f4d86914b9f422c93e6ab749244651abc5cc03a12336151c9f024da562160"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/trace-store.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "4ade0de0ee0432b266d441aed0229ddd1d871943",
+      "baseBytes": 6776,
+      "baseSha256": "f5af4e06730f600561ccc7608f4020d2ebe1956d903491bf7f555dc1bff0a9eb",
+      "workingBytes": 6776,
+      "workingSha256": "f5af4e06730f600561ccc7608f4020d2ebe1956d903491bf7f555dc1bff0a9eb"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/validator.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "cb14cae15c849f622e9750bad46cb96e333a7f5a",
+      "baseBytes": 34650,
+      "baseSha256": "3e20da0af0668925bdadd41546bf912e53dbf09d8c98f9b593a7f8cd1196afcd",
+      "workingBytes": 35107,
+      "workingSha256": "df4da978dc87e0736dc84361340a849aa90360bf59f74cdb544e7732f0dc2fba"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/vendor/ACORN-LICENSE",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "9d71cc63a35e7d878787e5159b5b163739486220",
+      "baseBytes": 1099,
+      "baseSha256": "76a876cf886ff9be2a8b5e2e86514fed06223c8c9f0c1e9ee9606e93841e00b7",
+      "workingBytes": 1099,
+      "workingSha256": "76a876cf886ff9be2a8b5e2e86514fed06223c8c9f0c1e9ee9606e93841e00b7"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/vendor/ACORN-WALK-LICENSE",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "d6be6db2cfff576dd96f97180707581bfb6b726c",
+      "baseBytes": 1099,
+      "baseSha256": "c2d8184ea9becd063aa40be243e8c6ec2c4f72828fdfe4b0752664ef73e96ed3",
+      "workingBytes": 1099,
+      "workingSha256": "c2d8184ea9becd063aa40be243e8c6ec2c4f72828fdfe4b0752664ef73e96ed3"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/vendor/acorn-walk.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "88f18bb616e1d9c523773c0fa31c622f77e1c1f4",
+      "baseBytes": 15271,
+      "baseSha256": "24bc7ea73dcc319360090f4849746b7493bf234f951ea99ae0b89105981b1b42",
+      "workingBytes": 15271,
+      "workingSha256": "24bc7ea73dcc319360090f4849746b7493bf234f951ea99ae0b89105981b1b42"
+    },
+    {
+      "path": "skills/skill-rails/scripts/runtime/vendor/acorn.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "3f4fc2f4df981df3c5e086297f778c91b0b7e4db",
+      "baseBytes": 233301,
+      "baseSha256": "953573b8fdab71599749ea5f2b33d3e760c2116178f9423ee7458dbe39d59453",
+      "workingBytes": 233301,
+      "workingSha256": "953573b8fdab71599749ea5f2b33d3e760c2116178f9423ee7458dbe39d59453"
+    },
+    {
+      "path": "skills/skill-rails/scripts/vendor/MARKDOWN-IT-THIRD-PARTY-LICENSES",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "dfaa30b83dce560dd3f881ee230d931985849f94",
+      "baseBytes": 8083,
+      "baseSha256": "11dbdf08503c055bd913283f445178bb72291d245dc67d851c2c737eef7c16ce",
+      "workingBytes": 8083,
+      "workingSha256": "11dbdf08503c055bd913283f445178bb72291d245dc67d851c2c737eef7c16ce"
+    },
+    {
+      "path": "skills/skill-rails/scripts/vendor/markdown-it.cjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "0a7ce25bf2aa91472c740e55ef14b01cd3114ec3",
+      "baseBytes": 203087,
+      "baseSha256": "41ab61d8a75e5f355be2c622d81f2190720101abe965243245fcacea2c420d9c",
+      "workingBytes": 203087,
+      "workingSha256": "41ab61d8a75e5f355be2c622d81f2190720101abe965243245fcacea2c420d9c"
+    },
+    {
+      "path": "skills/skill-rails/templates/authoring-card.md",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "4b82971464d7766d34ce0bb8a68554558d6926a9",
+      "baseBytes": 769,
+      "baseSha256": "431b022aa3cae4eb2a5e927df6003b67c5c847c54172350a747f971b60434ba3",
+      "workingBytes": 784,
+      "workingSha256": "2dc6ebc812ddc4f669d70b485db2d9dde3fa6af6b0b30cecc5ddcb853c0bef58"
+    },
+    {
+      "path": "skills/skill-rails/templates/intent-brief.json",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "a30a15fd2c4244fec20446cd36ce737ab3acc467",
+      "baseBytes": 427,
+      "baseSha256": "a19e96faedee19f0abcdb66a4441c3ad780db1ee66cb12d88efe73c64eafb857",
+      "workingBytes": 427,
+      "workingSha256": "a19e96faedee19f0abcdb66a4441c3ad780db1ee66cb12d88efe73c64eafb857"
+    },
+    {
+      "path": "tests/authoring.test.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "f423a678dd20349cd485da10018dc8441b2f5b7a",
+      "baseBytes": 57257,
+      "baseSha256": "0c328016537bbe24685dc921558549878ee5451cb98c91369cc3b7ab17307ffc",
+      "workingBytes": 58066,
+      "workingSha256": "1f3cc470d266c1d6c6542d789a9410d304c74d0420a2e0712fd418caae2cf9ee"
+    },
+    {
+      "path": "tests/g05.test.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "c34001d97b08dcdedba14ecb37e20dc9d6932f03",
+      "baseBytes": 7028,
+      "baseSha256": "0c1fd7183692dfaea272f0205dafd775e8246e2f5e640f436a7b2482548139dd",
+      "workingBytes": 7028,
+      "workingSha256": "0c1fd7183692dfaea272f0205dafd775e8246e2f5e640f436a7b2482548139dd"
+    },
+    {
+      "path": "tests/helpers.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "d4c8dcaf3fa77c6ef2a1bc6e9931db32b3ee0a4e",
+      "baseBytes": 898,
+      "baseSha256": "405efbe8723600d00dad513e54437d2002d7ca1c7f6fcbe87266b1b578522984",
+      "workingBytes": 898,
+      "workingSha256": "405efbe8723600d00dad513e54437d2002d7ca1c7f6fcbe87266b1b578522984"
+    },
+    {
+      "path": "tests/integration.test.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "affb6c205b317a2bc37339491ac8b8bcebb9c24c",
+      "baseBytes": 100110,
+      "baseSha256": "4dcdc6e921fc4aa215c7eda2907a9c3e4af8715df336a6a642bb99b9716c5204",
+      "workingBytes": 101171,
+      "workingSha256": "e3a95a030471c974f4aab73178de87e19fd2c91eacdefaf4b5f524ccf2242f0a"
+    },
+    {
+      "path": "tests/maintenance-context.test.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "18e434266713f110bfaf539cee7a57fbdfb633ee",
+      "baseBytes": 40896,
+      "baseSha256": "22dbc6308d77e248d872d14586b9d08468be62a419a0e6a4a384c159fba89ca7",
+      "workingBytes": 40896,
+      "workingSha256": "22dbc6308d77e248d872d14586b9d08468be62a419a0e6a4a384c159fba89ca7"
+    },
+    {
+      "path": "tests/profiles.test.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "cd605f509b03c049f39cec9b1bf4111d1c18cf5b",
+      "baseBytes": 6652,
+      "baseSha256": "8212c5619729541cbdc82fac50e401dfa1ca0b83449cf5fe936a7dfca008cb74",
+      "workingBytes": 6652,
+      "workingSha256": "8212c5619729541cbdc82fac50e401dfa1ca0b83449cf5fe936a7dfca008cb74"
+    },
+    {
+      "path": "tests/record-shell.test.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "236ea61972b9030d8129a877db08642d837c1e9f",
+      "baseBytes": 2232,
+      "baseSha256": "acfe5456fa95b4539d9e06d00a672ef75ff54dc8f3d45c79b60cde311b748049",
+      "workingBytes": 2232,
+      "workingSha256": "acfe5456fa95b4539d9e06d00a672ef75ff54dc8f3d45c79b60cde311b748049"
+    },
+    {
+      "path": "tests/runtime.test.mjs",
+      "classification": "archive-remove",
+      "mode": "100644",
+      "gitObject": "c66120c1c50a4edc68ec01af6bec654301fec117",
+      "baseBytes": 33751,
+      "baseSha256": "95aa088a79c12bfe2d6f0e6c2ddc9ca65fcf3ebe3aa57c6cbf0ad10e23115883",
+      "workingBytes": 34215,
+      "workingSha256": "55df7e6ecf91e428588404667ea7e9737b940ea6341086556651464972c5b8e3"
+    }
+  ]
+}

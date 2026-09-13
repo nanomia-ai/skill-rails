@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "targetId": "skill-rails-next",
+  "mode": "prose",
+  "entry": "../../SKILL.source.md",
+  "imports": []
+}

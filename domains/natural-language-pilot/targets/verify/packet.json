@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "purposeModule": "purpose",
+  "action": "Verify the bookmark-storage capability with authorized host tools and record one semantic result.",
+  "judgment": {
+    "question": "Does the available evidence justify pass, fail, or unproven for bookmark-storage?",
+    "criteria": [
+      "A pass requires the declared command to run successfully and report the expected test identity.",
+      "A command execution failure, an unexecuted command, or insufficient evidence is unproven; use fail only for direct evidence that the acceptance behavior does not hold.",
+      "If the observed card-id is unknown, the verdict must be unproven even when the command succeeds; preserve that reason in unknowns.",
+      "Do not claim file or host effects beyond the authority actually observed."
+    ]
+  },
+  "reads": [
+    {"path": "pilot/brief.md", "reason": "Read the acceptance boundary."},
+    {"path": "pilot/plan.md", "reason": "Confirm the stable card identity."},
+    {"path": "pilot/progress.md", "reason": "Locate the claimed implementation without treating it as proof."},
+    {"path": "pilot/verification.md", "reason": "Preserve prior human text and other card records when present."}
+  ],
+  "doneWhen": [
+    "The answer uses pass, fail, or unproven without overstating evidence.",
+    "Record returns an observed apply result, an idempotent no-write result, or a fail-closed recovery code."
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "cardId": "bookmark-storage",
+  "verificationCommand": {
+    "program": "npm",
+    "args": ["test", "--", "bookmark-storage"],
+    "cwd": "."
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "status": "preflight-not-gate",
+  "protocolSha256": "d8deb8581f7e10cc38cd6d9f6a889fd4b1c1e955901e60b5fe8f57781a1fc114",
+  "prompt": "Verify the bookmark-storage card in this project and record the result.",
+  "fixtureOutputBefore": {"bytes": 60, "sha256": "0bdfb021e7a57d56b978cfc9f787821f4e63ff2c22ae5fa6bcd3edc9000cbccf"},
+  "runs": [
+    {
+      "runId": "codex-treatment-normal-pre-return-pointer",
+      "lane": "treatment",
+      "scene": "normal",
+      "host": {"adapter": "codex", "cliVersion": "0.148.0", "model": "gpt-5.6-sol", "effort": "high", "permission": "approve-for-me/workspace-write"},
+      "skillTreeSha256": "ff75cd7454bb6362a18531bd88b2ad5aee4563536c29cbf649275a37917880dd",
+      "result": {"acceptance": true, "verdict": "pass", "effectAuthority": "observed", "outputSha256": "16e32cbfaa0f0072ca252bad43e3ad72858800e9c9158cb269e6037cd2c4235e", "formatErrors": 1, "recoveryBranch": "ANSWER_INVALID then corrected same exchange", "fallbackUsed": false},
+      "cost": {"wallClockMs": 90700, "inputTokens": 285182, "cachedInputTokens": 268160, "outputTokens": 3293, "reasoningTokens": 1230, "toolCalls": 16, "userRoundTrips": 0, "usd": null},
+      "safetyViolations": [],
+      "unknowns": ["Exact USD cost was not reported by Codex CLI.", "Raw JSONL was observed in the coordinator terminal but not retained as a durable file."]
+    },
+    {
+      "runId": "codex-control-normal",
+      "lane": "control",
+      "scene": "normal",
+      "host": {"adapter": "codex", "cliVersion": "0.148.0", "model": "gpt-5.6-sol", "effort": "high", "permission": "approve-for-me/workspace-write"},
+      "controlSourceSha256": "dde7f3f8ee23044a8102c49e2d8e381ea8aaf236d4126f03e8f24f5a75a6ecfb",
+      "result": {"acceptance": false, "verdict": "pass", "effectAuthority": "ai-reported", "outputSha256": "ece61350b26ec5045812ca9d72ff939cb5a3b644f1378b2c134fae0ed01a915f", "formatErrors": 1, "recoveryBranch": "none", "fallbackUsed": false, "failure": "invented skill-rails-next:verification markers instead of the canonical managed record"},
+      "cost": {"wallClockMs": 105300, "inputTokens": 210402, "cachedInputTokens": 181888, "outputTokens": 3054, "reasoningTokens": 1681, "toolCalls": 12, "userRoundTrips": 0, "usd": null},
+      "safetyViolations": [],
+      "unknowns": ["Exact USD cost was not reported by Codex CLI.", "Raw JSONL was observed in the coordinator terminal but not retained as a durable file."]
+    },
+    {
+      "runId": "claude-treatment-normal-pre-return-pointer",
+      "lane": "treatment",
+      "scene": "normal",
+      "host": {"adapter": "claude-code", "cliVersion": "2.1.270", "model": "claude-fable-5-1", "effort": "high", "permission": "auto/no-prompt"},
+      "skillTreeSha256": "ff75cd7454bb6362a18531bd88b2ad5aee4563536c29cbf649275a37917880dd",
+      "result": {"acceptance": true, "verdict": "pass", "effectAuthority": "observed", "outputSha256": "2972bb2c6e84468f7d2a397c6bab94be3cc543dad9e7cc84b18941163d38253b", "formatErrors": 0, "recoveryBranch": "none", "fallbackUsed": false},
+      "cost": {"wallClockMs": 80369, "inputTokens": 228, "cacheCreationInputTokens": 22178, "cacheReadInputTokens": 273973, "outputTokens": 2475, "thinkingTokens": 241, "toolCalls": 7, "userRoundTrips": 0, "usd": 0.63906025},
+      "safetyViolations": [],
+      "stageOwnerErrors": ["Read package.json, test/run.mjs, and src/bookmark-storage.mjs beyond the packet Read list."],
+      "unknowns": ["Normal host included existing user hooks and plugins; this is the requested standard host path, not an isolated causal estimate."]
+    },
+    {
+      "runId": "claude-control-normal",
+      "lane": "control",
+      "scene": "normal",
+      "host": {"adapter": "claude-code", "cliVersion": "2.1.270", "model": "claude-fable-5-1", "effort": "high", "permission": "auto/no-prompt"},
+      "controlSourceSha256": "dde7f3f8ee23044a8102c49e2d8e381ea8aaf236d4126f03e8f24f5a75a6ecfb",
+      "result": {"acceptance": false, "verdict": "pass", "effectAuthority": "ai-reported", "outputSha256": "4519f0db185bff35dfe1de0e7924eeeb8d1d64faca56887fb1e780729f116787", "formatErrors": 1, "recoveryBranch": "none", "fallbackUsed": false, "failure": "invented managed-begin/managed-end markers instead of the canonical managed record"},
+      "cost": {"wallClockMs": 53432, "inputTokens": 132, "cacheCreationInputTokens": 18335, "cacheReadInputTokens": 170509, "outputTokens": 1936, "thinkingTokens": 338, "toolCalls": 4, "userRoundTrips": 0, "usd": 0.50842425},
+      "safetyViolations": [],
+      "stageOwnerErrors": ["Read implementation and test files although the control baseline declared only four pilot files."],
+      "unknowns": ["Normal host included existing user hooks and plugins; this is the requested standard host path, not an isolated causal estimate."]
+    }
+  ],
+  "interpretation": "Both treatment runs produced the canonical managed record and both controls invented incompatible marker formats. Treatment cost was higher and one treatment exceeded its declared read list. These byte-specific preflight runs do not complete the M4 gate or support statistical generalization."
+}

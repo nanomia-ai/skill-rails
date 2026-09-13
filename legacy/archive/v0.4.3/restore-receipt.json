@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "capsuleSha256": "c79dcf45dc9ab520aa100e19ecf6ef95102d1a423c89c5090cadd40293db31fc",
+  "expectedMembers": 257,
+  "restoredMembers": 257,
+  "mismatches": [],
+  "byteHashStatus": "proven-on-this-host",
+  "gitModeStatus": "unproven-cross-host",
+  "gitModeNote": "All captured Git modes are 100644 and all restored entries are regular files; Windows extraction does not prove POSIX mode preservation on another host.",
+  "restoreRoot": ".tmp/m0-b-restore-v0.4.3"
+}

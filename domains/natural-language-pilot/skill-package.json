@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "packageId": "natural-language-pilot",
+  "packageVersion": "0.0.1",
+  "modules": {
+    "purpose": "modules/purpose.md",
+    "verifyBaseline": "modules/verify-baseline.md"
+  },
+  "targets": {
+    "verify-next": "targets/verify/target.json"
+  }
+}

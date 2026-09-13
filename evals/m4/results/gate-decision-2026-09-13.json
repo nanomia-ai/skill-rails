@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "status": "renderer-only-selected-for-next-milestone",
+  "protocolSha256": "d8deb8581f7e10cc38cd6d9f6a889fd4b1c1e955901e60b5fe8f57781a1fc114",
+  "decision": "renderer-only",
+  "decisionScope": "The natural-language bookmark-storage Verify pilot only; this does not generalize to other skills, targets, repositories, hosts, or fresh model versions.",
+  "candidateTreeSha256": "2ec356b8f99a81722fa45de07b6c2ba3ffa1f4c3f15f3aa936dedbc8b907848f",
+  "evidence": {
+    "pairedNormal": {
+      "receipt": "evals/m4/results/preflight-normal-2026-09-13.json",
+      "treatmentAcceptance": "2/2",
+      "controlAcceptance": "0/2",
+      "controlFailure": "Both hosts invented incompatible record markers.",
+      "limits": "The paired normal runs predate later bounded entry and packet corrections; they are byte-specific preflight evidence, not a current-tree statistical estimate."
+    },
+    "acceptedTreatmentScenes": [
+      {"scene": "unknown", "host": "codex", "receipt": "evals/m4/results/treatment-recovery-scenes-2026-09-13.json", "result": "unproven after one domain criterion correction"},
+      {"scene": "input-stale", "host": "codex", "receipt": "evals/m4/results/treatment-recovery-scenes-2026-09-13.json", "result": "no-write then fresh prepare and APPLIED"},
+      {"scene": "output-conflict", "host": "claude-code", "receipt": "evals/m4/results/treatment-recovery-scenes-2026-09-13.json", "result": "no-write then fresh prepare and APPLIED; bounded-read error retained"},
+      {"scene": "other-card-update", "host": "codex", "receipt": "evals/m4/results/other-card-update-codex-2026-09-13.json", "result": "other card payload and prefix byte-preserved"},
+      {"scene": "record-response-loss-retry", "host": "codex", "receipt": "evals/m4/results/response-loss-retry-codex-2026-09-13.json", "result": "one exact retry returned APPLIED_ALREADY with unchanged output hash"},
+      {"scene": "command-failure", "host": "codex", "receipt": "evals/m4/results/command-failure-unproven-codex-2026-09-13.json", "result": "unproven with reason after frozen-contract alignment"}
+    ],
+    "discardedOrFailedRevisions": [
+      {"receipt": "evals/m4/results/failed-unknown-codex-2026-09-13.json", "reason": "unsupported pass before unknown consequence was explicit"},
+      {"receipt": "evals/m4/results/failed-response-loss-codex-2026-09-13.json", "reason": "fresh agent stopped without idempotent retry"},
+      {"receipt": "evals/m4/results/failed-command-failure-claude-2026-09-13.json", "reason": "packet contradicted frozen unproven behavior and harness mislabeled the scene"}
+    ],
+    "fallback": {
+      "countedAsTreatmentWin": false,
+      "status": "unsuitable",
+      "receipts": ["evals/m4/results/failed-contaminated-fallback-claude-2026-09-13.json", "evals/m4/results/failed-fallback-format-claude-2026-09-13.json"],
+      "observed": "One run contaminated the lane by using treatment runtime; the bounded retest invented incompatible markers. No more prose was added."
+    },
+    "machineCost": {"receipt": "evals/m4/results/m1-m3-machine-cost-2026-09-13.json", "claim": "observed local counts and runtimes only; no economic win"}
+  },
+  "lexicographicGate": {
+    "acceptanceAndSafety": "Renderer/record treatment produced the canonical format where paired prose controls did not. Corrected treatment runs observed no silent loss, stale write, or effect-authority upgrade. Earlier unsafe or contract-mismatched revisions are rejected and retained, not erased.",
+    "costComparison": {
+      "codexNormal": {"treatmentInputTokens": 285182, "controlInputTokens": 210402, "treatmentWallClockMs": 90700, "controlWallClockMs": 105300, "usd": null},
+      "claudeNormal": {"treatmentUsd": 0.63906025, "controlUsd": 0.50842425, "treatmentWallClockMs": 80369, "controlWallClockMs": 53432},
+      "finding": "Prepare did not demonstrate lower total context or total cost. It also failed to keep Claude within the declared read surface in two treatment runs."
+    },
+    "result": "Per frozen section 9.7 item 5, retain the safe renderer/record value and do not expand prepare. The current prepare-record implementation remains an M1-M4 experiment artifact; renderer-only requires a deliberate M5 design/update before production expansion."
+  },
+  "maintenanceCost": {
+    "sourceEditToNormalInstalledUpperBoundMs": 151038,
+    "basis": {"latestInfluencingSourceMtime": "2026-09-13T11:53:23.300Z", "installedSkillMtime": "2026-09-13T11:55:54.338Z"},
+    "limits": "This observed upper bound includes coordinator analysis and receipt work between edit and install; it is not a controlled benchmark."
+  },
+  "measurementCompleteness": {
+    "fieldsPresent": ["acceptance", "safetyViolations", "stageOwnerErrors", "entryBytes", "packetBytes", "additionalReadBytes", "estimatedTokens", "toolCalls", "userRoundTrips", "wallClockMs", "machineRuntimeMs", "formatErrors", "staleWrites", "recordLoss", "recoveryBranch", "fallbackUsed", "unknowns"],
+    "nullOrUnproven": ["Codex USD cost", "separately emitted prepare/record runtime in early fresh runs", "exact read bytes and tool counts in pre-harness recovery runs", "statistical generalization", "final candidate hash exercised by both hosts in every scene"],
+    "policy": "A null or unavailable measurement is explicitly unproven and is not imputed from structure or another run."
+  },
+  "nextMilestoneConstraint": "M5 must not build a 9-target generator or Devflow integration on prepare-record as a proven baseline. If M5 proceeds, it must first materialize the renderer-only choice with one canonical source and repeat proportional fresh-agent checks."
+}

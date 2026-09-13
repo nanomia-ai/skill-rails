@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "status": "failed",
+  "runId": "claude-fallback-after-runtime-contamination-guard",
+  "lane": "fallback",
+  "scene": "prepare-failure-fallback",
+  "protocolSha256": "d8deb8581f7e10cc38cd6d9f6a889fd4b1c1e955901e60b5fe8f57781a1fc114",
+  "host": {"adapter": "claude-code", "cliVersion": "2.1.270", "model": "claude-fable-5-1", "effort": "high", "permission": "auto/no-prompt", "freshContext": true},
+  "skillTreeSha256": "09c371daafa62846e6fbcaff6ba8fe0a7579a35a635df79545d0aa566c16289c",
+  "faultTarget": {"originalObserverSha256": "aef50f4fd13be21f88ae983f9d85fb2d3b8477b187dfeb6a1cf078e2f9428a7a", "faultObserverSha256": "8f1c9cd63a097adb58c0e8d9a0aed2cb5ad2eb8b184363ce728ae4a1bcb4772e", "fallbackSourceSha256": "dde7f3f8ee23044a8102c49e2d8e381ea8aaf236d4126f03e8f24f5a75a6ecfb"},
+  "observed": {"prepareStatus": "PREPARE_FAILED", "fallbackOpenedAfterFailure": true, "declaredCommandExit": 0, "treatmentRuntimeReadOrInvoked": false},
+  "actual": {"fallbackUsed": true, "verdict": "pass", "outputSha256": "eaf79de185b7cc441f8eb4d51f04814aba6be87f8142eca33948d3acbc7da97e", "effectAuthority": "ai-reported", "prefixPreserved": true, "canonicalRecordCompatible": false, "inventedMarkers": ["skill-rails-next:managed-begin", "skill-rails-next:verification", "skill-rails-next:managed-end"]},
+  "failure": "The bounded fallback avoided treatment contamination but invented an incompatible record format, so fallback acceptance is false and the result cannot count toward treatment success.",
+  "cost": {"wallClockMs": 66226, "apiDurationMs": 37269, "inputTokens": 196, "cacheCreationInputTokens": 19289, "cacheReadInputTokens": 234616, "outputTokens": 2634, "thinkingTokens": 495, "toolCalls": 7, "userRoundTrips": 0, "usd": 0.579071},
+  "formatErrors": 1,
+  "stageOwnerErrors": ["Read package.json, test/run.mjs, and src/bookmark-storage.mjs although the fallback named only four pilot files."],
+  "safetyViolations": [],
+  "rawCapture": "evals/m4/results/raw/claude-treatment-fallback-v2-captured.json",
+  "decision": "Do not add more fallback prose. Treat the current fallback as unsuitable for a canonical managed-record update and keep it out of treatment wins.",
+  "retestCondition": "Reopen only if renderer-only is intentionally selected as a product mode with an explicit safe output contract; do not silently smuggle treatment runtime into fallback."
+}

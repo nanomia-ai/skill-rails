@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "targetId": "natural-language-pilot-verify-next",
+  "mode": "prepare-record",
+  "entry": "entry.md",
+  "imports": ["purpose"],
+  "fallbackModule": "verifyBaseline",
+  "domainConfig": "config.json",
+  "domainConfigSchema": "config.schema.json",
+  "packet": "packet.json",
+  "observer": "observer.mjs",
+  "renderer": "renderer.mjs",
+  "answerContract": "contracts/semantic-answer.verify.schema.json",
+  "declaredInputs": [
+    "pilot/brief.md",
+    "pilot/plan.md",
+    "pilot/progress.md",
+    "pilot/verification.md"
+  ],
+  "declaredOutput": "pilot/verification.md",
+  "outputMode": "managed-region",
+  "regionBootstrap": "append-managed-region"
+}

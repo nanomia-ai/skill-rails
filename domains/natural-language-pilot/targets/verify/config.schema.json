@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "natural-language-pilot/verify-config/1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "cardId", "verificationCommand"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "cardId": {"const": "bookmark-storage"},
+    "verificationCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["program", "args", "cwd"],
+      "properties": {
+        "program": {"const": "npm"},
+        "args": {"const": ["test", "--", "bookmark-storage"]},
+        "cwd": {"const": "."}
+      }
+    }
+  }
+}

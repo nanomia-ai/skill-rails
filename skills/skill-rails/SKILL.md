@@ -1,24 +1,26 @@
 ---
-name: skill-rails
-description: Create, migrate, maintain, diagnose, build, and evaluate drift-resistant AI-agent skills with the smallest sufficient P0/P1/P2 structure as one portable file-based package; current end-to-end adapter evidence covers Codex and Claude Code. Use when a skill must convert growing prose rules into maintainable executable mechanics, preserve migration provenance, generate platform-ready packages, or test trigger and behavior reliability.
+name: skill-rails-next
+description: Create and maintain standalone AI skills from canonical source packages when deterministic build, provenance, bounded inspection, or behavior-versus-effect evidence is required. Do not use archived Skill Rails or Devflow as a template or fallback.
 ---
+<!-- generated; do not edit; source: authoring/skill-rails/SKILL.source.md; receipt: .skill-rails-build.json -->
 
-# Skill Rails
+# Skill Rails Next
 
-The user's purpose and preferences guide the design; the selected profile and runtime contract govern execution until deliberately changed at their owning source. If they conflict, revisit the profile or canonical owner instead of forcing one through the other, and ask only when the resolution changes a product boundary or irreversible action. Rebuild generated projections after an approved change; never bypass mechanics, edit generated artifacts, or upgrade unproven evidence to success. Treat the generated package as the durable work surface; do not hold migration or generation state only in conversation.
+Build one standalone skill from a small canonical source graph while leaving genuine meaning judgments with the AI or user.
 
-Work on one target skill at a time and select its profile independently, never for an entire plugin or repository. Related skills may share repository-owned domain inputs and helpers, but each target package keeps behavior and judgment at its profile's canonical owners; never make one generated skill invoke another to obtain a shared contract. Read the related-skill guidance in [authoring-workflow.md](references/authoring-workflow.md).
+## Work from canonical source
 
-Before running a bundled script, resolve `<skill-root>` to the directory containing this `SKILL.md`. Use the host's discovered skill path when it exposes one. In Claude Code use `${CLAUDE_SKILL_DIR}`; in Codex use the absolute path supplied with the available-skill metadata. On another file-based host, resolve the active `SKILL.md` location before running a command. Never resolve scripts relative to the user's working project, and stop if the host does not expose a stable skill location.
+- Change the source package, target, modules, domain adapter, or contract that owns the behavior. Never hand-edit a generated target carrying `.skill-rails-build.json`.
+- Use exact IDs and paths. Do not infer requirement, check, effect, or causal relationships that the source graph does not declare.
+- Treat missing behavioral or host evidence as `unproven`; build and integrity checks prove delivery only.
+- Do not import archived Skill Rails or Devflow as an implementation baseline, compatibility layer, or runtime fallback.
 
-When the task is to understand, diagnose, resume, or change an already-existing target skill package, read the Maintenance section of [authoring-workflow.md](references/authoring-workflow.md) and begin from its read-only `--describe` view of current bytes. New-skill creation still begins from intent; it has no target package to describe.
+## Repository operations
 
-1. Capture or update an intent brief from [intent-brief.json](templates/intent-brief.json); its eleven requirement fields are the input contract. A `judgment_points` entry may remain an always-visible string or declare an independently routed `{ id, when, points }` topic. Read [authoring-workflow.md](references/authoring-workflow.md) for creation or maintenance.
-2. Choose the smallest sufficient profile: P0 for judgment-only guidance, P1 for exact formats or deterministic helpers without stateful branching, or P2 for repeated state-dependent guards, stages, ordered effects, and evidence gates.
-3. For P2 work, read [p2-contract.md](references/p2-contract.md). Keep `spec.mjs` as the only behavior source and keep judgment in `body.md`. Its `SPEC.version = "5"` lineage is a compatibility boundary, not the Skill Rails package version.
-4. For prose conversion, read [migration.md](references/migration.md). Create the atom ledger before deleting or rewriting source meaning.
-5. Generate with `node "<skill-root>/scripts/init.mjs" --intent <intent.json> --out <folder> [--profile auto|p0|p1|p2]` or migrate with `node "<skill-root>/scripts/migrate.mjs" --source <skill-folder> --out <folder>`. Treat generated P1/P2 output as a scaffold, not a finished skill.
-6. Maintain an intent-backed P0/P1 or P2 package with `node "<skill-root>/scripts/maintain.mjs" --skill <folder> --change <change.json>`. P0/P1 accepts intent-only changes, refuses profile changes and hand-edited intent projections, and preserves separately authored helpers and files. P2 uses stable-ID operations and emits a semantic impact report. Read the maintenance rules in [authoring-workflow.md](references/authoring-workflow.md) before accepting generated edits.
-7. Replace every marked scaffold with approved user-specific behavior and tests. Resolve each `.skill-rails/obligation-ledger.json` atom to stable target and evidence locators; never clear the final P2 `DEFERRED` item while any atom remains `review-required`. Run fast lint after a coherent edit set, or earlier when it can falsify a live assumption; do not force a lint cycle after every small edit. If a failed check would make you change authored behavior to clear it, first use the failed-check guidance in [authoring-workflow.md](references/authoring-workflow.md). Once the design and authored behavior logically converge, run full lint and build P2 before execution.
-8. Read [evaluation.md](references/evaluation.md) and run `node "<skill-root>/scripts/eval.mjs" --skill <folder>` before claiming behavior quality. Missing execution evidence is `unproven`, not success.
-Never edit generated artifacts behind `.generated.json` by hand. Change their canonical source and rebuild. If validation, manifest verification, or the runtime tool fails, stop and report the exact diagnostic instead of reconstructing a decision from prose.
+In a Skill Rails Next source repository:
+
+1. Inspect a known node with `node src/core/cli.mjs inspect --source <manifest> --id <exact-id> --json` or the exact `--path` form.
+2. Build all targets with `node src/core/cli.mjs build --source <manifest> --out-root <dist-root>`, or one target with the documented `--target` and `--out` form.
+3. Check artifact integrity separately from source currentness. Neither check establishes fresh-agent behavior or external effect.
+
+This alpha entry covers the source/build boundary. Runtime adoption and broader authoring guidance remain gated by the recorded pilot evidence.

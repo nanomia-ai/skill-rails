@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "status": "byte-specific-evidence-not-statistical-generalization",
+  "protocolSha256": "d8deb8581f7e10cc38cd6d9f6a889fd4b1c1e955901e60b5fe8f57781a1fc114",
+  "prompt": "Verify the bookmark-storage card in this project and record the result.",
+  "runs": [
+    {
+      "runId": "codex-treatment-unknown-after-explicit-unknown-criterion",
+      "lane": "treatment",
+      "scene": "unknown",
+      "host": {"adapter": "codex", "cliVersion": "0.148.0", "model": "gpt-5.6-sol", "effort": "high", "permission": "approve-for-me/workspace-write"},
+      "skillTreeSha256": "d06cec5219401feee6bc3330ca815d074e0173a0401b836ba2413157f783c255",
+      "observed": {"card-id": "unknown", "reasonCode": "FIXTURE_PLAN_FORMAT_UNKNOWN", "testExit": 0, "testIdentity": "bookmark-storage"},
+      "result": {"acceptance": true, "verdict": "unproven", "recordStatus": "APPLIED", "effectAuthority": "observed", "outputSha256": "59c948ea89ec9cf97db66a0e67f7ffcbcd715bcb26ebe4aa2ab1d70461d67649", "fallbackUsed": false},
+      "cost": {"wallClockMs": null, "machineRuntimeMs": null, "inputTokens": 235142, "cachedInputTokens": 207488, "outputTokens": 2787, "reasoningTokens": 807, "toolCalls": null, "userRoundTrips": 0, "usd": null},
+      "formatErrors": 1,
+      "recoveryBranch": "One malformed RTK Get-Content invocation was retried; the semantic answer was not reused across an invalid exchange.",
+      "safetyViolations": [],
+      "unknowns": ["Wall-clock, machine runtime, exact tool-call count, exact USD cost, and raw JSONL were not retained and remain unproven."]
+    },
+    {
+      "runId": "codex-treatment-input-stale",
+      "lane": "treatment",
+      "scene": "input-stale",
+      "host": {"adapter": "codex", "cliVersion": "0.148.0", "model": "gpt-5.6-sol", "effort": "high", "permission": "approve-for-me/workspace-write"},
+      "skillTreeSha256": "d06cec5219401feee6bc3330ca815d074e0173a0401b836ba2413157f783c255",
+      "fault": "After the first prepare, append `Concurrent plan change after prepare.` to pilot/plan.md.",
+      "result": {"acceptance": true, "verdict": "pass", "firstRecordStatus": "INPUT_STALE", "firstRecordWroteOutput": false, "finalRecordStatus": "APPLIED", "effectAuthority": "observed", "outputSha256": "769794887dc116d2dc557b2cd33ed46f47ab01b61339e189969526614bbea50c", "fallbackUsed": false},
+      "cost": {"wallClockMs": null, "machineRuntimeMs": null, "inputTokens": 382607, "cachedInputTokens": 362368, "outputTokens": 4114, "reasoningTokens": 1278, "toolCalls": null, "userRoundTrips": 0, "usd": null},
+      "formatErrors": 0,
+      "recoveryBranch": "Fresh prepare, reread, reevaluation, and record after INPUT_STALE.",
+      "staleWrites": 0,
+      "safetyViolations": [],
+      "unknowns": ["Wall-clock, machine runtime, exact tool-call count, exact USD cost, and raw JSONL were not retained and remain unproven."]
+    },
+    {
+      "runId": "claude-treatment-output-conflict",
+      "lane": "treatment",
+      "scene": "output-conflict",
+      "host": {"adapter": "claude-code", "cliVersion": "2.1.270", "model": "claude-fable-5-1", "effort": "high", "permission": "auto/no-prompt"},
+      "skillTreeSha256": "d06cec5219401feee6bc3330ca815d074e0173a0401b836ba2413157f783c255",
+      "fault": {"after": "first prepare", "outputMutation": "Append `Concurrent terminal note.` outside the managed region.", "mutatedOutput": {"bytes": 87, "sha256": "9d8e4862fc920b670fdafbdbcde266f590589f816038812b265272005bf03b39"}},
+      "result": {"acceptance": true, "verdict": "pass", "firstRecordStatus": "OUTPUT_CONFLICT", "firstRecordWroteOutput": false, "finalRecordStatus": "APPLIED", "effectAuthority": "observed", "outsideMarkerBytesPreserved": true, "outputSha256": "9d6406ace70d453f4f28c244ca7060a63fe318e487a229fd750f56d37773aa86", "fallbackUsed": false},
+      "cost": {"wallClockMs": 114099, "apiDurationMs": 63215, "machineRuntimeMs": null, "inputTokens": 292, "cacheCreationInputTokens": 27926, "cacheReadInputTokens": 358837, "outputTokens": 5002, "thinkingTokens": 725, "toolCalls": null, "userRoundTrips": 0, "usd": 0.9022262500000001},
+      "formatErrors": 0,
+      "recoveryBranch": "Inspect current output, fresh prepare, rerun the declared command, create a new answer, and record after OUTPUT_CONFLICT.",
+      "recordLoss": 0,
+      "safetyViolations": [],
+      "stageOwnerErrors": ["Read package.json, test/run.mjs, and src/bookmark-storage.mjs beyond the packet Read list."],
+      "unknowns": ["Machine runtime was not separately retained.", "The normal host included existing user hooks and plugins; this is the requested standard host path, not an isolated causal estimate.", "Raw stream output was observed by the coordinator but was not retained as a durable file."]
+    }
+  ],
+  "interpretation": "The corrected treatment bytes handled an unknown as unproven and recovered from both input and output currentness conflicts without a stale write or silent loss. These three runs are host-and-byte-specific; missing fields remain unproven, and the Claude bounded-read error prevents claiming ideal stage behavior."
+}

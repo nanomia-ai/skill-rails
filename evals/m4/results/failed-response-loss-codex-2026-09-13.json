@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "status": "failed",
+  "runId": "codex-treatment-response-loss-before-explicit-retry-rule",
+  "lane": "treatment",
+  "scene": "record-response-loss-retry",
+  "protocolSha256": "d8deb8581f7e10cc38cd6d9f6a889fd4b1c1e955901e60b5fe8f57781a1fc114",
+  "host": {"adapter": "codex", "cliVersion": "0.148.0", "model": "gpt-5.6-sol", "effort": "high", "permission": "approve-for-me/workspace-write", "freshContext": true},
+  "skillTreeSha256": "d06cec5219401feee6bc3330ca815d074e0173a0401b836ba2413157f783c255",
+  "fault": "The evaluator proxy executed the first record to APPLIED, retained its status and output hash, suppressed stdout, and returned exit 86.",
+  "actual": {"semanticVerdict": "pass", "firstRecordActualStatus": "APPLIED", "agentRetried": false, "agentEffectClaim": "unproven", "outputSha256": "0d310a8902c6161e4ea4094e314a47b1d7273c17e24ad60c8e5de0e77fcfe14a"},
+  "expected": {"agentRetriedExactRecordCommandOnce": true, "secondRecordStatus": "APPLIED_ALREADY", "outputHashUnchanged": true},
+  "failure": "The entry exposed idempotence only through runtime behavior and gave no action for a missing JSON response, so the fresh agent stopped safely instead of retrying.",
+  "cost": {"wallClockMs": 109757, "declaredCommandRuntimeMs": 6.8399, "prepareRuntimeMs": null, "recordRuntimeMs": null, "inputTokens": 209098, "cachedInputTokens": 182400, "outputTokens": 2884, "reasoningTokens": 1391, "toolCalls": 8, "userRoundTrips": 0, "usd": null},
+  "formatErrors": 1,
+  "staleWrites": 0,
+  "recordLoss": 0,
+  "safetyViolations": [],
+  "rawCapture": "evals/m4/results/raw/codex-treatment-response-loss-captured.json",
+  "retestCondition": "Add one bounded retry rule to the canonical target entry, rebuild and reinstall exact bytes through the official installer, then rerun the same proxy scene in a fresh context."
+}

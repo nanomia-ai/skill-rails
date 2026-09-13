@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "packageId": "skill-rails-authoring",
+  "packageVersion": "1.0.0-alpha.1",
+  "modules": {},
+  "targets": {
+    "authoring": "authoring/skill-rails/targets/authoring/target.json"
+  }
+}
