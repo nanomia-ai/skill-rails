@@ -54,7 +54,23 @@ flowchart LR
     C --> D["Safer maintenance"]
 ```
 
-### 3. Can every part of a skill be turned into code?
+### 3. How do you understand a skill once its structure becomes complex?
+
+As a skill grows, its purpose may live in prose, its behavior in code and templates, and its verification evidence in fixtures and tests. Opening those files one by one makes it difficult to understand the whole structure and the impact of a change.
+
+Skill Rails reads the skill's current source and produces a structure map for people and relationship context for AI exploration. A person can quickly understand the skill's purpose, major components, and the responsibility of each part. An AI can move from the item being changed to its actual source, connected consumers, and verification material, reducing both repeated investigation and missed relationships.
+
+The map is not stored as another source of truth. It is recalculated from the current source, reducing the risk of treating an outdated explanation as current fact after the skill changes. External relationships and runtime behavior that cannot be established from the current source remain visible as boundaries that require further inspection rather than being presented as complete.
+
+```mermaid
+flowchart LR
+    A["Current skill source"] --> B["Structure map for people"]
+    A --> C["Relationship context for AI"]
+    B --> D["Understand components and roles"]
+    C --> E["Navigate to source, consumers, and checks"]
+```
+
+### 4. Can every part of a skill be turned into code?
 
 - AI agents read text to obtain the purpose, background, and criteria needed for active judgment. Skill Rails does not replace that judgment. It gives the AI agent scripts containing the major execution logic as tools it can use.
 - Outputs that must follow a defined form are separated into templates. The template owns the exact output shape, while mechanically checkable parts connect to scripts and tests, so the AI does not have to reconstruct the format from prose on every use.
@@ -72,7 +88,7 @@ flowchart TD
     E --> G["Expose only the current action and evidence"]
 ```
 
-### 4. What changes when you develop and use a skill with Skill Rails?
+### 5. What changes when you develop and use a skill with Skill Rails?
 
 - The AI agent reads only what the current situation requires, optimizing its context use.
 - Mechanically decidable execution logic runs through tested scripts, making the result more trustworthy than relying on prose interpretation alone.
@@ -89,7 +105,7 @@ flowchart LR
 
 This structure does not guarantee that AI drift will never occur. It creates a path that is harder to drift from and improves the chance of detecting and correcting departures at meaningful completion boundaries.
 
-### 5. What else does Skill Rails provide?
+### 6. What else does Skill Rails provide?
 
 - Skill Rails includes guidelines for preventing recurring problems in skill development and a harness derived from real failure cases. This harness is not an answer key that grows through endless exceptions. It gives the AI judgment criteria for understanding the purpose and background and reaching a fundamental, natural solution.
 - When work benefits from separated roles, you can start with a concise default: overall coordination and supervision, integrated implementation, premise challenge and cross-checking, and final whole-result review. Roles are not forced automatically, and an agent does not claim one for itself. They activate only when a user or an authorized delegating agent explicitly assigns them. A user's different structure or model assignment takes precedence.
@@ -147,6 +163,13 @@ Port an existing prose skill without modifying the source.
 node "<skill-rails>/scripts/migrate.mjs" --source ./old-skill --out ./ported-skill
 ```
 
+When inspecting an existing skill, use the first command for a human-readable overview and the second to find evidence connected to a specific change point.
+
+```bash
+node "<skill-rails>/scripts/maintain.mjs" --skill ./my-skill --describe --map
+node "<skill-rails>/scripts/maintain.mjs" --skill ./my-skill --describe --query "<owner-or-interest>" --json
+```
+
 Validate and evaluate the generated result.
 
 ```bash
@@ -161,9 +184,9 @@ Skill Rails is an authoring system for creating and maintaining one skill at a t
 
 The P2 runtime calculates and validates allowed actions, required evidence, and the next Decision from the current state. It does not perform the domain work itself or control the host tool's permissions.
 
-### Human-readable visualization is not implemented yet
+### What the maintenance map can show
 
-Skill Rails can distribute prose across multiple files and move some logic into code, which can make it difficult for people to see at a glance how the skill is currently structured and how it works internally. A human-readable view explaining what the prose and code are each responsible for, and how the current structure and execution flow connect, through concise text and visuals is planned, but it is not implemented yet.
+The maintenance map shows structures and declared relationships that can be established from the current source of one skill package. It is not a complete system map that automatically proves every relationship across a repository, the meaning of external documents, or actual runtime behavior. Unverified areas remain visible, so the referenced source and external boundaries still need direct inspection when they matter.
 
 ## Documentation
 
