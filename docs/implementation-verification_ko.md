@@ -421,4 +421,14 @@
 - 비추적 empty `.agents/skills/`와 `.tmp/`는 파일 0개와 exact repository-local path를 확인한 뒤 제거했다. 이는 installed skill이나 legacy evidence 삭제가 아니다.
 - Generated receipt의 기존 `packageId`, `packageVersion`, `coreVersion`, `targetId`, `treeSha256`를 source-side `check`와 installed `scripts/run.mjs check`가 함께 반환하도록 했다. 새 version 파일, module별 version, remote-latest 추정이나 registry dependency는 추가하지 않았다. Targeted build test 13/13은 source check와 standalone copied target 양쪽의 `natural-language-pilot@0.0.1`, core `1.0.0` 자기 식별을 확인했다.
 
-이 closure는 기존 행동·effect·비용 evidence를 넓히지 않는다. 특히 진화 방법의 인과적 이익과 broad host repeatability는 계속 `unproven`이다. Root와 authoring package version은 새 architecture의 첫 안정 계약인 `1.0.0`을 유지하며 commit, push, Git tag와 host 재설치는 별도 승인 전까지 수행하지 않는다. 결정과 재검토 조건은 E-036이 소유한다.
+이 closure는 기존 행동·effect·비용 evidence를 넓히지 않는다. 특히 진화 방법의 인과적 이익과 broad host repeatability는 계속 `unproven`이다. Root와 authoring package version은 새 architecture의 첫 안정 계약인 `1.0.0`을 유지한다. 이 검사 시점에 아직 수행하지 않았던 commit, push, Git tag와 host 재설치의 후속 결과는 다음 절이 소유하고, 명칭 결정과 재검토 조건은 E-036이 소유한다.
+
+## v1.0.0 release closure — repository tag와 두 host 재설치 완료
+
+- Release commit `213245ec9f711027431869e907d2d246d2cf41c6`을 `origin/main`에 non-force fast-forward했고 annotated tag object `ed9f931ae2a09da67e7ccc6704c2227abc6c7d9a`의 peeled commit이 release commit과 같음을 local과 `git ls-remote`에서 확인했다.
+- 공식 전달 경로는 npm package publish가 아니라 README의 `npx skills@latest add nanomia-ai/skill-rails` repository install이다. `skills@1.5.26`으로 global scope에서 `skill-rails` 하나와 Codex·Claude Code를 명시해 설치했으며 installer skill hash는 `ec0d5e4c465c37bc359ff03ceef99a79bb3250fdb963b1e867179be39e6023f3`다.
+- Codex의 `~/.agents/skills/skill-rails`는 installed directory이고 Claude의 `~/.claude/skills/skill-rails`는 그 exact directory를 가리키는 junction이다. 양쪽 view는 36 files/202,763B, receipt file SHA-256 `f3af08ec5587568bfe83684fbd0fa6ea4a603fe71c2d089aea86f204f4846344`로 같고 installed `check`가 `skill-rails-authoring@1.0.0`, core `1.0.0`, target `skill-rails`, tree `e26b637ad076a66971cda8a18405262fc70d3320d9d590dcd3c4cd3fde17fcc7`, `ARTIFACT_INTACT`를 반환했다.
+- `CODEX_HOME`은 기존 `C:/Users/joinj/AppData/Roaming/orca/codex-runtime-home/home`에서 바꾸지 않았다. Installer assessment는 Gen safe, Socket 1 alert, Snyk low였고 출력에 alert 원인 상세가 없으므로 해석하지 않는다. 설치 전 discovery probe 하나는 installer가 `--list`와 `--json` 결합을 지원하지 않아 실패했지만, 지원되는 `--list`는 public repository에서 active skill 하나만 찾았고 실제 install과 두 runtime check는 성공했다.
+- 최종 source tree의 `npm run verify`는 31/31, 보존된 historical M5 harness 자기검사는 5/5 통과했다. `npm pack --dry-run --json`은 39 entries, packed 64,052B/unpacked 228,143B이며 설치 payload에는 README, package metadata와 generated `skills/skill-rails/`만 있고 legacy, evals, fixtures, authoring source와 repository tests는 없다.
+
+이 release closure가 새로 proven으로 만드는 것은 exact public commit/tag 전달, 두 이름 붙인 host의 같은 installed bytes와 version 자기 식별뿐이다. Fresh Devflow 저작·장기 update·remote latest 판정과 다른 host/model 반복성은 이 설치 smoke만으로 proven으로 올리지 않는다.

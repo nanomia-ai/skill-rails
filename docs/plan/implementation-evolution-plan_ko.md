@@ -747,7 +747,7 @@ Release 직전 local-link 감사에서 두 동결 plan의 기존 guide 상대 �
 
 ## E-037 — 설치 artifact의 package와 builder version은 기존 receipt에서 함께 조회
 
-상태: **v1.0.0 release closure에 반영 — repository release와 재설치 대기**
+상태: **v1.0.0 release closure와 두 host 재설치 완료**
 
 ### 실제 문제와 evidence
 
@@ -760,3 +760,5 @@ Generated target의 `.skill-rails-build.json`에는 이미 `packageVersion`과 a
 ### 검증과 재검토 조건
 
 Targeted `tests/build.test.mjs` 13/13은 source currentness 검사와 source repository 없이 복사된 standalone target의 package/core version을 확인했다. Canonical rebuild 뒤 production authoring target은 36 files/202,763B, tree `e26b637ad076a66971cda8a18405262fc70d3320d9d590dcd3c4cd3fde17fcc7`로 artifact-intact/source-current이고 source-side와 installed check가 모두 `skill-rails-authoring@1.0.0`, core `1.0.0`을 반환했다. 이는 설치 artifact의 자기 식별만 proven으로 만들며 remote latest, installer가 선택한 Git commit 또는 update availability는 계속 `null`/`unproven`이다. 향후 installer가 검증 가능한 source commit을 artifact에 전달하는 공식 계약을 제공할 때만 remote release identity 확장을 재검토한다.
+
+사용자 승인 뒤 release commit `213245ec9f711027431869e907d2d246d2cf41c6`과 annotated `v1.0.0` tag를 origin에 push하고 `skills@1.5.26`의 normal repository path로 Codex·Claude Code를 재설치했다. 두 host가 보는 36-file bytes, receipt hash와 installed `check` 결과가 같고 `CODEX_HOME`은 불변이다. Exact 설치 영수증과 좁은 claim은 `docs/implementation-verification_ko.md`의 v1.0.0 release closure 절이 소유한다.
