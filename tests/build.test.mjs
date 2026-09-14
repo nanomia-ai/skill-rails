@@ -61,7 +61,7 @@ test("Product target builds standalone and is source-current", async (t) => {
   assert.equal(checked.json.sourceCurrent, true);
   assert.equal(checked.json.packageId, "natural-language-pilot");
   assert.equal(checked.json.packageVersion, "0.0.1");
-  assert.equal(checked.json.coreVersion, "1.0.0");
+  assert.equal(checked.json.coreVersion, "1.0.1");
 });
 
 test("a Verify-only source change leaves the actual Product target current", async (t) => {
@@ -91,6 +91,11 @@ test("authoring target materializes the skill evolution method and a semantic-fr
   assert.equal(coreCli("build", "--source", "authoring-package.json", "--target", "skill-rails", "--out", right).status, 0);
   const original = await readFile(resolve(repositoryRoot, "docs/guide/ai-skill-evolution-method_ko.md"));
   assert.deepEqual(await readFile(join(left, "references", "skillEvolutionMethod.md")), original);
+  const entry = await readFile(join(left, "SKILL.md"), "utf8");
+  assert.match(entry, /smallest complete always-read contract/u);
+  assert.match(entry, /real task can safely skip it/u);
+  assert.match(entry, /never separate meanings that must be judged together/u);
+  assert.match(entry, /mechanically decidable safety checks/u);
   assert.deepEqual(await readFile(join(left, "references", "skillEvolutionMethod.index.json")), await readFile(join(right, "references", "skillEvolutionMethod.index.json")));
   const index = JSON.parse(await readFile(join(left, "references", "skillEvolutionMethod.index.json"), "utf8"));
   assert.equal(index.source.sha256, sha256(original));
@@ -170,7 +175,7 @@ test("copied target checks integrity without repository or sibling skill access"
   assert.equal(checked.json.status, "ARTIFACT_INTACT");
   assert.equal(checked.json.packageId, "natural-language-pilot");
   assert.equal(checked.json.packageVersion, "0.0.1");
-  assert.equal(checked.json.coreVersion, "1.0.0");
+  assert.equal(checked.json.coreVersion, "1.0.1");
   assert.equal(checked.json.sourceCurrent, null);
   assert.equal(checked.json.remoteLatest, null);
 });

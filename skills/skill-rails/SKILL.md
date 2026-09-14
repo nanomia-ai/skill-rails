@@ -12,7 +12,7 @@ Before making an authoring or maintenance judgment, read §§0–0.1 of `referen
 
 ## Work from canonical source
 
-- Change the source package, target, modules, domain adapter, or contract that owns the behavior. Never hand-edit a generated target carrying `.skill-rails-build.json`.
+- Change the source package, target, module, observer, renderer, or contract that owns the behavior. Never hand-edit a generated target carrying `.skill-rails-build.json`.
 - Put domain meaning in one canonical domain source, never in generated output or runtime state.
 - Declare only the source modules, imports, inputs, output, contracts, and mechanism files the target actually consumes. The build fails closed on unknown fields, undeclared paths, root escapes, and unsupported combinations.
 - Use exact IDs and paths. Do not infer requirement, check, effect, or causal relationships that the source graph does not declare.
@@ -23,9 +23,9 @@ Before making an authoring or maintenance judgment, read §§0–0.1 of `referen
 
 1. State the user burden to remove, the meaning that must remain with the AI or user, the observable result, and what stays out of scope.
 2. Compare the smallest viable forms. Prefer a prose target when the work is primarily judgment or host action. Use `record-only` only when one declared output benefits from a deterministic renderer, basis recheck, lock, and reread authority. Do not adopt `prepare-record` or fallback as a new product path; those paths remain historical evaluation evidence.
-3. Give every purpose, domain rule, input/output declaration, renderer, contract, and evidence claim one canonical owner. Add only the package manifest, target descriptor, entry, and mechanism files the chosen target actually consumes.
-4. Keep the entry short: say when to use the target, name the current inputs and completion evidence, and point to exact commands or sources. Put reusable domain meaning in imported modules and deterministic format or safety work in the renderer/core instead of repeating either in the entry.
-5. Inspect the package or target by exact ID before editing, then inspect the changed owner and its consumers. If the graph reports a gap, leave it explicit unless an observed maintenance failure justifies a new colocated edge.
+3. Give every purpose, domain rule, input/output declaration, renderer, contract, and evidence claim one canonical owner. Add only the package manifest, target descriptor, entry, imported modules, and mechanism files the chosen target actually consumes.
+4. Keep the entry as the smallest complete always-read contract: state the purpose and use trigger, common rules or unconditional pointers to their shared owners, current inputs, completion evidence, and the exact read condition for each optional module. A rule shared by multiple targets has one canonical module owner; every consuming entry points to it, unconditionally when every run needs it. Move other content to a whole-file module only when a real task can safely skip it and the saved reading exceeds navigation and rereading cost; never separate meanings that must be judged together. Put deterministic formatting and mechanically decidable safety checks in the renderer/core; keep semantic safety and permission judgments with the domain source, AI, or user.
+5. Inspect the package or target by exact ID before editing, then inspect the changed owner and its consumers. If inspection shows no declared relation, leave the gap explicit. Add a relation only at its canonical owner and only after an observed maintenance failure shows that it is needed.
 6. Build one target first, review its receipt and generated diff, and verify deterministic delivery and currentness. Test from a standalone copy; an artifact or hash check does not prove that a fresh AI understood or used it.
 7. At the adoption or release gate, run the smallest realistic fresh-use observation that can change the decision and reread the actual effect. Record `proven`, `failed`, and `unproven` separately; do not grow a matrix after the decision is already bounded.
 

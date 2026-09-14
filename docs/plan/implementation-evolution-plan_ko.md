@@ -762,3 +762,25 @@ Generated target의 `.skill-rails-build.json`에는 이미 `packageVersion`과 a
 Targeted `tests/build.test.mjs` 13/13은 source currentness 검사와 source repository 없이 복사된 standalone target의 package/core version을 확인했다. Canonical rebuild 뒤 production authoring target은 36 files/202,763B, tree `e26b637ad076a66971cda8a18405262fc70d3320d9d590dcd3c4cd3fde17fcc7`로 artifact-intact/source-current이고 source-side와 installed check가 모두 `skill-rails-authoring@1.0.0`, core `1.0.0`을 반환했다. 이는 설치 artifact의 자기 식별만 proven으로 만들며 remote latest, installer가 선택한 Git commit 또는 update availability는 계속 `null`/`unproven`이다. 향후 installer가 검증 가능한 source commit을 artifact에 전달하는 공식 계약을 제공할 때만 remote release identity 확장을 재검토한다.
 
 사용자 승인 뒤 release commit `213245ec9f711027431869e907d2d246d2cf41c6`과 annotated `v1.0.0` tag를 origin에 push하고 `skills@1.5.26`의 normal repository path로 Codex·Claude Code를 재설치했다. 두 host가 보는 36-file bytes, receipt hash와 installed `check` 결과가 같고 `CODEX_HOME`은 불변이다. Exact 설치 영수증과 좁은 claim은 `docs/implementation-verification_ko.md`의 v1.0.0 release closure 절이 소유한다.
+
+## E-038 — module 분할은 깊이나 길이가 아니라 실제 safe-skip과 순읽기 이익으로 결정
+
+상태: **v1.0.1 candidate 구현·bounded 교차 검토 완료 — release 작업 대기**
+
+### 실제 문제와 evidence
+
+Current source graph와 generated target은 entry, whole-file imports와 shared module owner를 지원한다. 그러나 canonical authoring entry는 entry를 짧게 하고 reusable meaning을 module로 옮기라고만 해, cold author가 “짧음”을 불완전한 entry로 해석하거나 문서 길이·주제만으로 항상 함께 판단해야 할 의미까지 분리할 가능성이 있었다. Module을 자동 semantic tree로 자르는 기능이나 2·3차 dependency 깊이의 부족이 아니라, 이미 있는 단순 구조의 선택 조건이 충분히 직접적이지 않은 문제다.
+
+### 영향받는 계약과 보존 목적
+
+영향은 shipped authoring prompt의 entry/module granularity와 semantic/mechanical safety boundary뿐이다. Source/target schema, whole-file materialization, build/currentness, standalone copy와 installed runtime은 바꾸지 않는다. 모든 실행의 목적·공통 규칙·입력·완료 의미를 함께 이해시키면서 실제로 불필요한 조건부 prose만 읽기 면에서 제거하고, 깊은 router·자동 semantic splitter·형식 필드를 추가하지 않는 목적을 보존한다.
+
+### 검토한 대안과 선택
+
+길이·heading threshold는 함께 판단해야 할 의미를 자를 수 있고, nested module graph나 자동 분할기는 새 routing owner와 왕복을 만든다. 반대로 기존 한 문장만 유지하면 저작 AI가 safe-skip 여부와 navigation cost를 명시적으로 비교하지 않을 수 있다. 따라서 entry를 최소 완전 always-read contract로 정의하고, 실제 작업이 해당 whole-file module을 안전하게 건너뛸 수 있으며 절감 읽기가 탐색·재읽기 비용보다 클 때만 분리한다. Optional module의 정확한 read condition은 consuming entry가 밝히고, 공통 의미는 한 module owner가 소유한다. 함께 판단해야 할 의미는 길이와 관계없이 나누지 않는다.
+
+### 교차 검토·검증과 재검토 조건
+
+초기 Codex 계열 읽기 전용 검토는 imported module 누락과 의미적 `safety work`의 기계 계층 오배치 위험을 찾았고 둘 다 같은 좁은 patch에 반영했다. Coordinator는 불투명한 `colocated edge`를 같은 의미의 평문으로 바꿨다. 서로 다른 계열의 독립 검토를 위해 기존 Claude Fable 5 세션에 현재 diff와 owner만 읽는 반증 검토를 다시 배정했다. Fable은 PASS와 known defect 0건을 보고하면서 공통 규칙을 entry에 직접 둘지 shared owner를 가리킬지 한 구절의 선택적 모호성만 지적했고, 이를 `common rules or unconditional pointers to their shared owners`로 좁혔다. 그 밖에는 수정하지 않았으며 새 schema·runtime·matrix를 열지 않았다. Targeted build test 13/13, 현재 exact bytes의 기본 suite 31/31과 generated tree `dae3260e5b1c4e9c76068b5a38fb3f4fd9dd0ef2c872c214c332f9030f2a04e7`의 artifact-intact/source-current가 통과했다.
+
+이 변경은 새 AI 행동이나 비용 우위를 구조 검사로 주장하지 않는다. 첫 실제 Devflow target에서 entry가 불완전하거나 optional module을 매번 읽거나 의미 결합이 끊기는 관찰이 생기면 문구 owner로 돌아온다. 그런 관찰 없이 더 깊은 module graph, 자동 splitter나 추가 검증 matrix를 열지 않는다.

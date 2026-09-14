@@ -432,3 +432,13 @@
 - 최종 source tree의 `npm run verify`는 31/31, 보존된 historical M5 harness 자기검사는 5/5 통과했다. `npm pack --dry-run --json`은 39 entries, packed 64,052B/unpacked 228,143B이며 설치 payload에는 README, package metadata와 generated `skills/skill-rails/`만 있고 legacy, evals, fixtures, authoring source와 repository tests는 없다.
 
 이 release closure가 새로 proven으로 만드는 것은 exact public commit/tag 전달, 두 이름 붙인 host의 같은 installed bytes와 version 자기 식별뿐이다. Fresh Devflow 저작·장기 update·remote latest 판정과 다른 host/model 반복성은 이 설치 smoke만으로 proven으로 올리지 않는다.
+
+## v1.0.1 candidate — entry와 module 분할 계약 명료화
+
+- 사용자의 실제 사용 전 질문에서 현재 source graph가 entry와 shared/target module을 분리할 수 있지만, canonical authoring entry가 “언제 분리하고 언제 함께 둘지”를 직접 닫지 않아 cold author가 길이나 주제만으로 분할하거나 optional module의 read condition을 생략할 여지가 확인됐다. 이는 새 tree 기능의 부재가 아니라 기존 whole-file module 경계의 전달 결함이다.
+- Canonical step 4는 entry를 목적·사용 trigger·직접 둔 공통 규칙 또는 그 shared owner를 향한 unconditional pointer·현재 입력·완료 evidence·각 optional module의 정확한 read condition을 함께 두는 최소 완전 always-read contract로 정의한다. 실제 작업이 의미 손실 없이 module을 건너뛸 수 있고 절감 읽기가 탐색·재읽기 비용보다 클 때만 whole-file module로 옮기며, 함께 판단해야 할 의미는 나누지 않는다. 여러 target의 같은 규칙은 module owner 하나가 소유하고 각 consumer entry가 실제 read condition을 밝힌다.
+- 같은 bounded review에서 step 3의 생성 대상 목록에 빠졌던 `imported modules`를 추가했고, renderer/core가 맡는 안전 작업을 `mechanically decidable safety checks`로 한정해 semantic safety와 permission judgment를 domain source·AI·user에 남겼다. 의미가 불투명했던 `colocated edge`는 inspect에 relation이 없으면 gap을 명시하고 관찰된 유지보수 실패가 필요성을 보일 때 canonical owner에만 relation을 추가한다는 평문으로 바꿨다.
+- 초기 Codex 계열 읽기 전용 교차 검토는 imported module 누락과 `safety work`의 의미적 오해 위험을 찾았다. 별도 Claude Fable 5 읽기 전용 반증 검토는 전체 판정을 PASS, known defect 0건으로 두면서 공통 규칙을 entry에 직접 반복할지 shared owner를 가리킬지 한 구절이 모호하다는 비차단 note를 냈고, 그 한 구절만 `common rules or unconditional pointers to their shared owners`로 좁혔다. 다수결·전면 재작성·guide 재편·새 schema/router/test harness는 열지 않았다.
+- Targeted `tests/build.test.mjs` 13/13과 현재 exact bytes의 기본 `npm run verify` 31/31은 generated entry에 always-read contract, safe-skip, together-meaning과 mechanically-decidable safety anchor가 전달되고 기존 standalone/build/currentness 계약이 유지됨을 확인했다. Canonical generated target은 36 files/203,326B, tree `dae3260e5b1c4e9c76068b5a38fb3f4fd9dd0ef2c872c214c332f9030f2a04e7`이며 source-side check는 source-current를, generated target의 standalone check는 `skill-rails-authoring@1.0.1`, core `1.0.1`, artifact-intact를 반환했다.
+
+이 검사는 문구 전달과 기존 기계 계약의 회귀만 proven으로 만든다. 새로운 cold AI가 실제 Devflow에서 더 잘 분할하는 행동 효과, token 절감과 여러 domain 반복성은 `unproven`이며, 이를 닫기 위한 synthetic matrix는 만들지 않는다. 첫 실제 Devflow target에서 always-read 누락, 읽지 않아도 되는 module의 매번 로드, 함께 판단해야 할 의미의 분리 중 하나가 관찰될 때 해당 owner와 문구를 다시 검토한다.

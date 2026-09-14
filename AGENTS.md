@@ -40,6 +40,7 @@ After a handoff, resume, or context compaction/reconstruction, reopen this file 
 - `docs/implementation-verification_ko.md` owns current evidence, failures, and `unproven` scope. Preserve unique receipts, but replace superseded current claims instead of turning it into a daily log.
 - `docs/maintenance-status_ko.md` is a replaceable handoff snapshot. Refresh it only at a coherent milestone or handoff.
 - `docs/reviews/v<version>_ko.md` records the acceptance judgment for one completed version. It summarizes and links to owners; it does not become a new source of implementation truth. Create a new review for a later version instead of rewriting the old judgment.
+- `docs/plan/v<version>-<scope>-plan_ko.md` owns the purpose, bounded scope, non-goals, and acceptance gates of a version that has not yet been accepted or released. Keep its implementation evidence in the verification owner; create the matching review only after final acceptance.
 - `docs/guide/ai-skill-evolution-method_ko.md` is the selective reasoning method for planning, implementation, verification, and recovery. It is neither a product plan nor a mandatory end-to-end workflow.
 
 ## Change and verification discipline
