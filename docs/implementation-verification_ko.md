@@ -442,3 +442,13 @@
 - Targeted `tests/build.test.mjs` 13/13과 최종 문구 exact bytes의 기본 `npm run verify` 31/31은 generated entry에 always-read contract, safe-skip, together-meaning과 mechanically-decidable safety anchor가 전달되고 기존 standalone/build/currentness 계약이 유지됨을 확인했다. Canonical generated target은 36 files/203,518B, tree `1268cac2b5532d8f5a8d191d2734e4cb921e3a5135ddc7d4827ebdc94ce3aae1`이며 source-side check는 source-current를, generated target의 standalone check는 `skill-rails-authoring@1.0.1`, core `1.0.1`, artifact-intact를 반환했다.
 
 이 검사는 문구 전달과 기존 기계 계약의 회귀만 proven으로 만든다. 새로운 cold AI가 실제 Devflow에서 더 잘 분할하는 행동 효과, token 절감과 여러 domain 반복성은 `unproven`이며, 이를 닫기 위한 synthetic matrix는 만들지 않는다. 첫 실제 Devflow target에서 always-read 누락, 읽지 않아도 되는 module의 매번 로드, 함께 판단해야 할 의미의 분리 중 하나가 관찰될 때 해당 owner와 문구를 다시 검토한다.
+
+## v1.0.1 release closure — repository tag와 두 host 재설치 완료
+
+- 첫 candidate commit `abd838f2a705142a8bfbba7a76674b3c02da8c15` 뒤 최종 context-preservation 교정 commit `c4cbaa540663862211ab7690fd359e2dce309ee3`을 `origin/main`에 non-force fast-forward했다. Annotated tag object `9cd418c8e865494695e2c68d5aa37fa918872ca2`의 `v1.0.1` peeled commit은 최종 release commit과 같음을 local과 `git ls-remote`에서 확인했다.
+- README의 공식 `npx skills@latest add nanomia-ai/skill-rails` repository 경로를 사용했다. `skills@1.5.26`으로 global scope에서 `skill-rails` 하나와 Codex·Claude Code를 명시해 설치했으며 installer skill hash는 `ee294f57f977baa4947d3bb5a620eed4592034a44d819060e57008c8ee17b836`다.
+- Codex의 `~/.agents/skills/skill-rails`는 installed directory이고 Claude의 `~/.claude/skills/skill-rails`는 그 exact directory를 가리키는 junction이다. 두 host의 installed `check`는 `skill-rails-authoring@1.0.1`, core `1.0.1`, target `skill-rails`, tree `1268cac2b5532d8f5a8d191d2734e4cb921e3a5135ddc7d4827ebdc94ce3aae1`, artifact-intact를 반환했다. `CODEX_HOME`은 변경하지 않았다.
+- Installer assessment는 Gen safe, Socket 1 alert, Snyk low였고 출력에 alert 원인 상세가 없으므로 추가 해석하지 않는다. `npm pack --dry-run --json`은 39 entries, packed 64,343B/unpacked 228,898B이며 payload는 README, package metadata와 generated `skills/skill-rails/`로 제한된다.
+- 최종 source의 `npm run verify`는 31/31 통과했고 generated target은 36 files/203,518B, artifact-intact/source-current다. 설치 뒤 repository working tree도 clean이었다.
+
+이 closure가 새로 proven으로 만드는 것은 exact public commit/tag 전달과 두 이름 붙인 host의 같은 installed v1.0.1 bytes다. 문구의 실제 cold-AI 행동 개선, 일반 산문 대비 token 절감과 첫 Devflow 적용 결과는 계속 `unproven`이며 `docs/reviews/v1.0.1_ko.md`의 재개 조건으로만 연다.

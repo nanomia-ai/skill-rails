@@ -2,7 +2,7 @@
 
 문서 상태: 교체형 현재 snapshot
 
-최종 갱신: 2026-09-15 KST — v1.0.1 entry·module 분할 계약 명료화 candidate
+최종 갱신: 2026-09-15 KST — v1.0.1 entry·module 분할 계약 release 완료
 
 ## 현재 위치
 
@@ -10,8 +10,8 @@
 - M0~M4 구현 checkpoint commit: `eb08ff3` (`feat: checkpoint greenfield Skill Rails through M4`). M5~M8 accumulated candidate commit은 `e321879`이며 기존 `origin/main`에 non-force fast-forward됐다.
 - 기존 v0.4.3 implementation 257개 파일은 `legacy/archive/v0.4.3/legacy-source.tar`에 보존했다. Capsule SHA-256은 `c79dcf45dc9ab520aa100e19ecf6ef95102d1a423c89c5090cadd40293db31fc`다.
 - `inventory.json`이 원경로·Git/working hash·mode를, `restore-receipt.json`이 Windows temporary-root 복원 257/257와 mismatch 0을 소유한다. POSIX mode 복원은 `unproven`이다.
-- Root와 authoring package의 현재 candidate version은 `1.0.1`, Node 범위는 `>=24 <25`이고 외부 runtime dependency는 없다. 공식 공개 전달은 npm registry package가 아니라 `nanomia-ai/skill-rails` repository의 `npx skills@latest` 경로다. 마지막 공개·설치 버전은 계속 `v1.0.0`이다.
-- v1.0.1 candidate는 entry를 최소이면서 완전한 always-read contract로 정의하고, 모든 분기 해석에 필요한 핵심 배경·의도와 운영 경계를 분기 전에 유지하며, optional module 조건을 module-open 전에 현재 작업과 선언된 입력으로 판정하도록 명료화했다. 실제 작업이 안전하게 건너뛸 수 있으며 절감 읽기가 탐색·재읽기 비용보다 클 때만 whole-file module로 분리한다. Imported module 누락, 의미적 안전을 core로 옮길 수 있던 표현, 공통 규칙 직접 기재와 shared-owner pointer의 경계, 불투명한 `colocated edge` 용어도 같은 owner에서 좁혔다. Codex 계열 검토 뒤 별도 Claude Fable 5 반증 검토 두 번이 모두 PASS를 보고했다. 첫 candidate commit은 `abd838f`이며 최종 rebuild는 36 files/203,518B, tree `1268cac2b5532d8f5a8d191d2734e4cb921e3a5135ddc7d4827ebdc94ce3aae1`, artifact-intact/source-current, 기본 suite 31/31이다. Release commit·tag·push·양 host 재설치는 아직 남았다.
+- Root와 authoring package의 현재 version은 `1.0.1`, Node 범위는 `>=24 <25`이고 외부 runtime dependency는 없다. 공식 공개 전달은 npm registry package가 아니라 `nanomia-ai/skill-rails` repository의 `npx skills@latest` 경로다. 마지막 공개·설치 버전은 `v1.0.1`이다.
+- v1.0.1은 entry를 최소이면서 완전한 always-read contract로 정의하고, 모든 분기 해석에 필요한 핵심 배경·의도와 운영 경계를 분기 전에 유지하며, optional module 조건을 module-open 전에 현재 작업과 선언된 입력으로 판정하도록 명료화했다. 실제 작업이 안전하게 건너뛸 수 있으며 절감 읽기가 탐색·재읽기 비용보다 클 때만 whole-file module로 분리한다. Imported module 누락, 의미적 안전을 core로 옮길 수 있던 표현, 공통 규칙 직접 기재와 shared-owner pointer의 경계, 불투명한 `colocated edge` 용어도 같은 owner에서 좁혔다. Codex 계열 검토 뒤 별도 Claude Fable 5 반증 검토 두 번과 최종 wording check가 모두 PASS를 보고했다. Release commit `c4cbaa5`, annotated tag `v1.0.1`과 원격 push가 완료됐고, `skills@1.5.26`의 정상 repository 경로로 Codex·Claude Code에 설치했다. 양쪽 installed check는 package/core `1.0.1`, 36 files/203,518B, tree `1268cac2b5532d8f5a8d191d2734e4cb921e3a5135ddc7d4827ebdc94ce3aae1`, artifact-intact를 반환한다.
 - v1.0.0 문서 closure는 선택형 판단 원문을 `docs/guide/ai-skill-evolution-method_ko.md`, generated module을 `skillEvolutionMethod`로 정리하고 `docs/reviews/v1.0.0_ko.md`에 목적 대비 합격선과 증거 경계를 기록했다. 설치 artifact의 기존 receipt를 단일 version owner로 유지하면서 source·installed `check`가 package/core version을 노출한다. Release commit `213245e`와 annotated tag `v1.0.0`은 origin에 push됐고, `skills@1.5.26`의 정상 repository 경로로 Codex·Claude Code에 설치한 tree `e26b637ad076a66971cda8a18405262fc70d3320d9d590dcd3c4cd3fde17fcc7`는 36 files/202,763B이며 양쪽 모두 `skill-rails-authoring@1.0.0`, core `1.0.0`, artifact-intact를 반환한다.
 - Canonical authoring source는 `authoring/skill-rails/`, generated tracked skill은 `skills/skill-rails/`이다. 현재 repository discovery에 active production skill은 `skill-rails` 하나뿐이다.
 - Natural-language pilot의 현재 record-only Verify 설치 target tree SHA-256은 `25798e8a916d8b0062427c3d38f100198e94cb2bda8e90f79d5bd1bfde21763a`다. 표준 installer로 Codex·Claude Code에 설치했고 두 runtime `check`는 `ARTIFACT_INTACT`다.
@@ -52,7 +52,7 @@ Treatment의 canonical renderer/record는 두 control이 발명한 비호환 mar
 
 M5의 renderer-only 선행 gate는 E-019와 `evals/m5/results/renderer-only-boundary-gate-2026-09-13.json`으로 닫혔다. Framework 초기 교정과 중단·격리는 E-020/E-021 및 `evals/m5/results/framework/`가 소유한다.
 
-1. v1.0.1 entry·module 분할 계약의 목적·범위·완료 조건은 `docs/plan/v1.0.1-entry-module-boundary-plan_ko.md`, current implementation/evidence는 `docs/implementation-verification_ko.md` 마지막 절, 결정과 재검토 조건은 E-038이 소유한다. 아직 완료 버전 review는 만들지 않으며 commit·tag·push와 두 host 재설치는 별도 승인 전까지 수행하지 않는다.
+1. v1.0.1 entry·module 분할 계약의 원래 목적·범위·완료 조건은 `docs/plan/v1.0.1-entry-module-boundary-plan_ko.md`, implementation/release evidence는 `docs/implementation-verification_ko.md` 마지막 절, 완료 판단은 `docs/reviews/v1.0.1_ko.md`, 결정과 재검토 조건은 E-038이 소유한다. Release commit·tag·push와 두 host 설치는 완료됐고, 첫 실제 Devflow target의 행동 효과는 review의 재개 조건 전까지 `unproven`이다.
 2. v1.0.0 문서·명칭 closure, artifact version 조회와 release/install evidence는 `docs/implementation-verification_ko.md`의 해당 절, version judgment는 `docs/reviews/v1.0.0_ko.md`, 결정은 E-036/E-037이 소유한다. Release commit·tag·두 host 설치는 완료됐다.
 3. Post-cutover closure의 exact implementation/evidence boundary는 `docs/implementation-verification_ko.md`와 `evals/m8/results/practical-closure-2026-09-14.json`이 소유한다. 기존 M8 cutover 값과 결정은 pre-release receipt와 E-034/E-035가 계속 소유한다.
 4. Post-release 실사용 slice 뒤 실제 Devflow adoption은 알려진 Skill Rails redesign blocker 없이 시작할 수 있다. 실패한 Devflow mechanism을 요구사항이나 source baseline으로 옮기지 않고 현재 사용자 목적과 domain 정본에서 첫 단위를 prose-first·한 owner·현재 evidence 우선으로 저작한다. 첫 적용의 효과는 그 장면에만 귀속하고 broad recovery나 진화 방법 우위로 확대하지 않는다.
