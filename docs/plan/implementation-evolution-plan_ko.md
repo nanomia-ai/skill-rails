@@ -765,7 +765,7 @@ Targeted `tests/build.test.mjs` 13/13은 source currentness 검사와 source rep
 
 ## E-038 — module 분할은 깊이나 길이가 아니라 실제 safe-skip과 순읽기 이익으로 결정
 
-상태: **v1.0.1 candidate 구현·bounded 교차 검토 완료 — release 작업 대기**
+상태: **v1.0.1 release와 두 host 설치 완료**
 
 ### 실제 문제와 evidence
 
@@ -784,3 +784,27 @@ Current source graph와 generated target은 entry, whole-file imports와 shared 
 초기 Codex 계열 읽기 전용 검토는 imported module 누락과 의미적 `safety work`의 기계 계층 오배치 위험을 찾았고 둘 다 같은 좁은 patch에 반영했다. Coordinator는 불투명한 `colocated edge`를 같은 의미의 평문으로 바꿨다. 서로 다른 계열의 독립 검토를 위해 기존 Claude Fable 5 세션에 현재 diff와 owner만 읽는 반증 검토를 다시 배정했다. Fable은 PASS와 known defect 0건을 보고하면서 공통 규칙을 entry에 직접 둘지 shared owner를 가리킬지 한 구절의 선택적 모호성만 지적했고, 이를 `common rules or unconditional pointers to their shared owners`로 좁혔다. 사용자 재검토 뒤 같은 Fable 세션이 entry 전체를 다시 반증해 PASS를 유지하면서 명시되지 않은 운영 경계만 비차단 위험으로 찾았다. 사용자가 함께 명시한 핵심 배경·의도와 module-open 이전 read-condition 판정 가능성을 같은 canonical 문장에 추가했다. 그 밖에는 수정하지 않았으며 새 schema·runtime·matrix를 열지 않았다. 최종 rebuild tree `1268cac2b5532d8f5a8d191d2734e4cb921e3a5135ddc7d4827ebdc94ce3aae1`은 artifact-intact/source-current이고 기본 suite 31/31이 통과했다.
 
 이 변경은 새 AI 행동이나 비용 우위를 구조 검사로 주장하지 않는다. 첫 실제 Devflow target에서 entry가 불완전하거나 optional module을 매번 읽거나 의미 결합이 끊기는 관찰이 생기면 문구 owner로 돌아온다. 그런 관찰 없이 더 깊은 module graph, 자동 splitter나 추가 검증 matrix를 열지 않는다.
+
+## E-039 — 기존 구조 선언 누락과 새 semantic relation의 입장 조건을 분리
+
+상태: **v1.0.2 candidate 상호 수렴·canonical 교정·전체 prompt 감사·targeted 검증 완료 — release 미수행**
+
+### 실제 문제와 evidence
+
+v1.0.1 step 5는 inspect에서 선언 관계가 보이지 않을 때 관찰된 유지보수 실패 뒤에만 관계를 추가하라고 했다. 이 문장은 아직 실패가 발생하지 않은 새 target에서도, target entry가 실제 module을 가리키지만 descriptor가 import를 빠뜨린 기존 구조 선언 누락과 D-12가 금지하는 추정 semantic edge를 구분하지 않았다. Prose target의 text reference는 current validator가 import와 대조하지 않으므로 이런 dead pointer는 build/check를 통과할 수 있다. Step 3과 4는 실제 소비하는 import와 shared owner 연결을 요구하지만 step 5를 더 좁은 후행 금지로 읽으면 필수 공통 의미가 조용히 빠질 수 있다.
+
+### 영향받는 결정·계약과 보존 목적
+
+영향은 shipped authoring entry의 step 5뿐이다. Existing input, output, import와 mechanism declaration은 실제 target 사용이 확인되면 처음부터 정확해야 하고, requirement/check/external-boundary 같은 새 semantic relation은 D-12대로 실제 유지보수 실패가 필요성을 보일 때만 추가한다. Source graph/schema, validator, 상세 판단 원문, module 구조, renderer/runtime와 증거 등급은 바꾸지 않는다. 누락을 방치하지 않으면서도 관계를 추측하거나 새 edge 체계를 선제 도입하지 않는 목적을 함께 보존한다.
+
+Release 직전 같은 Claude Fable 5 세션이 canonical entry 39줄과 상세 판단 원문 975줄 전체를 다시 읽었다(`task_8b84a877a5d3`, dispatch `ctx_bb00d6536dee`). Step 3·4 유지, Step 5 교정, entry-guide 일관성, 배경·권한·증거·과잉 검사 경계를 함께 대조해 blocker 0건으로 PASS했으며 style-only 차이는 교정 근거에서 제외했다. 따라서 이 결정 때문에 다른 prompt나 기계 계층을 추가로 바꾸지 않는다.
+
+### 검토한 대안과 선택
+
+모든 관계에 사용자 요구·외부 제약·관찰 실패를 열거하면 semantic edge 추론 허가처럼 읽힐 수 있어 기각했다. 반대로 v1.0.1 문구를 유지하면 실제 사용이 이미 정해진 import도 첫 실패까지 누락 상태로 둘 수 있어 기각했다. 따라서 step 3이 이미 소유하는 actual target input, output, import와 mechanism의 누락 선언은 canonical owner에서 바로 보완하고, 그 밖의 undeclared relation은 gap으로 남기며, 새 semantic relation에만 observed maintenance failure gate를 유지한다.
+
+### 상호 수렴과 재검토 조건
+
+Coordinator는 전체 prompt 감사에서 이 충돌을 찾았고, 기존 Claude Fable 5 세션에 자신의 판단과 반대 가능성을 함께 전달했다. Fable은 처음에는 v1.0.1 전체 entry를 PASS로 판정했던 자신의 범위가 step 5에서 지나치게 넓었다고 철회하고, validator가 prose text reference와 import 누락을 잡지 않는 실행 경로를 확인해 필수 교정에 동의했다. 첫 왕복에서 Fable이 제안한 `file the target actually consumes` 표현보다 step 3의 기존 분류를 직접 가리키는 coordinator 문구가 더 정확하다는 두 번째 왕복을 진행했고, Fable은 최종 문구를 그대로 승인했다. 양쪽은 상세 guide, schema, 새 test matrix와 다른 prompt는 바꾸지 않는 데도 합의했다.
+
+기존 authoring build test에 새 두 의미 anchor만 추가했고 별도 test·matrix·harness는 만들지 않았다. 기본 `npm run verify`는 31/31 통과했다. Canonical rebuild는 36 files/203,690B, tree `c67d7e651236713668b225ed7a07fd7a6cee765eb72eadb46be372b2e6fc43bd`이며 source-side check는 package/core `1.0.2`, artifact-intact/source-current를, standalone check는 같은 identity와 artifact-intact를 반환했다. Cold author가 구조 선언과 semantic relation을 실제로 올바르게 구분하는 행동 효과는 첫 실제 저작 장면 전까지 `unproven`이다. 그 장면에서 actual dependency를 여전히 누락하거나 관찰 없는 semantic edge를 추가한 경우에만 이 owner를 다시 연다.
