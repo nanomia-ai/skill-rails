@@ -386,3 +386,15 @@
 - `CODEX_HOME`은 `C:/Users/joinj/AppData/Roaming/orca/codex-runtime-home/home` 그대로였고 README, 두 동결 계획과 legacy capsule은 바꾸거나 삭제하지 않았다. Exact values와 좁은 claim은 M8 receipt의 `productionCutover`가 소유한다.
 
 현재 판정은 **M8 production repository cutover와 정상 두-host 설치 완료**다. Broad host/domain repeatability, Framework의 인과적 이익, authoring-process 비용 효율, POSIX capsule mode 복원은 계속 `unproven`이다.
+
+## Post-cutover practical closure — CLI 복구와 stale Resume 한 장면 통과
+
+- 반복 관찰된 command-discovery 마찰을 기존 owner인 `src/core/cli.mjs`에서만 좁혔다. No-args, `help`, `--help`는 모두 exit 0과 동일한 짧은 synopsis를 내고 build/check/inspect/overview의 최소 호출형과 기존 argument error의 `nextAction` 경로를 알린다. Canonical authoring entry는 command 목록을 복제하지 않고 이 synopsis로 복구하는 방법만 소유한다.
+- 기존 generated-authoring 별도-project test에 세 entrypoint의 실제 embedded copy 실행을 추가했고 targeted `node --test tests/build.test.mjs`는 13/13 pass했다. Canonical rebuild tree `978eb4f64d60eade4cd51e7aff058d88f7ccd6d3078b3b79164bb45f1f2dee16`은 artifact-intact/source-current다. 새 help schema, parser layer, tooling 값이나 runtime은 없다.
+- 별도 일반 project의 prose-only `release-recovery-resume` target은 세 item과 네 state file만 읽도록 저작했고 generated tree `96741e5fab42993d37de0c05537789bcf2f6902a330e319193a829cf2358250c`로 두 독립 build가 같았다. Fresh Codex Sol medium 1회는 installed target을 골라 C1 auth-write pass/approval을 C2에 대해 stale/incomplete로 낮추고, C2와 독립인 operator-runbook 완료를 보존하고, test 미실행 retry-after를 pending/unsupported로 유지한 뒤 C2 auth-write test 실행 하나만 next action으로 반환했다.
+- 이 consumer의 실제 domain read surface는 generated entry 1,664B와 state 네 파일 1,651B, 합계 3,315B였다. Worker 환경상 Orca/RTK 지침도 읽었지만 Skill Rails implementation internals는 읽지 않았다. 네 state file의 전후 SHA-256와 Git status는 동일해 project write가 없었다. Host가 total wall/read telemetry를 노출하지 않았으므로 여섯 exec wall time 외 값은 `unproven`으로 둔다.
+- 이번 owner 변경의 실제 consumer는 production authoring target 하나뿐이므로 새 shared-currentness 장면을 만들지 않았다. M8의 genuine two-consumer owner-change evidence는 그대로 유효하지만 새 breadth로 올리지 않는다. `docs/authoring-lessons_ko.md`의 부재는 E-004의 의도된 active-tree 제거와 일치해 별도 manual을 만들지 않았다.
+- 구현과 behavior evidence가 고정된 뒤 `npm run verify`를 정확히 한 번 실행해 31/31 pass했다. 이는 전체 repository의 구조·deterministic safety·currentness를 확인하지만 fresh recovery effect는 위 단일 관찰만 소유한다.
+- **Proven**: shipped generated route의 no-args/help 복구, 이 한 stale/unsupported recovery scene의 unfamiliar behavior와 no-write effect. **Failed**: 없음. **Unproven**: 반복성, 다른 Devflow recovery·host·model, host-total 비용, Framework/index 인과와 shared-currentness 추가 폭. 상세 receipt는 `evals/m8/results/practical-closure-2026-09-14.json`이 소유한다.
+
+현재 판정은 **한정된 실제 Devflow 적용을 즉시 시작할 수 있음**이다. 이 판정은 실패한 Devflow의 role renderer·`DISPATCH`·`project-state` observer·P2 spec을 Skill Rails 요구로 승계하지 않는다. 그 형식 아래의 실제 필요는 짧은 standalone entry, 한 shared owner, 현재 artifact에서의 AI 판단, 그리고 한 deterministic output에만 쓰는 record-only가 소유한다. 첫 실제 적용도 prose-first·한 owner·현재 근거 우선 경계를 유지하고, 그 결과를 broad recovery나 Framework 우위로 승격하지 않는다.

@@ -121,6 +121,17 @@ test("generated authoring CLI operates from a separate source project", async (t
   const authoring = join(root, "installed-skill");
   assert.equal(coreCli("build", "--source", "authoring-package.json", "--target", "skill-rails", "--out", authoring).status, 0);
   const cli = join(authoring, "scripts", "skill-rails-cli", "src", "core", "cli.mjs");
+  const helpOutputs = [runNode([cli]), runNode([cli, "help"]), runNode([cli, "--help"])];
+  for (const help of helpOutputs) {
+    assert.equal(help.status, 0, help.stderr || help.stdout);
+    assert.match(help.stdout, /Usage:\s+node <cli\.mjs> <command> \[options\]/u);
+    assert.match(help.stdout, /build\s+--source <manifest> --target <target-id> --out <target-dir>/u);
+    assert.match(help.stdout, /check\s+--out <target-dir>/u);
+    assert.match(help.stdout, /inspect\s+--source <manifest>/u);
+    assert.match(help.stdout, /overview --source <manifest>/u);
+    assert.match(help.stdout, /task-specific nextAction/u);
+  }
+  assert.equal(new Set(helpOutputs.map((help) => help.stdout)).size, 1);
   const project = join(root, "ordinary-project");
   await mkdir(join(project, "targets", "tiny"), { recursive: true });
   await writeFile(join(project, "skill-package.json"), JSON.stringify({ schemaVersion: 1, packageId: "tiny-portable-proof", packageVersion: "0.0.1", modules: {}, targets: { tiny: "targets/tiny/target.json" } }));

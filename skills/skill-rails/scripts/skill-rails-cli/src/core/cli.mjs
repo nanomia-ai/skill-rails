@@ -7,6 +7,22 @@ import { buildHumanOverview } from "./human-overview.mjs";
 import { inspectGraph } from "./inspect.mjs";
 import { loadSourceGraph } from "./validate.mjs";
 
+const SYNOPSIS = `Skill Rails authoring CLI
+
+Usage:
+  node <cli.mjs> <command> [options]
+
+Commands:
+  build    --source <manifest> --target <target-id> --out <target-dir>
+  build    --source <manifest> --out-root <distribution-root>
+  check    --out <target-dir>
+  check    --source <manifest> --target <target-id> --out <target-dir>
+  inspect  --source <manifest> (--id <exact-id> | --path <relative-path>) --json
+  overview --source <manifest>
+
+Invalid command arguments return JSON with a task-specific nextAction.
+`;
+
 function parse(argv) {
   const [command, ...rest] = argv;
   const values = {};
@@ -28,6 +44,10 @@ function allow(values, allowed) {
 
 async function main() {
   const { command, values } = parse(process.argv.slice(2));
+  if (command === undefined || command === "help" || command === "--help") {
+    allow(values, []);
+    return { format: "text", markdown: SYNOPSIS };
+  }
   if (command === "build") {
     allow(values, ["--source", "--target", "--out", "--out-root"]);
     if (!values["--source"]) fail("ARGUMENT_INVALID", "build requires --source.", "Provide the canonical source package manifest.");

@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-14",
+  "scope": "Bounded post-cutover CLI recovery repair and one Devflow-class Resume/recovery observation.",
+  "cliRecovery": {
+    "canonicalOwners": [
+      "src/core/cli.mjs",
+      "authoring/skill-rails/SKILL.source.md"
+    ],
+    "acceptedEntrypoints": [
+      "no arguments",
+      "help",
+      "--help"
+    ],
+    "behavior": "All three entrypoints exit 0 and print the same concise usage, build/check/inspect/overview forms, and the existing task-specific nextAction guidance.",
+    "targetedTest": {
+      "command": "node --test tests/build.test.mjs",
+      "tests": 13,
+      "passed": 13,
+      "failed": 0,
+      "deliveryBoundary": "The assertion executes the CLI copied into a generated authoring target in a separate source project."
+    },
+    "canonicalBuild": {
+      "command": "node src/core/cli.mjs build --source authoring-package.json --target skill-rails --out skills/skill-rails",
+      "treeSha256": "978eb4f64d60eade4cd51e7aff058d88f7ccd6d3078b3b79164bb45f1f2dee16",
+      "artifactIntact": true,
+      "sourceCurrent": true
+    },
+    "newSchemaOrRuntime": false
+  },
+  "recoveryObservation": {
+    "ordinaryProject": "D:/Projects/Private/nanomia/skill-rails-practical-closure-20260914",
+    "install": {
+      "command": "npx skills@latest add D:/Projects/Private/nanomia/nanomia-skills/skill-rails --skill skill-rails --agent codex --copy -y",
+      "location": ".agents/skills/skill-rails",
+      "codeHomeChanged": false,
+      "globalInstallChanged": false
+    },
+    "authoringRoute": {
+      "sourceManifest": "source/skill-package.json",
+      "generatedTarget": ".agents/skills/release-recovery-resume",
+      "secondBuild": "dist/release-recovery-resume-second",
+      "treeSha256": "96741e5fab42993d37de0c05537789bcf2f6902a330e319193a829cf2358250c",
+      "artifactIntact": true,
+      "sourceCurrent": true,
+      "mode": "prose",
+      "imports": [],
+      "observerOrRenderer": false
+    },
+    "scene": {
+      "items": [
+        "auth-write",
+        "operator-runbook",
+        "retry-after"
+      ],
+      "upstreamChange": "Contract C2 added X-Actor-Id and superseded C1 auth-write evidence.",
+      "unrelatedCompletion": "operator-runbook remained independent of C2.",
+      "unsupportedEvidence": "retry-after implementation was reported but its named test had not run."
+    },
+    "freshConsumer": {
+      "terminal": "term_4be7780e-1217-41d0-926e-1037d2c3994b",
+      "taskId": "task_032a4fe15952",
+      "dispatchId": "ctx_6d8fe4324270",
+      "model": "gpt-5.6-sol",
+      "reasoningEffort": "medium",
+      "mode": "YOLO",
+      "selectedSkill": ".agents/skills/release-recovery-resume/SKILL.md",
+      "result": {
+        "auth-write": "stale/incomplete because its 6/6 test and approval A-17 were bound to superseded C1",
+        "operator-runbook": "complete because its check and approval D-04 remain current and independent of C2",
+        "retry-after": "pending/unsupported because npm test -- retry-after had not run",
+        "nextAction": "run npm test -- auth-write against contract revision C2 to produce the highest-priority missing current-revision test evidence",
+        "nextActionCount": 1
+      },
+      "domainReads": [
+        {
+          "path": ".agents/skills/release-recovery-resume/SKILL.md",
+          "bytes": 1664
+        },
+        {
+          "path": "project/contract.md",
+          "bytes": 352
+        },
+        {
+          "path": "project/plan.md",
+          "bytes": 558
+        },
+        {
+          "path": "project/progress.md",
+          "bytes": 224
+        },
+        {
+          "path": "project/verification.md",
+          "bytes": 517
+        }
+      ],
+      "domainReadBytesFromFilesystem": 3315,
+      "environmentInstructionReads": [
+        "C:/Users/joinj/.agents/skills/orca-cli/SKILL.md",
+        "C:/Users/joinj/.agents/skills/orchestration/SKILL.md",
+        "C:/Users/joinj/.codex/RTK.md",
+        "live Orca orchestration/orca-cli guide output"
+      ],
+      "skillRailsImplementationInternalsRead": 0,
+      "reportedExecWallSeconds": [
+        0.8,
+        1.4,
+        1.0,
+        1.0,
+        1.0,
+        0.8
+      ],
+      "hostTotalWallTime": "unexposed",
+      "hostReadCountAndBytes": "unexposed; byte total above is a filesystem measurement of the five reported domain reads"
+    },
+    "effect": {
+      "projectWrites": 0,
+      "beforeAfterGitStatusIdentical": true,
+      "stateFileHashesBeforeAfterIdentical": true,
+      "stateFiles": {
+        "project/contract.md": "0caa322d45396b1e31e5023166e4c1da40b9d2534da97ef07db7083f05abafd1",
+        "project/plan.md": "d80cd52ac7848d15e4f869baa3889e5fe5d0c758abed101a2233adb029a87fc8",
+        "project/progress.md": "96559c385351a9af66e9a830b8f7df1ba6a509c2ad2571cf308dd3efa08404d8",
+        "project/verification.md": "0721b6b8251d6c16c6c73f9547af225f3fc1c4c2c3d12db2fd46717904ce5493"
+      }
+    }
+  },
+  "sharedOwnerCurrentness": {
+    "exercised": false,
+    "reason": "The current production authoring package has one target; this closure changed its embedded CLI and entry only. No genuine multi-consumer owner was naturally affected, so no synthetic target or fanout was added.",
+    "existingEvidencePreserved": "M8 already proves one genuine shared owner staling exactly its two real consumers and affected rebuild restoring currentness."
+  },
+  "authoringLessonsRouting": {
+    "pathExists": false,
+    "decisionOwner": "docs/plan/implementation-evolution-plan_ko.md E-004",
+    "result": "The legacy authoring-lessons document was intentionally removed from the active tree; this change adds no replacement manual because its causal facts already have current owners."
+  },
+  "claims": {
+    "proven": [
+      "The shipped generated authoring route now recovers a usable command synopsis through no arguments, help, and --help.",
+      "One unfamiliar consumer used one generated prose recovery skill and four project state files to preserve an unrelated completion, reject stale and unsupported completion, and return exactly one prioritized next action without writes.",
+      "The bounded recovery result required no schema, observer, renderer, state engine, prepare-record path, hidden fallback, or Skill Rails internal read."
+    ],
+    "failed": [],
+    "unproven": [
+      "Repeatability, other Devflow recovery scenes, hosts, models, and broad integration.",
+      "Host-total wall time and host-attributed read byte accounting because those metrics were not exposed.",
+      "Any new shared-currentness breadth beyond the already observed M8 two-consumer package."
+    ]
+  },
+  "closureVerification": {
+    "command": "npm run verify",
+    "runs": 1,
+    "tests": 31,
+    "passed": 31,
+    "failed": 0,
+    "durationMs": 10530.2071
+  }
+}

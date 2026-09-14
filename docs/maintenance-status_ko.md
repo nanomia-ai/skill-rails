@@ -2,7 +2,7 @@
 
 문서 상태: 교체형 현재 snapshot
 
-최종 갱신: 2026-09-14 KST — M8 production repository cutover와 Codex·Claude 설치 완료
+최종 갱신: 2026-09-14 KST — post-cutover practical closure 구현·단일 recovery 관찰 완료
 
 ## 현재 위치
 
@@ -37,6 +37,7 @@
 - **M8 전 완결성 감사와 portable authoring 보정 종료**: Canonical authoring entry의 작은 operational flow와 on-demand `overview --source`를 유지하면서 prose target의 optional enum-of-one `embeddedCoreTooling: "authoring-cli-v1"`을 추가했다. Authoring target만 이를 선언하고 generated `scripts/skill-rails-cli/`는 canonical 27-file closure를 기존 receipt/currentness 아래 전달한다. Production identity 재생성 뒤 release suite 31/31과 generated tree `cab9710da8105611dbb56e8d5e4b8ca4c1721378feec1a30f646ed96690b4fc7`의 artifact-intact/source-current가 통과했다.
 - **M8 produced-skill pre-release acceptance 통과**: 별도 일반 project에서 정상 `npx skills@latest` local-source flow로 current authoring skill을 두 host 위치에 설치했다. Fresh Codex는 두 prose target과 한 genuine shared module을 저작·double-build했고, shared owner 1회 변경은 두 consumer를 모두 stale로 만든 뒤 affected-only rebuild와 정상 재설치로 current를 복구했다. Fresh Claude Opus medium bypass 1회는 두 installed target을 발견해 570B/921B 실제 effect를 만들고 reread했으며 coordinator도 다시 읽었다. Generated target은 각각 8 files/약 19KB였고 fresh consumer의 실제 pre-write read는 5 files/6,081B, Skill Rails 내부 read/call은 0이었다. 기존 user-level `skill-rails` 두 위치는 각각 63 files/1,028,325B와 기존 task-local hash `367dc53f...`로 불변이고 `CODEX_HOME`도 바꾸지 않았다. Codex author input 468,994 tokens와 누락된 exact author tool/wall telemetry는 generated output 결함과 인과가 관찰되지 않은 secondary DX concern이지 release-blocking output failure가 아니다.
 - **M8 production cutover 완료**: Candidate `e321879`을 public `origin/main`에 fast-forward했고 `skills@1.5.26`의 repository route가 resolved hash `9f8619d...`와 production `skill-rails`를 선택했다. 두 전역 host 위치와 별도 일반 smoke project의 두 project-local 위치는 모두 generated tree `cab9710...`다. Fresh Codex Sol medium과 Claude Opus medium bypass가 각 project-local entry를 발견해 skill-local CLI integrity check를 통과했다. 이는 discovery/artifact smoke만 증명하며 prior authoring/use/effect claim을 넓히지 않는다. Npm publish/dist-tag, force/history rewrite, README·동결 계획 변경과 archive 삭제는 없었다.
+- **Post-cutover practical closure 완료**: 기존 embedded CLI owner는 no-args, `help`, `--help`에 같은 task-oriented synopsis를 제공하고 generated route targeted test 13/13을 통과했다. 새 generated production tree는 `978eb4f...`로 artifact-intact/source-current다. 별도 일반 project의 fresh Codex Sol medium 1회는 3,315B의 generated entry+네 state file만으로 C1 auth-write를 C2에 대해 stale로 낮추고, 독립 runbook 완료를 보존하고, 미실행 retry-after를 성공으로 부르지 않은 뒤 정확히 한 next action을 반환했다. State hash는 전후 같고 Skill Rails 내부 read는 0이다. 구현과 evidence 고정 뒤 final `npm run verify` 1회는 31/31 pass했다. 이 한 recovery scene만 proven이며 반복·다른 scene/host/model은 unproven이다.
 
 ## M4 판정
 
@@ -48,10 +49,10 @@ Treatment의 canonical renderer/record는 두 control이 발명한 비호환 mar
 
 M5의 renderer-only 선행 gate는 E-019와 `evals/m5/results/renderer-only-boundary-gate-2026-09-13.json`으로 닫혔다. Framework 초기 교정과 중단·격리는 E-020/E-021 및 `evals/m5/results/framework/`가 소유한다.
 
-1. M8 종단·final audit·production cutover evidence는 `docs/implementation-verification_ko.md` 마지막 세 절, `evals/m8/results/pre-release-end-to-end-2026-09-14.json`, E-034/E-035가 소유한다.
-2. 다음은 coordinator/user의 release evidence review다. Author telemetry나 broad coverage를 보충하려고 fresh flow, matrix, schema 또는 harness를 추가하지 않는다.
-3. 실제 저작·복구에서 unsupported-help 마찰이 반복되어 결정을 바꿀 때만 기존 CLI/entry owner를 최소 수정한다. 두 번째 tooling 값·consumer·closure, domain executable 또는 generic asset grammar는 열지 않는다.
-4. Force/history rewrite, README 변경과 archive 삭제는 계속 금지한다. Archive 제거와 POSIX restore 검증은 production cutover에 묶지 않고 별도 사용자 결정으로 남긴다.
+1. Post-cutover closure의 exact implementation/evidence boundary는 `docs/implementation-verification_ko.md` 마지막 절과 `evals/m8/results/practical-closure-2026-09-14.json`이 소유한다. 기존 M8 cutover 값과 결정은 pre-release receipt와 E-034/E-035가 계속 소유한다.
+2. 다음은 실패한 Devflow mechanism을 요구사항이나 source baseline으로 옮기지 않고, 현재 사용자 목적과 domain 정본에서 첫 실제 단위를 prose-first·한 owner·현재 evidence 우선으로 저작하는 것이다. 첫 적용의 효과는 그 장면에만 귀속하고 broad recovery나 Framework 우위로 확대하지 않는다.
+3. 추가 synthetic fresh flow, matrix, schema, harness, prepare/fallback, domain observer/runtime를 열지 않는다. 두 번째 declared output이나 multi-file managed write의 실제 필요, one-output renderer로 소유할 수 없는 fresh-AI deterministic 오판 반복, 실제 lost update가 생기면 core 경계를 구현하기 전에 사용자 결정으로 되돌린다. 첫 두 실제 target에서 큰 always-read shared module이 생기면 먼저 authoring granularity를 다시 열고 core runtime 문제로 간주하지 않는다.
+4. Force/history rewrite, README 변경과 archive 삭제는 계속 금지한다. Archive 제거와 POSIX restore 검증은 별도 사용자 결정으로 남긴다.
 
 ## 아직 unproven 또는 기각된 범위
 

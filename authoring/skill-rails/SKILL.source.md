@@ -32,11 +32,8 @@ When maintaining an existing package, edit the canonical owner rather than gener
 
 ## Repository operations
 
-The installed skill carries one closed authoring CLI. Set `<skill-root>` to the directory containing this `SKILL.md`, keep the working directory at the ordinary source project root, and invoke `node "<skill-root>/scripts/skill-rails-cli/src/core/cli.mjs"` with one of these operations:
+The installed skill carries one closed authoring CLI. Set `<skill-root>` to the directory containing this `SKILL.md`, keep the working directory at the ordinary source project root, and run `node "<skill-root>/scripts/skill-rails-cli/src/core/cli.mjs"` with no arguments, `help`, or `--help` to recover the current minimum forms for inspect, overview, build, and check. Invalid command arguments return JSON with a task-specific `nextAction`.
 
-1. Inspect a known node with `inspect --source <manifest> --id <exact-id> --json` or the exact `--path` form. Generate the current non-authoritative whole-package view with `overview --source <manifest>`.
-2. Build all targets with `build --source <manifest> --out-root <dist-root>`, or one target with the documented `--target` and `--out` form.
-3. Double-build and compare tree hashes, then check artifact integrity separately from source currentness. Neither check establishes fresh-agent behavior or external effect.
-4. Review the generated diff and build receipt before claiming delivery.
+Inspect the exact owner and consumers before editing, use overview only for a non-authoritative whole-package view, double-build and compare tree hashes, and check artifact integrity separately from source currentness. Neither check establishes fresh-agent behavior or external effect. Review the generated diff and build receipt before claiming delivery.
 
 Current evidence covers deterministic source/build/currentness, one bounded record-only use path, five small pilot stage observations, one machine-level non-Devflow generalization, and one bounded installed author-to-two-target-to-maintain-to-unfamiliar-use observation. The embedded CLI closes mechanical out-of-repository delivery without a sibling repository, global runtime, or network call. Framework navigation benefit, broad host behavior, authoring-process efficiency, and prose-relative total cost remain `unproven`; inspect the named receipts before extending those claims.
