@@ -409,3 +409,16 @@
 - **Proven**: 이 project에서 public final-byte authoring delivery, 세 standalone target, 한 shared owner와 두 consumer, Codex의 실질 plan·code·test·progress effect, Claude의 실질 test·verification·recovery effect, 양측·coordinator·후계 maintainer reread와 clean final commit. **Failed**: 없음. **Unproven**: unguided control 대비 인과적 비용·품질 우위, 반복성·통계적 host 안정성, token totals, 이 project에서 새 shared-owner edit의 stale/rebuild effect. 마지막 항목은 M8 기존 two-consumer receipt의 좁은 evidence를 반복하지 않는다.
 
 상세 receipt는 `evals/m8/results/post-release-real-use-vertical-slice-2026-09-14.json`이 소유한다. 현재 판정은 **실제 Devflow adoption을 prose-first·한 owner·현재 artifact 우선으로 시작해도 알려진 Skill Rails redesign blocker가 없음**이다. 이는 broad Devflow 성공, Framework 우위나 비용 절감을 증명하지 않으며 첫 실제 두 target에서 큰 always-read shared module 또는 실제 multi-output/lost-update 필요가 생기면 기존 재개 조건으로 되돌린다.
+
+## v1.0.0 문서·명칭 closure — 현재 역할과 역사 좌표 분리
+
+- 선택형 판단 원문의 현재 역할에 맞춰 source path를 `docs/guide/ai-skill-evolution-method_ko.md`, authoring module id를 `skillEvolutionMethod`로 바꿨다. Generated target의 reference와 semantic-free heading index도 canonical build를 통해 같은 이름으로 바뀌었으며 generated 파일을 직접 수정하지 않았다.
+- 현재 generated tree는 `e26b637ad076a66971cda8a18405262fc70d3320d9d590dcd3c4cd3fde17fcc7`, 36 files/202,763B이고 artifact-intact/source-current다. Authoring build와 repository boundary targeted test는 15/15 통과했다.
+- 과거 M5 Framework protocol과 결과는 당시 이름의 evidence로 유지한다. Source path를 직접 여는 historical harness와 현재 authoring sentence anchor만 새 canonical 위치에 맞췄고 harness 자기검사 5/5가 통과했다. 새 lane, receipt, schema 또는 fresh-agent 실행은 만들지 않았다.
+- 변경이 고정된 뒤 default `npm run verify`는 31/31 통과했고 별도 CLI check도 같은 tree를 artifact-intact/source-current로 확인했다. 이는 명칭·routing·deterministic delivery 회귀만 확인하며 기존 fresh behavior와 effect 범위를 넓히지 않는다.
+- `AGENTS.md`가 동결 plan, Evolution ledger, current product, evidence, status, version review와 선택형 진화 방법의 수명주기를 한 maintainer route에서 구분한다. `docs/reviews/v1.0.0_ko.md`는 목적 대비 합격선과 확신의 범위를 owner 문서에 연결하는 완료 판단 기록이며 구현·증거 정본을 복제하지 않는다.
+- 두 동결 plan이 가진 이전 guide 상대 링크는 frozen bytes를 수정하지 않고, 이전 path의 짧은 비정본 안내가 현재 `ai-skill-evolution-method_ko.md` 정본 하나로 연결한다. 이 안내는 authoring source graph나 generated npm payload에 포함되지 않는다.
+- 비추적 empty `.agents/skills/`와 `.tmp/`는 파일 0개와 exact repository-local path를 확인한 뒤 제거했다. 이는 installed skill이나 legacy evidence 삭제가 아니다.
+- Generated receipt의 기존 `packageId`, `packageVersion`, `coreVersion`, `targetId`, `treeSha256`를 source-side `check`와 installed `scripts/run.mjs check`가 함께 반환하도록 했다. 새 version 파일, module별 version, remote-latest 추정이나 registry dependency는 추가하지 않았다. Targeted build test 13/13은 source check와 standalone copied target 양쪽의 `natural-language-pilot@0.0.1`, core `1.0.0` 자기 식별을 확인했다.
+
+이 closure는 기존 행동·effect·비용 evidence를 넓히지 않는다. 특히 진화 방법의 인과적 이익과 broad host repeatability는 계속 `unproven`이다. Root와 authoring package version은 새 architecture의 첫 안정 계약인 `1.0.0`을 유지하며 commit, push, Git tag와 host 재설치는 별도 승인 전까지 수행하지 않는다. 결정과 재검토 조건은 E-036이 소유한다.

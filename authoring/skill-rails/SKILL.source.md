@@ -7,7 +7,7 @@ description: Create and maintain standalone AI skills from canonical source pack
 
 Build one standalone skill from a small canonical source graph while leaving genuine meaning judgments with the AI or user.
 
-Before making an authoring or maintenance judgment, read §0 and §0.1 of `references/universalFrameworkOriginal.md`. Use its routing table and the decision's uncertainty, reach, and reversal cost to choose any additional original sections. The generated `references/universalFrameworkOriginal.index.json` is only a byte-range navigation aid; it does not define meaning or a closed task taxonomy.
+Before making an authoring or maintenance judgment, read §§0–0.1 of `references/skillEvolutionMethod.md`. Use its routing table and the decision's uncertainty, reach, and reversal cost to choose any additional sections. The generated `references/skillEvolutionMethod.index.json` is only a byte-range navigation aid; it does not define meaning or a closed task taxonomy.
 
 ## Work from canonical source
 
@@ -36,4 +36,4 @@ The installed skill carries one closed authoring CLI. Set `<skill-root>` to the 
 
 Inspect the exact owner and consumers before editing, use overview only for a non-authoritative whole-package view, double-build and compare tree hashes, and check artifact integrity separately from source currentness. Neither check establishes fresh-agent behavior or external effect. Review the generated diff and build receipt before claiming delivery.
 
-Current evidence covers deterministic source/build/currentness, one bounded record-only use path, five small pilot stage observations, one machine-level non-Devflow generalization, and one bounded installed author-to-two-target-to-maintain-to-unfamiliar-use observation. The embedded CLI closes mechanical out-of-repository delivery without a sibling repository, global runtime, or network call. Framework navigation benefit, broad host behavior, authoring-process efficiency, and prose-relative total cost remain `unproven`; inspect the named receipts before extending those claims.
+Current evidence covers deterministic source/build/currentness, one bounded record-only use path, five small pilot stage observations, one machine-level non-Devflow generalization, and one bounded installed author-to-two-target-to-maintain-to-unfamiliar-use observation. The embedded CLI closes mechanical out-of-repository delivery without a sibling repository, global runtime, or network call. The evolution method's navigation benefit, broad host behavior, authoring-process efficiency, and prose-relative total cost remain `unproven`; inspect the named receipts before extending those claims.

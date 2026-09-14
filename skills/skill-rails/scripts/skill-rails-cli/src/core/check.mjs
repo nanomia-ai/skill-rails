@@ -55,6 +55,9 @@ export async function checkTarget(targetRoot, expectedPlan = undefined) {
   return {
     schemaVersion: 1,
     status: "CHECKED",
+    packageId: receipt.packageId,
+    packageVersion: receipt.packageVersion,
+    coreVersion: receipt.coreVersion,
     targetId: receipt.targetId,
     artifactIntact: true,
     sourceCurrent,

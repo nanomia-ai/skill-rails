@@ -3,7 +3,7 @@
   "packageId": "skill-rails-authoring",
   "packageVersion": "1.0.0",
   "modules": {
-    "universalFrameworkOriginal": "docs/guide/universal-ai-skill-inquiry-framework.md"
+    "skillEvolutionMethod": "docs/guide/ai-skill-evolution-method_ko.md"
   },
   "targets": {
     "authoring": "authoring/skill-rails/targets/authoring/target.json"

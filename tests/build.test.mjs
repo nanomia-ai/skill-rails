@@ -59,6 +59,9 @@ test("Product target builds standalone and is source-current", async (t) => {
   assert.equal(checked.status, 0, checked.stderr || checked.stdout);
   assert.equal(checked.json.artifactIntact, true);
   assert.equal(checked.json.sourceCurrent, true);
+  assert.equal(checked.json.packageId, "natural-language-pilot");
+  assert.equal(checked.json.packageVersion, "0.0.1");
+  assert.equal(checked.json.coreVersion, "1.0.0");
 });
 
 test("a Verify-only source change leaves the actual Product target current", async (t) => {
@@ -80,16 +83,16 @@ test("a Verify-only source change leaves the actual Product target current", asy
   assert.equal(verifyCheck.json.sourceCurrent, false);
 });
 
-test("authoring target materializes the Framework original and a semantic-free deterministic heading index", async (t) => {
-  const root = await temporary(t, "framework-index");
+test("authoring target materializes the skill evolution method and a semantic-free deterministic heading index", async (t) => {
+  const root = await temporary(t, "evolution-method-index");
   const left = join(root, "left");
   const right = join(root, "right");
   assert.equal(coreCli("build", "--source", "authoring-package.json", "--target", "skill-rails", "--out", left).status, 0);
   assert.equal(coreCli("build", "--source", "authoring-package.json", "--target", "skill-rails", "--out", right).status, 0);
-  const original = await readFile(resolve(repositoryRoot, "docs/guide/universal-ai-skill-inquiry-framework.md"));
-  assert.deepEqual(await readFile(join(left, "references", "universalFrameworkOriginal.md")), original);
-  assert.deepEqual(await readFile(join(left, "references", "universalFrameworkOriginal.index.json")), await readFile(join(right, "references", "universalFrameworkOriginal.index.json")));
-  const index = JSON.parse(await readFile(join(left, "references", "universalFrameworkOriginal.index.json"), "utf8"));
+  const original = await readFile(resolve(repositoryRoot, "docs/guide/ai-skill-evolution-method_ko.md"));
+  assert.deepEqual(await readFile(join(left, "references", "skillEvolutionMethod.md")), original);
+  assert.deepEqual(await readFile(join(left, "references", "skillEvolutionMethod.index.json")), await readFile(join(right, "references", "skillEvolutionMethod.index.json")));
+  const index = JSON.parse(await readFile(join(left, "references", "skillEvolutionMethod.index.json"), "utf8"));
   assert.equal(index.source.sha256, sha256(original));
   assert.equal(index.source.byteLength, original.length);
   assert.deepEqual(index.sections.slice(0, 3).map(({ sectionId, level, parent }) => ({ sectionId, level, parent })), [
@@ -101,7 +104,7 @@ test("authoring target materializes the Framework original and a semantic-free d
     assert.equal(section.sha256, sha256(original.subarray(section.startByte, section.endByte)));
   }
   const target = JSON.parse(await readFile(join(left, "config", "target.json"), "utf8"));
-  assert.equal(target.headingIndex, "references/universalFrameworkOriginal.index.json");
+  assert.equal(target.headingIndex, "references/skillEvolutionMethod.index.json");
   assert.equal(target.embeddedCoreTooling, "authoring-cli-v1");
 
   const embeddedRoot = join(left, "scripts", "skill-rails-cli");
@@ -165,6 +168,9 @@ test("copied target checks integrity without repository or sibling skill access"
   const checked = runNode([join(installed, "scripts", "run.mjs"), "check"], { cwd: root });
   assert.equal(checked.status, 0, checked.stdout);
   assert.equal(checked.json.status, "ARTIFACT_INTACT");
+  assert.equal(checked.json.packageId, "natural-language-pilot");
+  assert.equal(checked.json.packageVersion, "0.0.1");
+  assert.equal(checked.json.coreVersion, "1.0.0");
   assert.equal(checked.json.sourceCurrent, null);
   assert.equal(checked.json.remoteLatest, null);
 });

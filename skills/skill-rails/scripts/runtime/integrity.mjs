@@ -26,3 +26,13 @@ export async function assertIntegrity(targetRoot) {
   if (tree !== receipt.treeSha256) fail("ARTIFACT_INTEGRITY_FAILED", "The target tree hash differs from its receipt.", "Reinstall the generated target.");
   return receipt;
 }
+
+export function targetIdentity(receipt) {
+  return {
+    packageId: receipt.packageId,
+    packageVersion: receipt.packageVersion,
+    coreVersion: receipt.coreVersion,
+    targetId: receipt.targetId,
+    treeSha256: receipt.treeSha256,
+  };
+}

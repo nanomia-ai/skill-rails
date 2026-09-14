@@ -47,7 +47,7 @@ test("framework receipt metrics preserve Claude cache usage and observed bounded
 
 test("framework receipt metrics keep Codex usage host-local and expose repository-source reads", () => {
   const lines = [
-    { type: "item.completed", item: { id: "one", type: "command_execution", command: "rg -n '^##' docs/guide/universal-ai-skill-inquiry-framework.md", aggregated_output: "12:## section" } },
+    { type: "item.completed", item: { id: "one", type: "command_execution", command: "rg -n '^##' docs/guide/ai-skill-evolution-method_ko.md", aggregated_output: "12:## section" } },
     { type: "item.completed", item: { id: "two", type: "file_change" } },
     { type: "turn.completed", usage: { input_tokens: 100, cached_input_tokens: 70, output_tokens: 30, reasoning_output_tokens: 20 } },
   ];

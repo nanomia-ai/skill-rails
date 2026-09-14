@@ -18,7 +18,7 @@ Skill Rails는 AI가 사용할 독립적인 target skill을 저작하고, 현재
 - AI는 의미를 판단하고 host tool을 선택한다. Core는 자유 산문의 진실성이나 AI 준수를 보장하지 않는다.
 - Effect credit은 실제 관찰 권한을 넘지 않는다. 파일 write는 reread digest가 맞을 때만 `observed`다.
 - 기본 상태는 artifact-derived다. 대화나 run scratch를 durable semantic truth로 만들지 않는다.
-- 사람의 전체 구조 질문에는 source repository의 `overview --source`가 current graph에서 계산한 non-authoritative view 하나만 사용한다. 이 출력은 저장 정본, Framework index, generated skill 또는 AI runtime/router의 입력이 아니다.
+- 사람의 전체 구조 질문에는 source repository의 `overview --source`가 current graph에서 계산한 non-authoritative view 하나만 사용한다. 이 출력은 저장 정본, 진화 방법의 heading index, generated skill 또는 AI runtime/router의 입력이 아니다.
 - 공유 human source는 build-time whole-module materialization으로 standalone target에 들어간다. Installed target의 remote latest는 receipt가 증명하지 않는다.
 - Greenfield schema는 `schemaVersion: 1`이며 legacy V5를 읽지 않는다.
 - 첫 수직 흐름은 natural-language pilot Verify이고, 그 결과를 Devflow·9-target·다른 stage의 승리로 자동 승계하지 않는다.
@@ -36,7 +36,7 @@ Skill Rails는 AI가 사용할 독립적인 target skill을 저작하고, 현재
 - Public runtime은 `check | initialize | record`와 일치하고 generated target에는 observer, packet, semantic decision, fallback 또는 prepare runtime이 없다.
 - Prepare-record 코드는 재현과 반증을 위한 M1~M4 실험 evidence로 보존하지만 production baseline이나 fallback으로 사용하지 않는다.
 - 후속 target은 semantic answer를 현재 record-only initializer/exchange와 공통 safe record 경계에 넣을 수 있을 때만 채택한다. CAS·lock·reread authority와 marker 밖 bytes 보존 목적을 약화하거나 prepare를 되살리지 않는다.
-- Framework whole original과 heading index는 materialize됐지만 상대 효과는 `unproven/pre-gate`다. 평가 harness/schema는 product core가 아니라 `evals/m5/framework/`가 소유하며, 완료되지 않은 matrix나 구조 test를 adoption 증거로 쓰지 않는다.
+- 진화 방법 원문과 heading index는 materialize됐지만 상대 효과는 `unproven/pre-gate`다. 당시 Framework 평가 harness/schema는 product core가 아니라 `evals/m5/framework/`가 소유하며, 완료되지 않은 matrix나 구조 test를 adoption 증거로 쓰지 않는다.
 - M5 pilot의 Product·Direct·Work·Resume는 각자 별도 bounded gate를 거친 prose-only target이고 Verify만 record-only다. 한 stage의 관찰을 다른 stage나 Devflow에 복사하지 않으며, Resume는 artifact-derived read-only 해석일 뿐 durable workflow state가 아니다.
 - Authoring prose target만 optional `embeddedCoreTooling: "authoring-cli-v1"`을 선언할 수 있다. 이는 target/package identity와 무관하게 고정된 canonical CLI closure를 `scripts/skill-rails-cli/`에 넣고 기존 receipt/tree hash/currentness가 소유하는 단일 capability다. 임의 path·glob·destination·domain executable·두 번째 값이나 consumer는 허용하지 않는다. 한 M8 installed fresh author→build→maintain→unfamiliar-use 관찰만 proven이고 반복성과 넓은 host/domain 효과는 `unproven`이다.
 - Fallback 산문만으로 canonical managed record를 안정적으로 만들지 못한 실제 run이 있으므로 현재 fallback을 안전 경로로 안내하지 않는다.

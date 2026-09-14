@@ -64,7 +64,7 @@ async function copyWorkspace(projectRoot, protocol) {
   await mkdir(resolve(projectRoot, "fixture"), { recursive: true });
 }
 
-export const frameworkInstruction = "Before making an authoring or maintenance judgment, read §0 and §0.1 of `references/universalFrameworkOriginal.md`. Use its routing table and the decision's uncertainty, reach, and reversal cost to choose any additional original sections. The generated `references/universalFrameworkOriginal.index.json` is only a byte-range navigation aid; it does not define meaning or a closed task taxonomy.";
+export const frameworkInstruction = "Before making an authoring or maintenance judgment, read §§0–0.1 of `references/skillEvolutionMethod.md`. Use its routing table and the decision's uncertainty, reach, and reversal cost to choose any additional sections. The generated `references/skillEvolutionMethod.index.json` is only a byte-range navigation aid; it does not define meaning or a closed task taxonomy.";
 
 export function materializeLaneEntry(entry, instruction) {
   const changed = entry.replace(frameworkInstruction, instruction);
@@ -83,7 +83,7 @@ async function installLane(projectRoot, lane, host, protocol) {
     schemaVersion: 1,
     packageId: "skill-rails-authoring-evaluation",
     packageVersion: "1.0.0-m5",
-    modules: usesFramework ? { universalFrameworkOriginal: "docs/guide/universal-ai-skill-inquiry-framework.md" } : {},
+    modules: usesFramework ? { universalFrameworkOriginal: "docs/guide/ai-skill-evolution-method_ko.md" } : {},
     targets: { authoring: ".lane-source/target/target.json" },
   };
   const target = { schemaVersion: 1, targetId: "skill-rails-next", mode: "prose", entry: "../entry.md", imports: usesFramework ? ["universalFrameworkOriginal"] : [] };
@@ -190,8 +190,8 @@ async function preflight(projectRoot, task, host, laneBuild, fixtureTests) {
   for (const path of requiredByTask[task]) rows.push({ name: `fixture:${path}`, ok: await exists(resolve(projectRoot, path)), evidence: path });
   rows.push({ name: "harness-self-test-excluded", ok: !await exists(resolve(projectRoot, "tests/framework-harness.test.mjs")), evidence: "tests/framework-harness.test.mjs" });
 
-  const localFramework = await readFile(resolve(projectRoot, "docs/guide/universal-ai-skill-inquiry-framework.md"));
-  const canonicalFramework = await readFile(resolve(repositoryRoot, "docs/guide/universal-ai-skill-inquiry-framework.md"));
+  const localFramework = await readFile(resolve(projectRoot, "docs/guide/ai-skill-evolution-method_ko.md"));
+  const canonicalFramework = await readFile(resolve(repositoryRoot, "docs/guide/ai-skill-evolution-method_ko.md"));
   rows.push({ name: "framework-original-hash", ok: sha256(localFramework) === sha256(canonicalFramework), evidence: sha256(localFramework) });
 
   const check = await run(process.execPath, [resolve(projectRoot, "src/core/cli.mjs"), "check", "--source", laneBuild.manifestPath, "--target", "skill-rails-next", "--out", laneBuild.installed], { cwd: projectRoot });
@@ -255,7 +255,7 @@ function toolKind(name, input = {}) {
 function readObservation(name, input, returnedBytes) {
   const material = `${name ?? ""}\n${JSON.stringify(input ?? {})}`.replaceAll("\\", "/").toLowerCase();
   const packageReference = material.includes("references/universalframeworkoriginal.md");
-  const repositoryOriginal = material.includes("docs/guide/universal-ai-skill-inquiry-framework.md");
+  const repositoryOriginal = material.includes("docs/guide/ai-skill-evolution-method_ko.md");
   if (!packageReference && !repositoryOriginal) return null;
   const normalizedName = String(name ?? "").toLowerCase();
   const command = String(input?.command ?? input?.cmd ?? "").toLowerCase();

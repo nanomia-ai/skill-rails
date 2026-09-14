@@ -23,12 +23,24 @@ This repository is rebuilding Skill Rails from a clean greenfield source. The pr
    - implementation scope, receipts, and `unproven` claims: `docs/implementation-verification_ko.md`
    - implementation changes from the frozen plan: `docs/plan/implementation-evolution-plan_ko.md`
    - frozen requirement or decision trace: the two files in `docs/plan/`
-3. For judgment depth, start at §0.1 of `docs/guide/universal-ai-skill-inquiry-framework.md` and read only the sections that can change the current decision.
+3. For judgment depth, start at §§0–0.1 of `docs/guide/ai-skill-evolution-method_ko.md` and read only the sections that can change the current decision.
 4. Inspect the current canonical source and its direct consumer before editing. If `.codegraph/` exists, use CodeGraph before text search to locate or understand code.
 
 Do not preload every document. Open another owner when the task crosses its boundary.
 
 After a handoff, resume, or context compaction/reconstruction, reopen this file from disk and repeat Maintainer entry steps 1–3 before acting. A coordinator continuing through that boundary must pass the refreshed current milestone, one pending decision, evidence boundary, and exact next action to any active worker; inherited conversation context is not a substitute.
+
+## Document lifecycle
+
+`AGENTS.md` is the only maintainer router; do not create another documentation index.
+
+- The two frozen files in `docs/plan/` preserve the user-approved v1 intent and execution plan. Their planning-time names and paths are historical coordinates, not current naming authorities.
+- `docs/plan/implementation-evolution-plan_ko.md` is the durable implementation decision and deviation ledger despite its established filename. Add only material discoveries that change a frozen decision, contract, milestone, or reopening condition; keep routine chronology in Git.
+- `docs/skill-rails_ko.md` owns the current stable product and architecture boundary. Update it when that boundary changes rather than appending a parallel design document.
+- `docs/implementation-verification_ko.md` owns current evidence, failures, and `unproven` scope. Preserve unique receipts, but replace superseded current claims instead of turning it into a daily log.
+- `docs/maintenance-status_ko.md` is a replaceable handoff snapshot. Refresh it only at a coherent milestone or handoff.
+- `docs/reviews/v<version>_ko.md` records the acceptance judgment for one completed version. It summarizes and links to owners; it does not become a new source of implementation truth. Create a new review for a later version instead of rewriting the old judgment.
+- `docs/guide/ai-skill-evolution-method_ko.md` is the selective reasoning method for planning, implementation, verification, and recovery. It is neither a product plan nor a mandatory end-to-end workflow.
 
 ## Change and verification discipline
 

@@ -720,3 +720,43 @@ M8 produced-skill acceptance 뒤 실제 registry와 installer 경로를 확인�
 Canonical owner인 root package metadata, authoring package version, authoring target descriptor와 entry 이름만 production으로 바꾸고 generated target을 rebuild했다. `npm pack --dry-run --json`은 39 entries, 63,826B packed/227,085B unpacked이며 legacy/evals/tests/repository source를 제외했고 release `npm run verify`는 31/31 pass했다. Post-consumer input hash는 기존 receipt와 같았고 Claude raw session은 `--no-session-persistence` 때문에 없으므로 retained CLI metadata와 coordinator-reread effect만 권한으로 남긴다.
 
 Candidate commit `e321879dc3b1fbadf3677eb1eb06abb7d0f46551`은 기존 origin `main`에 force 없이 fast-forward됐고 remote head가 같음을 재확인했다. `skills@1.5.26`의 repository route는 production `skill-rails`와 generated tree `cab9710...`를 골라 Codex·Claude 전역 위치와 별도 일반 project의 두 project-local 위치에 설치했다. 전역 old tree는 승인된 범위에서 63 files/1,028,325B에서 36 files/201,705B production tree로 교체됐고 unrelated skill 이름은 설치 뒤에도 보존됐다. 별도 project의 fresh Codex Sol medium과 Claude Opus medium은 각각 project-local entry를 발견하고 skill-local CLI로 artifact-intact/tree hash를 확인했다. Codex가 문서에 없는 `--help`를 두 번 시도한 마찰과 installer의 상세가 노출되지 않은 Socket alert 1건은 숨기지 않되 이번 integrity smoke 결과를 broad behavior/effect로 확대하지 않는다. `CODEX_HOME`, README, 동결 계획과 legacy capsule은 바꾸지 않았다. 두 번째 tooling 값·consumer·closure나 domain executable 수요가 생기면 이 capability를 넓히지 않고 사용자 결정으로 되돌린다.
+
+## E-036 — v1 종료에서 탐구 문서의 역할명과 장기 문서 수명주기를 분리
+
+상태: **canonical 명칭 정리와 v1.0.0 review 추가 완료 — release 반영은 별도 승인 대기**
+
+### 실제 문제와 evidence
+
+현재 탐구 문서는 단순한 질의 모음이나 모든 AI 스킬에 강제하는 universal framework가 아니라, 기획·구현·검증·복구에서 필요한 절만 선택해 목적 보존, 비례성, 증식 차단과 환류를 판단하는 방법이다. 그러나 repository path `universal-ai-skill-inquiry-framework.md`와 generated module id `universalFrameworkOriginal`은 외부에서 가져온 임시 원본처럼 읽혀 현재 역할을 가렸다. `docs/plan/`에는 두 동결 입력과 35개 구현 결정을 보존한 Evolution ledger가 함께 있어, 파일명만 보고 현재 수정해야 할 plan과 고정된 역사 좌표를 구분하기도 어려웠다. 루트에는 project-local 설치와 scratch가 남긴 empty `.agents/skills/`와 `.tmp/`도 있었지만 두 경로 모두 Git 비추적이고 파일은 0개였다.
+
+### 영향받는 결정·계약과 보존 목적
+
+영향은 D-11의 탐구 원문 owner, authoring source graph, generated reference와 heading index, maintainer 문서 routing, v1 종료 판단이다. 동결된 concept와 상세 계획은 이동·수정하지 않고, established `implementation-evolution-plan_ko.md`도 기존 decision 좌표와 참조 비용 때문에 이름을 유지한다. 새 문서 index나 요약 정본을 만들지 않고 `AGENTS.md`를 유일한 maintainer router로 보존한다. Generated package는 직접 편집하지 않으며 canonical source와 target을 바꾼 뒤 rebuild한다. 과거 M5 Framework receipt와 protocol 명칭은 당시 evidence이므로 재작성하지 않는다.
+
+### 검토한 대안과 선택
+
+기존 이름을 유지하면 변경 비용은 없지만 현재 역할 오해와 `Original` 임시성이 계속 남는다. 동결 plan과 Evolution ledger까지 모두 rename하면 역사 좌표를 바꾸게 되고, 별도 docs index는 maintainer 진입점을 둘로 만든다. 따라서 현재 의미 owner만 `docs/guide/ai-skill-evolution-method_ko.md`, generated module은 `skillEvolutionMethod`로 좁히고, 문서별 수명주기는 `AGENTS.md`에 둔다. 동결 plan의 기존 상대 링크는 수정할 수 없으므로 이전 path에는 현재 정본 하나만 가리키는 짧은 비정본 안내를 보존한다. `docs/reviews/v1.0.0_ko.md`는 현재 owner를 링크하는 완료 버전 판단 기록일 뿐 새 구현·증거 정본이 아니다.
+
+### 검증 결과와 재검토 조건
+
+Canonical rebuild는 generated reference와 index를 새 이름으로 만들었고 tree SHA-256 `beaffa7d4f0b33dbe9a39b3f822058f415809a3168fe7a3ca13cf94c359a7479`, 36 files/202,221B로 artifact-intact/source-current였다. Authoring build와 repository boundary targeted test는 15/15 통과했다. 이름 변경 때문에 실패한 historical M5 harness 자기검사 두 개는 현재 canonical anchor와 source path를 가리키도록 좁혀 5/5 통과했으며 새 harness·schema·평가 run은 만들지 않았다. 최종 default `npm run verify`는 31/31 통과했고 별도 currentness check도 같은 tree를 확인했다. Empty `.agents/`와 `.tmp/`는 exact path 확인 뒤 제거했다.
+
+Release 직전 local-link 감사에서 두 동결 plan의 기존 guide 상대 링크가 rename으로 끊기는 것을 발견했다. 동결 bytes를 바꾸지 않고 이전 path를 현재 정본으로 연결하는 4-line 안내만 복구했으며, 이 파일은 source package import나 generated payload가 아니고 의미 owner도 아니다.
+
+이 변경은 method의 인과적 이익이나 broad AI 행동을 새로 proven으로 올리지 않는다. `1.0.0`은 새 architecture의 첫 안정 계약을 뜻하며 Git tag, commit, push, host 재설치는 별도 승인 전에는 수행하지 않는다. 후속 버전에서 문서 역할이 다시 겹치거나 cold maintainer가 `AGENTS.md`만으로 owner를 고르지 못하는 실제 장면이 생길 때 수명주기를 재검토한다.
+
+## E-037 — 설치 artifact의 package와 builder version은 기존 receipt에서 함께 조회
+
+상태: **v1.0.0 release closure에 반영 — repository release와 재설치 대기**
+
+### 실제 문제와 evidence
+
+Generated target의 `.skill-rails-build.json`에는 이미 `packageVersion`과 artifact를 만든 `coreVersion`이 있었지만 source-side와 installed runtime의 `check` 결과는 target id와 tree hash만 반환했다. 따라서 사용하는 프로젝트에서 설치 bytes가 어느 skill package와 builder 계약에서 왔는지 확인하려면 내부 receipt를 직접 열어야 했다. 과거처럼 module별 version을 추가하면 한 release의 주 version을 다시 분산시키고, 별도 version file은 receipt와 불일치할 두 번째 정본이 된다.
+
+### 영향받는 계약과 가장 작은 선택
+
+영향은 generated artifact의 자기 식별과 `check` 출력뿐이며 build schema, 설치 방식, remote update 판정과 skill frontmatter를 바꾸지 않는다. Existing build receipt를 계속 단일 owner로 두고 source-side `check`와 세 runtime mode의 installed `check`가 `packageId`, `packageVersion`, `coreVersion`, `targetId`, `treeSha256`를 같은 의미로 반환한다. 공통 installed identity projection은 `src/runtime/integrity.mjs` 하나가 소유하며 세 runner가 이를 재사용한다. Git tag는 repository release 좌표이고 receipt는 실제 설치 bytes의 identity라는 경계를 보존한다.
+
+### 검증과 재검토 조건
+
+Targeted `tests/build.test.mjs` 13/13은 source currentness 검사와 source repository 없이 복사된 standalone target의 package/core version을 확인했다. Canonical rebuild 뒤 production authoring target은 36 files/202,763B, tree `e26b637ad076a66971cda8a18405262fc70d3320d9d590dcd3c4cd3fde17fcc7`로 artifact-intact/source-current이고 source-side와 installed check가 모두 `skill-rails-authoring@1.0.0`, core `1.0.0`을 반환했다. 이는 설치 artifact의 자기 식별만 proven으로 만들며 remote latest, installer가 선택한 Git commit 또는 update availability는 계속 `null`/`unproven`이다. 향후 installer가 검증 가능한 source commit을 artifact에 전달하는 공식 계약을 제공할 때만 remote release identity 확장을 재검토한다.

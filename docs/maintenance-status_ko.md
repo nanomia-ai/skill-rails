@@ -2,7 +2,7 @@
 
 문서 상태: 교체형 현재 snapshot
 
-최종 갱신: 2026-09-14 KST — post-release 실사용 vertical slice의 두 host 개발·검증 effect 완료
+최종 갱신: 2026-09-15 KST — v1.0.0 문서 체계·artifact version 조회 release closure
 
 ## 현재 위치
 
@@ -11,6 +11,7 @@
 - 기존 v0.4.3 implementation 257개 파일은 `legacy/archive/v0.4.3/legacy-source.tar`에 보존했다. Capsule SHA-256은 `c79dcf45dc9ab520aa100e19ecf6ef95102d1a423c89c5090cadd40293db31fc`다.
 - `inventory.json`이 원경로·Git/working hash·mode를, `restore-receipt.json`이 Windows temporary-root 복원 257/257와 mismatch 0을 소유한다. POSIX mode 복원은 `unproven`이다.
 - Root package는 private metadata `@nanomia/skill-rails@1.0.0`, Node 범위는 `>=24 <25`이고 외부 runtime dependency는 없다. 공식 공개 전달은 npm registry package가 아니라 `nanomia-ai/skill-rails` repository의 `npx skills@latest` 경로다.
+- v1.0.0 문서 closure candidate는 선택형 판단 원문을 `docs/guide/ai-skill-evolution-method_ko.md`, generated module을 `skillEvolutionMethod`로 정리하고 `docs/reviews/v1.0.0_ko.md`에 목적 대비 합격선과 증거 경계를 기록했다. 설치 artifact의 기존 receipt를 단일 version owner로 유지하면서 source·installed `check`가 package/core version을 노출한다. 현재 local generated tree는 `e26b637ad076a66971cda8a18405262fc70d3320d9d590dcd3c4cd3fde17fcc7`, 36 files/202,763B로 artifact-intact/source-current이고 final default verify는 31/31 통과했지만 아직 commit·push·Git tag·host 재설치하지 않았다.
 - Canonical authoring source는 `authoring/skill-rails/`, generated tracked skill은 `skills/skill-rails/`이다. 현재 repository discovery에 active production skill은 `skill-rails` 하나뿐이다.
 - Natural-language pilot의 현재 record-only Verify 설치 target tree SHA-256은 `25798e8a916d8b0062427c3d38f100198e94cb2bda8e90f79d5bd1bfde21763a`다. 표준 installer로 Codex·Claude Code에 설치했고 두 runtime `check`는 `ARTIFACT_INTACT`다.
 - Production cutover 직전 기존 전역 `skill-rails`는 두 host 위치에서 각각 63 files/1,028,325B였다. 승인된 교체 뒤 Codex·Claude 위치는 각각 production 36 files/201,705B, task-local path+content hash `52e4070a...`, generated tree `cab9710...`로 같고 artifact-intact다. Pilot target `natural-language-pilot-verify-next`, unrelated global skills와 project-local alpha evidence는 보존한다.
@@ -50,10 +51,11 @@ Treatment의 canonical renderer/record는 두 control이 발명한 비호환 mar
 
 M5의 renderer-only 선행 gate는 E-019와 `evals/m5/results/renderer-only-boundary-gate-2026-09-13.json`으로 닫혔다. Framework 초기 교정과 중단·격리는 E-020/E-021 및 `evals/m5/results/framework/`가 소유한다.
 
-1. Post-cutover closure의 exact implementation/evidence boundary는 `docs/implementation-verification_ko.md` 마지막 절과 `evals/m8/results/practical-closure-2026-09-14.json`이 소유한다. 기존 M8 cutover 값과 결정은 pre-release receipt와 E-034/E-035가 계속 소유한다.
-2. Post-release 실사용 slice 뒤 실제 Devflow adoption은 알려진 Skill Rails redesign blocker 없이 시작할 수 있다. 실패한 Devflow mechanism을 요구사항이나 source baseline으로 옮기지 않고 현재 사용자 목적과 domain 정본에서 첫 단위를 prose-first·한 owner·현재 evidence 우선으로 저작한다. 첫 적용의 효과는 그 장면에만 귀속하고 broad recovery나 Framework 우위로 확대하지 않는다.
-3. 추가 synthetic fresh flow, matrix, schema, harness, prepare/fallback, domain observer/runtime를 열지 않는다. 두 번째 declared output이나 multi-file managed write의 실제 필요, one-output renderer로 소유할 수 없는 fresh-AI deterministic 오판 반복, 실제 lost update가 생기면 core 경계를 구현하기 전에 사용자 결정으로 되돌린다. 첫 두 실제 target에서 큰 always-read shared module이 생기면 먼저 authoring granularity를 다시 열고 core runtime 문제로 간주하지 않는다.
-4. Force/history rewrite, README 변경과 archive 삭제는 계속 금지한다. Archive 제거와 POSIX restore 검증은 별도 사용자 결정으로 남긴다.
+1. v1.0.0 문서·명칭 closure와 설치 artifact version 조회의 current implementation/evidence는 `docs/implementation-verification_ko.md` 마지막 절, version judgment는 `docs/reviews/v1.0.0_ko.md`, 결정은 E-036/E-037이 소유한다. Commit·push·Git tag와 두 host 재설치는 현재 사용자 승인에 따라 진행한다.
+2. Post-cutover closure의 exact implementation/evidence boundary는 `docs/implementation-verification_ko.md`와 `evals/m8/results/practical-closure-2026-09-14.json`이 소유한다. 기존 M8 cutover 값과 결정은 pre-release receipt와 E-034/E-035가 계속 소유한다.
+3. Post-release 실사용 slice 뒤 실제 Devflow adoption은 알려진 Skill Rails redesign blocker 없이 시작할 수 있다. 실패한 Devflow mechanism을 요구사항이나 source baseline으로 옮기지 않고 현재 사용자 목적과 domain 정본에서 첫 단위를 prose-first·한 owner·현재 evidence 우선으로 저작한다. 첫 적용의 효과는 그 장면에만 귀속하고 broad recovery나 진화 방법 우위로 확대하지 않는다.
+4. 추가 synthetic fresh flow, matrix, schema, harness, prepare/fallback, domain observer/runtime를 열지 않는다. 두 번째 declared output이나 multi-file managed write의 실제 필요, one-output renderer로 소유할 수 없는 fresh-AI deterministic 오판 반복, 실제 lost update가 생기면 core 경계를 구현하기 전에 사용자 결정으로 되돌린다. 첫 두 실제 target에서 큰 always-read shared module이 생기면 먼저 authoring granularity를 다시 열고 core runtime 문제로 간주하지 않는다.
+5. Force/history rewrite, README 변경과 archive 삭제는 계속 금지한다. Archive 제거와 POSIX restore 검증은 별도 사용자 결정으로 남긴다.
 
 ## 아직 unproven 또는 기각된 범위
 
