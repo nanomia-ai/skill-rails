@@ -787,7 +787,7 @@ Current source graph와 generated target은 entry, whole-file imports와 shared 
 
 ## E-039 — 기존 구조 선언 누락과 새 semantic relation의 입장 조건을 분리
 
-상태: **v1.0.2 candidate 상호 수렴·canonical 교정·전체 prompt 감사·targeted 검증 완료 — release 미수행**
+상태: **v1.0.2 상호 수렴·canonical 교정·전체 prompt 감사·targeted 검증·release·두 host 설치 완료**
 
 ### 실제 문제와 evidence
 
@@ -808,3 +808,5 @@ Release 직전 같은 Claude Fable 5 세션이 canonical entry 39줄과 상세 �
 Coordinator는 전체 prompt 감사에서 이 충돌을 찾았고, 기존 Claude Fable 5 세션에 자신의 판단과 반대 가능성을 함께 전달했다. Fable은 처음에는 v1.0.1 전체 entry를 PASS로 판정했던 자신의 범위가 step 5에서 지나치게 넓었다고 철회하고, validator가 prose text reference와 import 누락을 잡지 않는 실행 경로를 확인해 필수 교정에 동의했다. 첫 왕복에서 Fable이 제안한 `file the target actually consumes` 표현보다 step 3의 기존 분류를 직접 가리키는 coordinator 문구가 더 정확하다는 두 번째 왕복을 진행했고, Fable은 최종 문구를 그대로 승인했다. 양쪽은 상세 guide, schema, 새 test matrix와 다른 prompt는 바꾸지 않는 데도 합의했다.
 
 기존 authoring build test에 새 두 의미 anchor만 추가했고 별도 test·matrix·harness는 만들지 않았다. 기본 `npm run verify`는 31/31 통과했다. Canonical rebuild는 36 files/203,690B, tree `c67d7e651236713668b225ed7a07fd7a6cee765eb72eadb46be372b2e6fc43bd`이며 source-side check는 package/core `1.0.2`, artifact-intact/source-current를, standalone check는 같은 identity와 artifact-intact를 반환했다. Cold author가 구조 선언과 semantic relation을 실제로 올바르게 구분하는 행동 효과는 첫 실제 저작 장면 전까지 `unproven`이다. 그 장면에서 actual dependency를 여전히 누락하거나 관찰 없는 semantic edge를 추가한 경우에만 이 owner를 다시 연다.
+
+Release commit `e72bc29debae8f04efccadae56ab7fbe01823c95`, annotated tag `v1.0.2`와 원격 push를 완료했다. 공식 `npx skills@latest` repository 경로로 Codex와 Claude Code에 설치했고 installer hash는 `14b9872ba23306a535056ebc8a651a19d990bb8eb6d7f4b4a411037774f65cc8`이다. 두 host의 installed check는 package/core `1.0.2`, 같은 generated tree와 `ARTIFACT_INTACT`를 반환했다. 이 배포 사실은 위의 행동 효과를 proven으로 올리지 않는다.

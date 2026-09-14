@@ -453,7 +453,7 @@
 
 이 closure가 새로 proven으로 만드는 것은 exact public commit/tag 전달과 두 이름 붙인 host의 같은 installed v1.0.1 bytes다. 문구의 실제 cold-AI 행동 개선, 일반 산문 대비 token 절감과 첫 Devflow 적용 결과는 계속 `unproven`이며 `docs/reviews/v1.0.1_ko.md`의 재개 조건으로만 연다.
 
-## v1.0.2 candidate — 기존 구조 선언과 새 semantic relation의 입장 조건 분리
+## v1.0.2 release — 기존 구조 선언과 새 semantic relation의 입장 조건 분리
 
 - v1.0.1 전체 prompt 재감사에서 canonical step 5의 `observed maintenance failure` 조건이 두 종류를 함께 제한하는 충돌을 확인했다. 이미 target이 실제로 사용하는 input, output, import 또는 mechanism의 누락 선언은 처음부터 고쳐야 하지만, requirement/check/external-boundary 같은 새 semantic relation은 D-12대로 실제 유지보수 실패가 필요성을 보이기 전에는 추가하면 안 된다. Prose entry의 text reference와 import 누락을 current validator가 대조하지 않으므로 전자는 build/check를 통과하는 dead pointer가 될 수 있다.
 - Coordinator는 처음에 사용자 요구·외부 제약·관찰 실패를 관계 추가 근거로 함께 열거하는 안을 검토했다. 기존 Claude Fable 5 세션과 첫 왕복에서 이 표현은 semantic edge 추론 허가로 넓어질 수 있다는 반론에 동의하고, existing structural declaration과 new semantic relation을 직접 구분하는 한 문장으로 좁혔다. 두 번째 왕복에서 Fable은 `actual target input, output, import, or mechanism that step 3 requires`라는 최종 문구가 기존 rule owner를 중복하지 않으면서 dead pointer를 닫고 D-12를 보존한다고 PASS했으며, 자신의 첫 대안은 철회했다. 남은 이견은 0건이다.
@@ -461,4 +461,6 @@
 - 기본 `npm run verify`는 31/31 통과했다. Generated target은 36 files/203,690B, tree `c67d7e651236713668b225ed7a07fd7a6cee765eb72eadb46be372b2e6fc43bd`이며 source-side check는 `skill-rails-authoring@1.0.2`, core `1.0.2`, artifact-intact/source-current를, standalone check는 같은 package/core/tree와 artifact-intact를 반환했다.
 - Release 직전 같은 Claude Fable 5 세션이 canonical entry 39줄과 상세 판단 원문 975줄 전체를 읽고 다시 대조했다(`task_8b84a877a5d3`, dispatch `ctx_bb00d6536dee`). Step 3·4의 기존 변경은 최소·완전 계약을 보존하고, Step 5 교정은 구조 선언 누락과 새 semantic relation의 서로 다른 입장 조건을 일관되게 분리하며, entry와 guide 사이에 실제 다음 행동을 갈라놓는 충돌은 없다고 PASS했다. 구체적 blocker는 0건이었고 style-only 차이는 변경 근거에서 제외했다.
 
-이 evidence는 합의한 문구가 canonical source에서 generated target까지 전달되고 기존 기계 계약이 회귀하지 않았다는 것만 proven으로 만든다. Cold author가 새 target에서 누락 import를 실제로 보완하고 관찰 없는 semantic edge는 만들지 않는 행동은 `unproven`이다. Commit, tag, push, 설치와 배포는 수행하지 않았다.
+Release commit `e72bc29debae8f04efccadae56ab7fbe01823c95`를 `origin/main`에 non-force fast-forward했고, annotated tag object `f20fa142c668cb548fe514e58f3cc453eafe354b`의 `v1.0.2` peeled commit이 같은 release commit임을 `git ls-remote`로 확인했다. README의 공식 repository 경로를 사용한 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes --json` 설치는 hash `14b9872ba23306a535056ebc8a651a19d990bb8eb6d7f4b4a411037774f65cc8`을 반환했다. Codex의 `~/.agents/skills/skill-rails`와 그 exact directory를 가리키는 Claude Code의 `~/.claude/skills/skill-rails` 모두 package/core `1.0.2`, tree `c67d7e651236713668b225ed7a07fd7a6cee765eb72eadb46be372b2e6fc43bd`, `ARTIFACT_INTACT`를 반환했고 교정된 Step 5 bytes도 양쪽에서 확인했다. `CODEX_HOME`은 변경하지 않았다.
+
+이 evidence는 합의한 문구가 canonical source에서 generated target과 두 이름 붙인 host 설치본까지 동일하게 전달되고 기존 기계 계약이 회귀하지 않았다는 것만 proven으로 만든다. Cold author가 새 target에서 누락 import를 실제로 보완하고 관찰 없는 semantic edge는 만들지 않는 행동과 실제 비용 효과는 `unproven`이다.
