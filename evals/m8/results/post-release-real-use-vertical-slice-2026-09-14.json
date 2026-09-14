@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 1,
+  "gate": "post-release-real-use-vertical-slice",
+  "observedAt": "2026-09-14T17:40:20+09:00",
+  "decision": "DEVFLOW_ADOPTION_MAY_START_WITHOUT_A_KNOWN_SKILL_RAILS_REDESIGN_BLOCKER",
+  "closureContract": {
+    "attackedClaim": "The final public Skill Rails bytes can author and deliver a small standalone skill package that guides two fresh hosts through one moderately substantial connected software-delivery slice, with bounded reading, real code/test effects, honest recovery, and no need for legacy workflow machinery or a Skill Rails redesign.",
+    "supportAction": "Begin real Devflow adoption incrementally with prose-first targets, one canonical owner per rule, and current project artifacts as evidence; do not add core machinery for coverage.",
+    "refutationAction": "If current generated guidance or deterministic delivery causes a substantive host or effect failure, correct only the nearest existing canonical owner, rebuild affected targets, and rerun the one affected final-byte path.",
+    "indeterminateAction": "Leave Devflow adoption blocked only on the named missing observation; do not create a matrix, schema, harness, or broad recovery catalog.",
+    "cheapestSufficientObservation": "One fresh Codex Plan-to-Work chain followed by one fresh Claude Verify-to-Recovery chain in the same ordinary project, with coordinator and successor rereads of outputs, tests, hashes, installed trees, and scope.",
+    "stopBoundary": "Stop after both hosts use current installed generated skills, the executable project result is independently reread, the single practicality scorecard is reconciled, and no concrete redesign blocker remains. Repeatability and causal cost savings stay unproven."
+  },
+  "publicDelivery": {
+    "repository": "https://github.com/nanomia-ai/skill-rails.git",
+    "branch": "main",
+    "commit": "ff25f7b4186f60a229774a027d8279eceee0eda8",
+    "remoteHeadMatched": true,
+    "installCommand": "npx skills@latest add nanomia-ai/skill-rails --skill skill-rails --agent codex claude-code --copy -y",
+    "installedPaths": [
+      "D:/Projects/Private/nanomia/rollout-lens/.agents/skills/skill-rails",
+      "D:/Projects/Private/nanomia/rollout-lens/.claude/skills/skill-rails"
+    ],
+    "installedTreeSha256": "978eb4f64d60eade4cd51e7aff058d88f7ccd6d3078b3b79164bb45f1f2dee16",
+    "artifactIntactBothHosts": true,
+    "filesEach": 36,
+    "bytesEach": 202302,
+    "entryBytes": 5425,
+    "codeHomeChanged": false
+  },
+  "project": {
+    "path": "D:/Projects/Private/nanomia/rollout-lens",
+    "kind": "ordinary-separate-git-project",
+    "baselineCommit": "17dc2b17099af0482d02a36ab1c7c97fb2df3462",
+    "finalCommit": "1b26f01dc4aac9b80c4f9898f51bde1fcac77262",
+    "finalGitTree": "66340b115ec96ef78e168ae55b6cb8dc0da9fec2",
+    "finalStatusClean": true,
+    "remoteConfigured": false,
+    "pushed": false,
+    "scenario": "Extend a dependency-free explainable rollout evaluator from stable percentage allocation to full-input validation plus emergency, deny, allow, segment, and percentage precedence; plan the change, implement edge cases, independently verify actual execution, and recover one current next action."
+  },
+  "authoring": {
+    "frameworkRouting": {
+      "sectionsRead": ["0", "0.1", "4.1", "4.4", "7.3", "8", "8.1", "8.2", "8.3", "8.4", "9.2", "9.3"],
+      "usedAs": "Selective authoring and closure judgment reference, not target runtime.",
+      "causalBenefit": "unproven"
+    },
+    "packageId": "rollout-lens-delivery",
+    "sourceManifest": "skill-source/skill-package.json",
+    "sourceGraphSha256": "565eca24a9f27cd56365ab2928a6a05a3d3fc65876f299c71b2d5ad3301d7f35",
+    "profiles": {
+      "rollout-lens-plan": "prose",
+      "rollout-lens-work": "prose",
+      "rollout-lens-verify": "prose"
+    },
+    "mechanismsNotAdded": [
+      "observer",
+      "renderer",
+      "record-only",
+      "prepare-record",
+      "packet",
+      "fallback",
+      "durable state",
+      "domain executable",
+      "new schema"
+    ],
+    "sharedRule": {
+      "moduleId": "rollout-policy",
+      "canonicalPath": "skill-source/modules/rollout-policy.md",
+      "sha256": "52cdbc8126712b593c4681c090b29b0f4578567d56b47eb3a70c1e9e542cdf56",
+      "consumers": ["rollout-lens-verify", "rollout-lens-work"],
+      "generatedCopiesHaveSameSha256": true,
+      "generatedCopiesAreEditableOwners": false,
+      "postEffectMaintenanceRead": "Exact inspect returned the one owner, exactly two consumers, both generated artifact paths, and source-current builds.",
+      "newOwnerEditPropagationExercised": false,
+      "existingEvidenceBoundary": "The M8 pre-release receipt already owns one genuine shared-owner edit, two-consumer stale propagation, affected rebuild, and reinstall; this slice did not repeat it without a new need."
+    },
+    "builds": [
+      {
+        "targetId": "rollout-lens-plan",
+        "treeSha256": "e868851f9f8fe320b0b5a2a61c2b791641ba9416372461ee05f2d2f26e1e0c24",
+        "doubleBuildEqual": true,
+        "artifactIntact": true,
+        "sourceCurrent": true,
+        "files": 7,
+        "totalBytes": 17155,
+        "entryBytes": 1229,
+        "conditionalReferenceBytes": 0
+      },
+      {
+        "targetId": "rollout-lens-work",
+        "treeSha256": "091a3defdfc494deec96ca1d0652a669a448e26902b4a1e9b985a21cfddf0ebf",
+        "doubleBuildEqual": true,
+        "artifactIntact": true,
+        "sourceCurrent": true,
+        "files": 8,
+        "totalBytes": 19894,
+        "entryBytes": 1559,
+        "conditionalReferenceBytes": 2074
+      },
+      {
+        "targetId": "rollout-lens-verify",
+        "treeSha256": "346398b44735031fbb0cf732196cf3b07a80d0d47a492ebd353c54b71bb9c9f5",
+        "doubleBuildEqual": true,
+        "artifactIntact": true,
+        "sourceCurrent": true,
+        "files": 8,
+        "totalBytes": 20415,
+        "entryBytes": 2070,
+        "conditionalReferenceBytes": 2074
+      }
+    ],
+    "installer": {
+      "failedRelativePathAttempt": "The installer treated .\\dist as a repository locator and failed before changing a generated-skill installation.",
+      "successfulLocalSourceShape": "npx skills@latest add D:/Projects/Private/nanomia/rollout-lens/dist --skill <target> --agent codex claude-code --copy -y",
+      "allThreeTargetsInstalledBothHosts": true,
+      "installedTreesMatchedBuilds": true
+    }
+  },
+  "generatedSkillDocumentAcceptance": {
+    "result": "SUPPORTED_FOR_THIS_SLICE",
+    "observations": [
+      "Each entry states a narrow trigger, current project inputs, allowed action, forbidden scope, and reread-based completion evidence.",
+      "The Plan entry left exact policy fields as a genuine unknown; the Work entry resolved that unknown from its one conditional shared reference before code edits.",
+      "The Verify entry separated executable evidence, unproven claims, and recovery, and did not treat generated-tree integrity as behavior evidence.",
+      "Neither consumer read Skill Rails implementation internals, generated receipts, schemas, or executable integrity payload while doing domain work."
+    ],
+    "limits": [
+      "The Verify wording produced a broad 37-case table in one file; its proportionality is mixed rather than an unqualified documentation win.",
+      "One observation per host proves possibility and complementary interpretation, not repeatability or universal interpretation stability."
+    ]
+  },
+  "crossHostHandoff": {
+    "authoringToUse": "The Codex-based successor authored and built the canonical package from the project-local final public Skill Rails installation, then handed the installed generated targets to fresh Codex and fresh Claude consumers without sharing authoring conversation context.",
+    "projectWork": "Fresh Codex left plan, implementation, tests, and progress as the only handoff state; fresh Claude recovered from those artifacts and the independently installed Verify target, added verification evidence, and selected one next action.",
+    "hiddenConversationStateRequired": false
+  },
+  "freshHosts": {
+    "codex": {
+      "taskId": "task_545079b3e1eb",
+      "dispatchId": "ctx_8826d3fff3ad",
+      "terminal": "term_acf6b6ea-4e8a-411b-a71e-2aee08efe877",
+      "model": "gpt-5.6-sol",
+      "reasoningEffort": "medium",
+      "permissionMode": "YOLO",
+      "selectedSkills": [
+        ".agents/skills/rollout-lens-plan",
+        ".agents/skills/rollout-lens-work"
+      ],
+      "hostWallTimeMs": 258000,
+      "transcriptMessageEntries": 47,
+      "toolRoundTrips": "at most 23 from paired transcript entries; exact split unexposed after terminal close",
+      "inputTokens": null,
+      "outputTokens": null,
+      "contextUsageAtCompletion": "16 percent shown by the host; not converted to tokens",
+      "measuredDomainReadBytes": 28863,
+      "readByteBasis": "Reported entry/project/reference reads plus changed source/test/progress rereads at observed file sizes; excludes Git diff output and environment instruction files.",
+      "effects": [
+        {"path": "docs/change-plan.md", "sha256": "8df93a63fdaa15baa4ced91e286489580d4b8c3ee2da1380a9bbb8c2dffe81c4"},
+        {"path": "src/evaluate.mjs", "sha256": "39400f4f786cf21aa581bc464a0f06b8d88f2abfcad9c28ea5e2611b351f24d0"},
+        {"path": "test/evaluate.test.mjs", "sha256": "448991dff948839c274a11b2e5be6a7376662888ab27156c069ac3382448edb1"},
+        {"path": "docs/progress.md", "sha256": "c62f5af04618d9216659fde692d3231caced48e2fa06c22ed54976014a8f4171"}
+      ],
+      "workerTest": {"command": "npm test", "tests": 10, "passed": 10, "failed": 0},
+      "reread": true,
+      "processEvidence": [
+        "One Unix ls attempt failed on Windows and two combined PowerShell reads failed from quoting; separate reads recovered without project writes.",
+        "The worker ran the full test command twice although the first run was green; this is recorded burden, not added product evidence.",
+        "The Work tests omitted the Plan's explicit allow-over-segment interaction, but the dependent verifier added that distinct executable case."
+      ]
+    },
+    "claude": {
+      "taskId": "task_589c948225eb",
+      "dispatchId": "ctx_e7164083881a",
+      "terminal": "term_1ab16aa4-cdee-4cb5-a2f6-ec383c9b3423",
+      "model": "Claude Opus",
+      "reasoningEffort": "medium",
+      "permissionMode": "bypassPermissions",
+      "selectedSkills": [".claude/skills/rollout-lens-verify"],
+      "hostWallTimeMs": 131000,
+      "transcriptMessageEntries": 36,
+      "toolCalls": 17,
+      "toolCallBreakdown": {"Skill": 1, "Bash": 7, "Write": 3, "Read": 3, "PowerShell": 2, "Edit": 1},
+      "inputTokens": null,
+      "outputTokens": null,
+      "measuredDomainReadBytes": 35075,
+      "readByteBasis": "Required installed entry/reference and current project files plus completion rereads at observed sizes; excludes Git diff output and environment instruction files.",
+      "effects": [
+        {"path": "test/decision-table.test.mjs", "bytes": 5576, "sha256": "bf34ffd93caea5140e88608b03c8b3a9e0b8cd02e0dc5aee010a94d97967388f"},
+        {"path": "docs/verification.md", "bytes": 5268, "sha256": "520269ad44cc07b0282c5abb03010930a499085f1c13d58a44c7569c38aff418"},
+        {"path": "docs/recovery.md", "bytes": 1569, "sha256": "f0b4fc66ccdbacaa9cf23b48b9ef70dbf0c86b5b1e605aaa79a66746cc1a1a52"}
+      ],
+      "sourceDefectFound": false,
+      "sourceChanged": false,
+      "workerTest": {"command": "npm test", "tests": 47, "passed": 47, "failed": 0},
+      "recoveryNextActionCount": 1,
+      "recoveryNextAction": "Owner review and commit of the coherent slice.",
+      "reread": true,
+      "processEvidence": [
+        "One shell-quoted node probe treated a greater-than character as redirection and created a zero-byte stray file.",
+        "The host found and removed the stray file; the coordinator independently confirmed STRAY_CONSOLE_FILES=0 and only the seven expected slice paths before commit."
+      ]
+    }
+  },
+  "verificationProportionality": {
+    "result": "MIXED_NOT_BLOCKING",
+    "facts": {
+      "newVerificationFileBytes": 5576,
+      "newVerificationCases": 37,
+      "finalTests": 47,
+      "successorObservedDurationMs": 187.8456,
+      "newHarnessSchemaOrMechanism": false
+    },
+    "judgment": "Some emergency, validation, and precedence rows overlap the Work tests, so the file is not credited as a pure cost win. The table also covers distinct allow-over-segment, exact bucket-boundary, membership fallthrough, field-domain, and validation-before-higher-branch paths in one fast domain test file. Rewriting it or launching another evaluator would not change the adoption decision and would violate the fixed stop boundary."
+  },
+  "independentReread": {
+    "coordinator": {
+      "codexScopeConfirmed": true,
+      "claudeScopeConfirmed": true,
+      "allSevenEffectsReread": true,
+      "effectHashesMatched": true,
+      "npmTest": {"tests": 47, "passed": 47, "failed": 0, "durationMs": 162.0538},
+      "sourceHashes": {
+        "src/evaluate.mjs": "39400f4f786cf21aa581bc464a0f06b8d88f2abfcad9c28ea5e2611b351f24d0",
+        "test/evaluate.test.mjs": "448991dff948839c274a11b2e5be6a7376662888ab27156c069ac3382448edb1",
+        "test/decision-table.test.mjs": "bf34ffd93caea5140e88608b03c8b3a9e0b8cd02e0dc5aee010a94d97967388f"
+      },
+      "installedChecks": {
+        "codexPlan": "e868851f9f8fe320b0b5a2a61c2b791641ba9416372461ee05f2d2f26e1e0c24",
+        "codexWork": "091a3defdfc494deec96ca1d0652a669a448e26902b4a1e9b985a21cfddf0ebf",
+        "claudeVerify": "346398b44735031fbb0cf732196cf3b07a80d0d47a492ebd353c54b71bb9c9f5"
+      },
+      "beforeAfterScopeConfirmed": true,
+      "finalStatusClean": true,
+      "strayFiles": 0,
+      "processEvidence": "One HEAD^{tree} invocation was misparsed by the Windows shell/RTK; git show -s --format=%T recovered the exact tree without a write."
+    },
+    "successor": {
+      "allSevenEffectsReread": true,
+      "effectHashesMatched": true,
+      "installedTargetHashesMatched": true,
+      "protectedAuthoringAndGeneratedSurfacesChangedByConsumers": false,
+      "npmTest": {"tests": 47, "passed": 47, "failed": 0, "durationMs": 187.8456},
+      "gitDiffCheckPassed": true,
+      "finalProjectCommitReread": true
+    }
+  },
+  "practicalScorecard": [
+    {
+      "dimension": "authoring clarity",
+      "result": "SUPPORTED",
+      "evidence": "The installed 5,425-byte entry plus selective Framework sections and the closed CLI were sufficient to create three prose targets, one shared owner, exact inspect relations, deterministic builds, and normal installations without a sibling core or invented mechanism.",
+      "uncertainty": "No control isolates the Framework or entry's causal contribution, and primary-authoring total tokens/tool calls were not captured."
+    },
+    {
+      "dimension": "generated-skill AI usability",
+      "result": "SUPPORTED_FOR_THIS_SLICE",
+      "evidence": "Fresh consumers acted from 1,229-2,070 byte entries plus only the 2,074-byte shared reference where applicable, produced all intended durable artifacts, and reread them without Skill Rails internals.",
+      "uncertainty": "Repeat use, other models, and harder project scenes remain unproven."
+    },
+    {
+      "dimension": "cross-host interpretation stability",
+      "result": "SUPPORTED_FOR_COMPLEMENTARY_ROLES",
+      "evidence": "Codex implemented the shared policy and Claude independently derived passing decision-table evidence from the same generated-copy hash without changing production source.",
+      "uncertainty": "This is a connected handoff, not duplicate-host majority voting or statistical stability evidence."
+    },
+    {
+      "dimension": "mechanical value",
+      "result": "SUPPORTED",
+      "evidence": "Exact inspect found one owner and two consumers; double-build hashes matched; source/currentness and installed integrity stayed separate and green; normal installation delivered identical target hashes to both hosts.",
+      "uncertainty": "Remote long-term update behavior and other installer versions remain unproven."
+    },
+    {
+      "dimension": "maintenance economy",
+      "result": "MIXED",
+      "evidence": "The connected project has one 2,074-byte canonical shared rule and two non-owning standalone copies, and the post-effect maintenance read found exactly both consumers current.",
+      "uncertainty": "This slice did not repeat a shared-owner edit; actual stale fanout/rebuild remains owned by the prior M8 two-consumer receipt."
+    },
+    {
+      "dimension": "actual effect quality",
+      "result": "SUPPORTED_FOR_THIS_SLICE",
+      "evidence": "The final project contains requirements-linked planning, a nontrivial implementation, 47 passing tests, an independent verification report, and one artifact-derived release-preparation next action; coordinator and successor rereads agree.",
+      "uncertainty": "One possibility observation does not prove production correctness across all configurations."
+    },
+    {
+      "dimension": "total observed burden",
+      "result": "MIXED_NOT_BLOCKING",
+      "evidence": "Codex completed in 4m18s with at most 23 tool round trips and 28,863 measured domain-read bytes; Claude completed in 2m11s with 17 tool calls and 35,075 measured domain-read bytes. Installed integrity payload stayed outside the domain read path.",
+      "uncertainty": "Four consumer command/recovery failures occurred, verifier coverage has some overlap, token totals were unexposed, and no unguided control supports a causal savings claim."
+    }
+  ],
+  "skillRailsProductChanges": {
+    "coreChanged": false,
+    "authoringSourceChanged": false,
+    "generatedSkillChanged": false,
+    "repositoryTestsAdded": false,
+    "fullRepositoryVerifyRun": false,
+    "reason": "No Skill Rails product defect or redesign blocker was observed; documentation/evidence reconciliation does not justify rerunning the stable 31-test product suite."
+  },
+  "claims": {
+    "proven": [
+      "The required public repository installer delivered the final Skill Rails tree artifact-intact to both project-local hosts without changing CODEX_HOME.",
+      "One canonical three-target prose package double-built deterministically, installed normally to both hosts, and exposed one shared rule to exactly its two real consumers.",
+      "A fresh Codex used installed Plan and Work skills to produce a plan, nontrivial code change, ten passing tests, and progress, and reread all effects.",
+      "A fresh Claude used the installed Verify skill to add independent executable coverage, produce verification and recovery artifacts, preserve production code after finding no defect, and reread its effects.",
+      "The coordinator and successor independently reread scope, effects, hashes, installed trees, and the 47/47 executable result; the external project ended clean at one coherent local commit."
+    ],
+    "failed": [],
+    "unproven": [
+      "Causal quality or cost improvement versus an unguided control.",
+      "Repeatability, statistical cross-host stability, broader domains/models/installers, and production correctness for all rollout configurations.",
+      "Framework navigation benefit, primary-authoring token/tool/wall totals, both consumer token totals, and exact Codex tool-round-trip count.",
+      "A new shared-owner edit and stale/rebuild effect in this exact project; the prior M8 receipt remains the evidence owner for that behavior.",
+      "Whether the verifier's 37-case file is the minimum long-term test set; it is accepted as bounded current project evidence, not a template."
+    ]
+  },
+  "nextAction": "Start real Devflow adoption with the first prose-first target from current product/domain sources. Stop and return to product direction before adding core machinery if a second declared output or multi-file managed write becomes genuinely necessary, a fresh AI repeatedly miscomputes a deterministic fact that one-output record-only cannot own, an actual lost update occurs, or either of the first two real targets creates a large always-read shared module."
+}
