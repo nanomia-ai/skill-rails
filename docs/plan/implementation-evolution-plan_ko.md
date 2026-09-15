@@ -813,7 +813,7 @@ Release commit `e72bc29debae8f04efccadae56ab7fbe01823c95`, annotated tag `v1.0.2
 
 ## E-040 — 의미 결과 재정박과 runtime 복구는 실제 owner·actor 경계에서만 좁힌다
 
-상태: **v1.0.3 release candidate — release·설치 미수행**
+상태: **v1.0.3 release·두 host 설치 완료**
 
 ### 실제 문제와 evidence
 
@@ -830,3 +830,5 @@ Step 4에 abstract state·다중 branch·checklist를 넣거나 reconstructed pu
 ### 검증과 재검토 조건
 
 `1.0.3` canonical rebuild tree는 `73c06de2b57b07d70fa139d3efd2d9c8a19733a481c0f52c71b8577d670cf30c`다. Version bump 뒤 첫 `npm run verify`는 기존 build test의 core `1.0.2` 고정 기대값 두 곳에서만 실패했고 그 두 assertion을 `1.0.3`으로 좁혀 고친 재실행은 31/31 통과했다. Source-side와 standalone check는 package/core `1.0.3`, 같은 tree와 `ARTIFACT_INTACT`를 반환하고 source-side만 source-current를 확인했으며 embedded `record.mjs`도 canonical source와 동일하다. 구조 검사는 cold AI의 의미 행동과 사람의 orphan 복구 효과를 증명하지 않는다. 실제 actor가 새 안내로도 실행 불가능하거나 재정박이 고정 의식·과잉 재독이 되거나 필요한 시점에 누락되는 장면이 생길 때만 해당 문구 owner를 다시 열고, 새 validator·schema·checklist·harness·matrix를 만들지 않는다.
+
+Release commit `00b75877b194f9dc71b1c0c15b6563f6c13f8819`, annotated tag object `1cc61375ff9576a8df8417637710b6e67d1c18f3`와 peeled commit의 일치 및 origin push를 확인했다. 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes --json`은 `skills@1.5.26`, installer hash `b03028ecaa449cd83fe241407c48520db7ada896c7c1706ed1c4c034df3e5083`으로 Codex와 Claude Code를 설치했고 두 installed check는 package/core `1.0.3`, 같은 tree와 `ARTIFACT_INTACT`를 반환했다. 이 delivery evidence는 위의 행동·효과 `unproven` 경계를 바꾸지 않는다.
