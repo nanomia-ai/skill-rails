@@ -41,22 +41,29 @@ function assertFramePreserved(currentBytes, desiredBytes) {
 function assertBoundExchange(projectRoot, exchangeRoot) {
   const parent = resolve(projectRoot, ".skill-rails-next", "exchanges");
   const fromParent = relative(parent, exchangeRoot);
-  if (!fromParent || fromParent === ".." || fromParent.startsWith(`..${sep}`) || fromParent.includes(sep) || fromParent.includes("/")) fail("PATH_OUTSIDE_ROOT", "Exchange is not in the bound project's exchange directory.", "Initialize or prepare again in the intended project.");
+  if (!fromParent || fromParent === ".." || fromParent.startsWith(`..${sep}`) || fromParent.includes(sep) || fromParent.includes("/")) fail("PATH_OUTSIDE_ROOT", "Exchange is not in the bound project's exchange directory.", "Discard this exchange and use the exchange-creation command documented in this installed target's SKILL.md to create a new one in the intended project.");
 }
 
 export async function record(targetRoot, receipt, exchangeArgument, hooks = {}) {
-  const exchangeRoot = await realpath(resolve(exchangeArgument)).catch(() => fail("PATH_OUTSIDE_ROOT", "Exchange directory does not exist.", "Use the exact exchange returned by initialize or prepare."));
-  const exchange = await readJson(resolve(exchangeRoot, "exchange.json"), "ANSWER_INVALID");
+  const exchangeRoot = await realpath(resolve(exchangeArgument)).catch(() => fail("PATH_OUTSIDE_ROOT", "Exchange directory does not exist.", "Use the exact exchange path returned by the exchange-creation command documented in this installed target's SKILL.md."));
+  let exchange;
+  try {
+    exchange = await readJson(resolve(exchangeRoot, "exchange.json"), "ANSWER_INVALID");
+  } catch (error) {
+    if (error?.code === "ANSWER_INVALID") fail("ANSWER_INVALID", error.message, "Discard this exchange and use the exchange-creation command documented in this installed target's SKILL.md to create a new one.");
+    throw error;
+  }
   const exchangeSchema = await readJson(resolve(targetRoot, "contracts", "record-exchange.schema.json"));
   const exchangeErrors = validate(exchange, exchangeSchema);
-  if (exchangeErrors.length) fail("ANSWER_INVALID", "Exchange violates its closed contract.", "Initialize or prepare again; do not repair or transplant the exchange.", exchangeErrors);
+  if (exchangeErrors.length) fail("ANSWER_INVALID", "Exchange violates its closed contract.", "Discard this exchange and use the exchange-creation command documented in this installed target's SKILL.md to create a new one; do not repair or transplant it.", exchangeErrors);
   const projectRoot = await ensureProject(exchange.projectRoot);
   const currentTargetRoot = await realpath(targetRoot);
-  if (await realpath(exchange.targetRoot).catch(() => null) !== currentTargetRoot || exchange.packageId !== receipt.packageId || exchange.packageVersion !== receipt.packageVersion || exchange.targetId !== receipt.targetId || exchange.receiptTreeSha256 !== receipt.treeSha256) fail("ARTIFACT_INTEGRITY_FAILED", "Exchange target identity differs from the installed target.", "Initialize or prepare again with this installed target.");
+  if (await realpath(exchange.targetRoot).catch(() => null) !== currentTargetRoot || exchange.packageId !== receipt.packageId || exchange.packageVersion !== receipt.packageVersion || exchange.targetId !== receipt.targetId || exchange.receiptTreeSha256 !== receipt.treeSha256) fail("ARTIFACT_INTEGRITY_FAILED", "Exchange target identity differs from the installed target.", "Discard this exchange and use the exchange-creation command documented in this installed target's SKILL.md to create a new one.");
   assertBoundExchange(projectRoot, exchangeRoot);
   const target = await readJson(resolve(targetRoot, "config", "target.json"));
-  if (target.mode !== exchange.mode || target.declaredOutput !== exchange.declaredOutput) fail("ARTIFACT_INTEGRITY_FAILED", "Exchange mode or output identity differs from the target.", "Initialize or prepare again with this installed target.");
-  if (exchange.basis.output.path !== target.declaredOutput || exchange.basis.inputs.map((item) => item.path).join("\0") !== target.declaredInputs.join("\0")) fail("ANSWER_INVALID", "Exchange basis does not exactly match the target declarations.", "Initialize or prepare again; do not transplant basis rows.");
+  if (target.mode !== exchange.mode || target.declaredOutput !== exchange.declaredOutput) fail("ARTIFACT_INTEGRITY_FAILED", "Exchange mode or output identity differs from the target.", "Discard this exchange and use the exchange-creation command documented in this installed target's SKILL.md to create a new one.");
+  const restartCommand = target.mode === "record-only" ? "initialize" : "prepare";
+  if (exchange.basis.output.path !== target.declaredOutput || exchange.basis.inputs.map((item) => item.path).join("\0") !== target.declaredInputs.join("\0")) fail("ANSWER_INVALID", "Exchange basis does not exactly match the target declarations.", `Run ${restartCommand} again; do not transplant basis rows.`);
   if (exchange.mode === "prepare-record") {
     const decision = await readJson(resolve(exchangeRoot, "decision.json"), "ANSWER_INVALID");
     const { decisionSha256, ...semantic } = decision;
@@ -73,7 +80,15 @@ export async function record(targetRoot, receipt, exchangeArgument, hooks = {}) 
   await ensureDirectory(locks);
   let acquired = false;
   try {
-    try { await mkdir(lock); acquired = true; } catch (error) { if (error?.code === "EEXIST") fail("OUTPUT_BUSY", "Another record owns the output lock.", "Wait for the active record to finish, then initialize or prepare again; never break the lock automatically."); throw error; }
+    try { await mkdir(lock); acquired = true; } catch (error) {
+      if (error?.code === "EEXIST") {
+        const ownerPath = resolve(lock, "owner.json");
+        let recordedOwner = null;
+        try { recordedOwner = JSON.parse(await readFile(ownerPath, "utf8")); } catch {}
+        fail("OUTPUT_BUSY", "The output lock already exists.", `Inspect details.lock, details.ownerPath, and details.recordedOwner. Have a person confirm whether a record is active and explicitly decide whether removing the lock is safe. After the lock is released, run ${restartCommand} again; never break it automatically.`, { lock, ownerPath, recordedOwner });
+      }
+      throw error;
+    }
     await writeFile(resolve(lock, "owner.json"), `${canonicalJson({ schemaVersion: 1, projectRoot, output: target.declaredOutput, exchangeId: exchange.exchangeId, hostname: hostname(), pid: process.pid, createdAt: new Date().toISOString() })}\n`);
     if (hooks.afterLock) await hooks.afterLock({ lock });
 
@@ -82,7 +97,7 @@ export async function record(targetRoot, receipt, exchangeArgument, hooks = {}) 
     const expectedInputs = new Map(exchange.basis.inputs.map((item) => [item.path, item]));
     // Raw-basis CAS keeps changed inputs distinct from output conflict; see "input stale and output conflict are distinct no-write results".
     for (const current of currentInputs) {
-      if (current.path !== target.declaredOutput && !sameBasis(current, expectedInputs.get(current.path))) fail("INPUT_STALE", `${current.path} changed after the exchange was created.`, "Initialize or prepare again and re-evaluate the semantic answer.");
+      if (current.path !== target.declaredOutput && !sameBasis(current, expectedInputs.get(current.path))) fail("INPUT_STALE", `${current.path} changed after the exchange was created.`, `Run ${restartCommand} again and re-evaluate the semantic answer.`);
     }
     const currentOutput = await fileBasis(projectRoot, target.declaredOutput);
     const currentBytes = currentOutput.bytes ?? Buffer.alloc(0);
@@ -98,7 +113,7 @@ export async function record(targetRoot, receipt, exchangeArgument, hooks = {}) 
     const desiredHash = sha256(rendered.stdout);
     const currentHash = sha256(currentBytes);
     if (Buffer.compare(rendered.stdout, currentBytes) === 0) return { schemaVersion: 1, status: "APPLIED_ALREADY", output: target.declaredOutput, currentSha256: currentHash, effect: "none" };
-    if (!sameBasis(basisPublic(currentOutput), exchange.basis.output)) fail("OUTPUT_CONFLICT", `${target.declaredOutput} changed after the exchange was created.`, "Inspect the current output, then initialize or prepare again.");
+    if (!sameBasis(basisPublic(currentOutput), exchange.basis.output)) fail("OUTPUT_CONFLICT", `${target.declaredOutput} changed after the exchange was created.`, `Inspect the current output, then run ${restartCommand} again.`);
 
     const { resolveProjectPath } = await import("./common.mjs");
     const output = await resolveProjectPath(projectRoot, target.declaredOutput);

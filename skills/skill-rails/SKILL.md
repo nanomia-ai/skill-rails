@@ -29,6 +29,8 @@ Before making an authoring or maintenance judgment, read §§0–0.1 of `referen
 6. Build one target first, review its receipt and generated diff, and verify deterministic delivery and currentness. Test from a standalone copy; an artifact or hash check does not prove that a fresh AI understood or used it.
 7. At the adoption or release gate, run the smallest realistic fresh-use observation that can change the decision and reread the actual effect. Record `proven`, `failed`, and `unproven` separately; do not grow a matrix after the decision is already bounded.
 
+Before using a consequential semantic result as a premise for a later judgment or accepting it as final, reread the current canonical source owners it actually depended on and confirm the result still holds, unless you just read those same bytes.
+
 When maintaining an existing package, edit the canonical owner rather than generated output, rebuild only affected targets, and preserve failed receipts. If a stale input or output invalidates an answer, reread current sources instead of transplanting the old answer. For a person's whole-package question, generate the current non-authoritative view from that source package; do not save it as another source of truth.
 
 ## Repository operations
@@ -37,4 +39,4 @@ The installed skill carries one closed authoring CLI. Set `<skill-root>` to the 
 
 Inspect the exact owner and consumers before editing, use overview only for a non-authoritative whole-package view, double-build and compare tree hashes, and check artifact integrity separately from source currentness. Neither check establishes fresh-agent behavior or external effect. Review the generated diff and build receipt before claiming delivery.
 
-Current evidence covers deterministic source/build/currentness, one bounded record-only use path, five small pilot stage observations, one machine-level non-Devflow generalization, and one bounded installed author-to-two-target-to-maintain-to-unfamiliar-use observation. The embedded CLI closes mechanical out-of-repository delivery without a sibling repository, global runtime, or network call. The evolution method's navigation benefit, broad host behavior, authoring-process efficiency, and prose-relative total cost remain `unproven`; inspect the named receipts before extending those claims.
+Current evidence covers deterministic source/build/currentness, one bounded record-only use path, five small pilot stage observations, one machine-level non-Devflow generalization, and one bounded installed author-to-two-target-to-maintain-to-unfamiliar-use observation. The embedded CLI closes mechanical out-of-repository delivery without a sibling repository, global runtime, or network call. The evolution method's navigation benefit, broad host behavior, authoring-process efficiency, and prose-relative total cost remain `unproven`; the included `.skill-rails-build.json` is delivery evidence only.

@@ -61,7 +61,7 @@ test("Product target builds standalone and is source-current", async (t) => {
   assert.equal(checked.json.sourceCurrent, true);
   assert.equal(checked.json.packageId, "natural-language-pilot");
   assert.equal(checked.json.packageVersion, "0.0.1");
-  assert.equal(checked.json.coreVersion, "1.0.2");
+  assert.equal(checked.json.coreVersion, "1.0.3");
 });
 
 test("a Verify-only source change leaves the actual Product target current", async (t) => {
@@ -98,6 +98,8 @@ test("authoring target materializes the skill evolution method and a semantic-fr
   assert.match(entry, /mechanically decidable safety checks/u);
   assert.match(entry, /actual target input, output, import, or mechanism/u);
   assert.match(entry, /Add a new semantic relation only/u);
+  assert.match(entry, /consequential semantic result as a premise for a later judgment/u);
+  assert.match(entry, /`\.skill-rails-build\.json` is delivery evidence only/u);
   assert.deepEqual(await readFile(join(left, "references", "skillEvolutionMethod.index.json")), await readFile(join(right, "references", "skillEvolutionMethod.index.json")));
   const index = JSON.parse(await readFile(join(left, "references", "skillEvolutionMethod.index.json"), "utf8"));
   assert.equal(index.source.sha256, sha256(original));
@@ -177,7 +179,7 @@ test("copied target checks integrity without repository or sibling skill access"
   assert.equal(checked.json.status, "ARTIFACT_INTACT");
   assert.equal(checked.json.packageId, "natural-language-pilot");
   assert.equal(checked.json.packageVersion, "0.0.1");
-  assert.equal(checked.json.coreVersion, "1.0.2");
+  assert.equal(checked.json.coreVersion, "1.0.3");
   assert.equal(checked.json.sourceCurrent, null);
   assert.equal(checked.json.remoteLatest, null);
 });

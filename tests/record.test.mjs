@@ -83,6 +83,8 @@ test("input stale and output conflict are distinct no-write results", async (t) 
   const beforeInputRecord = await readFile(join(first.project, "pilot", "verification.md"));
   const stale = record(first.target, firstEnvelope);
   assert.equal(stale.json.code, "INPUT_STALE");
+  assert.match(stale.json.nextAction, /\binitialize\b/u);
+  assert.doesNotMatch(stale.json.nextAction, /\bprepare\b/u);
   assert.deepEqual(await readFile(join(first.project, "pilot", "verification.md")), beforeInputRecord);
 
   const second = await setup(t, "output-conflict");
@@ -92,6 +94,8 @@ test("input stale and output conflict are distinct no-write results", async (t) 
   await writeFile(join(second.project, "pilot", "verification.md"), changed);
   const conflict = record(second.target, secondEnvelope);
   assert.equal(conflict.json.code, "OUTPUT_CONFLICT");
+  assert.match(conflict.json.nextAction, /\binitialize\b/u);
+  assert.doesNotMatch(conflict.json.nextAction, /\bprepare\b/u);
   assert.deepEqual(await readFile(join(second.project, "pilot", "verification.md")), changed);
 });
 
@@ -125,6 +129,8 @@ test("record-only initializer and exchange fail closed on non-UTF-8 and unknown 
   const result = record(target, envelope);
   assert.notEqual(result.status, 0);
   assert.equal(result.json.code, "ANSWER_INVALID");
+  assert.match(result.json.nextAction, /installed target's SKILL\.md/u);
+  assert.doesNotMatch(result.json.nextAction, /\bprepare\b/u);
   assert.deepEqual(await readFile(join(project, "pilot", "verification.md")), original);
 });
 
@@ -232,7 +238,15 @@ test("output lock rejects a second record without silent loss", async (t) => {
   const releasePromise = new Promise((resolveRelease) => { release = resolveRelease; });
   const first = directRecord(target, receipt, firstEnvelope.exchange, { afterLock: async () => { locked(); await releasePromise; } });
   await lockedPromise;
-  await assert.rejects(() => directRecord(target, receipt, secondEnvelope.exchange), (error) => error.code === "OUTPUT_BUSY");
+  await assert.rejects(() => directRecord(target, receipt, secondEnvelope.exchange), (error) => {
+    assert.equal(error.code, "OUTPUT_BUSY");
+    assert.match(error.nextAction, /\binitialize\b/u);
+    assert.doesNotMatch(error.nextAction, /\bprepare\b/u);
+    assert.match(error.details.lock, /\.lock$/u);
+    assert.match(error.details.ownerPath, /owner\.json$/u);
+    assert.equal(error.details.recordedOwner.output, "pilot/verification.md");
+    return true;
+  });
   release();
   assert.equal((await first).status, "APPLIED");
   assert.match(await readFile(join(project, "pilot", "verification.md"), "utf8"), /bookmark-storage — pass/u);

@@ -810,3 +810,23 @@ Coordinator는 전체 prompt 감사에서 이 충돌을 찾았고, 기존 Claude
 기존 authoring build test에 새 두 의미 anchor만 추가했고 별도 test·matrix·harness는 만들지 않았다. 기본 `npm run verify`는 31/31 통과했다. Canonical rebuild는 36 files/203,690B, tree `c67d7e651236713668b225ed7a07fd7a6cee765eb72eadb46be372b2e6fc43bd`이며 source-side check는 package/core `1.0.2`, artifact-intact/source-current를, standalone check는 같은 identity와 artifact-intact를 반환했다. Cold author가 구조 선언과 semantic relation을 실제로 올바르게 구분하는 행동 효과는 첫 실제 저작 장면 전까지 `unproven`이다. 그 장면에서 actual dependency를 여전히 누락하거나 관찰 없는 semantic edge를 추가한 경우에만 이 owner를 다시 연다.
 
 Release commit `e72bc29debae8f04efccadae56ab7fbe01823c95`, annotated tag `v1.0.2`와 원격 push를 완료했다. 공식 `npx skills@latest` repository 경로로 Codex와 Claude Code에 설치했고 installer hash는 `14b9872ba23306a535056ebc8a651a19d990bb8eb6d7f4b4a411037774f65cc8`이다. 두 host의 installed check는 package/core `1.0.2`, 같은 generated tree와 `ARTIFACT_INTACT`를 반환했다. 이 배포 사실은 위의 행동 효과를 proven으로 올리지 않는다.
+
+## E-040 — 의미 결과 재정박과 runtime 복구는 실제 owner·actor 경계에서만 좁힌다
+
+상태: **v1.0.3 release candidate — release·설치 미수행**
+
+### 실제 문제와 evidence
+
+전체 prompt surface를 다시 감사하자, 당시 v1.0.2 PASS는 Entry와 guide에 한정됐고 runtime·pilot 안내까지 보증하지 않았다. Entry에는 중요한 의미 결과가 후속 판단의 전제나 최종 수용으로 승격될 때 current canonical owner와 다시 맞추는 행동이 없었으며 `named receipts`는 standalone에서 해소되지 않았다. Record-only actor에게 `prepare`를 권하는 shared record 문구와 orphan 가능성을 닫지 못하는 `OUTPUT_BUSY`, Verify의 미정의 `<target-root>`와 absent-input read도 각각 실제 다른 행동 경로를 만들었다. 사용자 요구 자체가 재정박 계약의 유효한 설계 evidence이고, runtime의 공개 mode와 기존 lock bytes가 나머지 기계적 evidence다.
+
+### 영향과 보존 목적
+
+영향 owner는 authoring Entry, `src/runtime/record.mjs`, Verify pilot Entry와 maintenance snapshot뿐이다. 현재 canonical authority와 의미 판단은 AI·user·domain owner에 남기고 runtime은 검증된 mode 선택과 lock 좌표·기록 사실만 제공한다. Existing build/currentness, CAS, lock 획득·소유 중 자동 제거, managed-region, reread authority, fail-closed no-write와 `unproven` 규율을 보존한다. Guide, 동결 계획, `common.mjs`, `errors.mjs`, schema, Resume, historical evidence와 generated projection의 수동 편집은 범위 밖이다.
+
+### 대안과 수렴
+
+Step 4에 abstract state·다중 branch·checklist를 넣거나 reconstructed purpose와 비교하는 안은 원래 guide보다 길고 기계적인 파생 지침을 다시 만들므로 기각했다. 모든 runtime 오류를 maintainer 보고로 일괄 교체하는 안은 actor가 스스로 복구할 수 있는 경로까지 닫으므로 기각했고, generic shared 오류는 그대로 두면서 `record.mjs`의 입증된 exchange/mode/lock 분기만 좁혔다. Lock TTL, stale 자동판정과 자동 break도 lost-update 안전을 약화해 기각했다. Codex와 Fable의 독립 감사·반증은 guide no-change, 한 문장 re-anchor, dead receipt 제거, actor/mode별 record recovery, 사람 소유 orphan 결정, Verify 두 문장과 snapshot 범위 정정에 수렴했다.
+
+### 검증과 재검토 조건
+
+`1.0.3` canonical rebuild tree는 `73c06de2b57b07d70fa139d3efd2d9c8a19733a481c0f52c71b8577d670cf30c`다. Version bump 뒤 첫 `npm run verify`는 기존 build test의 core `1.0.2` 고정 기대값 두 곳에서만 실패했고 그 두 assertion을 `1.0.3`으로 좁혀 고친 재실행은 31/31 통과했다. Source-side와 standalone check는 package/core `1.0.3`, 같은 tree와 `ARTIFACT_INTACT`를 반환하고 source-side만 source-current를 확인했으며 embedded `record.mjs`도 canonical source와 동일하다. 구조 검사는 cold AI의 의미 행동과 사람의 orphan 복구 효과를 증명하지 않는다. 실제 actor가 새 안내로도 실행 불가능하거나 재정박이 고정 의식·과잉 재독이 되거나 필요한 시점에 누락되는 장면이 생길 때만 해당 문구 owner를 다시 열고, 새 validator·schema·checklist·harness·matrix를 만들지 않는다.
