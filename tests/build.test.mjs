@@ -61,7 +61,7 @@ test("Product target builds standalone and is source-current", async (t) => {
   assert.equal(checked.json.sourceCurrent, true);
   assert.equal(checked.json.packageId, "natural-language-pilot");
   assert.equal(checked.json.packageVersion, "0.0.1");
-  assert.equal(checked.json.coreVersion, "1.0.3");
+  assert.equal(checked.json.coreVersion, "1.0.4");
 });
 
 test("a Verify-only source change leaves the actual Product target current", async (t) => {
@@ -179,7 +179,7 @@ test("copied target checks integrity without repository or sibling skill access"
   assert.equal(checked.json.status, "ARTIFACT_INTACT");
   assert.equal(checked.json.packageId, "natural-language-pilot");
   assert.equal(checked.json.packageVersion, "0.0.1");
-  assert.equal(checked.json.coreVersion, "1.0.3");
+  assert.equal(checked.json.coreVersion, "1.0.4");
   assert.equal(checked.json.sourceCurrent, null);
   assert.equal(checked.json.remoteLatest, null);
 });
