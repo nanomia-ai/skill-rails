@@ -78,31 +78,27 @@ The goal is not to restrain the AI with a longer prompt. It is to **state meanin
 
 ## What does “mechanizing” a skill actually mean?
 
-Suppose you want a skill that turns meeting notes into a useful follow-up summary:
+Suppose you want a skill that reviews a month of expenses and receipts and produces an expense report:
 
-> Separate decisions, owners, due dates, and unresolved items. Do not invent facts that are absent from the notes. Organize the result in a consistent format.
+> Check every expense. Require a receipt above the company's threshold. Flag matching dates, merchants, and amounts as possible duplicates. Calculate category totals and the overall amount, then produce a consistent table.
 
-A person can understand the intent. Execution introduces harder questions: Which statements were actual decisions rather than proposals? How much can be inferred about an owner or due date? Should an ambiguous statement remain unresolved? Is it safe to overwrite an existing summary? Listing every case in prose forces the AI to reinterpret the rule each time.
+The rules are easy for a person to understand. But a natural-language instruction is not the execution itself. As the number of items and overlapping conditions grows, so does the chance that the AI will skip an item, apply the same rule differently, or make a mistake in the calculations or output format.
 
-A natural-language instruction is not the execution itself. Even if it says, “check every input, repeat the same validation when conditions A and B hold, and do not write a result after a failure,” the AI may omit a condition or apply the steps in a different order. More branches and repetitions require more prose to guard against more interpretations.
-
-A Skill Rails skill can divide those responsibilities:
-
-| Judgment left to natural language and the AI | Execution a script can own |
+| When everything is instructed in prose | When the logic moves into scripts |
 | --- | --- |
-| Which statements were actually decided? | Do the declared meeting notes exist? |
-| Can an owner or due date be established from context? | Did the input change after summarization began? |
-| Should an uncertain statement remain unresolved? | Does the result contain the required fields and format? |
-| What should be asked of the user? | Would the write conflict with an existing result? |
-| Does the summary preserve the meaning of the meeting? | Does rereading the written result produce the expected content? |
+| Ask the AI to “check every item without omissions.” | A loop visits every item and verifies the processed count. |
+| List receipt thresholds and conditions in sentences. | An `if` statement applies the same rule to every item. |
+| Restate the duplicate criteria for each run. | A key built from date, merchant, and amount finds duplicate candidates. |
+| Ask the AI to calculate category totals and rounding. | Functions apply the same arithmetic and rounding rules. |
+| Describe the report's columns and order in prose. | A defined format and checks produce the same report structure. |
 
-Scripts do not imitate the AI's judgment. They verify facts that can be calculated reliably: files, hashes, formats, and declared inputs and outputs. The AI interprets those facts and returns to the user when meaning or authority is missing.
+Whether an expense has an unclear business purpose, whether an exception is acceptable, and what must be asked of the user remain judgments for the AI and the person. Scripts do not imitate that judgment. They own the repetition, conditions, calculations, and formatting that can be executed reliably.
 
-A condition that would take several sentences in prose can become an `if` statement. A procedure repeated for every input can become a loop. A transformation that must behave the same way in several places can become a function. The skill document only needs to say when to run the script and how to interpret its result.
+**If 10 rules must be applied to 100 expenses, the prose-only approach depends on the AI applying rules correctly 1,000 times. A script executes 10 tested rules across 100 items in a loop.**
 
-As the mechanically handled portion grows, **the amount of prompt text required by the skill can shrink.** Nothing is being omitted: execution rules are moving from prose that must be interpreted into code that is actually run. This does not guarantee that the AI will always invoke the script correctly, but once invoked, its conditions, loops, and format checks are no longer reinterpreted on each run.
+Skill Rails does not reduce meaning. It removes conditions, repetition, and calculations that do not need to be reinterpreted from the prompt and moves them into code that actually runs. As more of the mechanical work moves into scripts, the amount of prompt text required by the skill can shrink.
 
-Scripts can also be tested like ordinary code. When something fails, you can fix the faulty condition or output logic instead of rewriting the entire body of prose. Execution logic moved into code is easier to repeat and its results are more trustworthy than logic carried only by natural-language instructions.
+This does not guarantee that the AI will always invoke the script at the right time. Once invoked, however, its conditions and calculations are no longer reinterpreted on every run, and they can be tested like ordinary code. When something fails, you can fix the faulty condition or calculation instead of rewriting the entire body of prose.
 
 ## Write in your own language, then structure it with AI
 
@@ -197,12 +193,14 @@ During installation, select `skill-rails`, the AI tools that should receive it, 
 
 Then describe the skill you want in ordinary language:
 
-```text
-Use Skill Rails to create a skill that organizes meeting notes.
+The example below is not a built-in Skill Rails feature. It is one ordinary workflow a user could describe and turn into a new skill.
 
-It should separate decisions, owners, due dates, and unresolved items.
-Keep judgments about what was actually decided and how to handle uncertainty in natural language.
-Turn only repeatable checks for missing fields and a consistent output format into scripts.
+```text
+Use Skill Rails to create a skill that reviews a month of expenses.
+
+It should review expense records and receipts and produce a report with each item's status and the totals.
+Keep judgments about unclear business purpose and acceptable exceptions in natural language.
+Use scripts to handle iteration across every item, receipt rules, duplicate detection, totals, and the output format consistently.
 Separate the maintained source from the skill directory the AI tool will use, then build and verify it.
 ```
 
