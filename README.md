@@ -62,7 +62,7 @@ flowchart LR
 The result is not a separate application or server. It is a directory in the normal AI skill format. Some folders are optional, but a built skill generally looks like this:
 
 ```text
-release-check/
+my-skill/
 ├─ SKILL.md                  # The entry document the AI reads first
 ├─ references/               # Reference material included for this skill
 ├─ scripts/                  # Execution logic and integrity tools
@@ -70,7 +70,7 @@ release-check/
 └─ .skill-rails-build.json   # A receipt identifying the source of the build
 ```
 
-Copy this directory—or place it with a standard skill installer—under a project path such as `.agents/skills/release-check/` or `.claude/skills/release-check/`. The AI tool discovers `SKILL.md` and can use the material and scripts bundled with it.
+Copy this directory—or place it with a standard skill installer—under a project path such as `.agents/skills/my-skill/` or `.claude/skills/my-skill/`. The AI tool discovers `SKILL.md` and can use the material and scripts bundled with it.
 
 This is what *standalone* means here. It does not mean that another program is installed. **The skill directory contains everything it needs at runtime, so it does not have to reach back into the source directory or a Skill Rails installation.**
 
@@ -78,11 +78,11 @@ The goal is not to restrain the AI with a longer prompt. It is to **state meanin
 
 ## What does “mechanizing” a skill actually mean?
 
-Suppose a release-review skill includes this rule:
+Suppose you want a skill that turns meeting notes into a useful follow-up summary:
 
-> Do not declare the release complete without current test evidence. Confirm approval for changes that require it. Record the result in the required format.
+> Separate decisions, owners, due dates, and unresolved items. Do not invent facts that are absent from the notes. Organize the result in a consistent format.
 
-A person can understand the intent. Execution introduces harder questions: What counts as current? Which changes require approval? Did an input change halfway through the task? Is it safe to overwrite an existing record? Listing every case in prose forces the AI to reinterpret the rule each time.
+A person can understand the intent. Execution introduces harder questions: Which statements were actual decisions rather than proposals? How much can be inferred about an owner or due date? Should an ambiguous statement remain unresolved? Is it safe to overwrite an existing summary? Listing every case in prose forces the AI to reinterpret the rule each time.
 
 A natural-language instruction is not the execution itself. Even if it says, “check every input, repeat the same validation when conditions A and B hold, and do not write a result after a failure,” the AI may omit a condition or apply the steps in a different order. More branches and repetitions require more prose to guard against more interpretations.
 
@@ -90,11 +90,11 @@ A Skill Rails skill can divide those responsibilities:
 
 | Judgment left to natural language and the AI | Execution a script can own |
 | --- | --- |
-| Which risks require approval? | Do the declared input files exist? |
-| Is the available evidence sufficient for a conclusion? | Did an input change after the operation began? |
-| Is an exception acceptable? | Does the result match the required format? |
+| Which statements were actually decided? | Do the declared meeting notes exist? |
+| Can an owner or due date be established from context? | Did the input change after summarization began? |
+| Should an uncertain statement remain unresolved? | Does the result contain the required fields and format? |
 | What should be asked of the user? | Would the write conflict with an existing result? |
-| Does the final result satisfy the original purpose? | Does rereading the written result produce the expected content? |
+| Does the summary preserve the meaning of the meeting? | Does rereading the written result produce the expected content? |
 
 Scripts do not imitate the AI's judgment. They verify facts that can be calculated reliably: files, hashes, formats, and declared inputs and outputs. The AI interprets those facts and returns to the user when meaning or authority is missing.
 
@@ -198,12 +198,12 @@ During installation, select `skill-rails`, the AI tools that should receive it, 
 Then describe the skill you want in ordinary language:
 
 ```text
-Use Skill Rails to create a release-check skill.
+Use Skill Rails to create a skill that organizes meeting notes.
 
-It should verify test evidence and required approvals before a release.
-First identify the recurring burden and the decisions that should remain human judgment.
-Turn only the checks and recording steps that must behave the same way every time into scripts.
-Separate the maintained source from the deployable artifact, then build and verify it.
+It should separate decisions, owners, due dates, and unresolved items.
+Keep judgments about what was actually decided and how to handle uncertainty in natural language.
+Turn only repeatable checks for missing fields and a consistent output format into scripts.
+Separate the maintained source from the skill directory the AI tool will use, then build and verify it.
 ```
 
 The AI identifies the purpose and boundaries, writes the required sources and targets, and builds the skill. From then on, edit the source and rebuild rather than changing the artifact directly.
