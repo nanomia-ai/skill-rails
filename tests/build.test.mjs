@@ -100,6 +100,8 @@ test("authoring target materializes the skill evolution method and a semantic-fr
   assert.match(entry, /Add a new semantic relation only/u);
   assert.match(entry, /consequential semantic result as a premise for a later judgment/u);
   assert.match(entry, /build and integrity checks prove delivery only/u);
+  assert.match(entry, /references\/buildAndTest\.md/u);
+  assert.deepEqual(await readFile(join(left, "references", "buildAndTest.md")), await readFile(resolve(repositoryRoot, "authoring/skill-rails/modules/build-and-test.md")));
   assert.deepEqual(await readFile(join(left, "references", "skillEvolutionMethod.index.json")), await readFile(join(right, "references", "skillEvolutionMethod.index.json")));
   const index = JSON.parse(await readFile(join(left, "references", "skillEvolutionMethod.index.json"), "utf8"));
   assert.equal(index.source.sha256, sha256(original));

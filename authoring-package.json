@@ -3,6 +3,7 @@
   "packageId": "skill-rails-authoring",
   "packageVersion": "1.0.4",
   "modules": {
+    "buildAndTest": "authoring/skill-rails/modules/build-and-test.md",
     "skillEvolutionMethod": "docs/guide/ai-skill-evolution-method_ko.md"
   },
   "targets": {
