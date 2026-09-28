@@ -487,3 +487,13 @@ Cold Codex·Claude가 재정박 문장을 실제로 필요한 두 시점에만 �
 Release commit `a4a7dc42e8197d31786586ac511ae0fd50d33cdd`를 `origin/main`에 non-force fast-forward했고, annotated tag object `0c87df426028098afc67c8c44ab4ef3c2736b0c9`의 `v1.0.4` peeled commit이 같은 release commit임을 `git ls-remote`로 확인했다. 원격 push 뒤 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes --json` 명령은 `skills@1.7.0`과 installer hash `d3b6713362133c182b96563ed5f6cf0a25ab21736ec99e9dda906b0aede1049c`로 `C:\Users\joinj\.agents\skills\skill-rails`에 설치하고 `C:\Users\joinj\.claude\skills\skill-rails`를 그 exact directory의 junction으로 연결했다. 양쪽 installed `scripts/run.mjs check`는 package/core `1.0.4`, tree `098cd5e4cc391f692701f42459b2aa1f48fd524d28f116c29ecf21e5be065372`, `ARTIFACT_INTACT`를 반환했고 `CODEX_HOME`은 변경하지 않았다. `npm pack --dry-run --json`은 39 entries, packed 64,937B/unpacked 231,007B이며 npm registry publish는 수행하지 않았다.
 
 이 release가 cold author의 비대칭 handoff를 실제로 예방하는 행동 효과, Devflow 이외 package의 반복 빈도, fresh-use 비용 중복과 실제 절감은 `unproven`이다. Devflow source의 Sketch landing owner/import 교정은 이 Skill Rails 문구 변경과 분리된 해당 package의 필수 수정이다. 새 관계 선언이나 기계 검사는 같은 실패가 반복되어 현재 one-owner/import 방식으로 해결되지 않는 증거가 생길 때만 다시 검토한다.
+
+## Unreleased — entry 중복 제거와 build/test 조건부 분리
+
+- 유지보수 패치가 쌓이며 canonical entry에 같은 개념이 여러 곳에 반복된 상태를 확인했다. "build·integrity check는 delivery만 증명" 4곳, 편집 전 owner·consumer inspect 2곳, receipt·diff 검토 2곳, generated output 대신 canonical owner 수정 2곳, overview 제한 2곳이다. `2752238`은 의미 변경 없이 각 개념을 한 owner로 모았다. 원래 25줄의 파일 생성 억제 문장과 33줄의 stale transplant 금지는 고유 의미가 있어 유지했다.
+- `c87f5d2`는 build/check 방법, adoption·release gate 관찰, current evidence 경계를 문구 그대로 조건부 `references/buildAndTest.md`(source `authoring/skill-rails/modules/build-and-test.md`)로 옮겼다. Entry는 저작에 필요한 canonical-source 원칙, Step 1~5, CLI 사용법, overview 사용을 유지한다. Step 6은 "building, checking, testing, or claiming delivery 전과 adoption·release gate에서" 모듈을 연다. Generated `SKILL.md`는 7,136B에서 5,523B가 됐고 모듈은 1,387B다.
+- Claude Fable 5.1 xhigh 독립 읽기 전용 검토와 두 차례 상호 조율(`run_ae3bcbaf31b7`, `task_063165ce0470`, `task_49e9f356c5f2`)에서 이견 0건으로 수렴했다. Coordinator 원안의 25줄·33줄 삭제와 구역 순서 변경은 철회했다. 모듈 내부 행동을 전제하던 read condition은 열기 전에 판정 가능한 조건으로 고쳤다.
+- 이중 build tree hash가 일치했고, source-side check는 artifact-intact/source-current다. `npm test`는 30/31이다. 실패한 1건은 변경 전후 동일하게 이 Windows shell에 `rg`가 없어 난 환경 실패이며, 그 test가 검사하는 generated `SKILL.md` 유일성과 legacy import 부재는 직접 확인했다. Version, tag, push, 두 host 재설치는 수행하지 않았다.
+- `evals/m5/framework/harness.mjs`의 historical lane build는 자체 manifest로 이 entry를 빌드하므로, 재실행하면 새 pointer가 존재하지 않는 `references/buildAndTest.md`를 가리킨다. E-021로 격리된 평가라 코드는 바꾸지 않았다.
+
+AI가 build·test 요청 시 모듈을 실제로 열고 저작만 할 때는 열지 않는 행동, 그리고 context 절감의 실제 효과는 `unproven`이다.
