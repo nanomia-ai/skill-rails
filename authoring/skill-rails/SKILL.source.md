@@ -12,6 +12,7 @@ Before making an authoring or maintenance judgment, read §§0–0.1 of `referen
 ## Work from canonical source
 
 - Change the source package, target, module, observer, renderer, or contract that owns the behavior. Never hand-edit a generated target carrying `.skill-rails-build.json`.
+- When maintaining an existing package, rebuild only affected targets and preserve failed receipts.
 - Put domain meaning in one canonical domain source, never in generated output or runtime state.
 - Declare only the source modules, imports, inputs, output, contracts, and mechanism files the target actually consumes. The build fails closed on unknown fields, undeclared paths, root escapes, and unsupported combinations.
 - Use exact IDs and paths. Do not infer requirement, check, effect, or causal relationships that the source graph does not declare.
@@ -26,7 +27,7 @@ Before making an authoring or maintenance judgment, read §§0–0.1 of `referen
 3. Give every purpose, domain rule, input/output declaration, renderer, contract, and evidence claim one canonical owner. Add only the package manifest, target descriptor, entry, imported modules, and mechanism files the chosen target actually consumes.
 4. Keep the entry as the smallest complete always-read contract: state the essential background and intent needed to interpret every branch, the purpose, use trigger and operating boundary, common rules or unconditional pointers to their shared owners, current inputs, completion evidence, and the exact read condition for each optional module. That condition must be decidable from the current task and declared inputs before opening the module. A rule shared by multiple targets has one canonical module owner; every consuming entry points to it, unconditionally when every run needs it. Move other content to a whole-file module only when a real task can safely skip it and the saved reading exceeds navigation and rereading cost; never separate meanings that must be judged together. Put deterministic formatting and mechanically decidable safety checks in the renderer/core; keep semantic safety and permission judgments with the domain source, AI, or user.
 5. Inspect the package or target by exact ID before editing, then inspect the changed owner and its consumers. If inspection finds an actual target input, output, import, or mechanism that step 3 requires but the target does not declare, add the missing declaration at its canonical owner. When one target's prose hands an artifact, decision, recovery, cleanup, or next-actor responsibility to another target's actor, read each involved target's entry and confirm the receiving obligation is reachable from the receiver's own entry or an imported module; a shared import satisfies this only when that module itself states the obligation. Leave any other undeclared relation explicit. Add a new semantic relation only at its canonical owner and only after an observed maintenance failure shows that it is needed.
-6. Build and test with `references/buildAndTest.md`: open it before building, checking, testing, or claiming delivery, and at any adoption or release gate.
+6. Build and test with `references/buildAndTest.md`: open it before building, checking, testing, claiming delivery, or stating what current evidence covers or leaves `unproven`, and at any adoption or release gate.
 
 ## Repository operations
 

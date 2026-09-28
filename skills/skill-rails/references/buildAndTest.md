@@ -1,6 +1,6 @@
 # Build, check, test, and gate
 
-Build one target first, review its receipt and generated diff, and verify deterministic delivery and currentness before claiming delivery. Double-build and compare tree hashes, and check artifact integrity separately from source currentness. Test from a standalone copy. When maintaining an existing package, rebuild only affected targets and preserve failed receipts.
+Build one target first, review its receipt and generated diff, and verify deterministic delivery and currentness before claiming delivery. Double-build and compare tree hashes, and check artifact integrity separately from source currentness. Test from a standalone copy; an artifact or hash check does not prove that a fresh AI understood or used it.
 
 At the adoption or release gate, run the smallest realistic fresh-use observation that can change the decision and reread the actual effect. Scope that observation by the decision's distinct failure risks, not by target count: one observation may cover several targets, and any risk it does not actually exercise stays `unproven`. Record `proven`, `failed`, and `unproven` separately; do not grow a matrix after the decision is already bounded.
 
