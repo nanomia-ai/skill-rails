@@ -63,7 +63,7 @@ function generatedTargetConfig(graph, item) {
     targetId: target.targetId,
     mode: target.mode,
     imports: target.imports.map((id) => ({ id, path: artifactPathForModule(id) })),
-    ...(target.references?.length ? { references: target.references.map((path) => ({ path: `references/${path.split("/").at(-1)}` })) } : {}),
+    ...(item.referenceNames.length ? { references: item.referenceNames.map((name) => ({ path: `references/${name}` })) } : {}),
     headingIndex: target.headingIndex ? `references/${target.headingIndex}.index.json` : null,
     ...(target.embeddedCoreTooling ? { embeddedCoreTooling: target.embeddedCoreTooling } : {}),
     fallbackReference: target.fallbackModule ? "references/fallback.md" : null,

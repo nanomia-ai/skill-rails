@@ -205,7 +205,7 @@ export async function loadSourceGraph(manifestPath) {
       target.declaredInputs.forEach((path) => normalizeRelativePath(path, `${target.targetId} declared input`));
       normalizeRelativePath(target.declaredOutput, `${target.targetId} declared output`);
     }
-    targets.set(target.targetId, { alias, path: resolvedTarget.normalized, physical: resolvedTarget.physical, bytes: targetRead.bytes, target, files });
+    targets.set(target.targetId, { alias, path: resolvedTarget.normalized, physical: resolvedTarget.physical, bytes: targetRead.bytes, target, files, referenceNames });
     sourcePathSpellings.push(resolvedTarget.normalized);
   }
   assertNoCaseFoldCollisions([...targets.keys()], "target IDs");
