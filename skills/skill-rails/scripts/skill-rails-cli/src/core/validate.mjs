@@ -146,6 +146,7 @@ export async function loadSourceGraph(manifestPath) {
 
   const targetSchema = await readContract("target.schema.json");
   const targets = new Map();
+  const referenceOwners = new Map();
   for (const [alias, targetPath] of Object.entries(manifest.targets).sort(([a], [b]) => compareCodePoint(a, b))) {
     const resolvedTarget = await resolveContainedFile(rootReal, targetPath, `target ${alias}`);
     const targetRead = await readJsonFile(resolvedTarget.physical, resolvedTarget.normalized);
@@ -166,6 +167,23 @@ export async function loadSourceGraph(manifestPath) {
       sourcePathSpellings.push(resolved.normalized);
     };
     await addFile("entry", target.entry);
+    const referenceNames = [];
+    for (const path of target.references ?? []) {
+      const name = path.split("/").at(-1);
+      if (!name.endsWith(".md")) fail("REFERENCE_INVALID", `${target.targetId} reference is not a Markdown file: ${path}`, "Declare only whole Markdown documents under references; mechanisms have their own fields.");
+      if (referenceNames.includes(name)) fail("REFERENCE_COLLISION", `${target.targetId} declares two references named ${name}.`, "Give each target-owned reference a distinct file name.");
+      referenceNames.push(name);
+      await addFile(`reference:${name}`, path);
+      const physical = files.get(`reference:${name}`).physical;
+      // One file has one owner: a module is shared, a reference belongs to exactly one target.
+      const owner = [...modules.values()].find((module) => module.physical === physical)?.id ?? referenceOwners.get(physical);
+      if (owner) fail("REFERENCE_COLLISION", `${target.targetId} reference ${path} is already owned by ${owner}.`, "Keep a file needed by more than one target as one module that each target imports.");
+      referenceOwners.set(physical, target.targetId);
+    }
+    const referenceArtifacts = [...target.imports.map((id) => `${id}.md`), ...(target.headingIndex ? [`${target.headingIndex}.index.json`] : []), ...(target.fallbackModule ? ["fallback.md"] : []), ...referenceNames];
+    const duplicateArtifact = referenceArtifacts.find((name, index) => referenceArtifacts.indexOf(name) !== index);
+    if (duplicateArtifact) fail("REFERENCE_COLLISION", `${target.targetId} would generate references/${duplicateArtifact} twice.`, "Rename the target-owned reference so it differs from every imported module.");
+    assertNoCaseFoldCollisions(referenceArtifacts, `${target.targetId} generated references`);
     if (target.mode !== "prose") {
       await addFile("domainConfig", target.domainConfig);
       await addFile("domainConfigSchema", target.domainConfigSchema);

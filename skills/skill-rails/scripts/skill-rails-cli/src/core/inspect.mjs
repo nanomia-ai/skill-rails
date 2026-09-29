@@ -5,6 +5,7 @@ import { fail } from "./errors.mjs";
 function targetArtifacts(target) {
   const rows = [{ targetId: target.target.targetId, path: "SKILL.md" }];
   for (const id of target.target.imports) rows.push({ targetId: target.target.targetId, path: `references/${id}.md` });
+  for (const path of target.target.references ?? []) rows.push({ targetId: target.target.targetId, path: `references/${path.split("/").at(-1)}` });
   return rows;
 }
 

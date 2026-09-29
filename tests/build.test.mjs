@@ -278,6 +278,49 @@ test("schema, import, duplicate key, case collision and path escape fail closed"
   assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "PATH_OUTSIDE_ROOT");
 });
 
+test("a target-owned reference is delivered beside imported modules and keeps one owner", async (t) => {
+  const root = await temporary(t, "target-reference");
+  await mkdir(join(root, "modules"), { recursive: true });
+  await mkdir(join(root, "targets", "one"), { recursive: true });
+  await mkdir(join(root, "targets", "two"), { recursive: true });
+  await writeFile(join(root, "modules", "shared.md"), "Shared\n");
+  await writeFile(join(root, "targets", "one", "closure.md"), "Closure detail\n");
+  await writeFile(join(root, "targets", "one", "notes.txt"), "not prose\n");
+  for (const id of ["one", "two"]) await writeFile(join(root, "targets", id, "entry.md"), `---\nname: ${id}\ndescription: ${id} target\n---\nBody\n`);
+  const manifest = join(root, "skill-package.json");
+  await writeFile(manifest, JSON.stringify({ schemaVersion: 1, packageId: "p", packageVersion: "1", modules: { shared: "modules/shared.md" }, targets: { one: "targets/one/target.json", two: "targets/two/target.json" } }));
+  const setTargets = async (one, two = {}) => {
+    await writeFile(join(root, "targets", "one", "target.json"), JSON.stringify({ schemaVersion: 1, targetId: "one", mode: "prose", entry: "entry.md", imports: ["shared"], ...one }));
+    await writeFile(join(root, "targets", "two", "target.json"), JSON.stringify({ schemaVersion: 1, targetId: "two", mode: "prose", entry: "entry.md", imports: ["shared"], ...two }));
+  };
+
+  await setTargets({ references: ["closure.md"] });
+  const out = join(root, "dist");
+  assert.equal(coreCli("build", "--source", manifest, "--out-root", out).status, 0);
+  assert.equal(await readFile(join(out, "skills", "one", "references", "closure.md"), "utf8"), "Closure detail\n");
+  const config = JSON.parse(await readFile(join(out, "skills", "one", "config", "target.json"), "utf8"));
+  assert.deepEqual(config.references, [{ path: "references/closure.md" }]);
+  assert.equal(Object.hasOwn(JSON.parse(await readFile(join(out, "skills", "two", "config", "target.json"), "utf8")), "references"), false);
+  const receipt = JSON.parse(await readFile(join(out, "skills", "one", ".skill-rails-build.json"), "utf8"));
+  assert.equal(receipt.sources.find((row) => row.id === "reference:closure.md")?.path, "targets/one/closure.md");
+  const byPath = coreCli("inspect", "--source", manifest, "--path", "targets/one/closure.md", "--json");
+  assert.equal(byPath.json.focus.id, "one");
+  assert.ok(byPath.json.artifacts.some((row) => row.path === "references/closure.md"));
+
+  await setTargets({ references: ["notes.txt"] });
+  assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "REFERENCE_INVALID");
+  await setTargets({ references: ["../../modules/shared.md"] });
+  assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "REFERENCE_COLLISION");
+  await setTargets({ references: ["closure.md"] }, { references: ["../one/closure.md"] });
+  assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "REFERENCE_COLLISION");
+  await writeFile(join(root, "targets", "one", "Shared.md"), "Clash\n");
+  await setTargets({ references: ["Shared.md"] });
+  assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "CASE_COLLISION");
+  await writeFile(join(root, "targets", "one", "shared.md"), "Clash\n");
+  await setTargets({ references: ["shared.md"] });
+  assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "REFERENCE_COLLISION");
+});
+
 test("record-only mode rejects prepare-only and embedded-authoring fields", async (t) => {
   const root = await temporary(t, "record-only-shape");
   await cp(resolve(repositoryRoot, "domains", "natural-language-pilot"), root, { recursive: true });

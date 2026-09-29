@@ -12,6 +12,7 @@
         "mode": {"const": "prose"},
         "entry": {"type": "string", "minLength": 1},
         "imports": {"type": "array", "items": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"}, "uniqueItems": true},
+        "references": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
         "headingIndex": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"},
         "embeddedCoreTooling": {"const": "authoring-cli-v1"}
       }

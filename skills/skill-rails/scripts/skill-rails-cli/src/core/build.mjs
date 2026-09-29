@@ -63,6 +63,7 @@ function generatedTargetConfig(graph, item) {
     targetId: target.targetId,
     mode: target.mode,
     imports: target.imports.map((id) => ({ id, path: artifactPathForModule(id) })),
+    ...(target.references?.length ? { references: target.references.map((path) => ({ path: `references/${path.split("/").at(-1)}` })) } : {}),
     headingIndex: target.headingIndex ? `references/${target.headingIndex}.index.json` : null,
     ...(target.embeddedCoreTooling ? { embeddedCoreTooling: target.embeddedCoreTooling } : {}),
     fallbackReference: target.fallbackModule ? "references/fallback.md" : null,
@@ -98,6 +99,11 @@ export async function planTargetBuild(graph, targetId) {
     const module = graph.modules.get(id);
     addSource(sources, `module:${id}`, module);
     artifacts.set(artifactPathForModule(id), module.bytes);
+  }
+  for (const [role, file] of item.files) {
+    if (!role.startsWith("reference:")) continue;
+    addSource(sources, role, file);
+    artifacts.set(`references/${role.slice("reference:".length)}`, file.bytes);
   }
   if (item.target.headingIndex) {
     const module = graph.modules.get(item.target.headingIndex);
