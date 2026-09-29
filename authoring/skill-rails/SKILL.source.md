@@ -12,7 +12,7 @@ Before making an authoring or maintenance judgment, read §§0–0.1 of `referen
 ## Work from canonical source
 
 - Change the source package, target, module, observer, renderer, or contract that owns the behavior. Never hand-edit a generated target carrying `.skill-rails-build.json`.
-- When rebuilding a maintained package, rebuild only affected targets and preserve failed receipts.
+- When rebuilding a maintained package, rebuild only affected targets and keep the records of failed checks and observations.
 - Put domain meaning in one canonical domain source, never in generated output or runtime state.
 - Declare only the source modules, imports, references, inputs, output, contracts, and mechanism files the target actually consumes. The build fails closed on unknown fields, undeclared paths, root escapes, and unsupported combinations. Manifest paths are relative to the manifest, whose directory is the root every source path must stay inside; a descriptor's source-file paths are relative to that descriptor, and its declared inputs and output to the project; the closed schemas in `scripts/skill-rails-cli/contracts/` define the fields.
 - Use exact IDs and paths. Do not infer requirement, check, effect, or causal relationships that the source graph does not declare.
