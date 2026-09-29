@@ -96,7 +96,7 @@ test("authoring target materializes the skill evolution method and a semantic-fr
   assert.match(entry, /real task can safely skip it/u);
   assert.match(entry, /never separate meanings that must be judged together/u);
   assert.match(entry, /mechanically decidable safety checks/u);
-  assert.match(entry, /actual target input, output, import, or mechanism/u);
+  assert.match(entry, /actual target input, output, import, reference, or mechanism/u);
   assert.match(entry, /Add a new semantic relation only/u);
   assert.match(entry, /consequential semantic result as a premise for a later judgment/u);
   assert.match(entry, /build and integrity checks prove delivery only/u);
