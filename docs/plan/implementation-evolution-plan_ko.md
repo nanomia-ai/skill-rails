@@ -835,7 +835,7 @@ Release commit `00b75877b194f9dc71b1c0c15b6563f6c13f8819`, annotated tag object 
 
 ## E-041 — target 하나가 조건부로 읽는 문서는 module이 아니라 target-owned reference다
 
-상태: **v1.1.0 release 준비**
+상태: **v1.1.0 release·두 host 설치 완료**
 
 ### 실제 문제와 evidence
 
