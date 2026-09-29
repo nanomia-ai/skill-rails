@@ -3,7 +3,8 @@
   "targetId": "skill-rails",
   "mode": "prose",
   "entry": "../../SKILL.source.md",
-  "imports": ["skillEvolutionMethod", "buildAndTest"],
+  "imports": ["skillEvolutionMethod"],
+  "references": ["../../build-and-test.md"],
   "headingIndex": "skillEvolutionMethod",
   "embeddedCoreTooling": "authoring-cli-v1"
 }
