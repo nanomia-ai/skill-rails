@@ -271,6 +271,8 @@ test("schema, import, duplicate key, case collision and path escape fail closed"
   assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "HEADING_INDEX_UNDECLARED");
   await writeFile(join(root, "targets", "one", "target.json"), JSON.stringify({ schemaVersion: 1, targetId: "one", mode: "prose", entry: "entry.md", imports: [], embeddedCoreTooling: "other-cli" }));
   assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "SCHEMA_INVALID");
+  await writeFile(join(root, "targets", "one", "target.json"), JSON.stringify({ schemaVersion: 1, targetId: "one", mode: "prose", entry: "entry.md", imports: "a" }));
+  assert.ok(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.details.includes("$.imports must be array"));
   await writeFile(join(root, "targets", "one", "target.json"), JSON.stringify({ schemaVersion: 1, targetId: "one", mode: "prose", entry: "../../../outside.md", imports: [] }));
   await writeFile(join(sandbox, "outside.md"), "outside\n");
   assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "PATH_OUTSIDE_ROOT");

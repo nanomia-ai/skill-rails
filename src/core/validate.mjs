@@ -19,6 +19,10 @@ export function validateJsonSchema(value, schema, at = "$") {
       });
       const passing = candidates.filter((candidate) => candidate.length === 0).length;
       if (passing !== 1) errors.push(`${path} must match exactly one allowed shape`);
+      // A failed shape chosen by its required const fields (e.g. target mode) explains which field to fix.
+      const chosen = rule.oneOf.map((candidate, index) => ({ candidate, index })).filter(({ candidate }) => (candidate.required ?? []).some((key) => Object.hasOwn(candidate.properties?.[key] ?? {}, "const"))
+        && (candidate.required ?? []).every((key) => !Object.hasOwn(candidate.properties?.[key] ?? {}, "const") || canonicalJson(current?.[key]) === canonicalJson(candidate.properties[key].const)));
+      if (passing === 0 && chosen.length === 1) errors.push(...candidates[chosen[0].index]);
       return;
     }
     if (Object.hasOwn(rule, "const") && canonicalJson(current) !== canonicalJson(rule.const)) errors.push(`${path} must equal ${JSON.stringify(rule.const)}`);
