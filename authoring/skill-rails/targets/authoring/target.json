@@ -4,7 +4,7 @@
   "mode": "prose",
   "entry": "../../SKILL.source.md",
   "imports": ["skillEvolutionMethod"],
-  "references": ["../../build-and-test.md"],
+  "references": ["../../build-and-test.md", "../../project-docs.md"],
   "headingIndex": "skillEvolutionMethod",
   "embeddedCoreTooling": "authoring-cli-v1"
 }
