@@ -851,4 +851,4 @@ Prose target schema에 선택 필드 `references` 하나를 더한다. 이 필�
 
 ### 검증과 재검토 조건
 
-변경 전후 pilot과 Devflow 10 target의 생성물이 바이트 동일하고, reference 전달과 네 가지 충돌 벽을 test가 확인한다. Reference가 다른 target에 필요해지는 승격이 잦아지면 module-only 안을 다시 비교한다. 실제 package에서 dangling `references/` pointer가 처음 관찰되면 entry literal 대조 검사를 연다. Record-only target이 실제로 필요로 하면 shape를 확장한다. 비-Markdown 전달 요구는 mechanism 필드의 몫으로 거부한다. Fresh AI의 선택·열기 행동은 `unproven`이다.
+변경 전후 pilot과 Devflow 10 target의 생성물이 바이트 동일하고, reference 전달과 네 가지 충돌 벽을 test가 확인한다. Reference가 다른 target에 필요해지는 승격이 잦아지면 module-only 안을 다시 비교한다. 실제 package에서 dangling `references/` pointer가 처음 관찰되면 entry literal 대조 검사를 연다. Record-only target이 실제로 필요로 하면 shape를 확장한다. 비-Markdown 전달 요구는 mechanism 필드의 몫으로 거부한다. Entry·mechanism 파일을 module 또는 reference source로 선언한 사례가 관찰되면 두 경로를 함께 닫는다. Fresh AI의 선택·열기 행동은 `unproven`이다.
