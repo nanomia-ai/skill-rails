@@ -8,7 +8,7 @@ In one message: which route or routes, with each route's one-line shape and trad
 
 ## The three guided routes
 
-Each shape below is the shape, not the names: file names and fields belong to the tool, so confirm its current rules as the first source before writing them, and validate the frame with that tool before claiming delivery.
+Each shape below is the shape, not the names: file names and fields belong to the tool, so confirm its current rules as the first source before writing them, and validate the frame with that tool before claiming the route is in place.
 
 **A. An agent's own skill folder.** A copy or link of `skills/<targetId>/` placed in the folder an agent reads, personal or project; some such folders are read by several agents.
 
@@ -43,7 +43,7 @@ Routes coexist: B and C read the same `skills/`, and A places copies of it.
 ## Walls
 
 - A frame that declares a component the project does not have is a promise the installer fails on: add manifests and fields only for what exists.
-- Delivery that rewrites bytes on the way, such as line-ending conversion, breaks the receipt: run `check` on the installed copy, not only on the build.
+- A route that rewrites bytes on the way, such as line-ending conversion, breaks the receipt: run `check` on the installed copy, not only on the build.
 - Placing into an agent folder or publishing is an effect outside the project: only on the user's word.
 
 ## Record

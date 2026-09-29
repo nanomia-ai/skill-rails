@@ -4,7 +4,7 @@ A project that adopts the shape below owns these documents through its `AGENTS.m
 
 ## What a later session must recover from disk alone
 
-What the package is for, how it is composed, where source and builds live and how they are delivered, what is open, and why a non-obvious choice was made. Documents are the current interface to that knowledge, not a log: Git keeps history, and a document that starts recording history has lost its job.
+What the package is for, how it is composed, where source and builds live and how they reach their agents, what is open, and why a non-obvious choice was made. Documents are the current interface to that knowledge, not a log: Git keeps history, and a document that starts recording history has lost its job.
 
 ## Setting it up
 
