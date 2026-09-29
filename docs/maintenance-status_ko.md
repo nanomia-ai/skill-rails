@@ -2,7 +2,7 @@
 
 문서 상태: 교체형 현재 snapshot
 
-최종 갱신: 2026-09-29 KST — v1.1.1 소스 위치·배포 방식 안내 release 준비
+최종 갱신: 2026-09-29 KST — v1.1.1 소스 위치·배포 방식 안내 release·설치 완료
 
 ## 현재 위치
 
@@ -10,7 +10,7 @@
 - M0~M4 구현 checkpoint commit: `eb08ff3` (`feat: checkpoint greenfield Skill Rails through M4`). M5~M8 accumulated candidate commit은 `e321879`이며 기존 `origin/main`에 non-force fast-forward됐다.
 - 기존 v0.4.3 implementation 257개 파일은 `legacy/archive/v0.4.3/legacy-source.tar`에 보존했다. Capsule SHA-256은 `c79dcf45dc9ab520aa100e19ecf6ef95102d1a423c89c5090cadd40293db31fc`다.
 - `inventory.json`이 원경로·Git/working hash·mode를, `restore-receipt.json`이 Windows temporary-root 복원 257/257와 mismatch 0을 소유한다. POSIX mode 복원은 `unproven`이다.
-- Root와 authoring package version은 `1.1.1`, Node 범위는 `>=24 <25`이고 외부 runtime dependency는 없다. 공식 공개 전달은 npm registry package가 아니라 `nanomia-ai/skill-rails` repository의 `npx skills@latest` 경로다. 마지막 공개·설치 버전은 `v1.1.0`이며 npm registry publish는 수행하지 않았다.
+- Root와 authoring package version은 `1.1.1`, Node 범위는 `>=24 <25`이고 외부 runtime dependency는 없다. 공식 공개 전달은 npm registry package가 아니라 `nanomia-ai/skill-rails` repository의 `npx skills@latest` 경로다. 마지막 공개·설치 버전은 `v1.1.1`이며 npm registry publish는 수행하지 않았다.
 - v1.1.1은 v1.1.0 원격 설치본의 실사용 테스트에서 드러난 공백을 닫는다. 새 package는 첫 파일 전에 소스 위치를 사용자와 합의하고(기존 배치가 없으면 `source/` 제안) 배포 방식을 확인한다. Entry는 경로 기준(manifest·containment root, descriptor 소스 파일, project 기준 declared input·output)을 말하며, build/test 문서는 `running check` 때 열린다. 빌드는 합의된 root(또는 이미 빌드된 곳)에 `skills/<targetId>/` 폴더만 만들고, 배포 틀과 설치는 사용자가 고른 경로의 별도 단계로 그 도구의 현재 규칙을 확인한다. 증거와 `unproven` 경계는 `docs/implementation-verification_ko.md`의 v1.1.1 절이 소유한다.
 - v1.1.0은 세 변경을 묶는다. (1) Canonical entry의 중복을 한 owner로 모으고 build·check·test·gate·증거 현황을 조건부 `references/build-and-test.md`로 분리했다. (2) Target 하나만 조건부로 읽는 Markdown 문서를 공유 module과 다른 범주인 prose target.json `references`로 선언하게 했고(E-041), target.json 오류를 필드 수준으로 알린다. (3) Entry에 "Write prose another AI can act on" 절을 두어 목적지·판단 기준·벽, 열거가 해로운 이유, 예시와 필수 양식의 경계, 방법론 §§8.2–8.3·§9.2–9.3을 여는 행위 시점을 준다. 방법론 §8.2에는 대비 예시를 더했다. 기존 package 생성물은 바이트 동일하고, 공통 module의 스킬별 사본(D-03)은 유지한다. Release commit `4bcac45`, annotated tag `v1.1.0`와 origin push 뒤 공식 원격 NPX 경로로 Codex·Claude Code에 설치했고, 양쪽 installed check가 package/core `1.1.0`, tree `ec7b9dfedf3a301f552ea14c7f6948b4f96cc1a799385b39b0770d9ba0e302bd`와 `ARTIFACT_INTACT`를 반환했다. 증거와 `unproven` 경계는 `docs/implementation-verification_ko.md`의 v1.1.0 절들이 소유한다.
 - v1.0.4는 Devflow에서 실제 관찰된 발신자 전용 handoff 책임을 근거로 canonical authoring Step 5에 조건부 문장 하나를 추가하고, Step 7은 fresh-use 관찰 범위를 target 수가 아니라 결정에 관련된 서로 다른 실패 위험으로 정하도록 좁힌다. 한 관찰이 여러 target을 포괄해도 실제로 시험하지 않은 위험은 `unproven`으로 남는다. Step 6, schema, runtime, CLI와 관계 overview는 바꾸지 않았다. 기본 verify 31/31, source/embedded check artifact-intact/source-current와 generated tree `098cd5e4cc391f692701f42459b2aa1f48fd524d28f116c29ecf21e5be065372`를 확인했다. Release commit `a4a7dc4`, annotated tag `v1.0.4`와 origin push 뒤 공식 NPX 경로로 Codex·Claude Code에 설치했으며 양쪽 installed check가 package/core `1.0.4`, 같은 tree와 `ARTIFACT_INTACT`를 반환했다. Fresh author 행동 효과, 다른 package 반복성과 실제 비용 절감은 `unproven`이다.
@@ -57,7 +57,7 @@ Treatment의 canonical renderer/record는 두 control이 발명한 비호환 mar
 
 M5의 renderer-only 선행 gate는 E-019와 `evals/m5/results/renderer-only-boundary-gate-2026-09-13.json`으로 닫혔다. Framework 초기 교정과 중단·격리는 E-020/E-021 및 `evals/m5/results/framework/`가 소유한다.
 
-1. v1.1.1 release 준비: build·verify는 완료됐고 release commit·annotated tag·origin push와 공식 원격 경로의 Codex·Claude Code 설치, 깨끗한 프로젝트의 실사용 재검증이 남았다. v1.1.0의 release와 설치는 완료됐다. Exact evidence와 `unproven` 경계는 `docs/implementation-verification_ko.md`의 v1.1.0 절들이 소유한다. 새 산문 원칙과 target-owned reference의 fresh 저작 행동 효과는 관찰 전까지 `unproven`이다.
+1. v1.1.1의 build·verify·release commit·annotated tag·origin push와 공식 원격 경로의 Codex·Claude Code 설치는 완료됐다. 깨끗한 프로젝트의 실사용 재검증 결과는 사용자 보고로 남긴다. Exact evidence와 `unproven` 경계는 `docs/implementation-verification_ko.md`의 v1.1.0 절들이 소유한다. 새 산문 원칙과 target-owned reference의 fresh 저작 행동 효과는 관찰 전까지 `unproven`이다.
 2. v1.0.1 entry·module 분할 계약의 원래 목적·범위·완료 조건은 `docs/plan/v1.0.1-entry-module-boundary-plan_ko.md`, implementation/release evidence는 `docs/implementation-verification_ko.md`의 v1.0.1 절, 완료 판단은 `docs/reviews/v1.0.1_ko.md`, 결정과 재검토 조건은 E-038이 소유한다. Release commit·tag·push와 두 host 설치는 완료됐고, 첫 실제 Devflow target의 행동 효과는 review의 재개 조건 전까지 `unproven`이다.
 3. v1.0.0 문서·명칭 closure, artifact version 조회와 release/install evidence는 `docs/implementation-verification_ko.md`의 해당 절, version judgment는 `docs/reviews/v1.0.0_ko.md`, 결정은 E-036/E-037이 소유한다. Release commit·tag·두 host 설치는 완료됐다.
 4. Post-cutover closure의 exact implementation/evidence boundary는 `docs/implementation-verification_ko.md`와 `evals/m8/results/practical-closure-2026-09-14.json`이 소유한다. 기존 M8 cutover 값과 결정은 pre-release receipt와 E-034/E-035가 계속 소유한다.
