@@ -19,7 +19,7 @@ Skill Rails는 AI가 사용할 독립적인 target skill을 저작하고, 현재
 - Effect credit은 실제 관찰 권한을 넘지 않는다. 파일 write는 reread digest가 맞을 때만 `observed`다.
 - 기본 상태는 artifact-derived다. 대화나 run scratch를 durable semantic truth로 만들지 않는다.
 - 사람의 전체 구조 질문에는 source repository의 `overview --source`가 current graph에서 계산한 non-authoritative view 하나만 사용한다. 이 출력은 저장 정본, 진화 방법의 heading index, generated skill 또는 AI runtime/router의 입력이 아니다.
-- 공유 human source는 build-time whole-module materialization으로 standalone target에 들어간다. Installed target의 remote latest는 receipt가 증명하지 않는다.
+- 공유 human source는 build-time whole-module materialization으로 standalone target에 들어간다. Target 하나만 읽고 소유하는 조건부 Markdown 문서는 module이 아니라 prose target.json의 `references`로 선언하는 target-owned reference이며, `references/<file name>`으로 같은 방식으로 전달된다(E-041). Installed target의 remote latest는 receipt가 증명하지 않는다.
 - Greenfield schema는 `schemaVersion: 1`이며 legacy V5를 읽지 않는다.
 - 첫 수직 흐름은 natural-language pilot Verify이고, 그 결과를 Devflow·9-target·다른 stage의 승리로 자동 승계하지 않는다.
 

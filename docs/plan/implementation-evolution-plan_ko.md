@@ -832,3 +832,23 @@ Step 4에 abstract state·다중 branch·checklist를 넣거나 reconstructed pu
 `1.0.3` canonical rebuild tree는 `73c06de2b57b07d70fa139d3efd2d9c8a19733a481c0f52c71b8577d670cf30c`다. Version bump 뒤 첫 `npm run verify`는 기존 build test의 core `1.0.2` 고정 기대값 두 곳에서만 실패했고 그 두 assertion을 `1.0.3`으로 좁혀 고친 재실행은 31/31 통과했다. Source-side와 standalone check는 package/core `1.0.3`, 같은 tree와 `ARTIFACT_INTACT`를 반환하고 source-side만 source-current를 확인했으며 embedded `record.mjs`도 canonical source와 동일하다. 구조 검사는 cold AI의 의미 행동과 사람의 orphan 복구 효과를 증명하지 않는다. 실제 actor가 새 안내로도 실행 불가능하거나 재정박이 고정 의식·과잉 재독이 되거나 필요한 시점에 누락되는 장면이 생길 때만 해당 문구 owner를 다시 열고, 새 validator·schema·checklist·harness·matrix를 만들지 않는다.
 
 Release commit `00b75877b194f9dc71b1c0c15b6563f6c13f8819`, annotated tag object `1cc61375ff9576a8df8417637710b6e67d1c18f3`와 peeled commit의 일치 및 origin push를 확인했다. 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes --json`은 `skills@1.5.26`, installer hash `b03028ecaa449cd83fe241407c48520db7ada896c7c1706ed1c4c034df3e5083`으로 Codex와 Claude Code를 설치했고 두 installed check는 package/core `1.0.3`, 같은 tree와 `ARTIFACT_INTACT`를 반환했다. 이 delivery evidence는 위의 행동·효과 `unproven` 경계를 바꾸지 않는다.
+
+## E-041 — target 하나가 조건부로 읽는 문서는 module이 아니라 target-owned reference다
+
+상태: **구현 완료, 미배포**
+
+### 실제 문제와 evidence
+
+Devflow의 work closure와 direct tracked-contract 상세는 한 target이 드문 경로에서만 읽는 문서다. Skill Rails에는 공유 module(D-03 "공유 정본") 외의 범주가 없어 package module로 등록됐다. `devflow/tests/repeated-execution-context-optimization/README.md`는 그 등록이 전달 수단일 뿐 공유 계약이 아니라고 해명해야 했다. 동결 계획의 유지보수 질문은 이미 "공통 module 또는 target 전용 source"를 구분하지만, 산문 문서는 target 전용 source로 선언할 수 없었다.
+
+### 영향과 보존 목적
+
+Prose target schema에 선택 필드 `references` 하나를 더한다. 이 필드는 target.json 기준 Markdown 경로를 받아 `references/<file name>`으로 whole-file 전달한다. Module·headingIndex·receipt schema·runtime·CLI 인터페이스와 기존 target의 생성 bytes는 그대로다. 파일 하나에 소유자 하나를 유지하므로, module과 reference 겸용, 두 target의 공동 선언, 생성 이름 충돌은 fail-closed다. Authoring entry는 소유 기준(이 target만 읽고 소유하면 reference, 아니면 module)과 read condition 작성 방향만 안내한다.
+
+### 대안과 수렴
+
+안내만 바꾸고 module에 계속 섞는 안은 코드가 없지만, 공유 목록의 의미를 흐리고 Devflow의 해명을 공식 입장으로 만들어 기각했다. Module 값 shape 확장은 기존 manifest를 깨고, target 폴더 자동 포함은 "선언한 것만" 원칙을 어기며, imports에 경로를 섞거나 target-local module map을 두는 안은 더 모호하거나 크다. Claude Fable 5.1 독립 검토와 세 차례 조율에서 소비자 수가 아니라 소유를 기준으로 하고, 되돌림 신호 목록 같은 반복 산문은 두지 않는 쪽으로 수렴했다.
+
+### 검증과 재검토 조건
+
+변경 전후 pilot과 Devflow 10 target의 생성물이 바이트 동일하고, reference 전달과 네 가지 충돌 벽을 test가 확인한다. Reference가 다른 target에 필요해지는 승격이 잦아지면 module-only 안을 다시 비교한다. 실제 package에서 dangling `references/` pointer가 처음 관찰되면 entry literal 대조 검사를 연다. Record-only target이 실제로 필요로 하면 shape를 확장한다. 비-Markdown 전달 요구는 mechanism 필드의 몫으로 거부한다. Fresh AI의 선택·열기 행동은 `unproven`이다.

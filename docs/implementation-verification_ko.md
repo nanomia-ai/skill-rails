@@ -495,6 +495,16 @@ Release commit `a4a7dc42e8197d31786586ac511ae0fd50d33cdd`를 `origin/main`에 no
 - 작성 의도를 받지 않은 fresh Claude Fable 5.1의 전후 대조(`task_d97c681dc5c9`)와 후속 조율 1회 뒤 세 곳을 교정했다. 빌드 없이 증거 범위를 묻는 장면에서도 모듈이 열리도록 read condition에 "stating what current evidence covers or leaves `unproven`"을 더했다. 18줄과 역할이 다른 테스트 기준 절 "an artifact or hash check does not prove that a fresh AI understood or used it"를 원문 그대로 복원했다. 되돌릴 수 없는 증거 손실을 막는 "rebuild only affected targets and preserve failed receipts"는 변경 전처럼 always-read로 되돌렸다. 성공한 빌드만 receipt를 쓰므로 이 receipt는 테스트·관찰 증거다. 최종 Step 6은 "before building, checking, testing, claiming delivery, or stating what current evidence covers or leaves `unproven`, and at any adoption or release gate" 모듈을 연다. Generated `SKILL.md`는 7,136B에서 5,682B가 됐고 모듈은 1,369B다.
 - Claude Fable 5.1 xhigh 독립 읽기 전용 검토와 두 차례 상호 조율(`run_ae3bcbaf31b7`, `task_063165ce0470`, `task_49e9f356c5f2`)에서 이견 0건으로 수렴했다. Coordinator 원안의 25줄·33줄 삭제와 구역 순서 변경은 철회했다. 모듈 내부 행동을 전제하던 read condition은 열기 전에 판정 가능한 조건으로 고쳤다.
 - 최종 source의 이중 build tree hash가 일치했고, source-side check는 artifact-intact/source-current다. `npm test`는 30/31이다. 실패한 1건은 변경 전후 동일하게 이 Windows shell에 `rg`가 없어 난 환경 실패이며, 그 test가 검사하는 generated `SKILL.md` 유일성과 legacy import 부재는 직접 확인했다. Version, tag, push, 두 host 재설치는 수행하지 않았다.
-- `evals/m5/framework/harness.mjs`의 historical lane build는 자체 manifest로 이 entry를 빌드하므로, 재실행하면 새 pointer가 존재하지 않는 `references/buildAndTest.md`를 가리킨다. E-021로 격리된 평가라 코드는 바꾸지 않았다.
+- `evals/m5/framework/harness.mjs`의 historical lane build는 자체 manifest로 이 entry를 빌드하므로, 재실행하면 새 pointer가 존재하지 않는 `references/build-and-test.md`를 가리킨다. E-021로 격리된 평가라 코드는 바꾸지 않았다.
 
 AI가 build·test 요청 시 모듈을 실제로 열고 저작만 할 때는 열지 않는 행동, 그리고 context 절감의 실제 효과는 `unproven`이다.
+
+## Unreleased — target-owned reference와 필드 수준 schema 오류
+
+- Devflow의 `targets/work/closure.md`와 `targets/direct/tracked-contract.md`는 target 하나가 드문 경로에서만 읽는 문서다. Skill Rails에 이 범주가 없어 package module로 등록됐고, Devflow는 module 등록이 전달 수단일 뿐 공유가 아니라는 해명을 따로 써야 했다. `40b157b`는 prose target.json의 선택 필드 `references`(target.json 기준 Markdown 경로)를 추가했다. 이 문서는 `references/<file name>`으로 전달되고, receipt source `reference:<file name>`과 inspect artifact 행에 나타난다. 생성 `config/target.json`의 `references`는 선언이 있을 때만 쓴다. 같은 파일을 module과 reference로, 또는 두 target의 reference로 선언하는 것과 같은 `references/` 이름을 두 번 만드는 것(대소문자 포함)은 fail-closed다. 변경 전후 pilot package와 Devflow 10 target의 생성물은 바이트 동일했다.
+- `98736fb`는 target이 어떤 shape에도 맞지 않을 때, 필수 const 필드(mode)로 고른 후보의 필드 수준 오류를 기존 총괄 문장 뒤에 덧붙인다.
+- `4769ee6`·`545b9e9`는 authoring entry의 선언 목록, Step 3·5, Step 4의 read condition을 reference까지 넓혔다. "이 target만 읽고 소유하는 내용은 target-owned reference, 다른 target이 읽거나 target 밖에서 소유하는 내용은 module" 기준과 승격 시 독자 pointer를 다시 맞추라는 안내를 더했다. Generated `SKILL.md`는 5,682B에서 6,222B가 됐다. `070b72f`는 Skill Rails 자신의 build/test 문서를 reference로 전환했다(bytes sha256 `dbb2d915…` 불변, entry pointer 파일명만 변경). `skillEvolutionMethod`는 heading index와 target 밖 소유 때문에 module로 남는다.
+- 설계는 Claude Fable 5.1 xhigh와 세 차례 조율(`task_2211707ce6a1` 계열)해 이견 0건으로 확정했다. 판단 기준을 소비자 수에서 소유로 바꾼 것, Step 5 수신 의무의 reference 도달, 두 target 동시 선언 차단은 검토자가 찾았다. Step 5 보완 목록의 reference는 구현 중 줄 단위 재검토에서 추가했다.
+- 이중 build tree hash가 일치했고 source-side check는 artifact-intact/source-current다. `npm test`는 31/32다. 실패한 1건은 기존과 같은 `rg` 부재 환경 실패다. Version, 배포, Devflow 전환은 수행하지 않았다.
+
+AI가 새 기준으로 reference와 module을 올바르게 고르고 read condition을 쓰는지, 생성 skill이 드문 경로에서만 reference를 여는지는 `unproven`이다.
