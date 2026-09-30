@@ -1,6 +1,6 @@
 # Build, check, test, and gate
 
-Build into the root the project's own instructions record or the user agrees; if neither is at hand, agree it now rather than choosing one, proposing `--out-root <project root>`, which places each target in `skills/<targetId>/`. The built folder is the whole build; how it reaches an agent is the delivery route, which `references/delivery.md` owns. Once agreed, record the build root and the route where the project keeps its current state so the next session reuses them; if the project keeps none, expect to agree again.
+Build into the root the project's own instructions record; otherwise the root follows the delivery route, which `references/delivery.md` owns: a guided route builds with `--out-root <project root>`, which places each target in `skills/<targetId>/`, and a way of the project's own builds into the structure decided with it. The built folder is the whole build. Once the route is chosen, record the build root and the route where the project keeps its current state so the next session reuses them; if the project keeps none, expect to choose again.
 
 Build one target first, review its receipt and generated diff, and verify deterministic delivery and currentness before claiming delivery. Double-build and compare tree hashes, and check artifact integrity separately from source currentness. When the user asks for a test, run it from a copy that gives the fresh AI only the built skill; an artifact or hash check does not prove that a fresh AI understood or used it.
 
