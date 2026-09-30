@@ -1,6 +1,6 @@
 # Delivery routes
 
-A built target is one folder, `skills/<targetId>/` under the build root, and every route reads that same folder: a route adds thin files beside it and never moves, edits, or rebuilds it elsewhere, because that shared folder is what `check` verifies and what every other route reads too. The route is the user's choice, recorded with the build root; "later" is a valid answer and is recorded as the route's value, deferred by the user.
+The route decides where a build goes and what it must produce, so it is chosen before the first build. The guided routes below read one shared folder, `skills/<targetId>/` under the build root: a route adds thin files beside it and never moves, edits, or rebuilds it elsewhere, because that shared folder is what `check` verifies and what the other guided routes read too. A way of the project's own may need a different structure, so that structure is decided together with the route. The route is the user's choice, recorded with the build root.
 
 ## The three guided routes
 
