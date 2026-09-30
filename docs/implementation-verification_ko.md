@@ -606,3 +606,9 @@ Release commit `96c806719e0d021eb3220bbcf0571a260cc3e6a8`를 `origin/main`에 no
 - Root·authoring package를 `1.3.5`로 맞추고 test의 core 고정 기대값 두 곳을 같이 옮긴 뒤 정상 builder로 투영한 generated tree는 `77bf05ac11b4ef85991b00dec9f505c0072840634e4e6a2a5d21e7692ac5ffb9`이며 이중 build가 같은 tree를 냈다. Source-side check는 package/core `1.3.5`, artifact-intact/source-current를 반환했고 `npm test`는 31/32다(실패 1건은 기존 `rg` 부재 환경 실패). `npm pack --dry-run --json`은 42 entries, packed 74,353B/unpacked 258,258B다.
 
 Release commit `ee79ffa376577bcac4396c8359c5e234b9170ca0`를 `origin/main`에 non-force fast-forward했고, annotated tag object `8d0b5845ef459a1ab749fb3de78da1d5292b1caa`의 `v1.3.5` peeled commit이 같은 release commit임을 `git ls-remote`로 확인했다. 원격 push 뒤 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes --json` 명령을 저장소 밖에서 실행했다. 이 명령은 installer hash `f432e6d9c377ebd92a2041d77d47895ba6b09c4ba4462dd18c5202f77d3baab3`로 Codex·Claude Code(symlink/junction)에 설치했다. 설치 lock은 source `nanomia-ai/skill-rails`(github)이고, skillFolderHash `6e1ddd4e2019677b40e34a1ac2b0dd981769ac1f`는 release commit의 `skills/skill-rails` tree와 같다. 양쪽 installed `scripts/run.mjs check`는 package/core `1.3.5`, tree `77bf05ac11b4ef85991b00dec9f505c0072840634e4e6a2a5d21e7692ac5ffb9`와 `ARTIFACT_INTACT`를 반환했다. npm registry publish는 수행하지 않았다.
+
+## 작업 사이클 도식과 배포 방식 템플릿
+
+- v1.3.5 trial-11에서 뼈대는 처음으로 모두 돌았지만, 배포 선택지는 A를 둘로 나누고 B·C를 합쳤으며 사용자 정의 방식이 빠졌고, 진행 안내는 파일을 만든 뒤에 나왔으며, route 기록은 적지 않고 물었다. 원인은 흐름이 네 문서의 긴 문장들에 흩어져 AI가 매번 흐름을 스스로 짜 맞춘 것, 그리고 배포 방식을 문단으로 서술해 분기가 분리돼 있지 않았던 것이다.
+- `20924c5`는 엔트리 맨 위에 짧은 화살표 도식으로 작업 사이클(시작·재개 → SOURCE ⟲ → 요청 시 ROUTE → BUILD → TEST → SOURCE)을 보여 주게 했다. 상세 규칙은 기존 절들에 그대로 두어, 도식과 상세가 겹치더라도 최상위에서 흐름이 보이게 했다. `aed3ca0`는 delivery.md를 같은 항목(모양, 맞는 경우, 비용, 이 컴퓨터에서)을 가진 A·B·C 템플릿과 사용자가 채우는 D 템플릿으로 나눴다. `e070aa3`은 도식의 안내를 3단계로 가리키게 하고 A의 장점 문구를 되살렸다.
+- 설계는 코디네이터가 정하고 Claude Fable 5.1이 새 AI 읽기로 논리 검증했다. 새 AI 행동은 `unproven`이다.
