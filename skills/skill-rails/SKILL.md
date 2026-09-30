@@ -8,6 +8,31 @@ description: Create and maintain standalone AI skills from canonical source pack
 
 Design one standalone skill as a small canonical source graph, and build it when the user asks, while leaving genuine meaning judgments with the AI or user.
 
+## The work cycle
+
+```text
+start or resume
+ ├─ new package ──→ documents question (once, if none is kept) ──→ tell the user this cycle
+ └─ existing package ──→ read the project's recorded state
+        │
+        ▼
+SOURCE  design and refine with the user ⟲      nothing is built
+        │  user asks to build or test
+        ▼
+ROUTE   recorded? ── no ──→ references/delivery.md: user chooses A, B, C, or D ──→ record it
+        │
+        ▼
+BUILD   source ──→ the standalone skill folder the route needs      references/build-and-test.md
+        │  when a test was asked
+        ▼
+TEST    put it in place on this machine by the route ──→ a fresh AI uses it
+        │
+        ▼
+back to SOURCE: a later change is a source change; built and installed copies stay behind until the next build, so say so
+```
+
+Join the cycle where the user is; the sections and references below hold each stage's rules.
+
 Before making an authoring or maintenance judgment, read §§0–0.1 of `references/skillEvolutionMethod.md`. Use its routing table and the decision's uncertainty, reach, and reversal cost to choose any additional sections. The generated `references/skillEvolutionMethod.index.json` is only a byte-range navigation aid; it does not define meaning or a closed task taxonomy.
 
 ## Work from canonical source
