@@ -59,7 +59,7 @@ Treatment의 canonical renderer/record는 두 control이 발명한 비호환 mar
 
 M5의 renderer-only 선행 gate는 E-019와 `evals/m5/results/renderer-only-boundary-gate-2026-09-13.json`으로 닫혔다. Framework 초기 교정과 중단·격리는 E-020/E-021 및 `evals/m5/results/framework/`가 소유한다.
 
-1. v1.3.0의 build·verify·release commit·annotated tag·origin push와 공식 원격 경로의 Codex·Claude Code 설치는 완료됐다. 깨끗한 프로젝트의 단계적 실사용 재검증 결과는 사용자 보고로 남긴다. Exact evidence와 `unproven` 경계는 `docs/implementation-verification_ko.md`의 v1.1.0 절들이 소유한다. 새 산문 원칙과 target-owned reference의 fresh 저작 행동 효과는 관찰 전까지 `unproven`이다.
+1. v1.3.0의 build·verify·release commit·annotated tag·origin push와 공식 원격 경로의 Codex·Claude Code 설치는 완료됐다. 깨끗한 프로젝트의 단계적 실사용 재검증 결과는 사용자 보고로 남긴다. Exact evidence와 `unproven` 경계는 `docs/implementation-verification_ko.md`의 v1.3.0 절들이 소유한다. 새 산문 원칙과 target-owned reference의 fresh 저작 행동 효과는 관찰 전까지 `unproven`이다.
 2. v1.0.1 entry·module 분할 계약의 원래 목적·범위·완료 조건은 `docs/plan/v1.0.1-entry-module-boundary-plan_ko.md`, implementation/release evidence는 `docs/implementation-verification_ko.md`의 v1.0.1 절, 완료 판단은 `docs/reviews/v1.0.1_ko.md`, 결정과 재검토 조건은 E-038이 소유한다. Release commit·tag·push와 두 host 설치는 완료됐고, 첫 실제 Devflow target의 행동 효과는 review의 재개 조건 전까지 `unproven`이다.
 3. v1.0.0 문서·명칭 closure, artifact version 조회와 release/install evidence는 `docs/implementation-verification_ko.md`의 해당 절, version judgment는 `docs/reviews/v1.0.0_ko.md`, 결정은 E-036/E-037이 소유한다. Release commit·tag·두 host 설치는 완료됐다.
 4. Post-cutover closure의 exact implementation/evidence boundary는 `docs/implementation-verification_ko.md`와 `evals/m8/results/practical-closure-2026-09-14.json`이 소유한다. 기존 M8 cutover 값과 결정은 pre-release receipt와 E-034/E-035가 계속 소유한다.
