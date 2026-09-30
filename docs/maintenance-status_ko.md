@@ -2,7 +2,7 @@
 
 문서 상태: 교체형 현재 snapshot
 
-최종 갱신: 2026-09-30 KST — v1.3.5 첫 가이드 복원·테스트 정의 정렬 release 준비
+최종 갱신: 2026-09-30 KST — v1.3.5 첫 가이드 복원·테스트 정의 정렬 release·설치 완료
 
 ## 현재 위치
 
@@ -10,7 +10,7 @@
 - M0~M4 구현 checkpoint commit: `eb08ff3` (`feat: checkpoint greenfield Skill Rails through M4`). M5~M8 accumulated candidate commit은 `e321879`이며 기존 `origin/main`에 non-force fast-forward됐다.
 - 기존 v0.4.3 implementation 257개 파일은 `legacy/archive/v0.4.3/legacy-source.tar`에 보존했다. Capsule SHA-256은 `c79dcf45dc9ab520aa100e19ecf6ef95102d1a423c89c5090cadd40293db31fc`다.
 - `inventory.json`이 원경로·Git/working hash·mode를, `restore-receipt.json`이 Windows temporary-root 복원 257/257와 mismatch 0을 소유한다. POSIX mode 복원은 `unproven`이다.
-- Root와 authoring package version은 `1.3.5`, Node 범위는 `>=24 <25`이고 외부 runtime dependency는 없다. 공식 공개 전달은 npm registry package가 아니라 `nanomia-ai/skill-rails` repository의 `npx skills@latest` 경로다. 마지막 공개·설치 버전은 `v1.3.4`이며 npm registry publish는 수행하지 않았다.
+- Root와 authoring package version은 `1.3.5`, Node 범위는 `>=24 <25`이고 외부 runtime dependency는 없다. 공식 공개 전달은 npm registry package가 아니라 `nanomia-ai/skill-rails` repository의 `npx skills@latest` 경로다. 마지막 공개·설치 버전은 `v1.3.5`이며 npm registry publish는 수행하지 않았다.
 - v1.3.5는 첫 선택(문서 체계) 뒤 사람에게 네 걸음 절차를 안내하게 하고(소스로 설계·다듬기, 빌드·테스트 요청 시 가장 효율적인 독립 스킬 구조로 재구성, 첫 빌드 전 배포 방식 결정과 테스트, 이후 소스 수정과 요청 시 재빌드·테스트·배포), 테스트를 route 결정 → 빌드 → 이 컴퓨터에서 route 실행 → 새 AI 사용으로 맞춘다.
 - v1.3.4는 스킬 동작을 바꿔 달라는 요청을 빌드 폴더나 설치본이 있어도 소스 수정으로 다루고, 빌드·테스트·배포는 사용자가 요청할 때만 시작하며, 테스트 요청은 기록된 route가 없으면 route를 먼저 정한 뒤 빌드하고 테스트한다.
 - v1.3.3은 빌드를 사용자 요청으로만 시작하게 하고(상태 기록이 빌드 트리거가 되던 예외 삭제), delivery.md의 이유를 모든 route에 참인 문장으로 바꾸며, 사용자가 각 방식의 모양·장단점을 보거나 자기 방식을 정의한 뒤 고른다는 목적지를 되살린다.
@@ -64,7 +64,7 @@ Treatment의 canonical renderer/record는 두 control이 발명한 비호환 mar
 
 M5의 renderer-only 선행 gate는 E-019와 `evals/m5/results/renderer-only-boundary-gate-2026-09-13.json`으로 닫혔다. Framework 초기 교정과 중단·격리는 E-020/E-021 및 `evals/m5/results/framework/`가 소유한다.
 
-1. v1.3.5 release 준비: build·verify는 완료됐고 release commit·annotated tag·origin push와 공식 원격 경로의 Codex·Claude Code 설치, 깨끗한 프로젝트의 단계적 실사용 재검증이 남았다. v1.3.4의 release와 설치는 완료됐다. Exact evidence와 `unproven` 경계는 `docs/implementation-verification_ko.md`의 v1.3.0 절들이 소유한다. 새 산문 원칙과 target-owned reference의 fresh 저작 행동 효과는 관찰 전까지 `unproven`이다.
+1. v1.3.5의 build·verify·release commit·annotated tag·origin push와 공식 원격 경로의 Codex·Claude Code 설치는 완료됐다. 깨끗한 프로젝트의 단계적 실사용 재검증 결과는 사용자 보고로 남긴다. Exact evidence와 `unproven` 경계는 `docs/implementation-verification_ko.md`의 v1.3.0 절들이 소유한다. 새 산문 원칙과 target-owned reference의 fresh 저작 행동 효과는 관찰 전까지 `unproven`이다.
 2. v1.0.1 entry·module 분할 계약의 원래 목적·범위·완료 조건은 `docs/plan/v1.0.1-entry-module-boundary-plan_ko.md`, implementation/release evidence는 `docs/implementation-verification_ko.md`의 v1.0.1 절, 완료 판단은 `docs/reviews/v1.0.1_ko.md`, 결정과 재검토 조건은 E-038이 소유한다. Release commit·tag·push와 두 host 설치는 완료됐고, 첫 실제 Devflow target의 행동 효과는 review의 재개 조건 전까지 `unproven`이다.
 3. v1.0.0 문서·명칭 closure, artifact version 조회와 release/install evidence는 `docs/implementation-verification_ko.md`의 해당 절, version judgment는 `docs/reviews/v1.0.0_ko.md`, 결정은 E-036/E-037이 소유한다. Release commit·tag·두 host 설치는 완료됐다.
 4. Post-cutover closure의 exact implementation/evidence boundary는 `docs/implementation-verification_ko.md`와 `evals/m8/results/practical-closure-2026-09-14.json`이 소유한다. 기존 M8 cutover 값과 결정은 pre-release receipt와 E-034/E-035가 계속 소유한다.
