@@ -12,7 +12,7 @@ Design one standalone skill as a small canonical source graph, and build it when
 
 ```text
 start or resume
- ├─ new package ──→ documents question (once, if none is kept) ──→ tell the user this cycle
+ ├─ new package ──→ documents question (once, if none is kept) ──→ tell the user this cycle in their words (step 3)
  └─ existing package ──→ read the project's recorded state
         │
         ▼

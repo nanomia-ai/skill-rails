@@ -10,7 +10,7 @@ The route decides what the built folder becomes part of and what is done with it
   <agent skill folder>/<name>/   ← copy or link of <build root>/skills/<targetId>/
   ```
 
-- Fits when: one person uses it on this machine, or tries it first.
+- Fits when: one person uses it on this machine, or tries it first; nothing sits between build and use.
 - Costs: placement is per agent and per machine, updates are by hand, and nothing records where a copy came from.
 - On this machine: copy or link it into the chosen folder.
 
