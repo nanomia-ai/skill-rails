@@ -1,10 +1,6 @@
 # Delivery routes
 
-A built target is one folder, `skills/<targetId>/` under the build root, and every route reads that same folder: a route adds thin files beside it and never moves, edits, or rebuilds it elsewhere, because that shared folder is what `check` verifies and what every other route reads too. The route is the user's choice, recorded with the build root; "later" is a valid answer and becomes an open question. The host you are running in is not a default.
-
-## Ask, do not assume
-
-In one message: which route or routes, with each route's one-line shape and trade-off from below; and, for a route that adds a frame, whether the shared-`skills/` shape stays the template or the project wants its own and whether to prepare room now for more than skills or for more agents. Build no frame the user has not asked for.
+A built target is one folder, `skills/<targetId>/` under the build root, and every route reads that same folder: a route adds thin files beside it and never moves, edits, or rebuilds it elsewhere, because that shared folder is what `check` verifies and what every other route reads too. The route is the user's choice, recorded with the build root; "later" is a valid answer and is recorded as the route's value, deferred by the user.
 
 ## The three guided routes
 
@@ -34,17 +30,16 @@ One command reaches several agents and updates them. It needs the built folders 
 <repository root>/<marketplace file>     ← only when the project publishes a marketplace
 ```
 
-Versioned install and room for more than skills. Each plugin system keeps its own manifest and does not read the others', and keeping their names and versions in agreement is the project's discipline: one of them is the source the others copy, and the record says which.
+Versioned install and room for more than skills. Each plugin system keeps its own manifest and does not read the others', and keeping their names and versions in agreement is the project's discipline: one of them is the source the others copy, and the project's current state says which. Choosing C also raises whether the shared-`skills/` shape stays the template or the project wants its own, and whether to prepare room now for more than skills or for more agents.
 
-**Other.** Hosting, a package registry, or the project's own way: the user defines it and the record keeps the definition.
+**Other.** Hosting, a package registry, or the project's own way: the user defines it and the project's current state keeps the definition.
 
 Routes coexist: B and C read the same `skills/`, and A places copies of it.
 
 ## Walls
 
-- A frame that declares a component the project does not have is a promise the installer fails on: add manifests and fields only for what exists.
+- A frame that declares a component the project does not have is a promise the installer fails on: add manifests and fields only for what exists, and add no frame the user has not asked for.
 - A route that rewrites bytes on the way, such as line-ending conversion, breaks the receipt: run `check` on the installed copy, not only on the build.
-- Placing into an agent folder or publishing is an effect outside the project: only on the user's word.
 
 ## Record
 
