@@ -1,6 +1,6 @@
 {
   "name": "@nanomia/skill-rails",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "private": true,
   "description": "Greenfield AI-first skill authoring and standalone skill runtime experiments.",
   "type": "module",
