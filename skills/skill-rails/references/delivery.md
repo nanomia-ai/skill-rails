@@ -1,10 +1,8 @@
 # Delivery routes
 
-The route decides where a build goes and what it must produce, so it is chosen before the first build. The guided routes below read one shared folder, `skills/<targetId>/` under the build root: a route adds thin files beside it and never moves, edits, or rebuilds it elsewhere, because that shared folder is what `check` verifies and what the other guided routes read too. A way of the project's own may need a different structure, so that structure is decided together with the route. The route is the user's choice, recorded with the build root.
+The route decides what the built folder becomes part of and what is done with it afterward, so the route is chosen before the first build. The guided routes below read one shared folder, `skills/<targetId>/` under the build root: a route adds thin files beside it and never moves, edits, or rebuilds it elsewhere, because that shared folder is what `check` verifies and what the other guided routes read too. A way of the project's own may need a different structure, so that structure is decided together with the route. The route is the user's choice, made after seeing each route's shape and trade-offs below or defining a way of the project's own, and recorded with the build root.
 
 ## The three guided routes
-
-Each shape below is the shape, not the names: file names and fields belong to the tool, so confirm its current rules as the first source before writing them, and validate the frame with that tool before claiming the route is in place.
 
 **A. An agent's own skill folder.** A copy or link of `skills/<targetId>/` placed in the folder an agent reads, personal or project; some such folders are read by several agents.
 
@@ -38,6 +36,7 @@ Routes coexist: B and C read the same `skills/`, and A places copies of it.
 
 ## Walls
 
+- Each shape above is the shape, not the names: file names and fields belong to the tool, so confirm its current rules as the first source before writing them, and validate the frame with that tool before claiming the route is in place.
 - A frame that declares a component the project does not have is a promise the installer fails on: add manifests and fields only for what exists, and add no frame the user has not asked for.
 - A route that rewrites bytes on the way, such as line-ending conversion, breaks the receipt: run `check` on the installed copy, not only on the build.
 
