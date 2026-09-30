@@ -1,38 +1,54 @@
 # Delivery routes
 
-The route decides what the built folder becomes part of and what is done with it afterward, so the route is chosen before the first build. The guided routes below read one shared folder, `skills/<targetId>/` under the build root: a route adds thin files beside it and never moves, edits, or rebuilds it elsewhere, because that shared folder is what `check` verifies and what the other guided routes read too. A way of the project's own may need a different structure, so that structure is decided together with the route. The route is the user's choice, made after seeing each route's shape and trade-offs below or defining a way of the project's own, and recorded with the build root.
+The route decides what the built folder becomes part of and what is done with it afterward, so the route is chosen before the first build. Show the user all four routes below, each with its shape and trade-offs, and let them choose one or more, or define D; record the choice with the build root. The guided routes A, B, and C read one shared folder, `skills/<targetId>/` under the build root: a route adds thin files beside it and never moves, edits, or rebuilds it elsewhere, because that shared folder is what `check` verifies and what the other guided routes read too. B and C can coexist on the same `skills/`, and A places copies of it.
 
-## The three guided routes
+## A. An agent's own skill folder
 
-**A. An agent's own skill folder.** A copy or link of `skills/<targetId>/` placed in the folder an agent reads, personal or project; some such folders are read by several agents.
+- Shape: a copy or link of `skills/<targetId>/` in the folder an agent reads, personal or project; some such folders are read by several agents.
 
-```text
-<agent skill folder>/<name>/   ← copy or link of <build root>/skills/<targetId>/
-```
+  ```text
+  <agent skill folder>/<name>/   ← copy or link of <build root>/skills/<targetId>/
+  ```
 
-Nothing sits between build and use. Placement is per agent and per machine, updates are by hand, and nothing records where a copy came from.
+- Fits when: one person uses it on this machine, or tries it first.
+- Costs: placement is per agent and per machine, updates are by hand, and nothing records where a copy came from.
+- On this machine: copy or link it into the chosen folder.
 
-**B. An installer that pulls from a repository.** A tool such as `npx skills add <repository>` reads the pushed repository's `skills/`, installs into agent folders, and tracks origin and version.
+## B. An installer that pulls from a repository
 
-```text
-<repository root>/skills/<targetId>/   ← committed build output; the installer finds it here
-```
+- Shape: a tool such as `npx skills add <repository>` reads the repository's `skills/`, installs into agent folders, and tracks origin and version.
 
-One command reaches several agents and updates them. It needs the built folders committed and pushed, and it follows a third-party tool's rules, which change.
+  ```text
+  <repository root>/skills/<targetId>/   ← committed build output; the installer finds it here
+  ```
 
-**C. A plugin, optionally through a marketplace.** A manifest at the repository root beside `skills/` names the plugin; a marketplace file lists plugins and where to fetch them; skills may sit next to commands, hooks, or servers.
+- Fits when: several agents or machines should get it and receive updates.
+- Costs: the built folders are committed, reaching others needs a push, and the installer's third-party rules change.
+- On this machine: install it with that tool from the local repository; pushing is a separate step the user asks for.
 
-```text
-<repository root>/skills/<targetId>/
-<repository root>/<plugin manifest>      ← one per plugin system, each in its own format
-<repository root>/<marketplace file>     ← only when the project publishes a marketplace
-```
+## C. A plugin, optionally through a marketplace
 
-Versioned install and room for more than skills. Each plugin system keeps its own manifest and does not read the others', and keeping their names and versions in agreement is the project's discipline: one of them is the source the others copy, and the project's current state says which. Choosing C also raises whether the shared-`skills/` shape stays the template or the project wants its own, and whether to prepare room now for more than skills or for more agents.
+- Shape: a manifest at the repository root beside `skills/` names the plugin; a marketplace file lists plugins and where to fetch them; skills may sit next to commands, hooks, or servers.
 
-**Other.** Hosting, a package registry, or the project's own way: the user defines it and the project's current state keeps the definition.
+  ```text
+  <repository root>/skills/<targetId>/
+  <repository root>/<plugin manifest>      ← one per plugin system, each in its own format
+  <repository root>/<marketplace file>     ← only when the project publishes a marketplace
+  ```
 
-Routes coexist: B and C read the same `skills/`, and A places copies of it.
+- Fits when: it should be versioned as a package, or carry more than skills.
+- Costs: each plugin system keeps its own manifest and does not read the others'; keeping their names and versions in agreement is the project's discipline, with one of them the source the others copy, named in the project's current state.
+- Also raises: whether the shared-`skills/` shape stays the template or the project wants its own, and whether to prepare room now for more than skills or for more agents.
+- On this machine: install the plugin locally; publishing is a separate step the user asks for.
+
+## D. A way of the project's own
+
+Hosting, a package registry, or anything the user defines. Settle these with the user and record them in the project's current state:
+
+- Shape: where the built skill goes and what structure it needs; it may differ from `skills/<targetId>/`.
+- Frame: any files around it and who reads them.
+- On this machine: how it is put in place for a test.
+- Beyond this machine: how it is published, when the user asks.
 
 ## Walls
 
