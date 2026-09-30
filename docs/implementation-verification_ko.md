@@ -588,3 +588,9 @@ Release commit `e3433f04a198272e87a254d8ae0593641cc02ae9`를 `origin/main`에 no
 - Root·authoring package를 `1.3.3`으로 맞추고 test의 core 고정 기대값 두 곳을 같이 옮긴 뒤 정상 builder로 투영한 generated tree는 `b36f4e76646a69874025858829301ab0aee760a87d399b74d3a5e9eabd653e74`이며 이중 build가 같은 tree를 냈다. Source-side check는 package/core `1.3.3`, artifact-intact/source-current를 반환했고 `npm test`는 31/32다(실패 1건은 기존 `rg` 부재 환경 실패). `npm pack --dry-run --json`은 42 entries, packed 74,161B/unpacked 257,674B다.
 
 Release commit `6d3e3b5588f25fcbeb840a6f5c5e40f2345a5595`를 `origin/main`에 non-force fast-forward했고, annotated tag object `74742d8d21d55c7a40e9599e168cf224bbee849d`의 `v1.3.3` peeled commit이 같은 release commit임을 `git ls-remote`로 확인했다. 원격 push 뒤 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes --json` 명령을 저장소 밖에서 실행했다. 이 명령은 installer hash `c981867f558b4c48f0aea03ce98590d4a3337cf07c190434cc6e4c4f8fd8f39f`로 Codex·Claude Code(symlink/junction)에 설치했다. 설치 lock은 source `nanomia-ai/skill-rails`(github)이고, skillFolderHash `a3a677cae45abb56736027da0cddb70fbf751ebf`는 release commit의 `skills/skill-rails` tree와 같다. 양쪽 installed `scripts/run.mjs check`는 package/core `1.3.3`, tree `b36f4e76646a69874025858829301ab0aee760a87d399b74d3a5e9eabd653e74`와 `ARTIFACT_INTACT`를 반환했다. npm registry publish는 수행하지 않았다.
+
+## 소스 수정이 기본, 빌드는 요청할 때, 테스트는 route와 빌드 뒤
+
+- v1.3.3 trial-9에서 "써 볼 수 있어?"에 A·B·C가 모두 선택지로 나왔지만 AI가 "아직 정하지 않음, 테스트만"을 만들었고, 유지보수 세션은 "스킬에서 X하게 해 줘"를 반영 요청으로 읽어 요청 없이 재빌드하고 전역 스킬 폴더에 다시 복사했다. 엔트리는 빌드가 요청 때 시작한다고만 말했을 뿐, 동작을 바꿔 달라는 요청이 소스 수정인지 빌드 요청인지, 테스트가 route를 먼저 정해야 하는지를 말하지 않았다.
+- `97979a5`는 사용자가 정한 두 원칙을 엔트리 절에 적었다. 스킬 동작을 바꿔 달라는 요청은 빌드 폴더나 설치본이 있어도 소스 수정이며, 빌드·테스트·배포는 사용자가 빌드·테스트·배포를 요청할 때만 시작하고, 그때까지 사본은 소스보다 뒤처졌다고 알린다. 테스트는 빌드가, 빌드는 route가 필요하므로 기록된 route가 없으면 테스트 요청이 route를 먼저 정한 뒤 빌드하고 테스트한다.
+- 시험으로 전역 스킬 폴더에 생긴 trial-9 복사본은 지웠다. 실제 행동은 `unproven`이다.
