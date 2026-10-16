@@ -6,7 +6,7 @@
 
 ## 현재 위치
 
-- Root와 authoring package version은 `2.0.2`, Node 범위는 `>=24 <25`, 외부 runtime dependency는 없다. 마지막 공개·설치 버전은 `v2.0.2`이며 공식 경로는 `nanomia-ai/skill-rails` repository의 `npx skills@latest`다. npm registry publish는 하지 않았다.
+- Root와 authoring package version은 `2.0.2`, Node 범위는 `>=24 <25`, 외부 runtime dependency는 없다. 마지막 공개·설치 버전은 `v2.0.2`(`0d80ae4`)이며 공식 경로는 `nanomia-ai/skill-rails` repository의 `npx skills@latest`다. npm registry publish는 하지 않았다.
 - v2.0.0은 기계적 분리를 mode가 아니라 선언한 도구로 표현한다(E-042). 원문 형식은 `schemaVersion: 2`이고 v1 원문은 전환 안내와 함께 거부한다. 산문 target 산출물은 `SKILL.md`·`references/`·선언한 도구·receipt뿐이며, record runtime은 `record`를 선언한 target에만 있다. `prepare-record`·observer·packet·fallback은 제품에서 제거됐고 재현은 tag `v1.3.7`에서 한다.
 - 저작 스킬은 "Decide what a tool should own", "Split the work", "Review before you conclude"를 entry에, 도구 설계·연결·record 작성을 `references/tools.md`, 새 package 시작을 `references/new-package.md`에 둔다.
 - Canonical authoring source는 `authoring-package.json`과 `authoring/skill-rails/`, 선택형 판단 원문은 `docs/guide/ai-skill-evolution-method_ko.md`, generated tracked skill은 `skills/skill-rails/`다. 테스트 전용 pilot과 fixture는 `tests/fixtures/`, 역사 결과는 `evals/*/results/`, legacy capsule은 `legacy/archive/v0.4.3/`에 있다.
