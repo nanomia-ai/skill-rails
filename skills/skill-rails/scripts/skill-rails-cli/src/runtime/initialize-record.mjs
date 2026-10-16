@@ -4,7 +4,7 @@ import { ensureProject, fail, readJson } from "./common.mjs";
 
 export async function initializeRecord(targetRoot, receipt, projectArgument) {
   const target = await readJson(resolve(targetRoot, "config", "target.json"));
-  if (target.schemaVersion !== 1 || target.mode !== "record-only") fail("INITIALIZE_FAILED", "This target does not support record-only initialization.", "Use only the commands documented by this target entry.");
+  if (target.schemaVersion !== 2 || typeof target.declaredOutput !== "string") fail("INITIALIZE_FAILED", "This target does not declare a record output.", "Use only the commands documented by this target entry.");
   const projectRoot = await ensureProject(projectArgument);
   const current = await collectBasis(projectRoot, target, { code: "INITIALIZE_FAILED", nextAction: "Correct the declared text input and initialize again." });
   const answerContract = await readAnswerContract(targetRoot, target);

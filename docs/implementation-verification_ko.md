@@ -624,3 +624,41 @@ Release commit `4c3a81200b9714d4c44dbca9dbf7f16fb3862cd8`를 `origin/main`에 no
 - Root·authoring package를 `1.3.7`로 맞추고 test의 core 고정 기대값 두 곳을 같이 옮긴 뒤 정상 builder로 투영한 generated tree는 `f3433842cc5346cc8e5e1e461c14791d884a374dbfdc46466196699c07aba9af`이며 이중 build가 같은 tree를 냈다. Source-side check는 package/core `1.3.7`, artifact-intact/source-current를 반환했고 `npm test`는 31/32다(실패 1건은 기존 `rg` 부재 환경 실패). `npm pack --dry-run --json`은 42 entries, packed 75,221B/unpacked 260,652B다.
 
 Release commit `61d9eba0a1c2f7dd7cc99709bde715f37b8930e3`를 `origin/main`에 non-force fast-forward했고, annotated tag object `670d1c6ae9d8fced1123bbfddb3005a74a9b69d1`의 `v1.3.7` peeled commit이 같은 release commit임을 `git ls-remote`로 확인했다. 원격 push 뒤 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes --json` 명령을 저장소 밖에서 실행했다. 이 명령은 installer hash `e35486fe9a58019c6a0349ef2f24a0cda6ddcb78a07b4b53ef972f4835e8b3a5`로 Codex·Claude Code(symlink/junction)에 설치했다. 설치 lock은 source `nanomia-ai/skill-rails`(github)이고, skillFolderHash `ddf590e933007932b169531d36742939969da881`는 release commit의 `skills/skill-rails` tree와 같다. 양쪽 installed `scripts/run.mjs check`는 package/core `1.3.7`, tree `f3433842cc5346cc8e5e1e461c14791d884a374dbfdc46466196699c07aba9af`와 `ARTIFACT_INTACT`를 반환했다. npm registry publish는 수행하지 않았다.
+
+## v2.0.0 — 산문 + 선언한 도구 (E-042)
+
+### 이 절이 대체하는 현재 주장
+
+- "산문 target 설치본은 `scripts/run.mjs check`로 스스로 integrity를 확인한다"는 더 이상 현재 주장이 아니다. `record`·`tools`·`embeddedCoreTooling`을 선언하지 않은 target에는 실행 파일을 생성하지 않고, 선언한 도구와 저작 CLI는 각 선언에 따라 전달된다. 설치본 확인은 receipt와 저작 CLI `check --out <폴더>`가 한다. record target의 `scripts/run.mjs check|initialize|record`는 유지된다.
+- "prepare-record 코드·schema는 재현 증거로 보존된다"는 tag `v1.3.7`(`61d9eba`)의 별도 root 재현으로 대체됐다. `evals/*/results/`의 결과 파일은 보존된다.
+
+### Proven (구조·전달)
+
+- `npm test`: 38개 중 37 pass, 1 skip(이 Windows 호스트가 폴더 안 파일 symlink 생성을 EPERM으로 거부). 최상위 junction 선언 거부 테스트는 이 호스트에서 실제 실행되어 통과했다.
+- 기존 record 안전 테스트(정상·멱등, input stale/output conflict 구분, answer 검증, non-UTF-8, bootstrap·marker·CRLF frame, 다른 card 보존, renderer 실패, lock, exchange 이식, reread 불일치)는 mode 제거와 exchange schemaVersion 2 이후에도 모두 통과했다.
+- 도구: 파일·폴더·바이너리 템플릿의 바이트 그대로 전달, 두 target 공유와 도구 변경 시 소비 target만 source-stale, 미선언·root 탈출·경로 충돌·대소문자를 접은 파일↔폴더 충돌·link 선언·도구 안의 빈 폴더의 fail-closed, inspect/overview의 도구 owner·consumer·산출 경로, 도구 ID와 target ID가 겹칠 때 `INSPECT_AMBIGUOUS`.
+- 아무 도구도 선언하지 않은 target의 산출물은 `SKILL.md`·`references/`·receipt뿐이다(작은 separate-project target은 `SKILL.md`와 receipt 두 파일).
+- 저작 target `skills/skill-rails/`: 30 files/204,589B(receipt 포함), tree `eea7f2a2a20002251e6ed5f0770e6e447b7c5504ff6125d82393e35fb648bab3`, artifact-intact/source-current, double-build 동일, package/core `2.0.0`.
+
+### Proven (한 fresh 저작 관찰)
+
+- 별도 project에 후보 저작 스킬만 설치한 상태에서 fresh Claude Sonnet 1회가 "PR 설명 검토 스킬" 요청을 처리했다. 정확한 양식(세 heading·Risk level 값)은 Node 검사 도구로, 의미 판단(Summary의 이유, Testing의 위험 범위, 제안)은 산문으로 나눴다. 내장 CLI로 double-build 같은 tree, `check` intact/source-current, route A 설치본 `check` intact를 얻었고 설치본에서 도구를 좋은/나쁜 예시에 실행해 기대한 통과·위반 목록을 받았다. Review 절을 따라 엔트리를 다시 읽고 판정 기준 누락을 스스로 고쳤다.
+- 이 관찰은 한 요청·한 모델·Claude 한 host만 증명한다. 그 관찰에서 드러난 "새 검토자가 없을 때" 공백과 검토 대상 경로(생성물이 아닌 canonical entry)는 같은 Review 문장에서 고쳤고, 고친 문장의 fresh 행동은 `unproven`이다.
+
+### Proven (실사용 관찰, 2026-10-16)
+
+환경: 시나리오마다 새 project에 실제 installer(`npx skills@latest add <로컬 skills/skill-rails> --copy`)로 후보를 설치하고, 실제 host CLI에서 스킬 이름 없는 한국어 사용자 요청으로 실행했다. Claude Code 2.1.300(`claude -p --setting-sources project`, 전역 v1.3.7 skill-rails·plugin 배제, 모델 claude-opus-5-5), Codex 0.160.0(`codex exec -m gpt-6.1-sol`, 전역 skill-rails·skill-rails-next disabled). 질문에는 코디네이터가 사용자 사실만 답했다. 계획과 소견은 Codex 검증자가 교차 검토했다.
+
+- 도구 판단: 자유 형식 메일 스킬(Codex)은 도구 없이 기준·예시 템플릿·제시 전 자기 대조로 저작했다. 단계 간 고정 필드 인계 스킬(Claude·Codex)은 둘 다 스킬 3개 + 공유 module + 공유 검사기로 나누고 blocker 해소 판단은 산문에 남겼다. "확실하게" 어조 다듬기 스킬(Claude)은 어조 판단을 산문에 두고 코드·URL·숫자 보존 불변식만 검사기로 뺐다. 다른 사람이 고치는 CHANGELOG 기록 스킬(Claude)은 요구에서 core `record`를 골랐다.
+- 기존 기능: Devflow source 복사본(10 target, 12 module)을 두 host가 "2.0으로 올렸더니 빌드가 안 된다" 요청에서 v1 거부 안내만 보고 스스로 전환·빌드했고, 산출 `SKILL.md`·references가 같은 snapshot의 v1.3.7 빌드와 바이트 동일했다(코디네이터 기계 대조: 73 파일 동일, 차이는 receipt와 의도적으로 제거한 산문 runtime 5파일/target, double-build 동일, 공유 module 수정 시 소비 target만 stale). CHANGELOG 스킬은 빌드·route A 설치 후 fresh AI 사용에서 사람 항목 보존, 실행 중 끼어든 편집의 `OUTPUT_CONFLICT` 거부 후 재판단·기록, 같은 PR 재실행 skip을 보였다.
+- 도구 전달 route: Codex가 만든 인계 스킬을 다른 project에 `npx skills add <project>`로 설치한 사본 6개(.agents/.claude × 3)가 `check --out` artifact-intact, 도구 바이트 동일. 그 설치본을 fresh Codex가 쓰며 blockers 누락 인계 파일을 받자 도구 `invalid` → 계획 메모에서 blocker 복구 → `blocked`로 멈추고 구현하지 않았다.
+- 조건부 읽기: 새 package의 `new-package.md`, 도구를 다룰 때의 `tools.md`, 경로 선택·실행 때의 `delivery.md`와 방법론의 선택 구간을 읽는 장면을 관찰했다. 일부 Codex run은 빌드 요청 전 저작 단계에서도 `build-and-test.md`와 `project-docs.md`를 미리 읽었다. 조건부 읽기가 항상 최소 범위에 머무는지와 읽기 비용·이해도의 상대 효과는 `unproven`이다.
+- 고친 소견 2건(각 한 번 재관찰): 앞선 빌드 요청이 이후 변경의 build root 재빌드로 승계된 장면(Claude) → 요청 범위 문장 후 재관찰에서 재빌드하지 않고 물었다. 검사 도구 편의로 기존 `state.md` 형식을 YAML→JSON으로 동의 없이 바꾼 장면(Codex) → migration 비용·동의 문장 후 재관찰에서 기존 YAML 형식을 유지하고 migration을 요구하지 않았다.
+- skill-creator 비교 반영: description 작성 기준, fresh 검토자에게 기대 답·의심 문제를 주지 않기, 우위 결정 시 이전/부재 run과 비교. build의 name/description 검사는 YAML 해석 없이 오거부·미검출이 재현되어 채택하지 않았다.
+- 배포 직전 문장 단위 감사(Claude·Codex 독립 2인, 3자 creator 비교 1건, 반영분 Codex 재검토 "추가 수정 없음"): 손상된 생성물에 같은 출력으로 재빌드하라는 안내가 같은 거부를 반복함을 재현해 새 출력 디렉터리를 거치는 비파괴 복구 안내로 바꿨다. 이 밖에 기존 package일 때만 `inspect`, 요청된 시험의 과제 범위(사용자가 정한 과제 또는 주 용도 한두 개)와 실행 과정 읽기, 시험이 의존하는 도구만 설치본에서 실행, 경로를 고르는 동안만 네 경로 제시, record renderer의 실제 stdin/stdout·marker 계약, binary 자원은 선언한 도구로, 자기 결과 검증 도구는 도구 판단 기준으로, 개발 테스트는 도구가 둔 것만으로 문장을 교정했다. 교정 문장의 fresh 행동 효과는 `unproven`이다.
+
+### Unproven / out-of-scope
+
+- 반복성(각 장면 1회 관찰), 도구 채택이 산문 대비 총비용·품질을 줄이는지, 대화형 Codex에서 새 package 문서 질문 뒤 정지 여부(`codex exec`는 묻고도 안전한 기본으로 진행), Codex가 기본 skill-creator를 함께 읽는 영향(관찰한 결과물은 Skill Rails 구조를 따름), 고친 description의 선택 효과, 실제 사람의 동시 편집(감시 스크립트로 재현), lock 경합
+- Devflow의 v2 전환(별도 저장소·별도 승인)과 Devflow 도구 채택
+- Release, push, 전역 설치 교체는 수행하지 않았다.

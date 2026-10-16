@@ -1,22 +1,26 @@
 import { mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
-import { basename, dirname, relative, resolve } from "node:path";
+import { basename, dirname, extname, relative, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import { canonicalJson, compareCodePoint, sha256, treeSha256 } from "./canonicalize.mjs";
 import { fail } from "./errors.mjs";
 import { assertArtifactIntegrity } from "./check.mjs";
 import { buildHeadingIndex } from "./heading-index.mjs";
+import { assertNoCaseFoldCollisions } from "./paths.mjs";
 
-const COMMON_RUNTIME_ARTIFACTS = new Map([
+// The record tool's runtime closure: present only in targets that declare `record`.
+const RECORD_RUNTIME_ARTIFACTS = Object.freeze([
+  ["scripts/run.mjs", "src/runtime/run-record.mjs"],
   ["scripts/runtime/common.mjs", "src/runtime/common.mjs"],
   ["scripts/runtime/integrity.mjs", "src/runtime/integrity.mjs"],
+  ["scripts/runtime/exchange.mjs", "src/runtime/exchange.mjs"],
+  ["scripts/runtime/initialize-record.mjs", "src/runtime/initialize-record.mjs"],
+  ["scripts/runtime/record.mjs", "src/runtime/record.mjs"],
+  ["contracts/record-exchange.schema.json", "contracts/record-exchange.schema.json"],
 ]);
 
 const AUTHORING_CLI_ROOT = "scripts/skill-rails-cli";
 const AUTHORING_CLI_SOURCES = Object.freeze([
   "contracts/build-receipt.schema.json",
-  "contracts/observed-facts.schema.json",
-  "contracts/packet-kernel.schema.json",
-  "contracts/prepared-work.schema.json",
   "contracts/record-exchange.schema.json",
   "contracts/source-package.schema.json",
   "contracts/target.schema.json",
@@ -35,11 +39,8 @@ const AUTHORING_CLI_SOURCES = Object.freeze([
   "src/runtime/exchange.mjs",
   "src/runtime/initialize-record.mjs",
   "src/runtime/integrity.mjs",
-  "src/runtime/prepare.mjs",
   "src/runtime/record.mjs",
-  "src/runtime/run-check.mjs",
   "src/runtime/run-record.mjs",
-  "src/runtime/run.mjs",
 ]);
 
 function withGeneratedMarker(entry, logicalSource) {
@@ -54,29 +55,21 @@ function artifactPathForModule(id) {
   return `references/${id}.md`;
 }
 
-function generatedTargetConfig(graph, item) {
-  const { target } = item;
+export function toolArtifactPath(tool, file) {
+  return tool.kind === "file" ? `scripts/${tool.id}${extname(tool.path)}` : `scripts/${tool.id}/${file.relative}`;
+}
+
+// Only the fields the record runtime reads; the source descriptor stays the owner of their meaning.
+function recordRuntimeConfig(item) {
+  const { record } = item.target;
   return {
-    schemaVersion: 1,
-    packageId: graph.manifest.packageId,
-    packageVersion: graph.manifest.packageVersion,
-    targetId: target.targetId,
-    mode: target.mode,
-    imports: target.imports.map((id) => ({ id, path: artifactPathForModule(id) })),
-    ...(item.referenceNames.length ? { references: item.referenceNames.map((name) => ({ path: `references/${name}` })) } : {}),
-    headingIndex: target.headingIndex ? `references/${target.headingIndex}.index.json` : null,
-    ...(target.embeddedCoreTooling ? { embeddedCoreTooling: target.embeddedCoreTooling } : {}),
-    fallbackReference: target.fallbackModule ? "references/fallback.md" : null,
-    domainConfig: target.mode === "prose" ? null : "config/domain.json",
-    domainConfigSchema: target.mode === "prose" ? null : "config/domain.schema.json",
-    packet: target.packet ? "config/packet.json" : null,
-    observer: target.observer ? "scripts/domain/observer.mjs" : null,
-    renderer: target.renderer ? "scripts/domain/renderer.mjs" : null,
-    answerContract: target.mode === "prose" ? null : `contracts/${basename(target.answerContract)}`,
-    declaredInputs: target.declaredInputs ?? [],
-    declaredOutput: target.declaredOutput ?? null,
-    outputMode: target.outputMode ?? null,
-    regionBootstrap: target.regionBootstrap ?? null,
+    schemaVersion: 2,
+    targetId: item.target.targetId,
+    domainConfig: "config/domain.json",
+    renderer: "scripts/domain/renderer.mjs",
+    answerContract: `contracts/${basename(record.answerContract)}`,
+    declaredInputs: [...record.declaredInputs],
+    declaredOutput: record.declaredOutput,
   };
 }
 
@@ -89,79 +82,70 @@ export async function planTargetBuild(graph, targetId) {
   if (!item) fail("TARGET_NOT_FOUND", `Unknown targetId: ${targetId}`, "Choose an exact targetId declared by the source package.");
   const artifacts = new Map();
   const sources = [];
+  const put = (path, bytes, owner) => {
+    if (artifacts.has(path)) fail("ARTIFACT_COLLISION", `${targetId} would generate ${path} twice (${owner}).`, "Rename the tool or its file so its delivered path differs from every other artifact.");
+    artifacts.set(path, bytes);
+  };
   addSource(sources, "source-package", { path: relative(graph.rootReal, graph.manifestPath).replaceAll("\\", "/"), bytes: graph.manifestBytes });
   addSource(sources, `target:${targetId}`, { path: item.path, bytes: item.bytes });
   const entry = item.files.get("entry");
   addSource(sources, "entry", entry);
-  artifacts.set("SKILL.md", Buffer.from(withGeneratedMarker(entry.text, entry.path), "utf8"));
+  put("SKILL.md", Buffer.from(withGeneratedMarker(entry.text, entry.path), "utf8"), "entry");
 
   for (const id of item.target.imports) {
     const module = graph.modules.get(id);
     addSource(sources, `module:${id}`, module);
-    artifacts.set(artifactPathForModule(id), module.bytes);
+    put(artifactPathForModule(id), module.bytes, `module ${id}`);
   }
   for (const [role, file] of item.files) {
     if (!role.startsWith("reference:")) continue;
     addSource(sources, role, file);
-    artifacts.set(`references/${role.slice("reference:".length)}`, file.bytes);
+    put(`references/${role.slice("reference:".length)}`, file.bytes, role);
   }
   if (item.target.headingIndex) {
     const module = graph.modules.get(item.target.headingIndex);
-    artifacts.set(`references/${item.target.headingIndex}.index.json`, buildHeadingIndex(module));
+    put(`references/${item.target.headingIndex}.index.json`, buildHeadingIndex(module), "heading index");
   }
-  if (item.target.fallbackModule) {
-    const module = graph.modules.get(item.target.fallbackModule);
-    if (!sources.some((source) => source.id === `module:${module.id}`)) addSource(sources, `module:${module.id}`, module);
-    artifacts.set("references/fallback.md", module.bytes);
-  }
-
-  artifacts.set("config/target.json", Buffer.from(`${canonicalJson(generatedTargetConfig(graph, item))}\n`, "utf8"));
-  if (item.target.mode !== "prose") {
-    const mappings = [
-      ["domainConfig", "config/domain.json"],
-      ["domainConfigSchema", "config/domain.schema.json"],
-      ...(item.target.packet ? [["packet", "config/packet.json"]] : []),
-      ["renderer", "scripts/domain/renderer.mjs"],
-      ["answerContract", `contracts/${basename(item.target.answerContract)}`],
-    ];
-    if (item.target.observer) mappings.push(["observer", "scripts/domain/observer.mjs"]);
-    for (const [role, destination] of mappings) {
-      const source = item.files.get(role);
-      addSource(sources, role, source);
-      artifacts.set(destination, source.bytes);
+  for (const id of item.target.tools ?? []) {
+    const tool = graph.tools.get(id);
+    for (const file of tool.files) {
+      addSource(sources, `tool:${id}`, file);
+      put(toolArtifactPath(tool, file), file.bytes, `tool ${id}`);
     }
   }
-
-  const runtimeArtifacts = new Map(COMMON_RUNTIME_ARTIFACTS);
-  runtimeArtifacts.set("scripts/run.mjs", item.target.mode === "prose" ? "src/runtime/run-check.mjs" : item.target.mode === "record-only" ? "src/runtime/run-record.mjs" : "src/runtime/run.mjs");
-  if (item.target.mode === "prepare-record") {
-    runtimeArtifacts.set("scripts/runtime/prepare.mjs", "src/runtime/prepare.mjs");
-  }
-  if (item.target.mode !== "prose") {
-    runtimeArtifacts.set("scripts/runtime/exchange.mjs", "src/runtime/exchange.mjs");
-    runtimeArtifacts.set("scripts/runtime/record.mjs", "src/runtime/record.mjs");
-  }
-  if (item.target.mode === "record-only") runtimeArtifacts.set("scripts/runtime/initialize-record.mjs", "src/runtime/initialize-record.mjs");
-  for (const [destination, source] of runtimeArtifacts) {
-    const bytes = await readFile(resolve(graph.repositoryRoot, source));
-    artifacts.set(destination, bytes);
-    addSource(sources, `runtime:${destination}`, { path: source, bytes });
-  }
-  const contractNames = ["build-receipt.schema.json"];
-  if (item.target.mode !== "prose") contractNames.push("record-exchange.schema.json");
-  if (item.target.packet) contractNames.push("packet-kernel.schema.json", "observed-facts.schema.json", "prepared-work.schema.json");
-  for (const name of contractNames) {
-    const sourcePath = `contracts/${name}`;
-    const bytes = await readFile(resolve(graph.repositoryRoot, sourcePath));
-    artifacts.set(sourcePath, bytes);
-    addSource(sources, `contract:${name}`, { path: sourcePath, bytes });
+  if (item.target.record) {
+    put("config/target.json", Buffer.from(`${canonicalJson(recordRuntimeConfig(item))}\n`, "utf8"), "record");
+    addSource(sources, "record:domainConfigSchema", item.files.get("domainConfigSchema"));
+    for (const [role, destination] of [
+      ["domainConfig", "config/domain.json"],
+      ["renderer", "scripts/domain/renderer.mjs"],
+      ["answerContract", `contracts/${basename(item.target.record.answerContract)}`],
+    ]) {
+      const source = item.files.get(role);
+      addSource(sources, `record:${role}`, source);
+      put(destination, source.bytes, "record");
+    }
+    for (const [destination, sourcePath] of RECORD_RUNTIME_ARTIFACTS) {
+      const bytes = await readFile(resolve(graph.repositoryRoot, sourcePath));
+      put(destination, bytes, "record");
+      addSource(sources, `record-runtime:${destination}`, { path: sourcePath, bytes });
+    }
   }
   if (item.target.embeddedCoreTooling === "authoring-cli-v1") {
     for (const sourcePath of AUTHORING_CLI_SOURCES) {
       const destination = `${AUTHORING_CLI_ROOT}/${sourcePath}`;
       const bytes = await readFile(resolve(graph.repositoryRoot, sourcePath));
-      artifacts.set(destination, bytes);
+      put(destination, bytes, "embedded authoring CLI");
       addSource(sources, `embedded-core-tooling:${destination}`, { path: sourcePath, bytes });
+    }
+  }
+  assertNoCaseFoldCollisions([...artifacts.keys()], `${targetId} generated artifacts`);
+  const folded = new Set([...artifacts.keys()].map((path) => path.toLocaleLowerCase("en-US")));
+  for (const path of artifacts.keys()) {
+    const parts = path.split("/");
+    for (let index = 1; index < parts.length; index += 1) {
+      const ancestor = parts.slice(0, index).join("/");
+      if (folded.has(ancestor.toLocaleLowerCase("en-US"))) fail("ARTIFACT_COLLISION", `${targetId} would generate ${ancestor} as a file and as the folder of ${path}.`, "Rename the tool or its file so its delivered path differs from every other artifact.");
     }
   }
 

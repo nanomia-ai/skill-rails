@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "targetId": "natural-language-pilot-verify-next",
+  "entry": "entry.md",
+  "imports": [],
+  "record": {
+    "domainConfig": "config.json",
+    "domainConfigSchema": "config.schema.json",
+    "renderer": "renderer.mjs",
+    "answerContract": "contracts/semantic-answer.verify.schema.json",
+    "declaredInputs": [
+      "pilot/brief.md",
+      "pilot/plan.md",
+      "pilot/progress.md",
+      "pilot/verification.md"
+    ],
+    "declaredOutput": "pilot/verification.md"
+  }
+}

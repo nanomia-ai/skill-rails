@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 2,
+  "targetId": "natural-language-pilot-resume-next",
+  "entry": "entry.md",
+  "imports": []
+}

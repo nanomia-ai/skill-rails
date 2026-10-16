@@ -1,5 +1,5 @@
-import { readFile } from "node:fs/promises";
-import { dirname, relative, resolve } from "node:path";
+import { lstat, readFile, readdir, realpath } from "node:fs/promises";
+import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalJson, canonicalText, compareCodePoint, sha256 } from "./canonicalize.mjs";
 import { fail } from "./errors.mjs";
@@ -19,7 +19,7 @@ export function validateJsonSchema(value, schema, at = "$") {
       });
       const passing = candidates.filter((candidate) => candidate.length === 0).length;
       if (passing !== 1) errors.push(`${path} must match exactly one allowed shape`);
-      // A failed shape chosen by its required const fields (e.g. target mode) explains which field to fix.
+      // A failed shape chosen by its required const fields (e.g. a basis state) explains which field to fix.
       const chosen = rule.oneOf.map((candidate, index) => ({ candidate, index })).filter(({ candidate }) => (candidate.required ?? []).some((key) => Object.hasOwn(candidate.properties?.[key] ?? {}, "const"))
         && (candidate.required ?? []).every((key) => !Object.hasOwn(candidate.properties?.[key] ?? {}, "const") || canonicalJson(current?.[key]) === canonicalJson(candidate.properties[key].const)));
       if (passing === 0 && chosen.length === 1) errors.push(...candidates[chosen[0].index]);
@@ -126,14 +126,49 @@ function assertSchema(value, schema, label) {
   if (errors.length) fail("SCHEMA_INVALID", `${label} violates its closed schema.`, "Correct the canonical source fields.", errors);
 }
 
+// A tool is delivered byte for byte: it may carry binary templates, so it bypasses text canonicalization.
+async function loadTool(rootReal, id, sourcePath) {
+  const parts = normalizeRelativePath(sourcePath, `tool ${id}`).split("/");
+  for (let index = 1; index <= parts.length; index += 1) {
+    let stats;
+    try { stats = await lstat(resolve(rootReal, ...parts.slice(0, index))); } catch { break; }
+    if (stats.isSymbolicLink()) fail("SOURCE_PATH_INVALID", `tool ${id} passes through a link: ${parts.slice(0, index).join("/")}`, "Declare the tool by the path of the regular file or folder it should deliver.");
+  }
+  let physical;
+  try { physical = await realpath(resolve(rootReal, ...sourcePath.split("/"))); }
+  catch { fail("SOURCE_PATH_MISSING", `tool ${id} does not exist: ${sourcePath}`, "Add the declared tool file or folder, or correct its path."); }
+  const fromRoot = relative(rootReal, physical);
+  if (fromRoot === "" || fromRoot === ".." || fromRoot.startsWith(`..${sep}`) || isAbsolute(fromRoot)) fail("PATH_OUTSIDE_ROOT", `tool ${id} escapes the source root: ${sourcePath}`, "Keep every tool inside its package root.");
+  const path = fromRoot.replaceAll("\\", "/");
+  const stats = await lstat(physical);
+  if (stats.isFile()) return { id, path, kind: "file", files: [{ relative: null, path, bytes: await readFile(physical) }] };
+  if (!stats.isDirectory()) fail("SOURCE_PATH_INVALID", `tool ${id} is neither a regular file nor a folder: ${sourcePath}`, "Declare a regular file or a folder of regular files.");
+  const files = [];
+  const walk = async (current) => {
+    const entries = await readdir(current, { withFileTypes: true });
+    if (entries.length === 0) fail("SOURCE_PATH_INVALID", `tool ${id} contains an empty folder: ${relative(rootReal, current).replaceAll("\\", "/") || sourcePath}`, "Add the files the tool needs there, or remove the empty folder; a build delivers files, not empty folders.");
+    for (const entry of entries.sort((a, b) => compareCodePoint(a.name, b.name))) {
+      const child = resolve(current, entry.name);
+      if (entry.isSymbolicLink()) fail("SOURCE_PATH_INVALID", `tool ${id} contains a symbolic link: ${relative(rootReal, child).replaceAll("\\", "/")}`, "Replace the link with the regular file it should deliver.");
+      if (entry.isDirectory()) await walk(child);
+      else if (entry.isFile()) files.push({ relative: relative(physical, child).replaceAll("\\", "/"), path: relative(rootReal, child).replaceAll("\\", "/"), bytes: await readFile(child) });
+      else fail("SOURCE_PATH_INVALID", `tool ${id} contains a non-regular entry: ${entry.name}`, "Keep only regular files in a tool folder.");
+    }
+  };
+  await walk(physical);
+  assertNoCaseFoldCollisions(files.map((file) => file.relative), `tool ${id} files`);
+  return { id, path, kind: "folder", files };
+}
+
 export async function loadSourceGraph(manifestPath) {
   const { manifestReal, rootReal } = await sourceRootFor(manifestPath);
   const manifestRead = await readJsonFile(manifestReal, relative(rootReal, manifestReal).replaceAll("\\", "/"));
-  if (manifestRead.value?.schemaVersion !== 1) fail("UNSUPPORTED_VERSION", "The source package schemaVersion is not supported.", "Use source package schemaVersion 1.");
+  if (manifestRead.value?.schemaVersion !== 2) fail("UNSUPPORTED_VERSION", "The source package schemaVersion is not supported.", "Use source package schemaVersion 2: set schemaVersion to 2 in the manifest and in every target descriptor, delete each target's mode, and move a record-only target's domainConfig, domainConfigSchema, renderer, answerContract, declaredInputs, and declaredOutput into one record object.");
   assertSchema(manifestRead.value, await readContract("source-package.schema.json"), "source package");
   const manifest = manifestRead.value;
   assertNoCaseFoldCollisions(Object.keys(manifest.modules), "module IDs");
   assertNoCaseFoldCollisions(Object.keys(manifest.targets), "target aliases");
+  assertNoCaseFoldCollisions(Object.keys(manifest.tools ?? {}), "tool IDs");
 
   const modules = new Map();
   const sourcePathSpellings = [];
@@ -144,19 +179,26 @@ export async function loadSourceGraph(manifestPath) {
     sourcePathSpellings.push(resolved.normalized);
   }
 
+  const tools = new Map();
+  for (const [id, sourcePath] of Object.entries(manifest.tools ?? {}).sort(([a], [b]) => compareCodePoint(a, b))) {
+    const tool = await loadTool(rootReal, id, sourcePath);
+    tools.set(id, tool);
+    sourcePathSpellings.push(tool.path, ...tool.files.map((file) => file.path));
+  }
+
   const targetSchema = await readContract("target.schema.json");
   const targets = new Map();
   const referenceOwners = new Map();
   for (const [alias, targetPath] of Object.entries(manifest.targets).sort(([a], [b]) => compareCodePoint(a, b))) {
     const resolvedTarget = await resolveContainedFile(rootReal, targetPath, `target ${alias}`);
     const targetRead = await readJsonFile(resolvedTarget.physical, resolvedTarget.normalized);
-    if (targetRead.value?.schemaVersion !== 1) fail("UNSUPPORTED_VERSION", `Target ${alias} uses an unsupported schemaVersion.`, "Use target schemaVersion 1.");
+    if (targetRead.value?.schemaVersion !== 2) fail("UNSUPPORTED_VERSION", `Target ${alias} uses an unsupported schemaVersion.`, "Use target schemaVersion 2: delete mode, and move record-only fields into one record object.");
     assertSchema(targetRead.value, targetSchema, `target ${alias}`);
     const target = targetRead.value;
     if (targets.has(target.targetId)) fail("TARGET_COLLISION", `Duplicate targetId: ${target.targetId}`, "Give every target one unique ID.");
     for (const imported of target.imports) if (!modules.has(imported)) fail("IMPORT_MISSING", `${target.targetId} imports missing module ${imported}.`, "Declare the module or correct the target imports.");
     if (target.headingIndex && !target.imports.includes(target.headingIndex)) fail("HEADING_INDEX_UNDECLARED", `${target.targetId} headingIndex is not an imported module: ${target.headingIndex}.`, "Import the exact module selected for the generated heading index.");
-    if (target.fallbackModule && !modules.has(target.fallbackModule)) fail("IMPORT_MISSING", `${target.targetId} names missing fallback module ${target.fallbackModule}.`, "Declare the fallback module.");
+    for (const id of target.tools ?? []) if (!tools.has(id)) fail("TOOL_MISSING", `${target.targetId} lists undeclared tool ${id}.`, "Declare the tool in the package manifest's tools, or correct the target's tools.");
 
     const files = new Map();
     const targetRootReal = dirname(resolvedTarget.physical);
@@ -180,30 +222,22 @@ export async function loadSourceGraph(manifestPath) {
       if (owner) fail("REFERENCE_COLLISION", `${target.targetId} reference ${path} is already owned by ${owner}.`, "Keep a file needed by more than one target as one module that each target imports.");
       referenceOwners.set(physical, target.targetId);
     }
-    const referenceArtifacts = [...target.imports.map((id) => `${id}.md`), ...(target.headingIndex ? [`${target.headingIndex}.index.json`] : []), ...(target.fallbackModule ? ["fallback.md"] : []), ...referenceNames];
+    const referenceArtifacts = [...target.imports.map((id) => `${id}.md`), ...(target.headingIndex ? [`${target.headingIndex}.index.json`] : []), ...referenceNames];
     const duplicateArtifact = referenceArtifacts.find((name, index) => referenceArtifacts.indexOf(name) !== index);
     if (duplicateArtifact) fail("REFERENCE_COLLISION", `${target.targetId} would generate references/${duplicateArtifact} twice.`, "Rename the target-owned reference so it differs from every imported module.");
     assertNoCaseFoldCollisions(referenceArtifacts, `${target.targetId} generated references`);
-    if (target.mode !== "prose") {
-      await addFile("domainConfig", target.domainConfig);
-      await addFile("domainConfigSchema", target.domainConfigSchema);
-      if (target.packet) await addFile("packet", target.packet);
-      if (target.observer) await addFile("observer", target.observer);
-      await addFile("renderer", target.renderer);
-      await addFile("answerContract", target.answerContract);
+    if (target.record) {
+      const record = target.record;
+      await addFile("domainConfig", record.domainConfig);
+      await addFile("domainConfigSchema", record.domainConfigSchema);
+      await addFile("renderer", record.renderer);
+      await addFile("answerContract", record.answerContract);
       const config = (await readJsonFile(files.get("domainConfig").physical, files.get("domainConfig").path)).value;
       const configSchema = (await readJsonFile(files.get("domainConfigSchema").physical, files.get("domainConfigSchema").path)).value;
       assertSchema(config, configSchema, `${target.targetId} domain config`);
       await readJsonFile(files.get("answerContract").physical, files.get("answerContract").path);
-      if (target.mode === "prepare-record") {
-        const packet = (await readJsonFile(files.get("packet").physical, files.get("packet").path)).value;
-        assertSchema(packet, await readContract("packet-kernel.schema.json"), `${target.targetId} packet kernel`);
-        if (!target.imports.includes(packet.purposeModule)) fail("IMPORT_MISSING", `${target.targetId} packet purposeModule is not imported: ${packet.purposeModule}`, "Add the module to imports or correct packet.json.");
-        const availableReads = new Set([...target.declaredInputs, ...target.imports.map((id) => `references/${id}.md`)]);
-        for (const read of packet.reads) if (!availableReads.has(read.path)) fail("PACKET_READ_UNDECLARED", `${target.targetId} packet read is not declared or materialized: ${read.path}`, "Declare the input or imported reference before exposing it to the AI.");
-      }
-      target.declaredInputs.forEach((path) => normalizeRelativePath(path, `${target.targetId} declared input`));
-      normalizeRelativePath(target.declaredOutput, `${target.targetId} declared output`);
+      record.declaredInputs.forEach((path) => normalizeRelativePath(path, `${target.targetId} declared input`));
+      normalizeRelativePath(record.declaredOutput, `${target.targetId} declared output`);
     }
     targets.set(target.targetId, { alias, path: resolvedTarget.normalized, physical: resolvedTarget.physical, bytes: targetRead.bytes, target, files, referenceNames });
     sourcePathSpellings.push(resolvedTarget.normalized);
@@ -222,11 +256,12 @@ export async function loadSourceGraph(manifestPath) {
     manifest,
     manifestBytes: manifestRead.bytes,
     modules,
+    tools,
     targets,
     coreVersion: packageJson.value.version,
     sourceGraphSha256: sha256(Buffer.from(canonicalJson({
       manifest: JSON.parse(manifestRead.text),
-      sources: [...modules.values(), ...[...targets.values()].flatMap((item) => [{ path: item.path, bytes: item.bytes }, ...item.files.values()])]
+      sources: [...modules.values(), ...[...tools.values()].flatMap((tool) => tool.files), ...[...targets.values()].flatMap((item) => [{ path: item.path, bytes: item.bytes }, ...item.files.values()])]
         .map((item) => ({ path: item.path, sha256: sha256(item.bytes) }))
         .sort((a, b) => compareCodePoint(a.path, b.path)),
     }), "utf8")),

@@ -61,14 +61,9 @@ export async function record(targetRoot, receipt, exchangeArgument, hooks = {}) 
   if (await realpath(exchange.targetRoot).catch(() => null) !== currentTargetRoot || exchange.packageId !== receipt.packageId || exchange.packageVersion !== receipt.packageVersion || exchange.targetId !== receipt.targetId || exchange.receiptTreeSha256 !== receipt.treeSha256) fail("ARTIFACT_INTEGRITY_FAILED", "Exchange target identity differs from the installed target.", "Discard this exchange and use the exchange-creation command documented in this installed target's SKILL.md to create a new one.");
   assertBoundExchange(projectRoot, exchangeRoot);
   const target = await readJson(resolve(targetRoot, "config", "target.json"));
-  if (target.mode !== exchange.mode || target.declaredOutput !== exchange.declaredOutput) fail("ARTIFACT_INTEGRITY_FAILED", "Exchange mode or output identity differs from the target.", "Discard this exchange and use the exchange-creation command documented in this installed target's SKILL.md to create a new one.");
-  const restartCommand = target.mode === "record-only" ? "initialize" : "prepare";
+  if (target.declaredOutput !== exchange.declaredOutput) fail("ARTIFACT_INTEGRITY_FAILED", "Exchange output identity differs from the target.", "Discard this exchange and use the exchange-creation command documented in this installed target's SKILL.md to create a new one.");
+  const restartCommand = "initialize";
   if (exchange.basis.output.path !== target.declaredOutput || exchange.basis.inputs.map((item) => item.path).join("\0") !== target.declaredInputs.join("\0")) fail("ANSWER_INVALID", "Exchange basis does not exactly match the target declarations.", `Run ${restartCommand} again; do not transplant basis rows.`);
-  if (exchange.mode === "prepare-record") {
-    const decision = await readJson(resolve(exchangeRoot, "decision.json"), "ANSWER_INVALID");
-    const { decisionSha256, ...semantic } = decision;
-    if (decisionSha256 !== exchange.decisionSha256 || sha256(Buffer.from(canonicalJson(semantic), "utf8")) !== decisionSha256) fail("ANSWER_INVALID", "Exchange decision hash is invalid.", "Run prepare again; do not transplant an answer between exchanges.");
-  }
   const answer = await readJson(resolve(exchangeRoot, "answer.json"), "ANSWER_INVALID");
   const answerSchema = await readJson(resolve(targetRoot, target.answerContract), "ANSWER_INVALID");
   const answerErrors = validate(answer, answerSchema);

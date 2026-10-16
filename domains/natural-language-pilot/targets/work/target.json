@@ -1,7 +1,0 @@
-{
-  "schemaVersion": 1,
-  "targetId": "natural-language-pilot-work-next",
-  "mode": "prose",
-  "entry": "entry.md",
-  "imports": []
-}

@@ -18,6 +18,7 @@ Commands:
   check    --out <target-dir>
   check    --source <manifest> --target <target-id> --out <target-dir>
   inspect  --source <manifest> (--id <exact-id> | --path <relative-path>) --json
+           an ID names the package, a module, a tool, or a target
   overview --source <manifest>
 
 Invalid command arguments return JSON with a task-specific nextAction.

@@ -1,6 +1,6 @@
 # Delivery routes
 
-The route decides what the built folder becomes part of and what is done with it afterward, so the route is chosen before the first build. Show the user all four routes below, each with its shape and trade-offs, and let them choose one or more, or define D; record the choice with the build root. The guided routes A, B, and C read one shared folder, `skills/<targetId>/` under the build root: a route adds thin files beside it and never moves, edits, or rebuilds it elsewhere, because that shared folder is what `check` verifies and what the other guided routes read too. B and C can coexist on the same `skills/`, and A places copies of it.
+The route decides what the built folder becomes part of and what is done with it afterward, so the route is chosen before the first build. While the route is still to be chosen, show the user all four routes below, each with its shape and trade-offs, and let them choose one or more, or define D; record the choice with the build root. The guided routes A, B, and C read one shared folder, `skills/<targetId>/` under the build root: a route adds thin files beside it and never moves, edits, or rebuilds it elsewhere, because that shared folder is what `check` verifies and what the other guided routes read too. B and C can coexist on the same `skills/`, and A places copies of it.
 
 ## A. An agent's own skill folder
 
@@ -54,7 +54,7 @@ Hosting, a package registry, or anything the user defines. Settle these with the
 
 - Each shape above is the shape, not the names: file names and fields belong to the tool, so confirm its current rules as the first source before writing them, and validate the frame with that tool before claiming the route is in place.
 - A frame that declares a component the project does not have is a promise the installer fails on: add manifests and fields only for what exists, and add no frame the user has not asked for.
-- A route that rewrites bytes on the way, such as line-ending conversion, breaks the receipt: run `check` on the installed copy, not only on the build.
+- A route that rewrites or drops files on the way, such as line-ending conversion or an installer's skip list, breaks the receipt and can break a tool: run `check` on the installed copy, not only on the build.
 
 ## Record
 

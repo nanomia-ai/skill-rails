@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 2,
+  "targetId": "natural-language-pilot-direct-next",
+  "entry": "entry.md",
+  "imports": []
+}

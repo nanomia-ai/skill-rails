@@ -6,7 +6,7 @@ import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { coreCli, repositoryRoot, runNode, temporary } from "./helpers.mjs";
 
-const source = "domains/natural-language-pilot/skill-package.json";
+const source = "tests/fixtures/natural-language-pilot/skill-package.json";
 const passAnswer = {
   schemaVersion: 1,
   cardId: "bookmark-storage",
@@ -16,28 +16,28 @@ const passAnswer = {
   unknowns: [],
 };
 
-async function setup(t, name, fixture = "project", sourcePath = source) {
+async function setup(t, name, fixture = "verify-project", sourcePath = source) {
   const root = await temporary(t, name);
   const built = coreCli("build", "--source", sourcePath, "--out-root", join(root, "dist"));
   assert.equal(built.status, 0, built.stdout);
   const target = join(root, "installed", "natural-language-pilot-verify-next");
   await cp(join(root, "dist", "skills", "natural-language-pilot-verify-next"), target, { recursive: true });
   const project = join(root, "project");
-  await cp(resolve(repositoryRoot, "fixtures/verify-v1", fixture), project, { recursive: true });
+  await cp(resolve(repositoryRoot, "tests", "fixtures", fixture), project, { recursive: true });
   return { root, target, project };
 }
 
 async function setupWithRenderer(t, name, rendererSource) {
   const root = await temporary(t, name);
   const sourceRoot = join(root, "source");
-  await cp(resolve(repositoryRoot, "domains", "natural-language-pilot"), sourceRoot, { recursive: true });
+  await cp(resolve(repositoryRoot, "tests", "fixtures", "natural-language-pilot"), sourceRoot, { recursive: true });
   await writeFile(join(sourceRoot, "targets", "verify", "renderer.mjs"), rendererSource);
   const built = coreCli("build", "--source", join(sourceRoot, "skill-package.json"), "--out-root", join(root, "dist"));
   assert.equal(built.status, 0, built.stdout);
   const target = join(root, "installed", "natural-language-pilot-verify-next");
   await cp(join(root, "dist", "skills", "natural-language-pilot-verify-next"), target, { recursive: true });
   const project = join(root, "project");
-  await cp(resolve(repositoryRoot, "fixtures", "verify-v1", "project"), project, { recursive: true });
+  await cp(resolve(repositoryRoot, "tests", "fixtures", "verify-project"), project, { recursive: true });
   return { target, project };
 }
 

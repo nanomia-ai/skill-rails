@@ -1,10 +1,9 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "targetId": "skill-rails",
-  "mode": "prose",
   "entry": "../../SKILL.source.md",
   "imports": ["skillEvolutionMethod"],
-  "references": ["../../build-and-test.md", "../../project-docs.md", "../../delivery.md"],
+  "references": ["../../build-and-test.md", "../../project-docs.md", "../../delivery.md", "../../tools.md", "../../new-package.md"],
   "headingIndex": "skillEvolutionMethod",
   "embeddedCoreTooling": "authoring-cli-v1"
 }

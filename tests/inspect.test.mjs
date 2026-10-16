@@ -2,9 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { coreCli } from "./helpers.mjs";
 
-const source = "domains/natural-language-pilot/skill-package.json";
+const source = "tests/fixtures/natural-language-pilot/skill-package.json";
 
-test("inspect returns only graph-derived package, module, target and mechanism relations", () => {
+test("inspect returns only graph-derived package, module, target and record relations", () => {
   const moduleResult = coreCli("inspect", "--source", source, "--id", "purpose", "--json");
   assert.equal(moduleResult.status, 0, moduleResult.stdout);
   assert.deepEqual(moduleResult.json.consumers, []);
@@ -15,9 +15,9 @@ test("inspect returns only graph-derived package, module, target and mechanism r
 
   const targetResult = coreCli("inspect", "--source", source, "--id", "natural-language-pilot-verify-next", "--json");
   assert.equal(targetResult.status, 0, targetResult.stdout);
-  assert.equal(targetResult.json.mechanisms.observer, null);
-  assert.equal(targetResult.json.mechanisms.renderer, "targets/verify/renderer.mjs");
-  assert.equal(targetResult.json.declaredOutput, "pilot/verification.md");
+  assert.equal(targetResult.json.record.renderer, "targets/verify/renderer.mjs");
+  assert.equal(targetResult.json.record.declaredOutput, "pilot/verification.md");
+  assert.deepEqual(targetResult.json.tools, []);
 
   const pathResult = coreCli("inspect", "--source", source, "--path", "modules/purpose.md", "--json");
   assert.equal(pathResult.status, 0, pathResult.stdout);

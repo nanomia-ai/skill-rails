@@ -48,7 +48,7 @@ After a handoff, resume, or context compaction/reconstruction, reopen this file 
 - Preserve user changes. README files are not implementation authorities and must not be updated unless the user explicitly asks.
 - Keep writes inside this repository except for an explicitly authorized standard installation or external behavior test.
 - Never hand-edit generated files. Change their canonical source and rebuild.
-- Use final source/package paths from the frozen plan; do not create an incubator or a second active implementation.
+- Keep one active implementation at the paths `docs/skill-rails_ko.md` names; do not create an incubator or a second active implementation. The frozen plan's paths are historical coordinates.
 - Keep code-near comments to one non-obvious why, invariant, or risk plus the most stable test/contract pointer. Do not duplicate graph relations or exact behavior in prose.
 - Run checks proportional to the change. Record meaning, delivery, fresh behavior, and effect evidence separately.
 - Before an evaluation gate has changed a product decision, a second revision or additional evaluator-only protocol, schema, harness, matrix, agent path, or verification workflow serving that same decision is a proliferation signal, regardless of its filename or label. Stop that expansion, record the drift in `docs/plan/implementation-evolution-plan_ko.md`, and obtain user direction before continuing; leaving the claim `unproven` is preferable to building a validator for the validator.

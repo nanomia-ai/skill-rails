@@ -852,3 +852,34 @@ Prose target schema에 선택 필드 `references` 하나를 더한다. 이 필�
 ### 검증과 재검토 조건
 
 변경 전후 pilot과 Devflow 10 target의 생성물이 바이트 동일하고, reference 전달과 네 가지 충돌 벽을 test가 확인한다. Reference가 다른 target에 필요해지는 승격이 잦아지면 module-only 안을 다시 비교한다. 실제 package에서 dangling `references/` pointer가 처음 관찰되면 entry literal 대조 검사를 연다. Record-only target이 실제로 필요로 하면 shape를 확장한다. 비-Markdown 전달 요구는 mechanism 필드의 몫으로 거부한다. Entry·mechanism 파일을 module 또는 reference source로 선언한 사례가 관찰되면 두 경로를 함께 닫는다. Fresh AI의 선택·열기 행동은 `unproven`이다.
+
+
+## E-042 — 기계적 분리는 mode 가 아니라 선언한 도구로 표현한다 (v2.0.0)
+
+상태: **v2.0.0 구현·검증 완료, release·설치는 별도 승인**
+
+### 실제 문제와 evidence
+
+원문→빌드가 존재하는 핵심 이유는 해석에 따라 결과가 달라지는 산문에서 결정 가능한 부분을 기계로 분리하는 것이다. 그러나 v1 의 기계화는 target `mode` 선택에 묶여 있었다. 실제 채택된 기계 mode 는 `record-only`(선언된 출력 하나의 managed region 에 AI 답을 안전 기록) 하나였고 `prepare-record` 는 M4 에서 총비용 절감을 보이지 못해 실험 증거로만 남았다. 양식 파일 생성기, 완료 산출물 검사기, 반복 계산처럼 기계화 이익이 가장 큰 작성자 도구를 스킬에 실어 보낼 경로가 없었고(references 는 `.md` 만, schema 는 closed, `embeddedCoreTooling` 은 enum-of-one), 그 결과 Skill Rails 는 표준 스킬 형태(`SKILL.md` + `scripts/`)조차 만들 수 없었다. 반대로 기계가 없는 prose target 에는 어떤 산문도 호출을 지시하지 않는 `scripts/run.mjs`·`scripts/runtime/*`·`config/target.json`·`contracts/build-receipt.schema.json` 이 항상 생성됐다. 이 runtime 의 source 행 때문에 core runtime 수정이 모든 prose target 을 source-stale 로 만들었고, Devflow b341119 의 CRLF 사고도 이 설치본 자체 검사에서 드러났다.
+
+### 선택
+
+- 원문 형식 v2: manifest `tools: { id: 파일 또는 폴더 }`, target `tools: [id…]`, record-only 필드는 전부 필수인 `record{}` 객체 하나(PLAN:365 의 "부분 그룹·dummy 금지" 승계, `outputMode`/`regionBootstrap` 의 유일 값 흡수), `mode` 삭제, `embeddedCoreTooling`·`headingIndex` 유지. v1 원문은 정확한 전환 안내와 함께 거부한다(이전 버전 호환은 사용자 지시로 고려하지 않음).
+- 작성자 도구는 package root 안 regular file 묶음을 바이트 그대로 `scripts/<id>.<ext>` 또는 `scripts/<id>/…` 로 전달한다(바이너리 템플릿 허용). 선언 경로나 폴더 안의 link, 빈 폴더, root 탈출, 다른 산출물과의 경로·대소문자·파일↔폴더 충돌은 build 실패다. 공유 도구는 module 과 같이 한 번 선언하고 target 마다 복사한다.
+- 산출물: prose target 은 `SKILL.md`·`references/`·선언한 도구·receipt 만. record runtime·축소된 `config/target.json`·answer/exchange schema 는 `record` 선언 시에만. receipt 의 artifacts 는 실제 전달 파일, sources 는 배포되지 않는 descriptor·manifest·domain config schema 를 포함한 currentness 입력. record 의 경로·명령(`scripts/run.mjs initialize|record|check`)과 안전 계약은 그대로이고 exchange 는 schemaVersion 2 로 `mode` 를 뺐다.
+- D1: prose 설치본의 자체 무결성 실행 코드를 내려놓는다. 동결 PLAN:182·850(설치 target 의 단독 integrity/provenance 확인)과 E-010/E-011/E-037 의 세 runtime mode installed check 계약과 달라진다. receipt 데이터와 외부 `check --out <설치 폴더>` 는 남으며, 단독 검사가 필요할 때 호환 CLI 를 확보하는 부담을 수용한다. record target 은 기록 전 무결성 확인을 유지한다.
+- D2: `prepare-record`·observer·packet·fallback 코드와 schema 를 제품에서 제거한다. 재현은 tag `v1.3.7`(`61d9eba`)에서 별도 root 로 하며, 현재 main 의 helper 로 재현 가능하다는 약속은 하지 않는다. `evals/*/results/` 의 고유 결과는 보존하고 실행 harness·fixture·`src/evaluation/`·pilot 의 verify-baseline/observer/packet 은 정리했다.
+- E-033 재개방: 일반 경로 선언을 "한 소비자 때문에 plugin 문법을 여는 과잉"으로 막았던 판단을, 사용자가 밝힌 제품 목적(범용 기계적 분리)과 표준 스킬 형태, Devflow 후보 인벤토리(header/state 검사, 인벤토리, ID·폴더 생성, 커버리지 계산)를 근거로 뒤집는다. 도구 dispatcher·공통 결과 schema·config resolver·installer 별 변환은 만들지 않는다. 설치 도구가 일부 파일명을 건너뛰는 문제(`metadata.json`, `__pycache__` 등)는 build 가 아니라 route 검증(설치본 check 와 도구 실행)이 소유한다.
+- E-041 의 "비-Markdown 전달은 mechanism 필드의 몫" 은 tools 로 닫혔다. references 는 여전히 Markdown 만이다.
+- 저작 스킬: 기계화 판단 기준("Decide what a tool should own"), 분할·스킬 나누기·공유 module 비용("Split the work"), 결론 전 검토("Review before you conclude" — 과정에서 준수한 기준을 결론 전에 벽으로 다시 적용), 만드는 스킬 자신의 결과 검증 문단을 SKILL.md 에, 도구 설계·연결·record 작성은 조건부 `references/tools.md`, 새 package 시작은 조건부 `references/new-package.md` 에 둔다.
+- 저장소: 테스트 전용 pilot domain 과 verify fixture 를 `tests/fixtures/` 로 옮겼다. 방법 원문은 유지보수자와 저작 스킬이 함께 쓰는 단일 정본이라 `docs/guide/` 에 두고 manifest 도 repository root 에 둔다.
+
+### 검토한 대안
+
+mode 유지 + tools 추가는 record-only+tools 같은 불필요한 조합과 두 개념을 남긴다. 모든 것을 임의 스크립트로 두는 안은 CAS·lock·reread 를 도메인마다 다시 쓰게 해 기각했다. 공유 내용을 스킬 상위 공유 폴더로 두는 안은 `npx skills` 가 스킬 폴더만 설치하고 부분 설치 시 형제 경로가 깨져 기각했다(Anthropic 공식 스킬도 공유 스크립트를 복사). 복사본의 토큰 비용은 한 대화에서 같은 module 을 여러 스킬로 다시 읽을 때만 생기므로 항상 읽히는 공유 module 을 작게 유지하는 저작 기준으로 다룬다. 산문↔도구 경로의 양방향 literal 검사는 helper 구조와 예시 경로를 오판해 기각했다.
+
+### 검증과 재검토 조건
+
+`docs/implementation-verification_ko.md` 의 v2.0.0 절이 test·build·fresh 관찰 증거를 소유한다. 도구가 늘어 Devflow v0.25 같은 무게로 돌아가는 신호(도구를 위한 도구, 산문보다 긴 도구 사용 설명), AI 가 도구를 부르지 않거나 산문과 어긋나는 반복 관찰, 설치 route 가 도구 파일을 잃는 실제 사례가 생기면 이 결정을 다시 연다. 두 번째 record 출력·다중 파일 안전 기록의 실제 필요는 여전히 사용자 결정으로 되돌린다.
+
+실사용 관찰(2026-10-16) 뒤 저작 산문을 세 곳에서 보완했다. 빌드 요청은 함께 요청된 작업만 덮고 이후 변경으로 승계되지 않는다(앞선 요청을 상시 지시로 읽고 build root 를 재빌드한 장면). 도구가 사람·기존 파일에 지우는 형식 전환은 도구 비용이며 요청이 이미 포함하지 않으면 사용자와 합의한다(검사 편의로 기존 state 형식을 바꾼 장면). host skill-creator 비교에서 description 작성 기준, 검토자에게 기대 답을 주지 않기, 우위 결정 시 이전·부재 run 비교만 채택했다. Build 의 name/description hard check 는 YAML 을 해석하지 않으면 정상 frontmatter 를 거부하고 잘못된 값을 통과시켜 채택하지 않았다. 배포 직전 두 독립 문장 감사 뒤에는 새 기능 없이 실행 조건만 교정했다: 손상 생성물의 복구는 같은 출력 재빌드가 아니라 새 출력 디렉터리를 거치고, 요청된 시험은 사용자가 정한 과제나 주 용도 한두 개로 실행 과정까지 읽으며, record renderer 계약은 runtime 의 실제 stdin/stdout·marker 책임대로 적는다.

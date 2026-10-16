@@ -30,7 +30,7 @@ export async function collectBasis(projectRoot, target, textFailure) {
   };
 }
 
-export async function createExchange({ targetRoot, receipt, target, projectRoot, basis, answerContract, extraFields = {}, extraFiles = {} }) {
+export async function createExchange({ targetRoot, receipt, target, projectRoot, basis, answerContract }) {
   const exchangeId = nonce();
   const exchangeParent = resolve(projectRoot, ".skill-rails-next", "exchanges");
   const exchangeRoot = resolve(exchangeParent, exchangeId);
@@ -38,8 +38,7 @@ export async function createExchange({ targetRoot, receipt, target, projectRoot,
   const answerPath = resolve(exchangeRoot, "answer.json");
   const recordCommand = `node ${JSON.stringify(resolve(targetRoot, "scripts", "run.mjs"))} record --exchange ${JSON.stringify(exchangeRoot)}`;
   const exchange = {
-    schemaVersion: 1,
-    mode: target.mode,
+    schemaVersion: 2,
     exchangeId,
     projectRoot,
     targetRoot,
@@ -49,17 +48,12 @@ export async function createExchange({ targetRoot, receipt, target, projectRoot,
     receiptTreeSha256: receipt.treeSha256,
     declaredOutput: target.declaredOutput,
     basis,
-    ...extraFields,
   };
   await ensureDirectory(exchangeParent);
   try {
     await mkdir(stage);
     await writeFile(resolve(stage, "exchange.json"), `${canonicalJson(exchange)}\n`);
     await writeFile(resolve(stage, "answer.json"), `${canonicalJson(answerSkeleton(answerContract))}\n`);
-    for (const [path, contents] of Object.entries(extraFiles)) {
-      const value = typeof contents === "function" ? contents({ exchangeRoot, answerPath, recordCommand }) : contents;
-      await writeFile(resolve(stage, path), value);
-    }
     await rename(stage, exchangeRoot);
   } catch (error) {
     await rm(stage, { recursive: true, force: true });

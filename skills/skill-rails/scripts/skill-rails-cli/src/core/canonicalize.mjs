@@ -15,10 +15,10 @@ export function canonicalText(bytes, logicalPath) {
   try {
     text = utf8.decode(bytes);
   } catch {
-    fail("SOURCE_TEXT_INVALID", `${logicalPath} is not valid UTF-8 text.`, "Use UTF-8 text without binary bytes.");
+    fail("SOURCE_TEXT_INVALID", `${logicalPath} is not valid UTF-8 text.`, "Keep entries and prose modules as UTF-8 text; place binary resources in a declared tool file or folder.");
   }
   if (text.includes("\0")) {
-    fail("SOURCE_TEXT_INVALID", `${logicalPath} contains a NUL byte.`, "Move binary input outside the v1 source package.");
+    fail("SOURCE_TEXT_INVALID", `${logicalPath} contains a NUL byte.`, "Keep entries and prose modules as UTF-8 text; place binary resources in a declared tool file or folder.");
   }
   return text.replace(/\r\n?/g, "\n");
 }

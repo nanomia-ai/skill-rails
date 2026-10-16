@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "skill-rails-next/build-receipt/1",
+  "$id": "skill-rails/build-receipt/1",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "coreVersion", "packageId", "packageVersion", "targetId", "sources", "artifacts", "imports", "treeSha256"],
