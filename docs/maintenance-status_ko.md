@@ -2,11 +2,11 @@
 
 문서 상태: 교체형 현재 snapshot. 버전별 경과는 Git, 결정은 `docs/plan/implementation-evolution-plan_ko.md`, 증거는 `docs/implementation-verification_ko.md`가 소유한다.
 
-최종 갱신: 2026-10-16 KST — v2.0.0 산문 + 선언한 도구 구현·검증 완료, release 전
+최종 갱신: 2026-10-16 KST — v2.0.0 산문 + 선언한 도구 release·설치 완료
 
 ## 현재 위치
 
-- Root와 authoring package version은 `2.0.0`, Node 범위는 `>=24 <25`, 외부 runtime dependency는 없다. 마지막 공개·설치 버전은 `v1.3.7`(`61d9eba`)이다.
+- Root와 authoring package version은 `2.0.0`, Node 범위는 `>=24 <25`, 외부 runtime dependency는 없다. 마지막 공개·설치 버전은 `v2.0.0`(`a124001`)이며 공식 경로는 `nanomia-ai/skill-rails` repository의 `npx skills@latest`다. npm registry publish는 하지 않았다.
 - v2.0.0은 기계적 분리를 mode가 아니라 선언한 도구로 표현한다(E-042). 원문 형식은 `schemaVersion: 2`이고 v1 원문은 전환 안내와 함께 거부한다. 산문 target 산출물은 `SKILL.md`·`references/`·선언한 도구·receipt뿐이며, record runtime은 `record`를 선언한 target에만 있다. `prepare-record`·observer·packet·fallback은 제품에서 제거됐고 재현은 tag `v1.3.7`에서 한다.
 - 저작 스킬은 "Decide what a tool should own", "Split the work", "Review before you conclude"를 entry에, 도구 설계·연결·record 작성을 `references/tools.md`, 새 package 시작을 `references/new-package.md`에 둔다.
 - Canonical authoring source는 `authoring-package.json`과 `authoring/skill-rails/`, 선택형 판단 원문은 `docs/guide/ai-skill-evolution-method_ko.md`, generated tracked skill은 `skills/skill-rails/`다. 테스트 전용 pilot과 fixture는 `tests/fixtures/`, 역사 결과는 `evals/*/results/`, legacy capsule은 `legacy/archive/v0.4.3/`에 있다.
@@ -14,7 +14,7 @@
 
 ## 정확한 다음 진입
 
-1. v2.0.0 release commit·tag·push와 공식 `npx skills@latest` 경로의 Codex·Claude Code 설치는 사용자 승인 뒤에 한다. 설치 뒤 설치본 `check`를 실행한다.
+1. v2.0.0 release commit·annotated tag·origin push와 공식 원격 경로의 Codex·Claude Code 설치, 양쪽 설치본 `check`는 완료됐다(증거: `docs/implementation-verification_ko.md` v2.0.0 절). 다음 결정은 실사용에서 관찰된 장면이 생길 때 그 owner를 연다.
 2. Devflow의 v2 원문 전환(manifest·target `schemaVersion: 2`, `mode` 삭제)과 재빌드는 별도 저장소의 별도 승인이다. 도구 채택은 Devflow 자체 규칙에 따라 그 뒤에 판단한다.
 3. 추가 synthetic flow, matrix, schema, harness를 열지 않는다. 두 번째 record 출력이나 다중 파일 안전 기록의 실제 필요, 도구 증식 신호, 설치 route의 도구 손실이 관찰되면 E-042의 재검토 조건으로 돌아간다.
 4. Force/history rewrite, README 변경과 archive 삭제는 계속 금지한다. README는 v2.0.0 이전 서술(record-only, 스크립트 예시)을 담고 있어 갱신 여부를 사용자에게 묻는다.

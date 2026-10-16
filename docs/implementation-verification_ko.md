@@ -661,4 +661,7 @@ Release commit `61d9eba0a1c2f7dd7cc99709bde715f37b8930e3`를 `origin/main`에 no
 
 - 반복성(각 장면 1회 관찰), 도구 채택이 산문 대비 총비용·품질을 줄이는지, 대화형 Codex에서 새 package 문서 질문 뒤 정지 여부(`codex exec`는 묻고도 안전한 기본으로 진행), Codex가 기본 skill-creator를 함께 읽는 영향(관찰한 결과물은 Skill Rails 구조를 따름), 고친 description의 선택 효과, 실제 사람의 동시 편집(감시 스크립트로 재현), lock 경합
 - Devflow의 v2 전환(별도 저장소·별도 승인)과 Devflow 도구 채택
-- Release, push, 전역 설치 교체는 수행하지 않았다.
+
+### Release·설치
+
+Release commit `a124001f1afb465fa858ee261d300036be6617e4`를 `origin/main`에 non-force fast-forward했고, annotated tag object `43b6d41c508dba7c469c52982ce1202eb1d4f362`의 `v2.0.0` peeled commit이 같은 release commit임을 `git ls-remote`로 확인했다. 원격 push 뒤 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes --json`을 저장소 밖에서 실행했다. installer hash `9c46d964b829195f8e0357c82f0d520ddcbb0eda7d1df8aade95120796381d69`로 Codex·Claude Code(symlink)에 설치했고, 설치 lock의 source는 `nanomia-ai/skill-rails`(github), skillFolderHash `712ccd685fa8560af6e933760f1d0be6f52c5292`는 release commit의 `skills/skill-rails` tree와 같다. 양쪽 설치본의 내장 CLI `check --out`은 package/core `2.0.0`, tree `eea7f2a2a20002251e6ed5f0770e6e447b7c5504ff6125d82393e35fb648bab3`, artifact-intact를 반환했고 저장소 원문 기준 source-current였다. npm registry publish는 수행하지 않았다.
