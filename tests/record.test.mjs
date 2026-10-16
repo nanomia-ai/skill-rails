@@ -66,7 +66,7 @@ test("record preserves human bytes, applies one card, and retries idempotently",
   assert.equal(applied.json.effect.authority, "observed");
   const after = await readFile(join(project, "pilot", "verification.md"));
   assert.deepEqual(after.subarray(0, before.length), before);
-  assert.match(after.toString("utf8"), /skill-rails-next:verify-records:start/u);
+  assert.match(after.toString("utf8"), /skill-rails:verify-records:start/u);
   assert.match(after.toString("utf8"), /bookmark-storage — pass/u);
   const retried = record(target, envelope);
   assert.equal(retried.status, 0, retried.stdout);
@@ -136,10 +136,10 @@ test("record-only initializer and exchange fail closed on non-UTF-8 and unknown 
 
 test("managed-region bootstrap follows absent, empty, LF, and non-LF byte rules", async (t) => {
   for (const [name, initial, expectedPrefix] of [
-    ["absent", null, "<!-- skill-rails-next:verify-records:start -->"],
-    ["empty", Buffer.alloc(0), "<!-- skill-rails-next:verify-records:start -->"],
-    ["lf", Buffer.from("human\n"), "human\n\n<!-- skill-rails-next:verify-records:start -->"],
-    ["non-lf", Buffer.from("human"), "human\n\n<!-- skill-rails-next:verify-records:start -->"],
+    ["absent", null, "<!-- skill-rails:verify-records:start -->"],
+    ["empty", Buffer.alloc(0), "<!-- skill-rails:verify-records:start -->"],
+    ["lf", Buffer.from("human\n"), "human\n\n<!-- skill-rails:verify-records:start -->"],
+    ["non-lf", Buffer.from("human"), "human\n\n<!-- skill-rails:verify-records:start -->"],
   ]) {
     const { target, project } = await setup(t, `bootstrap-${name}`);
     const output = join(project, "pilot", "verification.md");
@@ -150,7 +150,7 @@ test("managed-region bootstrap follows absent, empty, LF, and non-LF byte rules"
     assert.equal(record(target, envelope).json.status, "APPLIED");
     const bytes = await readFile(output, "utf8");
     assert.ok(bytes.startsWith(expectedPrefix), name);
-    assert.ok(bytes.endsWith("<!-- skill-rails-next:verify-records:end -->\n"), name);
+    assert.ok(bytes.endsWith("<!-- skill-rails:verify-records:end -->\n"), name);
   }
 });
 
@@ -179,8 +179,8 @@ test("renderer preserves another card and updates only the selected card", async
 
 test("malformed and duplicate markers are no-write", async (t) => {
   for (const [name, content] of [
-    ["missing-end", "human\n<!-- skill-rails-next:verify-records:start -->\n"],
-    ["duplicate", "<!-- skill-rails-next:verify-records:start -->\n<!-- skill-rails-next:verify-records:end -->\n<!-- skill-rails-next:verify-records:start -->\n<!-- skill-rails-next:verify-records:end -->\n"],
+    ["missing-end", "human\n<!-- skill-rails:verify-records:start -->\n"],
+    ["duplicate", "<!-- skill-rails:verify-records:start -->\n<!-- skill-rails:verify-records:end -->\n<!-- skill-rails:verify-records:start -->\n<!-- skill-rails:verify-records:end -->\n"],
   ]) {
     const { target, project } = await setup(t, `marker-${name}`);
     const output = join(project, "pilot", "verification.md");
@@ -197,9 +197,9 @@ test("duplicate card records are rejected without changing output", async (t) =>
   const { target, project } = await setup(t, "duplicate-card");
   const outputPath = join(project, "pilot", "verification.md");
   const valid = invokeRenderer(target, Buffer.from("human\n"), passAnswer).toString("utf8");
-  const hiddenRecord = valid.match(/^<!-- skill-rails-next:verify-record:[A-Za-z0-9_-]+ -->$/mu)?.[0];
+  const hiddenRecord = valid.match(/^<!-- skill-rails:verify-record:[A-Za-z0-9_-]+ -->$/mu)?.[0];
   assert.ok(hiddenRecord);
-  const duplicate = valid.replace("<!-- skill-rails-next:verify-records:end -->", `${hiddenRecord}\n<!-- skill-rails-next:verify-records:end -->`);
+  const duplicate = valid.replace("<!-- skill-rails:verify-records:end -->", `${hiddenRecord}\n<!-- skill-rails:verify-records:end -->`);
   await writeFile(outputPath, duplicate);
   const envelope = initialize(target, project);
   await answer(envelope);
@@ -262,7 +262,7 @@ test("exchange transplant and cross-basis reuse fail closed", async (t) => {
   assert.equal(record(target, oldEnvelope).json.code, "INPUT_STALE");
   const otherProject = join(root, "other-project");
   await cp(project, otherProject, { recursive: true });
-  const transplanted = join(otherProject, ".skill-rails-next", "exchanges", "transplanted");
+  const transplanted = join(otherProject, ".skill-rails", "exchanges", "transplanted");
   await mkdir(dirname(transplanted), { recursive: true });
   await cp(newEnvelope.exchange, transplanted, { recursive: true });
   const result = runNode([join(target, "scripts", "run.mjs"), "record", "--exchange", transplanted]);
@@ -295,6 +295,6 @@ test("CRLF-converted managed frame is updated without creating a second region",
   const secondResult = record(target, second);
   assert.equal(secondResult.json.status, "APPLIED", JSON.stringify(secondResult.json));
   const output = await readFile(outputPath, "utf8");
-  assert.equal((output.match(/skill-rails-next:verify-records:start/g) ?? []).length, 1);
+  assert.equal((output.match(/skill-rails:verify-records:start/g) ?? []).length, 1);
   assert.ok(output.startsWith("# Human verification notes\r\n"));
 });

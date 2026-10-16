@@ -75,6 +75,8 @@ Make separate skills for responsibilities that start independently — their own
 
 Give a fresh AI the destination, why it matters, and the criteria and boundaries for choosing its own route; a fixed sequence only where order, state, external effect, or approval changes the result; what must not happen by its nature and why, not as a closed list; and a wall a wrong turn will hit, whether a tool's check or a boundary a reviewer can test. A reader treats every listed step or item as a duty, drops some under load, and has nothing to reason from when its case is not listed.
 
+Keep what one judgment needs — its purpose, criterion, boundary, and any example — together where that judgment is made, call each thing by one name throughout, and say what a word such as *this* or *as needed* points to. A reader cannot reliably assemble an intent from scattered mentions, reads two names as two things, and fills a vague word with its own guess.
+
 Where a skill's own result can drift from its criteria — a document, a plan, a review — end its work by checking that result against those criteria before reporting it done: a tool where *Decide what a tool should own* gives one, a reread against the criteria for the rest. The wall belongs where the drift happens.
 
 A reader copies what it sees more faithfully than what it is told, so wherever a shape repeats, show it:
@@ -87,17 +89,17 @@ a result that must match     → the form itself, its fields and order fixed    
 
 For instance, a skill with two modes gives each its own block, `## Review` and `## Fix`, instead of one paragraph that describes both; each has the same fields, such as *When*, *Produces*, and *Stops when*, whose names are that skill's own.
 
-Apply §§8.2–8.3 and §§9.2–9.3 of `references/skillEvolutionMethod.md` before writing more at each of these moments: before turning guidance into a list of cases, before adding a rule, exception, or tool to patch a failure, when the same sentence needs a third fix, and when a review names no failure scene beyond "it could confuse".
+Apply §5, §§9.3–9.4, and §10 of `references/skillEvolutionMethod.md` before writing more at each of these moments: before turning guidance into a list of cases, before adding a rule, exception, or tool to patch a failure, when the same sentence needs a third fix, and when a review names no failure scene beyond "it could confuse".
 
 ## Review before you conclude
 
 A draft drifts toward what was easiest to write, and its author reads it with intentions the next AI will not have. Review applies this skill's criteria again, as a wall, before you call a change done or build it.
 
 - When: after a change that alters what another AI will decide or do — a new target, a changed criterion or boundary, a new or changed tool or the step that calls it, a moved file boundary. Spelling or wording that leaves targets, permissions, and behavior the same needs none; a path change that alters what is read, written, or run does.
-- Read as its user: start from the changed target's canonical entry and follow its declared reading conditions, with only the inputs its using AI would have. A reader without this conversation does this better than you — a fresh subagent where the host offers one, given that source, the content it can reach, and one or two realistic tasks, but not the answer you expect or the problem you suspect, and asked what it would do, skip, and not know (method §8.3); without one, read it that way yourself. Where its answer departs from the intent, the source is missing a condition, a reason, or an owner.
+- Read as its user: start from the changed target's canonical entry and follow its declared reading conditions, with only the inputs its using AI would have. A reader without this conversation does this better than you — a fresh subagent where the host offers one, given that source, the content it can reach, and one or two realistic tasks, but not the answer you expect or the problem you suspect, and asked what it would do, skip, and not know (method §9.4); without one, read it that way yourself. Where its answer departs from the intent, the source is missing a condition, a reason, or an owner.
 - Hold it to this skill: check the change against *Decide what a tool should own*, *Split the work*, and *Write prose another AI can act on*, and across them for what no single section owns: two places that pull the same step different ways, or a sentence that stops what another requires.
 - A finding names its place, the misreading or failure it leads to, and why; "it could confuse" without a scene is not a finding, and finding nothing is a valid result.
-- Fix at the owner, not where the symptom showed: a missing condition goes to the step that needs it, a fact the reader got wrong may belong to a tool, and removing or clarifying beats adding a rule. Review the changed part again and stop when a pass finds nothing new; when the same sentence needs a third fix, decide with method §8.3 what is missing instead of rewording it.
+- Fix at the owner, not where the symptom showed: a missing condition goes to the step that needs it, a fact the reader got wrong may belong to a tool, and removing or clarifying beats adding a rule. Review the changed part again and stop when a pass finds nothing new; when the same sentence needs a third fix, decide with method §10.2 what is missing instead of rewording it.
 - Build validation and any development test a tool keeps are the walls for the exact parts; this review covers how the AI uses them. Neither replaces the fresh-use test of the installed skill, which runs when the user asks.
 
 ## Build, test, and deliver when the user asks

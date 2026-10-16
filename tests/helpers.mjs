@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 export const repositoryRoot = resolve(import.meta.dirname, "..");
 
 export async function temporary(t, prefix) {
-  const path = await mkdtemp(join(tmpdir(), `skill-rails-next-${prefix}-`));
+  const path = await mkdtemp(join(tmpdir(), `skill-rails-${prefix}-`));
   t.after(() => rm(path, { recursive: true, force: true }));
   return path;
 }

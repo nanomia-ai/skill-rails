@@ -1,6 +1,6 @@
 node_modules/
 .npm-cache/
-.skill-rails-next/
+.skill-rails/
 .tmp/
 coverage/
 dist/

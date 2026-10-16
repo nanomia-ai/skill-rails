@@ -32,7 +32,7 @@ export async function collectBasis(projectRoot, target, textFailure) {
 
 export async function createExchange({ targetRoot, receipt, target, projectRoot, basis, answerContract }) {
   const exchangeId = nonce();
-  const exchangeParent = resolve(projectRoot, ".skill-rails-next", "exchanges");
+  const exchangeParent = resolve(projectRoot, ".skill-rails", "exchanges");
   const exchangeRoot = resolve(exchangeParent, exchangeId);
   const stage = resolve(exchangeParent, `.stage-${exchangeId}`);
   const answerPath = resolve(exchangeRoot, "answer.json");

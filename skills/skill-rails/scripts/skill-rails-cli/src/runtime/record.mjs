@@ -5,7 +5,7 @@ import { TextDecoder } from "node:util";
 import { basisPublic, canonicalJson, ensureDirectory, ensureProject, fail, fileBasis, nonce, readJson, runChild, sha256, validate } from "./common.mjs";
 
 const decoder = new TextDecoder("utf-8", { fatal: true });
-const FRAME = /^<!-- skill-rails-next:([a-z0-9]+(?:-[a-z0-9]+)*):(start|end) -->\r?$/gm;
+const FRAME = /^<!-- skill-rails:([a-z0-9]+(?:-[a-z0-9]+)*):(start|end) -->\r?$/gm;
 
 function sameBasis(left, right) {
   return left?.path === right?.path && left?.state === right?.state && left?.sha256 === right?.sha256;
@@ -39,7 +39,7 @@ function assertFramePreserved(currentBytes, desiredBytes) {
 }
 
 function assertBoundExchange(projectRoot, exchangeRoot) {
-  const parent = resolve(projectRoot, ".skill-rails-next", "exchanges");
+  const parent = resolve(projectRoot, ".skill-rails", "exchanges");
   const fromParent = relative(parent, exchangeRoot);
   if (!fromParent || fromParent === ".." || fromParent.startsWith(`..${sep}`) || fromParent.includes(sep) || fromParent.includes("/")) fail("PATH_OUTSIDE_ROOT", "Exchange is not in the bound project's exchange directory.", "Discard this exchange and use the exchange-creation command documented in this installed target's SKILL.md to create a new one in the intended project.");
 }
@@ -70,7 +70,7 @@ export async function record(targetRoot, receipt, exchangeArgument, hooks = {}) 
   if (answerErrors.length) fail("ANSWER_INVALID", "Semantic answer violates its closed contract.", "Correct only answer.json in the same exchange.", answerErrors);
 
   // Output ownership must fail closed under concurrency; see "output lock rejects a second record without silent loss".
-  const locks = resolve(projectRoot, ".skill-rails-next", "locks");
+  const locks = resolve(projectRoot, ".skill-rails", "locks");
   const lock = resolve(locks, `${sha256(Buffer.from(target.declaredOutput, "utf8"))}.lock`);
   await ensureDirectory(locks);
   let acquired = false;
@@ -113,7 +113,7 @@ export async function record(targetRoot, receipt, exchangeArgument, hooks = {}) 
     const { resolveProjectPath } = await import("./common.mjs");
     const output = await resolveProjectPath(projectRoot, target.declaredOutput);
     await ensureDirectory(dirname(output));
-    const stage = resolve(dirname(output), `.${basename(output)}.skill-rails-next-${nonce()}.tmp`);
+    const stage = resolve(dirname(output), `.${basename(output)}.skill-rails-${nonce()}.tmp`);
     try {
       await writeFile(stage, rendered.stdout);
       await rename(stage, output);
