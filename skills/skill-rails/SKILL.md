@@ -17,10 +17,12 @@ start or resume
         │
         ▼
 SOURCE  design and refine with the user, over as many passes as needed; nothing is built      § Author or change one target
-        ├─ a change alters what another AI decides or does ──→ REVIEW   § Review before you conclude
-        │     read it as its user would and hold it to this skill
-        │     a finding ──→ fix at the owner, then REVIEW again from the entry
-        │     a pass that finds nothing left to fix ──→ back to SOURCE
+        │  before a change is reported done or built
+        ▼
+REVIEW  of a change that alters what another AI decides or does      § Review before you conclude
+        │  read it yourself as its user would and hold it to this skill
+        │  a finding ──→ fix at the owner, then REVIEW again from the entry
+        │  nothing left to fix, or no such change ──→ the change is done: report how it was reviewed, what that found, and which built copies stay behind
         │  the user asks to build or test                                § Build, test, and deliver when the user asks
         ▼
 ROUTE   recorded? ── no ──→ references/delivery.md: user chooses among routes A–D ──→ record it
@@ -51,7 +53,7 @@ Join the cycle where the user is. When the user chooses or later asks for the re
 2. State the user burden to remove, the meaning that must remain with the AI or user, the observable result, and what stays out of scope.
 3. Choose the smallest form that delivers it and write it, with *Decide what a tool should own*, *Split the work*, and *Write prose another AI can act on*; give every purpose, rule, declaration, tool, and evidence claim one canonical owner.
 4. When one target's prose hands an artifact, decision, recovery, cleanup, or next-actor responsibility to another target's actor, read each involved target's entry and confirm the receiving obligation is reachable from the receiver's own entry, its references, or an imported module; a shared import satisfies this only when that module itself states the obligation. Treat a hand-off that these texts do not state as absent rather than inferring it.
-5. Review the change with *Review before you conclude*. A change that the review's *When* covers is not done until that review has run, however small the change looks; your report says who reviewed it and what the review found.
+5. Review the change with *Review before you conclude*. A change that the review's *When* covers is not done until that review has run, however small the change looks; your report says how it was reviewed and what that found.
 
 ## Decide what a tool should own
 
