@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "packageId": "skill-rails-authoring",
-  "packageVersion": "2.0.5",
+  "packageVersion": "2.0.6",
   "modules": {
     "skillEvolutionMethod": "docs/guide/ai-skill-evolution-method_ko.md"
   },
