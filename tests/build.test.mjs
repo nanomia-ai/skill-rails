@@ -55,7 +55,7 @@ test("Product target builds standalone and is source-current", async (t) => {
   assert.equal(checked.json.sourceCurrent, true);
   assert.equal(checked.json.packageId, "natural-language-pilot");
   assert.equal(checked.json.packageVersion, "0.0.1");
-  assert.equal(checked.json.coreVersion, "2.0.6");
+  assert.equal(checked.json.coreVersion, "2.0.7");
 });
 
 test("a Verify-only source change leaves the actual Product target current", async (t) => {
@@ -92,11 +92,11 @@ test("authoring target materializes the skill evolution method and a semantic-fr
   assert.match(entry, /## Decide what a tool should own/u);
   assert.match(entry, /## Review before you conclude/u);
   assert.match(entry, /actually reads, runs, or writes something it does not declare/u);
-  assert.match(entry, /add a new semantic relation at its canonical owner only after an observed maintenance failure/u);
+  assert.match(entry, /Treat a hand-off that these texts do not state as absent rather than inferring it/u);
   assert.match(entry, /references\/tools\.md/u);
   assert.deepEqual(await readFile(join(left, "references", "tools.md")), await readFile(resolve(repositoryRoot, "authoring/skill-rails/tools.md")));
-  assert.match(entry, /consequential semantic result as a premise for a later judgment/u);
-  assert.match(entry, /Build and integrity checks prove delivery only/u);
+  assert.match(entry, /rely on an earlier reading of the source for a later decision/u);
+  assert.match(entry, /Build and integrity checks prove only the properties they check/u);
   assert.match(entry, /references\/new-package\.md/u);
   assert.match(entry, /references\/build-and-test\.md/u);
   assert.deepEqual(await readFile(join(left, "references", "build-and-test.md")), await readFile(resolve(repositoryRoot, "authoring/skill-rails/build-and-test.md")));
@@ -183,7 +183,7 @@ test("copied target checks integrity without repository or sibling skill access"
   assert.equal(checked.json.status, "ARTIFACT_INTACT");
   assert.equal(checked.json.packageId, "natural-language-pilot");
   assert.equal(checked.json.packageVersion, "0.0.1");
-  assert.equal(checked.json.coreVersion, "2.0.6");
+  assert.equal(checked.json.coreVersion, "2.0.7");
   assert.equal(checked.json.sourceCurrent, null);
   assert.equal(checked.json.remoteLatest, null);
 });

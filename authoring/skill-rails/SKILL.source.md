@@ -1,6 +1,6 @@
 ---
 name: skill-rails
-description: Design, build, and maintain standalone AI skills from a canonical source package, with prose for judgment and declared tools for exact work, built deterministically into skill folders. Use when creating, changing, splitting, testing, or delivering an AI skill as a source package (`skill-package.json`), including starting a project's first one, or when a built skill's delivery or evidence is in question. Do not use archived Skill Rails or Devflow as a template or fallback.
+description: Design, build, and maintain standalone AI skills from a canonical source package, with prose for judgment and declared tools for exact work, built deterministically into skill folders. Use when creating, changing, splitting, testing, or delivering an AI skill as a source package (`skill-package.json`), including starting a project's first one, or when a built skill's delivery or evidence is in question.
 ---
 
 # Skill Rails
@@ -11,18 +11,18 @@ Design one standalone skill as a small canonical source package, and build it wh
 
 ```text
 start or resume
- ├─ new package ──→ references/new-package.md: location, documents question, the cycle told to the user
+ ├─ new package ──→ references/new-package.md: where the source goes, whether to keep maintenance documents, how the work will run
  └─ existing package ──→ read the project's recorded state
         │
         ▼
-SOURCE  design and refine with the user ⟲      nothing is built      § Author or change one target
+SOURCE  design and refine with the user, over as many passes as needed; nothing is built      § Author or change one target
         ├─ a change alters what another AI decides or does ──→ REVIEW   § Review before you conclude
         │     read it as its user would and hold it to this skill
         │     a finding ──→ fix at the owner, then REVIEW again from the entry
-        │     a pass that finds nothing new ──→ back to SOURCE
+        │     a pass that finds nothing left to fix ──→ back to SOURCE
         │  the user asks to build or test                                § Build, test, and deliver when the user asks
         ▼
-ROUTE   recorded? ── no ──→ references/delivery.md: user chooses A, B, C, or D ──→ record it
+ROUTE   recorded? ── no ──→ references/delivery.md: user chooses among routes A–D ──→ record it
         │
         ▼
 BUILD   source ──→ the standalone skill folder the route needs      references/build-and-test.md
@@ -32,26 +32,25 @@ BUILD   source ──→ the standalone skill folder the route needs      refere
 TEST    put it in place on this machine by the route ──→ a fresh AI uses it
         │  the run falls short ──→ keep what it showed and resolve the cause at its owner; a source fix returns to SOURCE
         ▼
-back to SOURCE: a later change is a source change; built and installed copies stay behind until the next build, so say so
+back to SOURCE: a later change is a source change; built and installed copies stay behind until they are rebuilt and put in place again, so say so
 ```
 
-Join the cycle where the user is. When the user chooses or later asks for the recommended maintenance documents, set them up with `references/project-docs.md`. Before an authoring or maintenance judgment, read §§0–0.1 of `references/skillEvolutionMethod.md` and use its routing table, with the decision's uncertainty, reach, and reversal cost, to choose any further sections; its generated `skillEvolutionMethod.index.json` only locates byte ranges and defines no meaning or task list.
+Join the cycle where the user is. When the user chooses or later asks for the recommended maintenance documents, set them up with `references/project-docs.md`. Before an authoring or maintenance judgment, read §§0–0.1 of `references/skillEvolutionMethod.md` (the method), choose any further sections from its routing table by the decision at hand, and set how deep to go with its §2; its generated `skillEvolutionMethod.index.json` only locates byte ranges and defines no meaning or task list.
 
 ## Work from canonical source
 
 - Change the manifest, target descriptor, entry, module, reference, tool, or record file that owns the behavior, never generated output or runtime state; a folder carrying `.skill-rails-build.json` is generated and never hand-edited.
 - Declare only the modules, references, tools, and record files a target actually uses. The build fails closed on unknown fields, undeclared paths, root escapes, and colliding outputs. Manifest paths are relative to the manifest, whose directory is the root every source path must stay inside; a descriptor's file paths are relative to that descriptor, and a record's declared inputs and output to the project; the closed schemas in `scripts/skill-rails-cli/contracts/` define the fields.
 - Use exact IDs and paths. Do not infer requirement, check, effect, or causal relationships the source does not declare.
-- Do not import archived Skill Rails or Devflow as an implementation baseline, compatibility layer, or runtime fallback.
-- Before using a consequential semantic result as a premise for a later judgment or accepting it as final, reread the current canonical source owners it actually depended on and confirm the result still holds, unless you just read those same bytes. If a stale input or output invalidates an answer, reread current sources instead of transplanting the old answer.
+- Before you rely on an earlier reading of the source for a later decision, or report it as final, reread the source files it rested on and confirm it still holds; skip the reread only when those files have not changed since you read them. If a stale input or output invalidates an answer, reread current sources instead of transplanting the old answer.
 
 ## Author or change one target
 
 1. Inspect before editing: when the package exists, query it or the target by exact ID with the CLI's `inspect` (*Repository operations*), then the owner you will change and its consumers. If a target actually reads, runs, or writes something it does not declare, add the declaration at its canonical owner.
 2. State the user burden to remove, the meaning that must remain with the AI or user, the observable result, and what stays out of scope.
 3. Choose the smallest form that delivers it and write it, with *Decide what a tool should own*, *Split the work*, and *Write prose another AI can act on*; give every purpose, rule, declaration, tool, and evidence claim one canonical owner.
-4. When one target's prose hands an artifact, decision, recovery, cleanup, or next-actor responsibility to another target's actor, read each involved target's entry and confirm the receiving obligation is reachable from the receiver's own entry, its references, or an imported module; a shared import satisfies this only when that module itself states the obligation. Treat any other relation as undeclared rather than inferring it, and add a new semantic relation at its canonical owner only after an observed maintenance failure shows it is needed.
-5. Review the change with *Review before you conclude*. A change its *When* covers is not done until that review has run, however small the change looks; your report says who reviewed it and what the review found.
+4. When one target's prose hands an artifact, decision, recovery, cleanup, or next-actor responsibility to another target's actor, read each involved target's entry and confirm the receiving obligation is reachable from the receiver's own entry, its references, or an imported module; a shared import satisfies this only when that module itself states the obligation. Treat a hand-off that these texts do not state as absent rather than inferring it.
+5. Review the change with *Review before you conclude*. A change that the review's *When* covers is not done until that review has run, however small the change looks; your report says who reviewed it and what the review found.
 
 ## Decide what a tool should own
 
@@ -71,7 +70,7 @@ Move a block into its own file when a run can tell from its current task or stag
 
 Content only this target reads and owns is a target-owned reference, declared by target-relative path in the descriptor's `references` and delivered as `references/<file name>`. Content other targets read, or owned outside this target, is a package module imported by ID; when a second target needs a reference, promote it to a module and repoint its readers. The build copies a module into each consuming skill because every installed skill must work alone; context is spent when content is read, so a module read again through another skill in the same conversation is spent again. Keep the modules every consumer always reads complete but small, and move parts only some consumers need into a module they open when a step needs it.
 
-Make separate skills for responsibilities that start independently — their own trigger, their own session, their own review boundary. Keep stages in one skill when they always run together in one sitting and none needs its own entry point or review, loading each stage's detail when that stage starts. A hand-off to another skill names that skill and the artifact it should find, never a path into its folder.
+Make separate skills for responsibilities that start independently — their own trigger, their own session, or a check that must be made apart from the work it checks, such as a review by a session that did not write it. Keep stages in one skill when they always run together in one sitting and none needs its own entry point or such a separate check, loading each stage's detail when that stage starts. A hand-off to another skill names that skill and the artifact it should find, never a path into its folder.
 
 ## Write prose another AI can act on
 
@@ -102,19 +101,19 @@ Apply §5, §§8.3–8.4, and §9 of `references/skillEvolutionMethod.md` before
 A draft drifts toward what was easiest to write, and its author reads it with intentions the next AI will not have. Review applies this skill's criteria again, as a wall, before you call a change done or build it.
 
 - When: after a change that alters what another AI will decide or do — a new target, a changed criterion or boundary, a new or changed tool or the step that calls it, a moved file boundary. Spelling or wording that leaves targets, permissions, and behavior the same needs none; a path change that alters what is read, written, or run does.
-- Read as its user: do this read yourself. Start from the changed target's canonical entry and follow its declared reading conditions, with only the inputs its using AI would have, and for one or two realistic tasks trace what the source tells that AI to do, skip, and leave unknown, crediting only what a line actually says, not what you meant. This read works on the source as written and needs no build or install; it is part of finishing the change, not the test the user asks for, so it runs even when the user asked for no build or test. Where the traced behavior departs from the intent, the source is missing a condition, a reason, or an owner.
+- Read as its user, the method's reading test (§8.4): do this read yourself. Start from the changed target's canonical entry and follow its declared reading conditions, with only the inputs its using AI would have, and for one or two realistic tasks trace what the source tells that AI to do, skip, and leave unknown, crediting only what a line actually says, not what you meant. This read works on the source as written and needs no build or install; it is part of finishing the change, not the test the user asks for, so it runs even when the user asked for no build or test. Where the traced behavior departs from the intent, the source is missing a condition, a reason, or an owner.
 - Hold it to this skill: check the change against *Decide what a tool should own*, *Split the work*, and *Write prose another AI can act on*, and across them for what no single section owns: two places that pull the same step different ways, or a sentence that stops what another requires.
 - A finding names its place, the misreading or failure it leads to, and why; "it could confuse" without a scene is not a finding, and finding nothing is a valid result.
-- Fix at the owner, not where the symptom showed: a missing condition goes to the step that needs it, a fact the reader got wrong may belong to a tool, and removing or clarifying beats adding a rule. After a fix, review again from the entry as above, because a fix can break text it did not touch, and stop when a pass finds nothing new; when the same sentence needs a third fix, decide with method §9.2 what is missing instead of rewording it.
+- Fix at the owner, not where the symptom showed: a missing condition goes to the step that needs it, a fact the reader got wrong may belong to a tool, and removing or clarifying beats adding a rule. After a fix, review again from the entry as above, because a fix can break text it did not touch, and stop when a pass finds nothing left to fix; when the same sentence needs a third fix, decide with method §9.2 what is missing instead of rewording it.
 - Another reviewer: when the user asks, also give the review to another agent — a subagent, or one started through a coordinator the user runs. When a wrong change would be costly, or fixes keep failing on the same premise, recommend that in your report rather than starting one unasked. Brief it and weigh its findings as method §10 describes: the background and intent in full, never the result you expect or the problem you suspect; it traces the tasks from the source and inputs alone.
-- Build validation and any development test a tool keeps are the walls for the exact parts; this review covers how the AI uses them. Neither replaces the fresh-use test of the installed skill, which runs when the user asks.
+- Build validation and any development test a tool keeps are the walls for the exact parts; this review covers how the AI uses them. Neither replaces the test of the installed skill, which runs when the user asks.
 
 ## Build, test, and deliver when the user asks
 
-A source package with no built folder is a complete result of authoring, refined with the user over as many passes as it needs. A request to change what the skill does is a source change, even when a built folder or installed copy exists. Building, and the testing and delivery that depend on it, start only when the user asks, never to finish a change; a build request covers the work requested with it and does not carry over to a later change unless the user made it a standing instruction. Until then every built or installed copy stays behind the source, so say so when a change makes it so, and what a build would prove stays `unproven`. A test uses the delivered skill, so a request to test settles the route first when none is recorded, then builds, carries that route out on this machine, and tests. Rebuild only the targets a change affects, and keep the records of failed checks and observations. Build and integrity checks prove delivery only; missing behavioral or host evidence is `unproven`.
+A source package with no built folder is a complete result of authoring, refined with the user over as many passes as it needs. A request to change what the skill does is a source change, even when a built folder or installed copy exists. Building, and the testing and delivery that depend on it, start only when the user asks, never to finish a change; a build request covers the work requested with it and does not carry over to a later change unless the user made it a standing instruction. Until then every built or installed copy stays behind the source, so say so when a change makes it so, and what a build would prove stays `unproven`. A test uses the delivered skill, so a request to test settles the route first when none is recorded, then builds, carries that route out on this machine, and tests. Rebuild only the targets a change affects, and keep the records of failed checks and observations. Build and integrity checks prove only the properties they check, and source-currentness only when checked against the current source; missing behavioral or host evidence is `unproven`.
 
 Open `references/build-and-test.md` before building, running `check`, testing, claiming delivery, or stating what evidence covers, and at an adoption or release decision. Open `references/delivery.md` before a build when the project records no route, and whenever the user wants to choose, change, or carry out a delivery route.
 
 ## Repository operations
 
-The installed skill carries one closed authoring CLI. Set `<skill-root>` to the directory containing this `SKILL.md`, keep the working directory at the ordinary source project root, and run `node "<skill-root>/scripts/skill-rails-cli/src/core/cli.mjs"` with no arguments, `help`, or `--help` to recover the current forms of inspect, overview, build, and check. Invalid command arguments return JSON with a task-specific `nextAction`. For a person's whole-package question, use overview only to generate the current non-authoritative view from that source package; do not save it as another source of truth.
+The installed skill carries one closed authoring CLI. Set `<skill-root>` to the directory containing this `SKILL.md`, keep the working directory at the project root that holds the source package (the folder containing `source/` for a package started with this skill), and run `node "<skill-root>/scripts/skill-rails-cli/src/core/cli.mjs"` with no arguments, `help`, or `--help` to recover the current forms of inspect, overview, build, and check. Invalid command arguments return JSON with a task-specific `nextAction`. For a person's whole-package question, use overview only to generate the current non-authoritative view from that source package; do not save it as another source of truth.

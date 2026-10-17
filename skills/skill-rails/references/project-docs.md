@@ -8,16 +8,16 @@ What the package is for, how it is composed, where source and builds live and wh
 
 ## Setting it up
 
-One router. Add the section below to an existing `AGENTS.md` with the user's consent, never overwrite; a project that already routes documents elsewhere registers these there rather than gaining a rival. A host that reads its own entry file gets one line pointing to `AGENTS.md`; a host that reads `AGENTS.md` itself needs nothing. At setup only the router section and `docs/current.md` exist; write `current.md` from what is known now, and an unknown build root or route is an open question, not a guess.
+One router. Add the section below to `AGENTS.md`, creating it when the project has none and never overwriting an existing one, since the user's choice of these documents is the consent to add it; a project that already routes documents elsewhere registers these there rather than gaining a rival. A host that reads its own entry file gets one line pointing to `AGENTS.md`; a host that reads `AGENTS.md` itself needs nothing. At setup only the router section and `docs/current.md` exist; write `current.md` from what is known now, and an unknown build root or route is an open question, not a guess.
 
-The section is written so the rules close without this file: every wall and every criterion a later session needs is inside it, and nothing in it points back here. Fixed are the read order, the update column with its walls, and the closing lines; free are the purpose line, the wording of what each document owns, headings, and language, which is the project's own.
+The section is written so the rules close without this file: every wall and every criterion a later session needs is inside it, and nothing in it points back here. Fixed are the read order, the update column with its rules, and the closing lines; free are the purpose line, the wording of what each document owns, headings, and language, which is the project's own.
 
 ```markdown
 ## Maintenance documents
 <one line: what this project's skill package does>
 Read `docs/current.md` first; open the others only when the task needs them. One owner per fact; every other document links to it, so two statements can never disagree.
 
-| document | owns | update and its wall |
+| document | owns | when and how to update it |
 |---|---|---|
 | `docs/current.md` | purpose; what each target, module, reference, and tool is for; source root, build root, delivery route and its frame files; open questions | replace in place, in the same change that alters what it states. Never a line about what changed or when: such a line belongs in `changes/` or Git, and finding one is the signal to move it |
 | `docs/decisions/<slug>.md` | one question: current answer, alternatives weighed, what would reopen it | made only when losing the reason would make a next worker repeat the debate or undo the choice; replace when the answer changes; delete when it no longer protects a judgment. A decision that restates a rule instead of its reason sits in the wrong owner |
