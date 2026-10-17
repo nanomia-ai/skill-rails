@@ -2,7 +2,7 @@
 
 문서 상태: 교체형 현재 snapshot. 버전별 경과는 Git, 결정은 `docs/plan/implementation-evolution-plan_ko.md`, 증거는 `docs/implementation-verification_ko.md`가 소유한다.
 
-최종 갱신: 2026-10-17 KST — v2.0.2 수정 후 전체 재검수 release
+최종 갱신: 2026-10-17 KST — 흐름 지도·문서 양식 기준(E-043) 원문 반영, 미release
 
 ## 현재 위치
 
@@ -14,7 +14,7 @@
 
 ## 정확한 다음 진입
 
-1. v2.0.2는 뜻을 바꾸는 계획·결과를 내놓기 전 대조를 방법 §0으로 옮겨 계획까지 넓히고 고치지 않은 앞뒤 글과의 충돌·인과를 보게 했으며, entry Review는 지적을 고친 뒤 바뀐 부분이 아니라 entry부터 다시 보게 했다. v2.0.1은 방법 문서를 처음 읽는 AI 기준으로 재작성·압축하고 runtime 이름 `skill-rails-next`를 `skill-rails`로 바꿨다. v2.0.0의 record로 쓴 구역 표시는 새 버전이 알아보지 못한다(증거: `docs/implementation-verification_ko.md` 방법 원문 재구성 절). 다음 결정은 실사용에서 관찰된 장면이 생길 때 그 owner를 연다.
+1. E-043(미release): entry *Write prose*가 흐름이 있는 글은 지도부터 그리고 절이 지도를 따르게 하며, 블록 모양은 내용이 요구하는 것으로 고르게 한다. Review는 기존 "Hold it to this skill"로 이 기준을 벽으로 쓴다. 다음 release 때 version을 올리고 설치한다(사용자 승인). v2.0.2는 뜻을 바꾸는 계획·결과를 내놓기 전 대조를 방법 §0으로 옮겨 계획까지 넓히고 고치지 않은 앞뒤 글과의 충돌·인과를 보게 했으며, entry Review는 지적을 고친 뒤 바뀐 부분이 아니라 entry부터 다시 보게 했다. v2.0.1은 방법 문서를 처음 읽는 AI 기준으로 재작성·압축하고 runtime 이름 `skill-rails-next`를 `skill-rails`로 바꿨다. v2.0.0의 record로 쓴 구역 표시는 새 버전이 알아보지 못한다(증거: `docs/implementation-verification_ko.md` 방법 원문 재구성 절). 다음 결정은 실사용에서 관찰된 장면이 생길 때 그 owner를 연다.
 2. Devflow의 v2 원문 전환(manifest·target `schemaVersion: 2`, `mode` 삭제)과 재빌드는 별도 저장소의 별도 승인이다. 도구 채택은 Devflow 자체 규칙에 따라 그 뒤에 판단한다.
 3. 추가 synthetic flow, matrix, schema, harness를 열지 않는다. 두 번째 record 출력이나 다중 파일 안전 기록의 실제 필요, 도구 증식 신호, 설치 route의 도구 손실이 관찰되면 E-042의 재검토 조건으로 돌아간다.
 4. Force/history rewrite, README 변경과 archive 삭제는 계속 금지한다. README는 v2.0.0 이전 서술(record-only, 스크립트 예시)을 담고 있어 갱신 여부를 사용자에게 묻는다.

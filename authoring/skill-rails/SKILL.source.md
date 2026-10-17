@@ -15,10 +15,10 @@ start or resume
  └─ existing package ──→ read the project's recorded state
         │
         ▼
-SOURCE  design and refine with the user ⟲      nothing is built
-        ⇅  REVIEW when a change alters what another AI decides or does:
+SOURCE  design and refine with the user ⟲      nothing is built      § Author or change one target
+        ⇅  REVIEW when a change alters what another AI decides or does:   § Review before you conclude
            read it as its user would, hold it to this skill, fix at the owner
-        │  the user asks to build or test
+        │  the user asks to build or test                                § Build, test, and deliver when the user asks
         ▼
 ROUTE   recorded? ── no ──→ references/delivery.md: user chooses A, B, C, or D ──→ record it
         │
@@ -44,7 +44,7 @@ Join the cycle where the user is. When the user chooses or later asks for the re
 
 ## Author or change one target
 
-1. Inspect before editing: when the package exists, query it or the target by exact ID with the CLI's `inspect`, then the owner you will change and its consumers. If a target actually reads, runs, or writes something it does not declare, add the declaration at its canonical owner.
+1. Inspect before editing: when the package exists, query it or the target by exact ID with the CLI's `inspect` (*Repository operations*), then the owner you will change and its consumers. If a target actually reads, runs, or writes something it does not declare, add the declaration at its canonical owner.
 2. State the user burden to remove, the meaning that must remain with the AI or user, the observable result, and what stays out of scope.
 3. Choose the smallest form that delivers it and write it, with *Decide what a tool should own*, *Split the work*, and *Write prose another AI can act on*; give every purpose, rule, declaration, tool, and evidence claim one canonical owner.
 4. When one target's prose hands an artifact, decision, recovery, cleanup, or next-actor responsibility to another target's actor, read each involved target's entry and confirm the receiving obligation is reachable from the receiver's own entry, its references, or an imported module; a shared import satisfies this only when that module itself states the obligation. Treat any other relation as undeclared rather than inferring it, and add a new semantic relation at its canonical owner only after an observed maintenance failure shows it is needed.
@@ -62,7 +62,7 @@ Declare a tool in the manifest's `tools` and list it in each target that ships i
 
 ## Split the work
 
-Keep the entry the smallest complete always-read contract: the background and intent needed to interpret every branch; the purpose, use trigger, and operating boundary; rules every branch uses, or unconditional pointers to their canonical owners; current inputs; completion evidence; and, for each other file, the exact condition for opening it, decidable from the current task before opening it — a next action, a confirmed state, or a question asked, in the entry's own words. When the work runs in stages, across sessions, or back through earlier stages, begin the entry with a short map of that flow, stages joined by arrows each marked with what moves it; the map orients, and the sections below it keep each stage's rules. Use the frontmatter `description` to say what the skill does and which requests should start it, in users' words, with enough to tell it apart from neighboring skills; keep the workflow in the body.
+Keep the entry the smallest complete always-read contract: the background and intent needed to interpret every branch; the purpose, use trigger, and operating boundary; rules every branch uses, or unconditional pointers to their canonical owners; current inputs; completion evidence; and, for each other file, the exact condition for opening it, decidable from the current task before opening it — a next action, a confirmed state, or a question asked, in the entry's own words; when the work runs in stages, the map of that flow comes first (*Write prose another AI can act on*). Use the frontmatter `description` to say what the skill does and which requests should start it, in users' words, with enough to tell it apart from neighboring skills; keep the workflow in the body.
 
 Move a block into its own file when a run can tell from its current task or stage that it does not need the block yet — a stage's detail before that stage starts, the handling of a rare case — and the reading saved exceeds the navigation and rereading cost. Never put apart things that must be judged together, whatever their length.
 
@@ -77,6 +77,10 @@ Give a fresh AI the destination, why it matters, and the criteria and boundaries
 Keep what one judgment needs — its purpose, criterion, boundary, and any example — together where that judgment is made, call each thing by one name throughout, and say what a word such as *this* or *as needed* points to. A reader cannot reliably assemble an intent from scattered mentions, reads two names as two things, and fills a vague word with its own guess.
 
 Where a skill's own result can drift from its criteria — a document, a plan, a review — end its work by checking that result against those criteria before reporting it done: a tool where *Decide what a tool should own* gives one, a reread against the criteria for the rest. The wall belongs where the drift happens.
+
+Lay out the whole before its parts. A reader takes a file in from the top, sometimes from its first screen alone, and keeps the order it can see. Wherever a file's parts make one whole — stages that follow, return, or resume in a later session, skills that hand work to one another, the steps of one procedure, parts that depend on each other — draw that whole in a short map before explaining any part: each part with the section or file that holds its rules, each arrow marked with what moves it, and every check the work must pass, such as a review or a verification, as a part of its own. The sections then follow the map's order under the names it uses, so the map indexes them instead of summarizing beside them, and a rule several parts share sits once, before them or where they point to it. A whole that fits in one short list needs no map beyond that list. An order spread through paragraphs is rebuilt differently by each reader, and the step at its end, usually the check, is the first one dropped.
+
+Give each block the form its content asks of the reader — prose for purpose, reasons, and judgment; a numbered list only for an order that must hold; bullets for a set without order; a table for several things compared on the same attributes; a code block for a map, a template, or an exact form; and, for a long procedure whose place the reader must not lose, a checklist it copies into its own work and ticks off. One section holds one stage or one judgment, under a heading that says what it decides or does in the words the text uses elsewhere. Keep one convention for headings, labels, and emphasis across the package: the reader learns the layout from the first file it opens and looks for it in the next, and emphasis on everything marks nothing, so keep it for what changes behavior when missed. A file opened on a condition begins with one line saying what it owns and when it is read, and a long one lists its sections at the top, since a reader may preview only its top. A document the skill writes for a later reader takes its form the same way, given in the skill through the shapes below.
 
 A reader copies what it sees more faithfully than what it is told, so wherever a shape repeats, show it:
 
