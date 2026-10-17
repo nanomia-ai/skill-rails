@@ -17,18 +17,21 @@ start or resume
         │
         ▼
 SOURCE  design and refine with the user ⟲      nothing is built      § Author or change one target
-        ⇅  REVIEW when a change alters what another AI decides or does:   § Review before you conclude
-           read it as its user would, hold it to this skill, fix at the owner
+        ├─ a change alters what another AI decides or does ──→ REVIEW   § Review before you conclude
+        │     read it as its user would and hold it to this skill
+        │     a finding ──→ fix at the owner, then REVIEW again from the entry
+        │     a pass that finds nothing new ──→ back to SOURCE
         │  the user asks to build or test                                § Build, test, and deliver when the user asks
         ▼
 ROUTE   recorded? ── no ──→ references/delivery.md: user chooses A, B, C, or D ──→ record it
         │
         ▼
 BUILD   source ──→ the standalone skill folder the route needs      references/build-and-test.md
+        │  build or check returns ERROR ──→ stop and follow its nextAction
         │  when a test was asked
         ▼
 TEST    put it in place on this machine by the route ──→ a fresh AI uses it
-        │
+        │  the run falls short ──→ keep what it showed and resolve the cause at its owner; a source fix returns to SOURCE
         ▼
 back to SOURCE: a later change is a source change; built and installed copies stay behind until the next build, so say so
 ```
@@ -79,7 +82,7 @@ Keep what one judgment needs — its purpose, criterion, boundary, and any examp
 
 Where a skill's own result can drift from its criteria — a document, a plan, a review — end its work by checking that result against those criteria before reporting it done: a tool where *Decide what a tool should own* gives one, a reread against the criteria for the rest. The wall belongs where the drift happens.
 
-Lay out the whole before its parts. A reader takes a file in from the top, sometimes from its first screen alone, and keeps the order it can see. Wherever a file's parts make one whole — stages that follow, return, or resume in a later session, skills that hand work to one another, the steps of one procedure, parts that depend on each other — draw that whole in a short map before explaining any part: each part with the section or file that holds its rules, each arrow marked with what moves it, and every check the work must pass, such as a review or a verification, as a part of its own. The sections then follow the map's order under the names it uses, so the map indexes them instead of summarizing beside them, and a rule several parts share sits once, before them or where they point to it. A whole that fits in one short list needs no map beyond that list. An order spread through paragraphs is rebuilt differently by each reader, and the step at its end, usually the check, is the first one dropped.
+Lay out the whole before its parts. A reader takes a file in from the top, sometimes from its first screen alone, and keeps the order it can see. Wherever a file's parts make one whole — stages that follow, return, or resume in a later session, skills that hand work to one another, the steps of one procedure, parts that depend on each other — draw that whole in a short map before explaining any part: each part with the section or file that holds its rules, every check the work must pass, such as a review or a verification, as a part of its own, and each transition, a failed check's included, stating in words where it starts, what triggers it, and where it leads, so that no route depends on the placement of lines or arrows alone, since a reader takes a text drawing one line at a time. The sections then follow the map's order under the names it uses, so the map indexes them instead of summarizing beside them: each transition points to the section that owns its details and exceptions and never directs a move those conditions forbid, and a rule several parts share sits once, before them or where they point to it. A whole that fits in one short list needs no map beyond that list. An order spread through paragraphs is rebuilt differently by each reader, and the step at its end, usually the check, is the first one dropped.
 
 Give each block the form its content asks of the reader — prose for purpose, reasons, and judgment; a numbered list only for an order that must hold; bullets for a set without order; a table for several things compared on the same attributes; a code block for a map, a template, or an exact form; and, for a long procedure whose place the reader must not lose, a checklist it copies into its own work and ticks off. One section holds one stage or one judgment, under a heading that says what it decides or does in the words the text uses elsewhere. Keep one convention for headings, labels, and emphasis across the package: the reader learns the layout from the first file it opens and looks for it in the next, and emphasis on everything marks nothing, so keep it for what changes behavior when missed. A file opened on a condition begins with one line saying what it owns and when it is read, and a long one lists its sections at the top, since a reader may preview only its top. A document the skill writes for a later reader takes its form the same way, given in the skill through the shapes below.
 
