@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "targetId": "skill-rails",
+  "entry": "SKILL.source.md",
+  "imports": ["skill-evolution-method"],
+  "references": ["references/build-and-test.md", "references/maintenance-docs.md", "references/delivery.md", "references/tools.md", "references/new-package.md"],
+  "headingIndex": "skill-evolution-method",
+  "embeddedCoreTooling": "authoring-cli-v1"
+}

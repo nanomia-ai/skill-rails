@@ -81,10 +81,10 @@ test("authoring target materializes the skill evolution method and a semantic-fr
   const root = await temporary(t, "evolution-method-index");
   const left = join(root, "left");
   const right = join(root, "right");
-  assert.equal(coreCli("build", "--source", "authoring-package.json", "--target", "skill-rails", "--out", left).status, 0);
-  assert.equal(coreCli("build", "--source", "authoring-package.json", "--target", "skill-rails", "--out", right).status, 0);
-  const original = await readFile(resolve(repositoryRoot, "docs/guide/ai-skill-evolution-method_ko.md"));
-  assert.deepEqual(await readFile(join(left, "references", "skillEvolutionMethod.md")), original);
+  assert.equal(coreCli("build", "--source", "source/skill-package.json", "--target", "skill-rails", "--out", left).status, 0);
+  assert.equal(coreCli("build", "--source", "source/skill-package.json", "--target", "skill-rails", "--out", right).status, 0);
+  const original = await readFile(resolve(repositoryRoot, "source/modules/skill-evolution-method_ko.md"));
+  assert.deepEqual(await readFile(join(left, "references", "skill-evolution-method.md")), original);
   const entry = await readFile(join(left, "SKILL.md"), "utf8");
   assert.match(entry, /smallest complete always-read contract/u);
   assert.match(entry, /does not need the block yet/u);
@@ -94,18 +94,18 @@ test("authoring target materializes the skill evolution method and a semantic-fr
   assert.match(entry, /actually reads, runs, or writes something it does not declare/u);
   assert.match(entry, /Treat a hand-off that these texts do not state as absent rather than inferring it/u);
   assert.match(entry, /references\/tools\.md/u);
-  assert.deepEqual(await readFile(join(left, "references", "tools.md")), await readFile(resolve(repositoryRoot, "authoring/skill-rails/tools.md")));
+  assert.deepEqual(await readFile(join(left, "references", "tools.md")), await readFile(resolve(repositoryRoot, "source/targets/skill-rails/references/tools.md")));
   assert.match(entry, /rely on an earlier reading of the source, or on a check or output made from it/u);
   assert.match(entry, /Build and integrity checks prove only the properties they check/u);
   assert.match(entry, /references\/new-package\.md/u);
   assert.match(entry, /references\/build-and-test\.md/u);
-  assert.deepEqual(await readFile(join(left, "references", "build-and-test.md")), await readFile(resolve(repositoryRoot, "authoring/skill-rails/build-and-test.md")));
-  assert.match(entry, /references\/project-docs\.md/u);
-  assert.deepEqual(await readFile(join(left, "references", "project-docs.md")), await readFile(resolve(repositoryRoot, "authoring/skill-rails/project-docs.md")));
+  assert.deepEqual(await readFile(join(left, "references", "build-and-test.md")), await readFile(resolve(repositoryRoot, "source/targets/skill-rails/references/build-and-test.md")));
+  assert.match(entry, /references\/maintenance-docs\.md/u);
+  assert.deepEqual(await readFile(join(left, "references", "maintenance-docs.md")), await readFile(resolve(repositoryRoot, "source/targets/skill-rails/references/maintenance-docs.md")));
   assert.match(entry, /references\/delivery\.md/u);
-  assert.deepEqual(await readFile(join(left, "references", "delivery.md")), await readFile(resolve(repositoryRoot, "authoring/skill-rails/delivery.md")));
-  assert.deepEqual(await readFile(join(left, "references", "skillEvolutionMethod.index.json")), await readFile(join(right, "references", "skillEvolutionMethod.index.json")));
-  const index = JSON.parse(await readFile(join(left, "references", "skillEvolutionMethod.index.json"), "utf8"));
+  assert.deepEqual(await readFile(join(left, "references", "delivery.md")), await readFile(resolve(repositoryRoot, "source/targets/skill-rails/references/delivery.md")));
+  assert.deepEqual(await readFile(join(left, "references", "skill-evolution-method.index.json")), await readFile(join(right, "references", "skill-evolution-method.index.json")));
+  const index = JSON.parse(await readFile(join(left, "references", "skill-evolution-method.index.json"), "utf8"));
   assert.equal(index.source.sha256, sha256(original));
   assert.equal(index.source.byteLength, original.length);
   assert.deepEqual(index.sections.slice(0, 3).map(({ sectionId, level, parent }) => ({ sectionId, level, parent })), [
@@ -134,7 +134,7 @@ test("authoring target materializes the skill evolution method and a semantic-fr
 test("generated authoring CLI operates from a separate source project", async (t) => {
   const root = await temporary(t, "embedded-authoring-cli");
   const authoring = join(root, "installed-skill");
-  assert.equal(coreCli("build", "--source", "authoring-package.json", "--target", "skill-rails", "--out", authoring).status, 0);
+  assert.equal(coreCli("build", "--source", "source/skill-package.json", "--target", "skill-rails", "--out", authoring).status, 0);
   const cli = join(authoring, "scripts", "skill-rails-cli", "src", "core", "cli.mjs");
   const helpOutputs = [runNode([cli]), runNode([cli, "help"]), runNode([cli, "--help"])];
   for (const help of helpOutputs) {

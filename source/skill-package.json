@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 2,
+  "packageId": "skill-rails-authoring",
+  "packageVersion": "2.0.8",
+  "modules": {
+    "skill-evolution-method": "modules/skill-evolution-method_ko.md"
+  },
+  "targets": {
+    "skill-rails": "targets/skill-rails/target.json"
+  }
+}

@@ -1063,3 +1063,30 @@ Sonnet이 entry를 읽은 실행 기준 자기 검토 비율과 "다른 AI가 �
 검증자 20–25차를 거쳤다. 그 과정에서 검증자는 자기 권고 셋을 철회했다(18차 "같은 원문은 빌드 때 재리뷰 불요", 20차 "결과 반환 시만", 22차 삭제 동의). 실행 결과는 verification 문서에 있다.
 
 **다시 여는 조건:** entry를 읽은 실행이 결과를 내기 전에 검토하지 않아 결함이 사용자에게 간 장면이 나오면 연다. 그때도 문장을 덧대지 말고 작업 구조에서 원인을 찾는다.
+
+## E-049 — 원본을 `source/` 한 곳에 모으고, 역사 자료는 태그로 보낸다
+
+상태: **commit, 미배포**
+
+### 실제 문제
+
+- **공개 방문자에게 직관적이지 않았다.**
+  - 저작 원본이 흩어져 있었다. 루트의 `authoring-package.json`, `authoring/skill-rails/`, 그 안의 `targets/authoring/target.json`(entry `../../SKILL.source.md`)이다. 같은 대상을 가리키는 폴더 이름도 섞여 있었다.
+  - 배포되는 판단 방법 원문이 사람용 문서 폴더(`docs/guide/`)에 있었다.
+  - 배포 references 가운데 `skillEvolutionMethod.md`만 camelCase였다.
+  - 다른 곳에서는 모두 "maintenance documents"라고 부르는 문서의 파일 이름만 `project-docs.md`였다.
+- **역사 자료가 HEAD에 남아 있었다.** `evals/m4–m8`(v1 record·prepare 구조의 2026-09 시험 결과, 8.7MB)과 `legacy/archive/v0.4.3/`(2.7MB) capsule은 현재 제품과 결정에 쓰이지 않는다.
+
+### 선택
+
+- **배치:** `source/skill-package.json`, `source/modules/skill-evolution-method_ko.md`, `source/targets/skill-rails/{target.json, SKILL.source.md, references/}`. 이 스킬이 새 package에 권하는 배치와 같다. manifest 폴더가 원본 경계이므로 방법 원문도 함께 옮겼다. 동결 상세 계획의 루트 manifest 결정을 이것으로 대체한다(동결 문서는 수정하지 않는다).
+- **이름:** module ID는 `skill-evolution-method`이고, 배포 이름은 `references/skill-evolution-method.md`와 `.index.json`이다. 내용 hash는 같다. `project-docs.md`는 `maintenance-docs.md`로 바꿨다. 설치한 사람이 없어 호환 비용이 없다(사용자 확인).
+- **역사 자료:** `evals/`와 `legacy/`를 HEAD에서 지웠다(사용자 승인). 둘 다 tag `v2.0.8`의 같은 경로에서 복구한다. v0.4.3 원본 비교는 tag `v0.4.3`으로 한다.
+- **죽은 코드:** CLI `validate.mjs`의 `LEGACY_REFERENCE_FORBIDDEN` 검사는 원본 루트가 저장소 루트일 때만 동작했다. 원본을 옮겨 더는 실행되지 않고, 막을 대상도 지웠으므로 함께 지웠다.
+- **유지한 것:** `src/`(코드)와 `source/`(스킬 원본)가 함께 있는 것은 각각의 보편 관례라 두었다. `contracts/`, 동결 링크용 `docs/guide/universal-…` 안내(목적지만 갱신), 완료된 v1.0.1 계획, 결정 기록 파일 이름도 유지했다.
+
+### 검증
+
+- 2회 빌드 hash가 같았다. `check`는 `artifactIntact`와 `sourceCurrent` 모두 true였다. `npm test` 37개 통과, 1개 건너뜀.
+- 배포 스킬을 HEAD와 비교했다. 바뀐 것은 경로 언급 세 곳, 원본 표시 줄, 파일 이름 두 개, 죽은 검사 3줄뿐이다.
+- 배포 스킬이 언급하는 references와 scripts 경로는 모두 실제로 있다.

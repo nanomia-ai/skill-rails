@@ -26,19 +26,19 @@ Skill Rails는 AI가 사용할 독립적인 skill을 canonical source package에
 - 기본 상태는 artifact-derived다. 대화나 run scratch를 durable semantic truth로 만들지 않는다.
 - 사람의 전체 구조 질문에는 `overview --source`가 current graph에서 계산한 non-authoritative view 하나만 사용한다. 저장 정본, generated skill 또는 AI runtime의 입력이 아니다.
 - AI는 의미를 판단하고 host tool을 선택한다. Core는 자유 산문의 진실성이나 AI 준수를 보장하지 않는다. 도구 검사 통과는 그 도구가 검사한 것만 증명한다.
-- `prepare-record`, observer, packet, fallback은 제품에 없다. M1~M4 재현은 tag `v1.3.7`에서 별도 root로 하며, 고유 결과는 `evals/*/results/`에 남는다.
+- `prepare-record`, observer, packet, fallback은 제품에 없다. M1~M4 재현은 tag `v1.3.7`에서 별도 root로 하며, 고유 결과는 tag `v2.0.8`의 `evals/*/results/`에서 복구한다.
 
 ## 저작 스킬
 
-- Canonical source는 `authoring/skill-rails/`와 repository root의 `authoring-package.json`, 선택형 판단 원문은 `docs/guide/ai-skill-evolution-method_ko.md`(유지보수자와 저작 스킬이 함께 쓰는 단일 정본), generated tracked skill은 `skills/skill-rails/`다.
+- Canonical source는 `source/`(manifest `source/skill-package.json`, target `source/targets/skill-rails/`), 선택형 판단 원문은 module `source/modules/skill-evolution-method_ko.md`(유지보수자와 저작 스킬이 함께 쓰는 단일 정본), generated tracked skill은 `skills/skill-rails/`다.
 - 저작 스킬은 고정 CLI closure(`embeddedCoreTooling: "authoring-cli-v1"`)를 `scripts/skill-rails-cli/`로 실어 sibling 없이 author→build→check→inspect를 한다.
-- 저작 흐름은 SOURCE ⇄ REVIEW → ROUTE → BUILD → TEST다. REVIEW는 다른 AI의 판단·행동을 바꾸는 변경을 결론 전에 그 스킬을 쓸 AI처럼 읽고 저작 기준으로 다시 대조한다. 빌드·시험·전달은 사용자가 요청할 때만 시작한다.
+- 저작 흐름은 SOURCE ⇄ REVIEW → ROUTE → BUILD → TEST다. REVIEW는 기획이나 원문 변경을 사용자에게 결과로 내놓기 전, 그리고 빌드 직전(배포될 target 전체)에 서는 벽이다. 작성 AI가 그 스킬을 쓸 AI처럼 읽고, 저작 기준과 대조하고, 바꾸기 전 판과 비교해 퇴보를 찾는다. 깊이는 드리프트할 수 있는 만큼이고, 다른 에이전트는 사용자가 요청할 때만 쓴다. 빌드·시험·전달은 사용자가 요청할 때만 시작한다.
 - 테스트 전용 pilot domain과 fixture는 `tests/fixtures/`에 있다.
 
 ## 배포와 권한
 
 - Repository/package identity는 `nanomia-ai/skill-rails`와 private metadata `@nanomia/skill-rails`, generated skill identity는 `skill-rails`다. Public delivery는 repository-based `npx skills@latest` 경로이며 npm registry에 발행하지 않는다.
 - 실제 host 검증은 generated package가 준비된 뒤 표준 installer 경로에서 수행한다. 설치 도구가 건너뛰거나 바꾸는 파일이 있으므로 도구를 싣는 target은 설치본 `check`와 도구 실행으로 route를 확인한다.
-- Release, push, 전역 설치 교체, published identity와 `latest` cutover는 사용자의 명시 승인 범위에서만 수행한다. Force push/history rewrite, README 변경과 legacy archive 삭제는 승인되지 않았다.
+- Release, push, 전역 설치 교체, published identity와 `latest` cutover는 사용자의 명시 승인 범위에서만 수행한다. Force push/history rewrite와 승인 범위(E-049의 방법 문서 링크 경로) 밖의 README 변경은 승인되지 않았다. legacy capsule과 v1 결과는 사용자 승인으로 HEAD에서 지웠고(E-049), 복원에는 별도 승인이 필요하다.
 
 정확한 구현 계약과 milestone은 동결 상세 계획이, 구현 중 차이는 Evolution 문서가 소유한다.

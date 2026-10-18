@@ -244,9 +244,6 @@ export async function loadSourceGraph(manifestPath) {
   }
   assertNoCaseFoldCollisions([...targets.keys()], "target IDs");
   assertNoCaseFoldCollisions(sourcePathSpellings, "source paths");
-  if (rootReal === repositoryRoot) {
-    for (const spelling of sourcePathSpellings) if (spelling === "legacy" || spelling.startsWith("legacy/")) fail("LEGACY_REFERENCE_FORBIDDEN", `Active source references archived legacy path: ${spelling}`, "Move the requirement into current canonical source without importing legacy runtime material.");
-  }
 
   const packageJson = await readJsonFile(resolve(repositoryRoot, "package.json"), "package.json");
   return {

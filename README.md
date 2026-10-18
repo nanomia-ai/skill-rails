@@ -238,4 +238,4 @@ One source package may contain several build targets, but every generated skill 
 - [Skill Rails usage procedure](skills/skill-rails/SKILL.md)
 - [Product purpose and architecture (Korean)](docs/skill-rails_ko.md)
 - [Implementation and verification scope (Korean)](docs/implementation-verification_ko.md)
-- [Method for evolving AI skills (Korean)](docs/guide/ai-skill-evolution-method_ko.md)
+- [Method for evolving AI skills (Korean)](source/modules/skill-evolution-method_ko.md)

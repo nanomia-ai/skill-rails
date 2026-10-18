@@ -238,4 +238,4 @@ Skill Rails는 AI가 사용할 독립적인 스킬을 만들고 유지하기 위
 - [Skill Rails 사용 절차](skills/skill-rails/SKILL.md)
 - [제품 목적과 구조](docs/skill-rails_ko.md)
 - [구현과 검증 범위](docs/implementation-verification_ko.md)
-- [스킬을 발전시킬 때 사용하는 판단 방법](docs/guide/ai-skill-evolution-method_ko.md)
+- [스킬을 발전시킬 때 사용하는 판단 방법](source/modules/skill-evolution-method_ko.md)

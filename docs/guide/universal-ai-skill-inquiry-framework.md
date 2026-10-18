@@ -2,4 +2,4 @@
 
 이 파일은 동결된 v1 계획 문서의 역사적 링크를 보존하는 비정본 안내다.
 
-현재 정본은 [AI 스킬 진화 방법](./ai-skill-evolution-method_ko.md)이다. 새 참조와 수정은 현재 정본 경로만 사용한다.
+현재 정본은 [AI 스킬 진화 방법](../../source/modules/skill-evolution-method_ko.md)이다. 새 참조와 수정은 현재 정본 경로만 사용한다.

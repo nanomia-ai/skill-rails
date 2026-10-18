@@ -2,7 +2,7 @@
 name: skill-rails
 description: Design, build, and maintain standalone AI skills from a canonical source package, with prose for judgment and declared tools for exact work, built deterministically into skill folders. Use when creating, changing, splitting, testing, or delivering an AI skill as a source package (`skill-package.json`), including starting a project's first one, or when a built skill's delivery or evidence is in question.
 ---
-<!-- generated; do not edit; source: authoring/skill-rails/SKILL.source.md; receipt: .skill-rails-build.json -->
+<!-- generated; do not edit; source: targets/skill-rails/SKILL.source.md; receipt: .skill-rails-build.json -->
 
 # Skill Rails
 
@@ -37,7 +37,7 @@ TEST    put it in place on this machine by the route ──→ a fresh AI uses i
 back to SOURCE: a later change is a source change; built and installed copies stay behind until they are rebuilt and put in place again, so say so
 ```
 
-Join the cycle where the user is. When the user chooses or later asks for the recommended maintenance documents, set them up with `references/project-docs.md`. Before an authoring or maintenance judgment, read §§0–0.1 of `references/skillEvolutionMethod.md` (the method), choose any further sections from its routing table by the decision at hand, and set how deep to go with its §2; its generated `skillEvolutionMethod.index.json` only locates byte ranges and defines no meaning or task list.
+Join the cycle where the user is. When the user chooses or later asks for the recommended maintenance documents, set them up with `references/maintenance-docs.md`. Before an authoring or maintenance judgment, read §§0–0.1 of `references/skill-evolution-method.md` (the method), choose any further sections from its routing table by the decision at hand, and set how deep to go with its §2; its generated `skill-evolution-method.index.json` only locates byte ranges and defines no meaning or task list.
 
 ## Work from canonical source
 
@@ -96,7 +96,7 @@ a result that must match     → the form itself, its fields and order fixed    
 
 For instance, a skill with two modes gives each its own block, `## Review` and `## Fix`, instead of one paragraph that describes both; each has the same fields, such as *When*, *Produces*, and *Stops when*, whose names are that skill's own.
 
-Apply §5, §§8.3–8.4, and §9 of `references/skillEvolutionMethod.md` before writing more at each of these moments: before turning guidance into a list of cases, before adding a rule, exception, or tool to patch a failure, when the same sentence needs a third fix, and when a review names no failure scene beyond "it could confuse".
+Apply §5, §§8.3–8.4, and §9 of `references/skill-evolution-method.md` before writing more at each of these moments: before turning guidance into a list of cases, before adding a rule, exception, or tool to patch a failure, when the same sentence needs a third fix, and when a review names no failure scene beyond "it could confuse".
 
 ## Review before you present or build
 

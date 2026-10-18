@@ -2,6 +2,8 @@
 
 문서 상태: 현재 구현 범위와 evidence owner
 
+이 문서의 `evals/…`와 `legacy/…` 증거 좌표는 HEAD에서 지워졌으며 tag `v2.0.8`의 같은 경로에서 회수한다(E-049).
+
 ## Claim 규칙
 
 각 claim은 `proven`, `failed`, `unproven`, `out-of-scope` 중 하나다. 구조 검사는 AI 행동을, AI transcript는 host effect를, 성공 exit는 의미 진실성을 대신 증명하지 않는다. 아래 proven은 명시한 bytes·host·scene·authority에만 적용된다.
@@ -32,7 +34,7 @@
 - Generated target 단독 copy에서 repository나 sibling 접근 없이 integrity check가 동작한다.
 - Authoring-side source currentness와 installed artifact integrity가 별도 상태다.
 - `inspect`는 package/module/target/mechanism/artifact의 선언 관계만 exact ID/path JSON으로 반환한다.
-- `authoring/skill-rails`에서 생성한 tracked `skills/skill-rails`은 source-current이고 npm payload는 implementation root를 포함하지 않는다.
+- `source/`에서 생성한 tracked `skills/skill-rails`은 source-current이고 npm payload는 implementation root를 포함하지 않는다.
 - Repository active generated skill은 현재 production candidate `skill-rails` 하나이며 legacy import는 0이다. M1 당시 alpha identity였던 사실과 protocol namespace의 `skill-rails-next` 문자열은 historical evidence/closed contract로 보존한다.
 
 ### Cost receipt
@@ -718,3 +720,5 @@ v2.0.8 release·설치: release commit `95f15a01cfb0a592635dafa46ee81f8afef28dd2
 Release commit `a124001f1afb465fa858ee261d300036be6617e4`를 `origin/main`에 non-force fast-forward했고, annotated tag object `43b6d41c508dba7c469c52982ce1202eb1d4f362`의 `v2.0.0` peeled commit이 같은 release commit임을 `git ls-remote`로 확인했다. 원격 push 뒤 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes --json`을 저장소 밖에서 실행했다. installer hash `9c46d964b829195f8e0357c82f0d520ddcbb0eda7d1df8aade95120796381d69`로 Codex·Claude Code(symlink)에 설치했고, 설치 lock의 source는 `nanomia-ai/skill-rails`(github), skillFolderHash `712ccd685fa8560af6e933760f1d0be6f52c5292`는 release commit의 `skills/skill-rails` tree와 같다. 양쪽 설치본의 내장 CLI `check --out`은 package/core `2.0.0`, tree `eea7f2a2a20002251e6ed5f0770e6e447b7c5504ff6125d82393e35fb648bab3`, artifact-intact를 반환했고 저장소 원문 기준 source-current였다. npm registry publish는 수행하지 않았다.
 
 E-048(미배포 commit): 리뷰 관문을 '결과 앞과 빌드 직전'으로 바꾸고 퇴보 정의를 추가한 원문으로 시험했다. 중간판(cand5)의 Sonnet 9회 결과는 이렇다. 3회는 skill-rails를 부르지 않았다. 부른 6회 중 명시적 자기 검토는 f16·c3 2회였고, 빌드 장면 k1·k2는 빌드와 시험은 정확했지만 빌드 전 리뷰 언급이 없었다. 다단계 흐름 C는 회귀하지 않았다. 마지막 실험(cand8)은 이전 장면·프로젝트를 재사용하지 않은 새 장면 5개, 6회다(scratchpad `pt/fixtures4.py`, `pt/out4/`). 이 설치본의 퇴보 bullet은 첫 문안이고 그 밖의 원문은 commit본과 같으므로, 현재 퇴보 정의를 직접 시험한 것은 아니다. entry를 읽은 4회는 모두 결과 전에 자기 검토를 했다고 보고했다. Sonnet 기획안은 기획안 전에 점검했다. Opus 절반 축약은 수정 전 문장과 대조해 규칙과 이유를 보존했다. Codex medium 규칙 추가·빌드·시험은 전체 검토를 기록했지만 첫 빌드 직전에 했는지는 원자료상 미확인이다. 빌드 2회 hash 일치(`3a919806…`), 빌드본·설치본 check `artifactIntact`·`sourceCurrent` true, 새 에이전트 회의록 1건의 8항목 통과. Codex low 구성안은 사례 둘을 따라갔고 3분할이었다. Sonnet 2회(같은 축약, 오타 하나)는 skill-rails에 진입하지 않았다. 축약 결과는 규칙은 보존했지만 이유 하나를 지웠다. 미진입의 원인은 확정하지 않는다. 집계는 검증자 25차가 원자료로 대조했다.
+
+E-049(미배포 commit): 원본을 `source/`로 옮기고 이름을 정리했다(module `skill-evolution-method`, `maintenance-docs.md`). 판단 방법 원문의 bytes는 v2.0.8과 같다. 2회 빌드 hash가 같았고, `check`의 artifactIntact와 sourceCurrent가 true다. 배포 스킬의 경로 언급은 모두 실재한다. `evals/`와 `legacy/`는 HEAD에서 지웠으며 tag `v2.0.8`에서 복구한다. 이 문서의 앞선 문단에 나오는 옛 경로는 당시의 사실이다.

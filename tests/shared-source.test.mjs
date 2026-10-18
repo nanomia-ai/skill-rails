@@ -9,7 +9,7 @@ test("repository exposes exactly one active generated skill and no active legacy
   const files = [
     "src/core/build.mjs", "src/core/check.mjs", "src/core/cli.mjs", "src/core/inspect.mjs", "src/core/validate.mjs",
     "src/runtime/common.mjs", "src/runtime/integrity.mjs", "src/runtime/run-record.mjs",
-    "authoring-package.json", "authoring/skill-rails/SKILL.source.md",
+    "source/skill-package.json", "source/targets/skill-rails/SKILL.source.md",
     "tests/fixtures/natural-language-pilot/skill-package.json",
   ];
   for (const file of files) assert.doesNotMatch(await readFile(resolve(repositoryRoot, file), "utf8"), /(?:from|import|spawn|fallback)[^\n]*legacy[\\/]/iu, file);
@@ -19,7 +19,7 @@ test("repository exposes exactly one active generated skill and no active legacy
 });
 
 test("authoring generated target is source-current and npm payload excludes implementation roots", async (t) => {
-  const checked = coreCli("check", "--source", "authoring-package.json", "--target", "skill-rails", "--out", "skills/skill-rails");
+  const checked = coreCli("check", "--source", "source/skill-package.json", "--target", "skill-rails", "--out", "skills/skill-rails");
   assert.equal(checked.status, 0, checked.stdout);
   assert.equal(checked.json.sourceCurrent, true);
   const cache = await temporary(t, "npm-cache");
@@ -28,5 +28,5 @@ test("authoring generated target is source-current and npm payload excludes impl
   const result = JSON.parse(packed.stdout);
   const paths = result[0].files.map((item) => item.path.replaceAll("\\", "/"));
   assert.ok(paths.includes("skills/skill-rails/SKILL.md"));
-  for (const forbidden of ["legacy/", "tests/", "src/", "authoring/", "evals/", "docs/"]) assert.equal(paths.some((path) => path.startsWith(forbidden)), false, forbidden);
+  for (const forbidden of ["source/", "tests/", "src/", "docs/"]) assert.equal(paths.some((path) => path.startsWith(forbidden)), false, forbidden);
 });
