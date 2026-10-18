@@ -1,6 +1,7 @@
 ---
 name: skill-rails
 description: Design, build, and maintain standalone AI skills from a canonical source package, with prose for judgment and declared tools for exact work, built deterministically into skill folders. Use when creating, changing, splitting, testing, or delivering an AI skill as a source package (`skill-package.json`), including starting a project's first one, or when a built skill's delivery or evidence is in question.
+license: Apache-2.0
 ---
 <!-- generated; do not edit; source: targets/skill-rails/SKILL.source.md; receipt: .skill-rails-build.json -->
 

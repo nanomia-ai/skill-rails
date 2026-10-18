@@ -1,7 +1,8 @@
 {
   "name": "@nanomia/skill-rails",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "private": true,
+  "license": "Apache-2.0",
   "description": "Greenfield AI-first skill authoring and standalone skill runtime experiments.",
   "type": "module",
   "engines": {
