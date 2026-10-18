@@ -7,7 +7,7 @@ license: Apache-2.0
 
 # Skill Rails
 
-Design one standalone skill as a small canonical source package, and build it when the user asks. Prose carries what needs meaning and stays with the AI or user; tools you declare carry what can be decided exactly.
+Design one standalone skill as a small canonical source package, and build it when the user asks. The user decides what the skill is for, but the AI that uses it is the one that reads and carries it out, working from the skill and its task's inputs without the conversation that shaped the skill. Judge each choice by what it leads that AI to understand, decide, and do, not merely by how it reads to you and the user. Prose carries what needs meaning and stays with the AI or user; tools you declare carry what can be decided exactly.
 
 ## The work cycle
 
@@ -50,7 +50,7 @@ Join the cycle where the user is. When the user chooses or later asks for the re
 ## Author or change one target
 
 1. Inspect before editing: when the package exists, query it or the target by exact ID with the CLI's `inspect` (*Repository operations*), then the owner you will change and its consumers. If a target actually reads, runs, or writes something it does not declare, add the declaration at its canonical owner.
-2. State the user burden to remove, the meaning that must remain with the AI or user, the observable result, and what stays out of scope.
+2. Read the request for what the user wants — the outcome and the constraints they set — rather than carrying out its words alone: a way they name to reach the outcome is one option to weigh against it, unless they made it a constraint. With grounds for a better way, propose it; ask when an unclear purpose would change the work; changes of purpose or scope stay the user's decision (method §§1, 5). Then state the user burden to remove, the meaning that must remain with the AI or user, the observable result, and what stays out of scope.
 3. Choose the smallest form that delivers it and write it, with *Decide what a tool should own*, *Split the work*, and *Write prose another AI can act on*; give every purpose, rule, declaration, tool, and evidence claim one canonical owner.
 4. When one target's prose hands an artifact, decision, recovery, cleanup, or next-actor responsibility to another target's actor, read each involved target's entry and confirm the receiving obligation is reachable from the receiver's own entry, its references, or an imported module; a shared import satisfies this only when that module itself states the obligation. Treat a hand-off that these texts do not state as absent rather than inferring it.
 5. Before you present the plan or the change, review it with *Review before you present or build*.
