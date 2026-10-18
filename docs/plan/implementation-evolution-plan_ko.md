@@ -1121,3 +1121,31 @@ Sonnet이 entry를 읽은 실행 기준 자기 검토 비율과 "다른 AI가 �
 - 빌드는 요청 시에만 한다는 규칙, 리뷰 관문, new-package의 한 번 묻기, 방법 §1의 우선순위와 충돌하지 않음을 원문 대조로 확인했다.
 - 행동 효과(실행 AI 전제를 덜 잊는지)는 실행 시험 전이라 `unproven`이다.
 - **다시 여는 조건:** 요청 해석이 사용자가 정한 제약을 넘거나 질문이 늘어나는 장면, 또는 실행 AI 기준을 놓친 결과가 사용자에게 간 장면이 나오면 연다.
+
+## E-051 — 리뷰 깊이를 정하는 문장이 세 점검을 모두 이름으로 댄다
+
+상태: **v2.0.11 release**
+
+### 실제 문제
+
+- 리뷰 절의 점검은 셋이다(Read as the AI that uses it, Hold it to this skill, Check for regressions). 지도와 bullet도 셋을 든다.
+- 그런데 리뷰의 깊이를 정하는 When 문장은 뜻을 바꾸는 변경에 "the reading test below" 하나만 이름을 댔다. AI는 이 문장으로 할 일을 고르므로, 읽기 시험만 하고 끝낼 여지가 있었다. 리뷰는 했지만 독자 읽기를 빠뜨린 과거 관찰(v2.0.5 C·F)은 당시 문장이 달라 직접 증거는 아니다. 그래도 일부 항목만 하는 실패가 실제로 있음을 보여 준다.
+- 같은 문장의 "another AI"는 정의되지 않은 일반 영어였다. 바로 아래 "Another reviewer … another agent"와 "another"가 겹쳤다.
+
+### 선택
+
+- When의 세미콜론 뒤를 이렇게 바꿨다. "a plan or change that can alter what the AI using the target skill decides or does needs each of the three checks below: read as the AI that uses it, hold it to this skill, and check for regressions."
+  - Fix bullet의 "as above"가 When을 가리키므로, 다시 리뷰할 때도 셋이 한 pass다.
+  - "the target skill"(저작 대상)과 "this skill"(기준을 주는 Skill Rails)을 구별했다.
+- **기각한 안:**
+  - 항목별 보고: 사용자에게 복잡한 보고를 준다. 목표는 내부 준수다.
+  - "모든 항목을 대조하라"는 문장이나 체크리스트: 세 항목의 중복이다. 깊이 맞추기와 부딪힌다.
+  - "every check below": Another reviewer를 의무로 읽게 할 수 있다.
+- **넓히지 않은 것:** 실행 AI를 가리키는 다른 표현(절 제목의 "another AI", "the next AI", "a fresh AI")은 오독 장면이 없어 관찰로만 둔다.
+
+### 검증과 재검토 조건
+
+- 검증자 32–34차를 거쳤다. 33차에서 첫 문구의 두 "it"이 서로 다른 대상을 가리킨다는 결함을 찾아, 대상 스킬을 명시하는 것으로 고쳤다.
+- 읽기 시험 연결(Read-as bullet의 §8.4, entry의 §§8.3–8.4 진입)은 유지된다.
+- 누락률 감소는 `unproven`이다.
+- **다시 여는 조건:** 리뷰가 세 점검 중 일부만 하고 끝낸 장면이 나오면 연다.
