@@ -90,12 +90,12 @@ test("authoring target materializes the skill evolution method and a semantic-fr
   assert.match(entry, /does not need the block yet/u);
   assert.match(entry, /Never put apart things that must be judged together/u);
   assert.match(entry, /## Decide what a tool should own/u);
-  assert.match(entry, /## Review before you conclude/u);
+  assert.match(entry, /## Review before you present or build/u);
   assert.match(entry, /actually reads, runs, or writes something it does not declare/u);
   assert.match(entry, /Treat a hand-off that these texts do not state as absent rather than inferring it/u);
   assert.match(entry, /references\/tools\.md/u);
   assert.deepEqual(await readFile(join(left, "references", "tools.md")), await readFile(resolve(repositoryRoot, "authoring/skill-rails/tools.md")));
-  assert.match(entry, /rely on an earlier reading of the source for a later decision/u);
+  assert.match(entry, /rely on an earlier reading of the source, or on a check or output made from it/u);
   assert.match(entry, /Build and integrity checks prove only the properties they check/u);
   assert.match(entry, /references\/new-package\.md/u);
   assert.match(entry, /references\/build-and-test\.md/u);

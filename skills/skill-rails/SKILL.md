@@ -17,13 +17,12 @@ start or resume
         │
         ▼
 SOURCE  design and refine with the user, over as many passes as needed; nothing is built      § Author or change one target
-        │  before a change is reported done or built
+        │  a plan or change is ready to present, or the user asks to build or test
         ▼
-REVIEW  of a change that alters what another AI decides or does      § Review before you conclude
-        │  read it yourself as its user would and hold it to this skill
+REVIEW  read it yourself as the AI that uses it would, hold it to this skill, and check for regressions against what it replaces; before a build, the whole target as it will ship      § Review before you present or build
         │  a finding ──→ fix at the owner, then REVIEW again from the entry
-        │  nothing left to fix, or no such change ──→ the change is done: report how it was reviewed, what that found, and which built copies stay behind
-        │  the user asks to build or test                                § Build, test, and deliver when the user asks
+        │  nothing left to fix ──→ present the result with how it was reviewed and what that found
+        │  nothing left to fix, and a build or test was asked                § Build, test, and deliver when the user asks
         ▼
 ROUTE   recorded? ── no ──→ references/delivery.md: user chooses among routes A–D ──→ record it
         │
@@ -45,7 +44,7 @@ Join the cycle where the user is. When the user chooses or later asks for the re
 - Change the manifest, target descriptor, entry, module, reference, tool, or record file that owns the behavior, never generated output or runtime state; a folder carrying `.skill-rails-build.json` is generated and never hand-edited.
 - Declare only the modules, references, tools, and record files a target actually uses. The build fails closed on unknown fields, undeclared paths, root escapes, and colliding outputs. Manifest paths are relative to the manifest, whose directory is the root every source path must stay inside; a descriptor's file paths are relative to that descriptor, and a record's declared inputs and output to the project; the closed schemas in `scripts/skill-rails-cli/contracts/` define the fields.
 - Use exact IDs and paths. Do not infer requirement, check, effect, or causal relationships the source does not declare.
-- Before you rely on an earlier reading of the source for a later decision, or report it as final, reread the source files it rested on and confirm it still holds; skip the reread only when those files have not changed since you read them. If a stale input or output invalidates an answer, reread current sources instead of transplanting the old answer.
+- Before you rely on an earlier reading of the source, or on a check or output made from it, for a later decision, or report it as final, reread what it rested on and confirm it still holds; skip the reread only when those files have not changed since you read them.
 
 ## Author or change one target
 
@@ -53,7 +52,7 @@ Join the cycle where the user is. When the user chooses or later asks for the re
 2. State the user burden to remove, the meaning that must remain with the AI or user, the observable result, and what stays out of scope.
 3. Choose the smallest form that delivers it and write it, with *Decide what a tool should own*, *Split the work*, and *Write prose another AI can act on*; give every purpose, rule, declaration, tool, and evidence claim one canonical owner.
 4. When one target's prose hands an artifact, decision, recovery, cleanup, or next-actor responsibility to another target's actor, read each involved target's entry and confirm the receiving obligation is reachable from the receiver's own entry, its references, or an imported module; a shared import satisfies this only when that module itself states the obligation. Treat a hand-off that these texts do not state as absent rather than inferring it.
-5. Review the change with *Review before you conclude*. A change that the review's *When* covers is not done until that review has run, however small the change looks; your report says how it was reviewed and what that found.
+5. Before you present the plan or the change, review it with *Review before you present or build*.
 
 ## Decide what a tool should own
 
@@ -79,9 +78,9 @@ Make separate skills for responsibilities that start independently — their own
 
 Give a fresh AI the destination, why it matters, and the criteria and boundaries for choosing its own route; a fixed sequence only where order, state, external effect, or approval changes the result; what must not happen by its nature and why, not as a closed list; and a wall a wrong turn will hit, whether a tool's check or a boundary a reviewer can test. A reader treats every listed step or item as a duty, drops some under load, and has nothing to reason from when its case is not listed.
 
-Keep what one judgment needs — its purpose, criterion, boundary, and any example — together where that judgment is made, call each thing by one name throughout, and say what a word such as *this* or *as needed* points to. A reader cannot reliably assemble an intent from scattered mentions, reads two names as two things, and fills a vague word with its own guess.
+Keep what one judgment needs — its purpose, criterion, boundary, and any example — together where that judgment is made, call each thing by one name throughout, say what a word such as *this* or *as needed* points to, and use no name that only your conversation with the user defined. A reader cannot reliably assemble an intent from scattered mentions, reads two names as two things, fills a vague word with its own guess, and knows nothing that was said while the skill was written.
 
-Where a skill's own result can drift from its criteria — a document, a plan, a review — end its work by checking that result against those criteria before reporting it done: a tool where *Decide what a tool should own* gives one, a reread against the criteria for the rest. The wall belongs where the drift happens.
+Where a skill's own result can drift from its criteria — a document, a plan, a review — end its work by checking that result against those criteria before presenting it: a tool where *Decide what a tool should own* gives one, a reread against the criteria for the rest. The wall belongs where the drift happens.
 
 Lay out the whole before its parts. A reader takes a file in from the top, sometimes from its first screen alone, and keeps the order it can see. Wherever a file's parts make one whole — stages that follow, return, or resume in a later session, skills that hand work to one another, the steps of one procedure, parts that depend on each other — draw that whole in a short map before explaining any part: each part with the section or file that holds its rules, every check the work must pass, such as a review or a verification, as a part of its own, and each transition, a failed check's included, stating in words where it starts, what triggers it, and where it leads, so that no route depends on the placement of lines or arrows alone, since a reader takes a text drawing one line at a time. The sections then follow the map's order under the names it uses, so the map indexes them instead of summarizing beside them: each transition points to the section that owns its details and exceptions and never directs a move those conditions forbid, and a rule several parts share sits once, before them or where they point to it. A whole that fits in one short list needs no map beyond that list. An order spread through paragraphs is rebuilt differently by each reader, and the step at its end, usually the check, is the first one dropped.
 
@@ -99,13 +98,14 @@ For instance, a skill with two modes gives each its own block, `## Review` and `
 
 Apply §5, §§8.3–8.4, and §9 of `references/skillEvolutionMethod.md` before writing more at each of these moments: before turning guidance into a list of cases, before adding a rule, exception, or tool to patch a failure, when the same sentence needs a third fix, and when a review names no failure scene beyond "it could confuse".
 
-## Review before you conclude
+## Review before you present or build
 
-A draft drifts toward what was easiest to write, and its author reads it with intentions the next AI will not have. Review applies this skill's criteria again, as a wall, before you call a change done or build it.
+A draft drifts toward what was easiest to write, and its author reads it with intentions the next AI will not have. Review is the wall that stops that drift before it leaves your hands: apply this skill's criteria again before the user sees a result and again before a build fixes what ships, and present the result with how you reviewed it and what that found.
 
-- When: after a change that alters what another AI will decide or do — a new target, a changed criterion or boundary, a new or changed tool or the step that calls it, a moved file boundary. Spelling or wording that leaves targets, permissions, and behavior the same needs none; a path change that alters what is read, written, or run does.
-- Read as its user, the method's reading test (§8.4): do this read yourself. Start from the changed target's canonical entry and follow its declared reading conditions, with only the inputs its using AI would have, and for one or two realistic tasks trace what the source tells that AI to do, skip, and leave unknown, crediting only what a line actually says, not what you meant. This read works on the source as written and needs no build or install; it is part of finishing the change, not the test the user asks for, so it runs even when the user asked for no build or test. Where the traced behavior departs from the intent, the source is missing a condition, a reason, or an owner.
-- Hold it to this skill: check the change against *Decide what a tool should own*, *Split the work*, and *Write prose another AI can act on*, and across them for what no single section owns: two places that pull the same step different ways, or a sentence that stops what another requires.
+- When: before you present to the user, as the outcome of their request, a plan you propose or a change to the source; and right before a build, over the whole target as it will ship, since changes reviewed one at a time can still pull against each other. A question or a progress note while you work is not such a result. Size the review to what could drift: an edit that changes no meaning needs a reread of it in context; a plan or change that can alter what another AI decides or does needs the reading test below.
+- Read as the AI that uses it, the method's reading test (§8.4): do this read yourself. Start from the target's canonical entry and follow its declared reading conditions, with only the inputs that AI would have, and for one or two realistic tasks trace what the source tells that AI to do, skip, and leave unknown, crediting only what a line actually says, not what you meant; for a plan, trace them through what the plan would have the source say. This read needs no build or install, and it is not the test of the installed skill. Where the traced behavior departs from the intent, the source is missing a condition, a reason, or an owner.
+- Hold it to this skill: check the result against *Decide what a tool should own*, *Split the work*, and *Write prose another AI can act on*, and across them for what no single section owns: two places that pull the same step different ways, or a sentence that stops what another requires.
+- Check for regressions: when the result replaces existing text or behavior, compare it with what it replaces. A regression is the loss or narrowing of anything the user's current requirements still need — a purpose, a constraint, or what a rule covered. Keep a removal only when you can show that what it did is no longer needed or is still done elsewhere; restore any other loss at its owner.
 - A finding names its place, the misreading or failure it leads to, and why; "it could confuse" without a scene is not a finding, and finding nothing is a valid result.
 - Fix at the owner, not where the symptom showed: a missing condition goes to the step that needs it, a fact the reader got wrong may belong to a tool, and removing or clarifying beats adding a rule. After a fix, review again from the entry as above, because a fix can break text it did not touch, and stop when a pass finds nothing left to fix; when the same sentence needs a third fix, decide with method §9.2 what is missing instead of rewording it.
 - Another reviewer: when the user asks, also give the review to another agent — a subagent, or one started through a coordinator the user runs. When a wrong change would be costly, or fixes keep failing on the same premise, recommend that in your report rather than starting one unasked. Brief it and weigh its findings as method §10 describes: the background and intent in full, never the result you expect or the problem you suspect; it traces the tasks from the source and inputs alone.
