@@ -126,38 +126,54 @@ function assertSchema(value, schema, label) {
   if (errors.length) fail("SCHEMA_INVALID", `${label} violates its closed schema.`, "Correct the canonical source fields.", errors);
 }
 
-// A tool is delivered byte for byte: it may carry binary templates, so it bypasses text canonicalization.
-async function loadTool(rootReal, id, sourcePath) {
-  const parts = normalizeRelativePath(sourcePath, `tool ${id}`).split("/");
+// A tool or a target's delivered file is copied byte for byte: it may be binary, so it bypasses text canonicalization.
+// A tool path is manifest-relative; a target's file path is descriptor-relative and, like a reference, may climb with "..".
+async function loadDelivered(rootReal, baseReal, label, sourcePath) {
+  const parts = baseReal === rootReal ? normalizeRelativePath(sourcePath, label).split("/") : sourcePath.split("/");
+  if (sourcePath.includes("\\") || isAbsolute(sourcePath) || parts.some((part) => part === "" || part === ".")) fail("PATH_OUTSIDE_ROOT", `${label} must be a relative path using forward slashes with no empty or dot segment: ${sourcePath}`, "Correct the declared path.");
   for (let index = 1; index <= parts.length; index += 1) {
     let stats;
-    try { stats = await lstat(resolve(rootReal, ...parts.slice(0, index))); } catch { break; }
-    if (stats.isSymbolicLink()) fail("SOURCE_PATH_INVALID", `tool ${id} passes through a link: ${parts.slice(0, index).join("/")}`, "Declare the tool by the path of the regular file or folder it should deliver.");
+    try { stats = await lstat(resolve(baseReal, ...parts.slice(0, index))); } catch { break; }
+    if (stats.isSymbolicLink()) fail("SOURCE_PATH_INVALID", `${label} passes through a link: ${parts.slice(0, index).join("/")}`, "Declare it by the path of the regular file or folder it should deliver.");
   }
   let physical;
-  try { physical = await realpath(resolve(rootReal, ...sourcePath.split("/"))); }
-  catch { fail("SOURCE_PATH_MISSING", `tool ${id} does not exist: ${sourcePath}`, "Add the declared tool file or folder, or correct its path."); }
+  try { physical = await realpath(resolve(baseReal, ...parts)); }
+  catch { fail("SOURCE_PATH_MISSING", `${label} does not exist: ${sourcePath}`, "Add the declared file or folder, or correct its path."); }
   const fromRoot = relative(rootReal, physical);
-  if (fromRoot === "" || fromRoot === ".." || fromRoot.startsWith(`..${sep}`) || isAbsolute(fromRoot)) fail("PATH_OUTSIDE_ROOT", `tool ${id} escapes the source root: ${sourcePath}`, "Keep every tool inside its package root.");
+  if (fromRoot === "" || fromRoot === ".." || fromRoot.startsWith(`..${sep}`) || isAbsolute(fromRoot)) fail("PATH_OUTSIDE_ROOT", `${label} escapes the source root: ${sourcePath}`, "Keep every delivered file inside its package root.");
   const path = fromRoot.replaceAll("\\", "/");
   const stats = await lstat(physical);
-  if (stats.isFile()) return { id, path, kind: "file", files: [{ relative: null, path, bytes: await readFile(physical) }] };
-  if (!stats.isDirectory()) fail("SOURCE_PATH_INVALID", `tool ${id} is neither a regular file nor a folder: ${sourcePath}`, "Declare a regular file or a folder of regular files.");
+  if (stats.isFile()) return { path, kind: "file", files: [{ relative: null, path, bytes: await readFile(physical) }] };
+  if (!stats.isDirectory()) fail("SOURCE_PATH_INVALID", `${label} is neither a regular file nor a folder: ${sourcePath}`, "Declare a regular file or a folder of regular files.");
   const files = [];
   const walk = async (current) => {
     const entries = await readdir(current, { withFileTypes: true });
-    if (entries.length === 0) fail("SOURCE_PATH_INVALID", `tool ${id} contains an empty folder: ${relative(rootReal, current).replaceAll("\\", "/") || sourcePath}`, "Add the files the tool needs there, or remove the empty folder; a build delivers files, not empty folders.");
+    if (entries.length === 0) fail("SOURCE_PATH_INVALID", `${label} contains an empty folder: ${relative(rootReal, current).replaceAll("\\", "/") || sourcePath}`, "Add the files it needs there, or remove the empty folder; a build delivers files, not empty folders.");
     for (const entry of entries.sort((a, b) => compareCodePoint(a.name, b.name))) {
       const child = resolve(current, entry.name);
-      if (entry.isSymbolicLink()) fail("SOURCE_PATH_INVALID", `tool ${id} contains a symbolic link: ${relative(rootReal, child).replaceAll("\\", "/")}`, "Replace the link with the regular file it should deliver.");
+      if (entry.isSymbolicLink()) fail("SOURCE_PATH_INVALID", `${label} contains a symbolic link: ${relative(rootReal, child).replaceAll("\\", "/")}`, "Replace the link with the regular file it should deliver.");
       if (entry.isDirectory()) await walk(child);
       else if (entry.isFile()) files.push({ relative: relative(physical, child).replaceAll("\\", "/"), path: relative(rootReal, child).replaceAll("\\", "/"), bytes: await readFile(child) });
-      else fail("SOURCE_PATH_INVALID", `tool ${id} contains a non-regular entry: ${entry.name}`, "Keep only regular files in a tool folder.");
+      else fail("SOURCE_PATH_INVALID", `${label} contains a non-regular entry: ${entry.name}`, "Keep only regular files in a delivered folder.");
     }
   };
   await walk(physical);
-  assertNoCaseFoldCollisions(files.map((file) => file.relative), `tool ${id} files`);
-  return { id, path, kind: "folder", files };
+  assertNoCaseFoldCollisions(files.map((file) => file.relative), `${label} files`);
+  return { path, kind: "folder", files };
+}
+
+// SKILL.md, references/, and scripts/ belong to the entry, references, modules, and tools; the receipt to the build.
+const RESERVED_FILE_PATHS = ["skill.md", ".skill-rails-build.json", "references", "scripts"];
+
+async function loadTargetFiles(rootReal, targetRootReal, target) {
+  const delivered = [];
+  for (const [at, sourcePath] of Object.entries(target.files ?? {}).sort(([a], [b]) => compareCodePoint(a, b))) {
+    const label = `${target.targetId} file ${at}`;
+    const top = normalizeRelativePath(at, label).split("/")[0].toLocaleLowerCase("en-US");
+    if (RESERVED_FILE_PATHS.includes(top)) fail("FILE_PATH_RESERVED", `${label} is a path the build gives to another declaration.`, "Declare what the AI reads as a reference or module and what it runs as a tool; files is only for what another program or a person reads at a fixed path.");
+    delivered.push({ at, ...(await loadDelivered(rootReal, targetRootReal, label, sourcePath)) });
+  }
+  return delivered;
 }
 
 export async function loadSourceGraph(manifestPath) {
@@ -181,7 +197,7 @@ export async function loadSourceGraph(manifestPath) {
 
   const tools = new Map();
   for (const [id, sourcePath] of Object.entries(manifest.tools ?? {}).sort(([a], [b]) => compareCodePoint(a, b))) {
-    const tool = await loadTool(rootReal, id, sourcePath);
+    const tool = { id, ...(await loadDelivered(rootReal, rootReal, `tool ${id}`, sourcePath)) };
     tools.set(id, tool);
     sourcePathSpellings.push(tool.path, ...tool.files.map((file) => file.path));
   }
@@ -239,7 +255,9 @@ export async function loadSourceGraph(manifestPath) {
       record.declaredInputs.forEach((path) => normalizeRelativePath(path, `${target.targetId} declared input`));
       normalizeRelativePath(record.declaredOutput, `${target.targetId} declared output`);
     }
-    targets.set(target.targetId, { alias, path: resolvedTarget.normalized, physical: resolvedTarget.physical, bytes: targetRead.bytes, target, files, referenceNames });
+    const delivered = await loadTargetFiles(rootReal, targetRootReal, target);
+    sourcePathSpellings.push(...delivered.flatMap((entry) => entry.files.map((file) => file.path)));
+    targets.set(target.targetId, { alias, path: resolvedTarget.normalized, physical: resolvedTarget.physical, bytes: targetRead.bytes, target, files, referenceNames, delivered });
     sourcePathSpellings.push(resolvedTarget.normalized);
   }
   assertNoCaseFoldCollisions([...targets.keys()], "target IDs");
@@ -258,7 +276,7 @@ export async function loadSourceGraph(manifestPath) {
     coreVersion: packageJson.value.version,
     sourceGraphSha256: sha256(Buffer.from(canonicalJson({
       manifest: JSON.parse(manifestRead.text),
-      sources: [...modules.values(), ...[...tools.values()].flatMap((tool) => tool.files), ...[...targets.values()].flatMap((item) => [{ path: item.path, bytes: item.bytes }, ...item.files.values()])]
+      sources: [...modules.values(), ...[...tools.values()].flatMap((tool) => tool.files), ...[...targets.values()].flatMap((item) => [{ path: item.path, bytes: item.bytes }, ...item.files.values(), ...item.delivered.flatMap((entry) => entry.files)])]
         .map((item) => ({ path: item.path, sha256: sha256(item.bytes) }))
         .sort((a, b) => compareCodePoint(a.path, b.path)),
     }), "utf8")),

@@ -59,6 +59,10 @@ export function toolArtifactPath(tool, file) {
   return tool.kind === "file" ? `scripts/${tool.id}${extname(tool.path)}` : `scripts/${tool.id}/${file.relative}`;
 }
 
+export function fileArtifactPath(entry, file) {
+  return entry.kind === "file" ? entry.at : `${entry.at}/${file.relative}`;
+}
+
 // Only the fields the record runtime reads; the source descriptor stays the owner of their meaning.
 function recordRuntimeConfig(item) {
   const { record } = item.target;
@@ -83,7 +87,7 @@ export async function planTargetBuild(graph, targetId) {
   const artifacts = new Map();
   const sources = [];
   const put = (path, bytes, owner) => {
-    if (artifacts.has(path)) fail("ARTIFACT_COLLISION", `${targetId} would generate ${path} twice (${owner}).`, "Rename the tool or its file so its delivered path differs from every other artifact.");
+    if (artifacts.has(path)) fail("ARTIFACT_COLLISION", `${targetId} would generate ${path} twice (${owner}).`, "Rename the tool, its file, or the declared file path so its delivered path differs from every other artifact.");
     artifacts.set(path, bytes);
   };
   addSource(sources, "source-package", { path: relative(graph.rootReal, graph.manifestPath).replaceAll("\\", "/"), bytes: graph.manifestBytes });
@@ -111,6 +115,12 @@ export async function planTargetBuild(graph, targetId) {
     for (const file of tool.files) {
       addSource(sources, `tool:${id}`, file);
       put(toolArtifactPath(tool, file), file.bytes, `tool ${id}`);
+    }
+  }
+  for (const entry of item.delivered) {
+    for (const file of entry.files) {
+      addSource(sources, `file:${entry.at}`, file);
+      put(fileArtifactPath(entry, file), file.bytes, `file ${entry.at}`);
     }
   }
   if (item.target.record) {
@@ -145,7 +155,7 @@ export async function planTargetBuild(graph, targetId) {
     const parts = path.split("/");
     for (let index = 1; index < parts.length; index += 1) {
       const ancestor = parts.slice(0, index).join("/");
-      if (folded.has(ancestor.toLocaleLowerCase("en-US"))) fail("ARTIFACT_COLLISION", `${targetId} would generate ${ancestor} as a file and as the folder of ${path}.`, "Rename the tool or its file so its delivered path differs from every other artifact.");
+      if (folded.has(ancestor.toLocaleLowerCase("en-US"))) fail("ARTIFACT_COLLISION", `${targetId} would generate ${ancestor} as a file and as the folder of ${path}.`, "Rename the tool, its file, or the declared file path so its delivered path differs from every other artifact.");
     }
   }
 

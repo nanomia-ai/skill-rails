@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { cp, mkdir, readFile, symlink, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { sha256 } from "../src/core/canonicalize.mjs";
 import { coreCli, fileMap, repositoryRoot, runNode, temporary } from "./helpers.mjs";
 
@@ -132,4 +132,39 @@ test("a linked file inside a tool folder fails closed when the host permits link
   try { await symlink(join(root, "tools", "check-state.mjs"), join(root, "tools", "fill-form", "linked.mjs")); }
   catch (error) { if (["EPERM", "ENOTSUP"].includes(error?.code)) return t.skip(`host cannot create symlink: ${error.code}`); throw error; }
   assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "SOURCE_PATH_INVALID");
+});
+
+test("a target's files land at their declared paths byte for byte and stay out of the paths the build owns", async (t) => {
+  const { root, manifest } = await toolPackage(t, { work: ["check-state"], verify: [] });
+  const icon = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00]);
+  await mkdir(join(root, "targets", "work", "agents"), { recursive: true });
+  await mkdir(join(root, "brand"), { recursive: true });
+  await writeFile(join(root, "targets", "work", "agents", "openai.yaml"), "policy:\r\n  allow_implicit_invocation: false\r\n");
+  await writeFile(join(root, "brand", "icon.png"), icon);
+  const descriptorPath = join(root, "targets", "work", "target.json");
+  const descriptor = JSON.parse(await readFile(descriptorPath, "utf8"));
+  await writeFile(descriptorPath, JSON.stringify({ ...descriptor, files: { "agents/openai.yaml": "agents/openai.yaml", assets: "../../brand" } }));
+  await writeFile(join(root, "targets", "verify", "target.json"), JSON.stringify({ schemaVersion: 2, targetId: "verify", entry: "entry.md", imports: [], tools: [], files: { assets: "../../brand" } }));
+  const out = join(root, "dist", "skills", "work");
+  assert.equal(coreCli("build", "--source", manifest, "--out-root", join(root, "dist")).status, 0);
+  const work = await fileMap(out);
+  assert.deepEqual([...work.keys()].sort(), [".skill-rails-build.json", "SKILL.md", "agents/openai.yaml", "assets/icon.png", "scripts/check-state.mjs"]);
+  assert.deepEqual(work.get("agents/openai.yaml"), await readFile(join(root, "targets", "work", "agents", "openai.yaml")));
+  assert.deepEqual(work.get("assets/icon.png"), icon);
+  const shared = coreCli("inspect", "--source", manifest, "--path", "brand/icon.png", "--json");
+  assert.deepEqual(shared.json.focus, { kind: "file", id: null, path: "brand/icon.png" });
+  assert.deepEqual(shared.json.consumers, ["verify", "work"]);
+  assert.deepEqual(coreCli("inspect", "--source", manifest, "--path", "brand", "--json").json.consumers, ["verify", "work"]);
+  assert.equal(coreCli("check", "--source", manifest, "--target", "work", "--out", out).json.sourceCurrent, true);
+  await writeFile(join(root, "brand", "icon.png"), Buffer.from([0x00]));
+  assert.equal(coreCli("check", "--source", manifest, "--target", "work", "--out", out).json.sourceCurrent, false);
+
+  for (const reserved of ["SKILL.md", "references/extra.md", "Scripts/x.mjs", ".skill-rails-build.json"]) {
+    await writeFile(descriptorPath, JSON.stringify({ ...descriptor, files: { [reserved]: "agents/openai.yaml" } }));
+    assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "FILE_PATH_RESERVED", reserved);
+  }
+  const outside = await temporary(t, "outside");
+  await writeFile(join(outside, "LICENSE.txt"), "outside\n");
+  await writeFile(descriptorPath, JSON.stringify({ ...descriptor, files: { "LICENSE.txt": relative(join(root, "targets", "work"), join(outside, "LICENSE.txt")).replaceAll("\\", "/") } }));
+  assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "PATH_OUTSIDE_ROOT");
 });

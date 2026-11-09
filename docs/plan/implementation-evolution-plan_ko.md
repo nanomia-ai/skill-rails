@@ -1149,3 +1149,33 @@ Sonnet이 entry를 읽은 실행 기준 자기 검토 비율과 "다른 AI가 �
 - 읽기 시험 연결(Read-as bullet의 §8.4, entry의 §§8.3–8.4 진입)은 유지된다.
 - 누락률 감소는 `unproven`이다.
 - **다시 여는 조건:** 리뷰가 세 점검 중 일부만 하고 끝낸 장면이 나오면 연다.
+
+## E-052 — 호스트가 정해진 경로에서 읽는 파일을 target `files`로 싣고, 기존 스킬 옮기기를 안내한다
+
+상태: **v2.1.0 release**
+
+### 실제 문제
+
+- Codex의 기본 스킬 구조는 `agents/openai.yaml`(표시 이름·아이콘·`policy.allow_implicit_invocation`)과 그 파일이 가리키는 `assets/` 아이콘을 포함한다. Codex `skill-creator`의 초기화 스크립트가 모든 새 스킬에 이 파일을 만들고, 설치된 Codex 시스템 스킬 다섯 개 모두 `agents/`를 가진다. Skill Rails 빌드는 `SKILL.md`·`references/`·도구·record·receipt만 만들 수 있어서, Codex에서 이름으로 부를 때만 쓰는 스킬을 만들 수 없었고 기존 Codex 스킬을 옮기면 이 설정을 잃었다. Claude Code의 같은 설정은 frontmatter에 있고 build가 그대로 보존하므로, 한쪽 호스트만 막혀 있었다.
+- 사용자가 기존 스킬을 옮기는 일은 지금 AI로 충분히 가능하다고 판단했다. 다만 옮길 때 원본이 어떤 형태로 보관되는지, 큰 스킬은 여러 단계에 걸쳐 함께 옮긴다는 것을 사용자가 알아야 한다.
+- 출력용 템플릿·데이터는 이미 도구 폴더가 바이트 그대로 싣는다(`references/tools.md`). 그래서 `assets/` 전체를 위한 새 자리는 만들지 않았다.
+- `engines.node` `>=24 <25`는 구현 시작 시 실측한 LTS 하나로 고정한 것이었고 API 요구가 아니었다(동결 계획의 runtime 고정 방침). v2.0.11 코드는 Node 20·22·24·26에서 같은 테스트가 통과하고 빌드가 바이트 단위로 같았다(18은 테스트 보조 코드만 실패). 상한 `<25`는 현행 LTS 26을 범위 밖으로 표시했다.
+
+### 선택
+
+- Target descriptor에 선택 필드 `files`를 더했다. 스킬 폴더 안 경로 → descriptor 기준 원본 경로(파일 또는 폴더)이며, 도구와 같은 로더로 바이트 그대로 싣고 receipt·`check`·currentness·inspect에 들어간다. `SKILL.md`, receipt, `references/`, `scripts/`는 각 선언의 자리라 거부한다(`FILE_PATH_RESERVED`).
+- 누가 스킬을 시작하는지(설명에 맞으면 AI가 스스로, 배포·전송·삭제·지출처럼 사용자가 택해야 할 효과가 있으면 사용자가 이름으로 부를 때만)는 호스트와 무관한 설계 판단이다. Claude Code는 frontmatter `disable-model-invocation: true`, Codex는 `agents/openai.yaml`의 `policy.allow_implicit_invocation: false`로 같은 개념을 표현한다. 이 판단은 frontmatter `description`을 정하는 entry *Split the work* 첫 문단이 한 번 소유하고, 두 호스트의 필드 이름과 '현재 문서로 확인'(틀린 이름은 오류 없이 무시됨)을 함께 둔다. 처음 초안은 이를 Codex 파일의 예로만 다뤄 사례 추가에 가까웠다(사용자 지적).
+- `files`의 판단 기준은 entry *Split the work*의 다른 한 문단이 소유한다. AI가 아니라 다른 프로그램이나 사람이 정해진 경로에서 읽는 파일만 `files`다. AI가 읽는 것은 reference·module, AI가 실행하거나 AI와 도구가 쓰는 템플릿·데이터는 도구로 남는다.
+- 기존 스킬 옮기기는 `references/new-package.md`의 한 항목이 소유한다. 내용: 원본은 건드리지 않고 비교 기준으로 두며 시험용 빌드를 원본 폴더에 덮어 놓지 않는다, 서로 import하는 스크립트는 한 폴더 도구로 묶는다, 옮기기 전 파일별 대응표(새 원본 위치, 바뀌는 배포 경로, 따라 고칠 언급, 맞는 자리가 없는 것)를 보여 준다, 큰 스킬은 사용자와 함께 여러 단계로 옮긴다, 각 단계의 퇴보 비교와 시험은 기존 리뷰·`build-and-test.md`의 비교를 쓴다. entry 지도와 description에 이 진입을 더했다.
+- `engines.node`를 `>=22`로 넓혔다. 하한은 지원 중인 가장 오래된 LTS이고 테스트 보조 코드가 쓰는 `import.meta.dirname`(20.11+)도 덮는다. 사용자 방향에 따라 상한은 두지 않는다. 새 major는 나올 때 테스트로 확인한다.
+- **기각한 안:**
+  - `assets/` 전용 슬롯: 출력용 파일은 도구가 이미 싣고, 아이콘은 호스트가 읽으므로 `files`가 덮는다.
+  - 도구 ID에 밑줄 허용, `references/` 하위 폴더 유지: 옮길 때 경로가 바뀌는 비용은 대응표와 시험이 다룬다. ID·평탄화 규칙을 바꿀 실패 장면은 없다.
+  - 산문 안 경로 언급을 검사하는 validator: 언급 형태가 자유로워 오탐이 크고, 시험이 실제 실패를 잡는다.
+
+### 검증과 재검토 조건
+
+- `npm test` 39개 중 38 통과·1 건너뜀(호스트 symlink 권한). Node 22.23.4·24.18.0·26.13.0에서 같다. 새 테스트는 `files`의 바이트 전달(CRLF·바이너리), 두 target이 함께 쓰는 폴더의 `..` 경로와 inspect의 소비자 목록, currentness, 예약 경로 거부, 루트 탈출 거부를 확인한다.
+- 독립 리뷰어(대화 맥락 없음) 한 번: 코드 결함 없음. 지적 넷(시험 빌드가 원본을 덮을 수 있음, 시작 설정 필드 이름 부재, 공유 `files`의 소비자 누락, 서로 import하는 스크립트 묶기)을 각 owner에 반영했다.
+- 실제 Codex가 설치된 `agents/openai.yaml`의 정책을 따르는지는 호스트 행동이라 이 검사들로 증명되지 않는다.
+- **다시 여는 조건:** `files`가 AI가 읽는 문서나 실행 파일을 싣는 우회로로 쓰이는 장면, 또는 설치 도구가 `agents/`·`assets/`를 건너뛰는 장면이 나오면 연다.

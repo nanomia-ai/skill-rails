@@ -11,6 +11,7 @@
     "imports": {"type": "array", "items": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"}, "uniqueItems": true},
     "references": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
     "tools": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"}, "uniqueItems": true},
+    "files": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}},
     "record": {
       "type": "object",
       "additionalProperties": false,

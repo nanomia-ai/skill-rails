@@ -1,6 +1,6 @@
 # Skill Rails 제품·architecture 경계
 
-문서 상태: 현재 채택된 안정 경계 (v2.0.0)
+문서 상태: 현재 채택된 안정 경계 (v2.1.0)
 
 ## 목적
 
@@ -11,11 +11,12 @@ Skill Rails는 AI가 사용할 독립적인 skill을 canonical source package에
 ## 원문과 빌드
 
 - 저작 source와 generated target은 분리한다. 사람이 generated target을 직접 고치지 않는다.
-- Source package는 manifest(`schemaVersion: 2`, `modules`, `tools`, `targets`)와 target descriptor(`entry`, `imports`, `references`, `tools`, 선택 `record`, 선택 `headingIndex`, 저작 target 전용 `embeddedCoreTooling`)로 이루어진다. mode는 없다. v1 원문은 전환 안내와 함께 거부한다.
+- Source package는 manifest(`schemaVersion: 2`, `modules`, `tools`, `targets`)와 target descriptor(`entry`, `imports`, `references`, `tools`, 선택 `files`, 선택 `record`, 선택 `headingIndex`, 저작 target 전용 `embeddedCoreTooling`)로 이루어진다. mode는 없다. v1 원문은 전환 안내와 함께 거부한다.
 - 공유 산문은 module로 한 번 선언하고 build가 소비 target마다 whole-file로 복사한다. target 하나만 읽고 소유하는 조건부 Markdown은 target-owned reference다(E-041).
 - 도구는 package root 안의 파일 또는 폴더이며, build가 바이트 그대로 `scripts/<id>.<ext>` 또는 `scripts/<id>/…`로 전달한다. 공유 도구도 module처럼 한 번 선언하고 복사한다(E-042).
+- `files`는 AI가 아니라 호스트나 사람이 스킬 폴더의 정해진 경로에서 읽는 파일(예: Codex `agents/openai.yaml`과 아이콘)을 그 경로에 바이트 그대로 싣는다. `SKILL.md`, receipt, `references/`, `scripts/`는 거부한다(E-052).
 - `record`는 Skill Rails가 소유한 코어 도구다. AI의 의미 답을 선언된 텍스트 파일 하나의 managed region에 basis 재확인·lock·멱등 재시도·reread로 기록한다. 그 밖의 쓰기 안전은 작성자 도구가 소유한다.
-- Generated target은 `SKILL.md`, `references/`, 선언한 도구, (record 시) record runtime·config·contract, (저작 target) 내장 CLI, 그리고 receipt만 가진다. 이 중 아무것도 선언하지 않은 target에는 실행 파일이 없다.
+- Generated target은 `SKILL.md`, `references/`, 선언한 도구, 선언한 `files`, (record 시) record runtime·config·contract, (저작 target) 내장 CLI, 그리고 receipt만 가진다. 이 중 아무것도 선언하지 않은 target에는 실행 파일이 없다.
 - Target package는 standalone이며 저작 repository, sibling skill, global runtime과 legacy archive를 실행 시 참조하지 않는다. `npx skills`가 스킬 폴더 단위로 설치하므로 스킬 상위 공유 폴더는 두지 않는다.
 
 ## Core 책임

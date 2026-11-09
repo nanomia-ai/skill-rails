@@ -1,6 +1,6 @@
 import { relative } from "node:path";
 import { compareCodePoint } from "./canonicalize.mjs";
-import { toolArtifactPath } from "./build.mjs";
+import { fileArtifactPath, toolArtifactPath } from "./build.mjs";
 import { fail } from "./errors.mjs";
 
 const NO_RECORD = { renderer: null, contract: null, declaredInputs: [], declaredOutput: null };
@@ -14,6 +14,7 @@ function targetArtifacts(graph, item) {
     const tool = graph.tools.get(id);
     for (const file of tool.files) rows.push({ targetId, path: toolArtifactPath(tool, file) });
   }
+  for (const entry of item.delivered) for (const file of entry.files) rows.push({ targetId, path: fileArtifactPath(entry, file) });
   return rows;
 }
 
@@ -58,6 +59,22 @@ function toolView(graph, id) {
   };
 }
 
+// A declared file may be delivered by several targets; its view lists every one so a change rebuilds them all.
+function fileView(graph, path) {
+  const rows = [...graph.targets.values()].flatMap((item) => item.delivered
+    .filter((entry) => entry.path === path || entry.files.some((file) => file.path === path))
+    .flatMap((entry) => entry.files.filter((file) => entry.path === path || file.path === path).map((file) => ({ targetId: item.target.targetId, path: fileArtifactPath(entry, file) }))));
+  if (rows.length === 0) return undefined;
+  return {
+    focus: { kind: "file", id: null, path },
+    imports: [],
+    tools: [],
+    consumers: [...new Set(rows.map((row) => row.targetId))].sort(compareCodePoint),
+    artifacts: rows,
+    record: NO_RECORD,
+  };
+}
+
 function targetView(graph, item) {
   return {
     focus: { kind: "target", id: item.target.targetId, path: item.path },
@@ -84,9 +101,11 @@ export function inspectGraph(graph, query) {
     const module = [...graph.modules.entries()].find(([, item]) => item.path === exact);
     const tool = [...graph.tools.values()].find((item) => item.path === exact || item.files.some((file) => file.path === exact));
     const target = [...graph.targets.values()].find((item) => item.path === exact || [...item.files.values()].some((file) => file.path === exact));
+    const file = module || tool || target ? undefined : fileView(graph, exact);
     if (module) view = moduleView(graph, module[0]);
     else if (tool) view = toolView(graph, tool.id);
     else if (target) view = targetView(graph, target);
+    else if (file) view = file;
     else if (manifestPath === exact) view = packageView(graph, exact);
   }
   if (!view) fail("INSPECT_NOT_FOUND", "No canonical source node matches the exact query.", "Use an exact package/module/tool/target ID or referenced relative path.");

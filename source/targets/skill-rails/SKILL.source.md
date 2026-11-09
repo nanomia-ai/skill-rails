@@ -1,6 +1,6 @@
 ---
 name: skill-rails
-description: Design, build, and maintain standalone AI skills from a canonical source package, with prose for judgment and declared tools for exact work, built deterministically into skill folders. Use when creating, changing, splitting, testing, or delivering an AI skill as a source package (`skill-package.json`), including starting a project's first one, or when a built skill's delivery or evidence is in question.
+description: Design, build, and maintain standalone AI skills from a canonical source package, with prose for judgment and declared tools for exact work, built deterministically into skill folders. Use when creating, changing, splitting, testing, or delivering an AI skill as a source package (`skill-package.json`), including starting a project's first one or bringing an existing skill folder under source, or when a built skill's delivery or evidence is in question.
 license: Apache-2.0
 ---
 
@@ -12,7 +12,7 @@ Design one standalone skill as a small canonical source package, and build it wh
 
 ```text
 start or resume
- ├─ new package ──→ references/new-package.md: where the source goes, whether to keep maintenance documents, how the work will run
+ ├─ new package ──→ references/new-package.md: where the source goes, whether to keep maintenance documents, how the work will run, how an existing skill moves in
  └─ existing package ──→ read the project's recorded state
         │
         ▼
@@ -42,7 +42,7 @@ Join the cycle where the user is. When the user chooses or later asks for the re
 ## Work from canonical source
 
 - Change the manifest, target descriptor, entry, module, reference, tool, or record file that owns the behavior, never generated output or runtime state; a folder carrying `.skill-rails-build.json` is generated and never hand-edited.
-- Declare only the modules, references, tools, and record files a target actually uses. The build fails closed on unknown fields, undeclared paths, root escapes, and colliding outputs. Manifest paths are relative to the manifest, whose directory is the root every source path must stay inside; a descriptor's file paths are relative to that descriptor, and a record's declared inputs and output to the project; the closed schemas in `scripts/skill-rails-cli/contracts/` define the fields.
+- Declare only the modules, references, tools, `files`, and record files a target actually uses. The build fails closed on unknown fields, undeclared paths, root escapes, and colliding outputs. Manifest paths are relative to the manifest, whose directory is the root every source path must stay inside; a descriptor's file paths are relative to that descriptor, and a record's declared inputs and output to the project; the closed schemas in `scripts/skill-rails-cli/contracts/` define the fields.
 - Use exact IDs and paths. Do not infer requirement, check, effect, or causal relationships the source does not declare.
 - Before you rely on an earlier reading of the source, or on a check or output made from it, for a later decision, or report it as final, reread what it rested on and confirm it still holds; skip the reread only when those files have not changed since you read them.
 
@@ -66,11 +66,13 @@ Declare a tool in the manifest's `tools` and list it in each target that ships i
 
 ## Split the work
 
-Keep the entry the smallest complete always-read contract: the background and intent needed to interpret every branch; the purpose, use trigger, and operating boundary; rules every branch uses, or unconditional pointers to their canonical owners; current inputs; completion evidence; and, for each other file, the exact condition for opening it, decidable from the current task before opening it — a next action, a confirmed state, or a question asked, in the entry's own words; when the work runs in stages, the map of that flow comes first (*Write prose another AI can act on*). Use the frontmatter `description` to say what the skill does and which requests should start it, in users' words, with enough to tell it apart from neighboring skills; keep the workflow in the body.
+Keep the entry the smallest complete always-read contract: the background and intent needed to interpret every branch; the purpose, use trigger, and operating boundary; rules every branch uses, or unconditional pointers to their canonical owners; current inputs; completion evidence; and, for each other file, the exact condition for opening it, decidable from the current task before opening it — a next action, a confirmed state, or a question asked, in the entry's own words; when the work runs in stages, the map of that flow comes first (*Write prose another AI can act on*). Use the frontmatter `description` to say what the skill does and which requests should start it, in users' words, with enough to tell it apart from neighboring skills; keep the workflow in the body. Decide also who starts it. A skill normally starts whenever a request matches its description; one whose run causes an effect the user should choose to cause, such as deploying, sending, deleting, or spending, starts only when the user names it. Each host keeps this setting in its own place — Claude Code in the entry's frontmatter (`disable-model-invocation: true`), Codex in `agents/openai.yaml` (`policy.allow_implicit_invocation: false`), delivered through `files` below — so set it for every host the skill is delivered to, and confirm the field against the host's current documentation first, since a host ignores a misspelled setting without an error.
 
 Move a block into its own file when a run can tell from its current task or stage that it does not need the block yet — a stage's detail before that stage starts, the handling of a rare case — and the reading saved exceeds the navigation and rereading cost. Never put apart things that must be judged together, whatever their length.
 
 Content only this target reads and owns is a target-owned reference, declared by target-relative path in the descriptor's `references` and delivered as `references/<file name>`. Content other targets read, or owned outside this target, is a package module imported by ID; when a second target needs a reference, promote it to a module and repoint its readers. The build copies a module into each consuming skill because every installed skill must work alone; context is spent when content is read, so a module read again through another skill in the same conversation is spent again. Keep the modules every consumer always reads complete but small, and move parts only some consumers need into a module they open when a step needs it.
+
+Some files are read not by the AI but by another program or a person, at a path that reader fixes, such as Codex's `agents/openai.yaml` with the display name, start setting, and icon files it points to, or a license that must sit beside `SKILL.md`. Declare such a file or folder in the descriptor's `files`, under the path it must have in the skill folder, with its source path relative to the descriptor; the build copies it there byte for byte, as it keeps the entry's frontmatter as written. What the AI reads stays a reference or module, and what it runs, with the templates and data it or its tools use, stays a tool.
 
 Make separate skills for responsibilities that start independently — their own trigger, their own session, or a check that must be made apart from the work it checks, such as a review by a session that did not write it. Keep stages in one skill when they always run together in one sitting and none needs its own entry point or such a separate check, loading each stage's detail when that stage starts. A hand-off to another skill names that skill and the artifact it should find, never a path into its folder.
 
