@@ -738,3 +738,37 @@ v2.0.11 release·설치: release commit `128cdcbb41db76b33a024b40ede6c095203f05b
 v2.1.0 release 준비(E-052): target `files`, entry의 시작 주체 판단(AI가 스스로 / 사용자가 이름으로), `references/new-package.md`의 기존 스킬 옮기기, `engines.node` `>=22`. 2회 빌드 tree `ce16b1bb9de412564f7c47d3932deb567c5101e3d0835e78705bd7c77df97b0c` 일치, `check` artifactIntact·sourceCurrent true, `npm test` 39개 중 38 통과·1 건너뜀이 Node 22.23.4·24.18.0·26.13.0에서 같다. Claude Code 필드 `disable-model-invocation: true`는 공식 plugin의 skills reference(부작용 있는 스킬은 사용자만 호출)로, Codex 필드는 `skill-creator`의 `references/openai_yaml.md`로 확인했다. 맥락 없는 리뷰어 1회의 지적 넷은 E-052에 기록했다. Codex가 설치본의 `allow_implicit_invocation: false`를 실제로 따르는지는 `unproven`.
 
 v2.1.0 release·설치·실사용: release commit `fb43e1b17e7f019cfea18eb299e2e682cfe25ed5`, tag `v2.1.0`의 peeled commit이 같다(`git ls-remote`). 저장소 밖에서 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes`로 설치했다(`~/.agents/skills/skill-rails`, Claude Code는 symlink). 설치본 내장 CLI를 Node 22.23.4로 돌린 `check --out`은 package `2.1.0`, tree `ce16b1bb…`, artifact-intact였다. 실사용: 임시 git 프로젝트에 Codex식 기존 스킬 `receipt-totals`(SKILL.md, `agents/openai.yaml`의 `allow_implicit_invocation: false`, `assets/icon.svg`, `references/categories.md`, `sum_receipts.py`가 `csv_utils.py`를 import)를 두고, 새 Claude Code 세션(`claude -p`, Opus 5.5, effort medium, 사용자 전역 설정 그대로)에 세 번의 사용자 발화로 옮기게 했다. 1차 "Skill Rails로 옮겨 줘": 파일을 쓰기 전에 진행 방식 4점, 파일 대응표(두 Python 파일을 폴더 도구 하나로, yaml·아이콘은 `files`, 바뀌는 경로는 실행 명령 하나), 원본 보존을 보였고, 유지보수 문서와 Claude 쪽 시작 설정의 부재(Codex만 이름 호출)를 스스로 찾아 물었다. 2차 답변 뒤: 공식 문서로 필드를 확인하고 `disable-model-invocation: true`를 넣었으며, 원본과 비교한 리뷰를 보고하고 빌드 전에 배포 경로 A–D를 물었다. 3차 "A, 프로젝트 `.claude/skills`": 2회 빌드 일치, 설치본 `check` 통과, 맥락 없는 AI가 140,900원을 맞혔다(미리 계산한 답과 같음). 원본 폴더는 바뀌지 않았다. 코디네이터가 따로 설치본 `check`(artifact-intact·source-current), yaml 바이트 동일, 스크립트 실행 결과를 확인했다. 시작 설정 관찰: 같은 프로젝트의 새 세션에 이름 없이 같은 일을 맡기자 Skill 도구 호출은 없었다(자동 시작 차단). 대신 AI가 프로젝트를 검색해 그 스킬 파일을 일반 파일로 읽고 썼다 — 설정은 자동 시작을 막을 뿐 파일 접근을 막지 않는 호스트 동작이다. `unproven`: Codex의 정책 준수, 큰 스킬의 단계별 이동, 반복성.
+
+미배포 후보 E-053(시험 과제 저장, 실행 전 판정 항목, 시작 시험, 회귀 판정): 최종 2회 빌드 tree `14bd744153128c416552052650882e20d6019539b7be8f7c46351f2c21276049` 일치(Node 22·24·26 테스트 동일), `check` artifactIntact·sourceCurrent true, `npm test` 39개 중 38 통과·1 건너뜀. 실사용: 위 `receipt-totals` 프로젝트 사본(source만, 이름 호출 전용)에 후보를 프로젝트 `.claude/skills/skill-rails`로 두고 새 Claude Code 세션(`claude -p --setting-sources project`, Opus 5.5, effort medium)에 사용자 발화 네 번과 새 세션 한 번을 주었다. 첫 시도는 과제를 제안하기 전에 실행했다 — 원인은 검토 반영 병합에서 빠진 '실행 전' 구절이었고, 되살린 뒤 처음부터 다시 했다. 1 "테스트해 줘(배포는 프로젝트 `.claude/skills`)": 빌드·설치 뒤 실행 없이 과제 둘(이름 호출 합계 과제의 판정 항목 넷, 이름 없는 근접 요청 하나)을 제안하고 실제 데이터 커밋 여부를 물었다. 2 동의: `source/receipt-totals/tests/tasks.md`와 입력 사본을 저장하고, 이름 호출은 서브에이전트로, 근접 요청은 새 세션에서 이름 없이 돌려 항목별 근거로 판정했다(모두 통과, 근접 요청은 Skill 호출 없음). 소스의 실제 문제(분류 파일 위치 미정)를 찾았다. 결함: 통과했는데도 과제마다 2회 실행 — 원칙 문장이 조건보다 앞선 탓으로 보고 순서를 바꿨다. 3 "stdin으로 고치고 건수도": 소스만 고치고 빌드하지 않았으며, 요구가 바뀐 만큼 저장 과제 항목을 고쳤음을 보고했고, 리뷰의 읽기 시험에 저장 과제를 썼다. 4 "다시 빌드해서 테스트": 저장 과제로 다시 돌려 모든 항목 통과, 지난 시험보다 실행 단계가 줄었다고 이전 결과와 비교했고 이전 판은 돌리지 않았다(같은 세션이라 2회 반복은 유지). 5 새 세션 "다시 테스트해 줘": 저장 과제를 스스로 찾고 새 과제가 필요 없다고 판단했으며, 계획은 과제당 1회였다. 이름 호출 과제의 추가 실행은 첫 실행이 Git Bash 경로 변환으로 무효가 된 뒤의 재실행이었다. 다섯 턴 비용 약 4.9달러. 실사용 뒤 Codex 최종 검토로 회귀 판정 문장 하나를 '회귀를 가리킨다'로 바꿨다(이름만 바뀌고 실행 지시는 같아 재시험하지 않음). 배포 전 추가 시험 두 가지. A 회귀 주입(Claude Code, 같은 프로젝트): 동료 커밋이라며 같은 가맹점·금액을 날짜와 무관하게 중복으로 빼는 버그를 넣고 "다시 빌드해서 테스트해 줘" — 빌드 전 리뷰에서 저장 과제의 입력과 항목으로 도구를 돌려 총합 140,900→134,400 실패를 잡고 빌드를 멈췄으며, 도구가 낸 결정적 실패라 재실행하지 않았고 원인은 커밋 diff로 확인해 이전 판을 돌리지 않았다(0.3달러). 이어 "1번으로 고치고 중복 과제도 저장해서 빌드·테스트": 메시지 안의 동의를 받아 고치고 새 과제를 저장한 뒤 과제 셋을 각 1회 돌려 통과했다. 결함: 기록 문서를 두지 않은 프로젝트에 AI가 `docs/current.md`를 스스로 만들어 시험 결과를 쌓았다 → 기록할 곳이 없으면 그렇다고 말하고 스스로 기록을 시작하지 않게 시험 기록 문장과 배포 방식 기록 문장을 같은 형태로 맞췄다(Codex 첫 시도도 배포 방식을 같은 식으로 기록해 두 호스트에서 관찰됨). B 새 스킬 첫 시험(Codex 0.160.0, gpt-6.1-sol medium, 전역 skill-rails는 `skills.config`로 끄고 후보만 프로젝트 `.agents/skills`에): 첫 시도는 시작 시험을 빼먹었다 — '설명이 새로 생기거나 바뀌었을 때'를 이전 세션에 쓴 설명은 새것이 아니라고 읽음 → '현재 설명을 다루는 저장 시작 과제가 없을 때'로 바꿨다. 다시 한 시도: 실행 전에 과제(이름 호출 2, 이름 없이 시작해야 할 요청 1, 시작하면 안 될 번역 요청 1)를 제안하고 동의 뒤 `source/targets/release-notes/tests/tasks.md`에 저장, 새 Codex 세션에서 각 1회 실행해 모두 통과(이름 없는 요청은 스킬을 읽어 사용, 번역 요청은 스킬 미호출), 샌드박스 오류로 무효인 첫 실행은 판정에서 뺐다. 마지막으로 `build-and-test.md` 첫 줄에 이 파일이 맡는 것과 절 순서를 밝혔다(조건부 문서의 첫 줄 규칙). `unproven`: Codex 호스트의 시작 시험, 과제가 많아졌을 때의 비용, 사용자가 과제 동의를 번거롭게 여기는지.
+
+미배포 후보 E-054(frontmatter 검사, `start-rate` 측정·조정, Skill Rails 자기 시험 과제)를 같은 작업 트리에 더했다. 최종 원문의 빌드 2회는 tree `8e66e5af0241…`로 같았고(뜻을 바꾸지 않고 문장 이음매 7곳을 다듬은 뒤의 값이다. 다듬기 전에는 `09d7d4a1b9b9…`), `check`는 intact·current였다. `npm test`는 Node 22.23.4·24.18.0·26.13.0에서 44개 중 43개 통과, 1개 건너뜀(symlink 권한)이다.
+
+- **새 테스트**
+  - frontmatter 거부 사례와 허용 사례(판독은 합성 40개와 설치된 SKILL.md 3,019개에서 PyYAML과 대조했다. 3,056개가 같고, 엄격 거부는 0, 나머지 3개는 1,024자 초과로 의도한 거부. 검토의 적대적 사례 17개에서 길이를 덜 세는 경우는 0)
+  - 가짜 호스트로 측정: 시작 수, 5분의 2 떼어 두기, 시간 초과와 오류는 어느 쪽에도 세지 않음, 오류 보고
+  - 따옴표·`&`·`%`가 든 인자가 직접 실행에서도, Windows의 공백 경로 `.cmd`를 거쳐서도 그대로 전달됨
+  - synced·플러그인 경로의 같은 이름 사본 찾기
+  - 호스트 인자 검사
+- **실측 1: Skill Rails 자신의 설명**
+  - 조건: `source/targets/skill-rails/tests/tasks.md`의 시작 과제 16개(시작해야 할 요청 8, 근접 요청 8) × 3회 × Claude Code 2.1.321·Codex 0.160.0, 96회.
+  - 7분 걸렸고 오류·시간 초과는 0이다.
+  - 결과: 두 호스트 모두 조정용 10/10, 떼어 둔 6/6이다.
+  - 격리: 설치된 skill-rails 때문에 Claude에서는 사용자 수준 스킬·플러그인을 가렸다(기본 모델 claude-opus-5-5로 돌았고, 사용자 설정 모델과 같다). Codex에서는 그 사본만 껐다.
+  - 따라서 Claude에서 `skill-creator`처럼 사용자 수준에 있는 경쟁 스킬과의 경합은 `unproven`이다.
+- **실측 2: 조정 흐름**
+  - 대화를 모르는 새 Claude 세션(Opus 5.5 medium, 후보 skill-rails만 프로젝트에 둠)에 receipt-totals 설명 조정을 맡겼다. 이 스킬은 이름으로만 시작하는 설정을 푼 변형이다.
+  - 첫 턴: 측정 전에 시작해야 할 요청 10개와 근접 요청 9개를 제안하고, 실행 횟수(측정 한 번에 120세션, 최대 720)를 알려 한도를 물었다.
+  - 사용자가 "claude만, 3회, 1라운드"로 답한 뒤 세션이 한 일:
+    - 과제를 저장했다.
+    - 기준선: 조정용 9/12, 떼어 둔 7/7, 57회. 실패는 근접 요청 3개가 시작된 것이다.
+    - 다시 쓴 설명(형식·범위·한국어 표현): 12/12, 7/7, 57회.
+    - 빌드하지 않았고, 기록할 곳이 없다고 말했다.
+  - 당시 규칙("떼어 둔 과제가 동점이면 이전 것")에 따라 나아진 설명이 버려졌다. 그래서 동점이면 조정용 과제 성적으로 가르게 고쳤다. 고친 규칙으로 같은 장면을 다시 돌리지는 않았다(원문 읽기로만 확인).
+- **비용:** 하위 세션 비용은 따로 집계되지 않는다. Claude 측정은 실행당 0.1~0.15달러 수준이었다.
+- **`unproven`**
+  - Codex 위에서의 조정 흐름
+  - 다른 모델
+  - 프로젝트 수준의 경쟁 스킬
+  - 측정 비용에 대한 사용자의 부담감
+  - 판독이 받는 형태 밖의 YAML이 호스트와 같게 읽히는지
+  - Skill Rails 자기 시험 과제 중 이름으로 부르는 네 과제의 이번 판 실행(그중 세 장면은 E-053 시험에서 관찰)

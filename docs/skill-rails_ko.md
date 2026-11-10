@@ -21,7 +21,7 @@ Skill Rails는 AI가 사용할 독립적인 skill을 canonical source package에
 
 ## Core 책임
 
-- Core는 manifest/schema, 경로 격리, deterministic build, receipt/currentness, inspect/overview, record runtime과 공통 오류를 소유한다.
+- Core는 manifest/schema, 경로 격리, deterministic build, receipt/currentness, inspect/overview, record runtime과 공통 오류를 소유한다. 빌드는 entry frontmatter의 `name`이 targetId와 같고 `description`이 텍스트이고 비지 않았으며 1,024자 이내인지 확인한다(호스트들이 공유하는 한계, 나머지 키는 호스트 소유로 그대로 둔다). `start-rate`는 target의 이름 없는 시험 과제마다 호스트 새 세션을 여러 번 띄워 시작 비율을 세는 측정 도구다(빌드 없이 원문 frontmatter로 재고, 설명을 고치는 판단은 AI에 둔다, E-054).
 - Receipt의 artifacts는 실제 전달 파일, sources는 currentness 입력이다. `check --out`은 receipt만으로 설치본의 artifact-intact를, `--source`를 함께 주면 source-current를 따로 답한다. 산문 설치본 자체의 무결성 실행 코드는 v2.0.0에서 내려놓았다(E-042 D1).
 - Effect credit은 실제 관찰 권한을 넘지 않는다. 파일 write는 reread digest가 맞을 때만 `observed`다.
 - 기본 상태는 artifact-derived다. 대화나 run scratch를 durable semantic truth로 만들지 않는다.
@@ -33,7 +33,7 @@ Skill Rails는 AI가 사용할 독립적인 skill을 canonical source package에
 
 - Canonical source는 `source/`(manifest `source/skill-package.json`, target `source/targets/skill-rails/`), 선택형 판단 원문은 module `source/modules/skill-evolution-method_ko.md`(유지보수자와 저작 스킬이 함께 쓰는 단일 정본), generated tracked skill은 `skills/skill-rails/`다.
 - 저작 스킬은 고정 CLI closure(`embeddedCoreTooling: "authoring-cli-v1"`)를 `scripts/skill-rails-cli/`로 실어 sibling 없이 author→build→check→inspect를 한다.
-- 저작 흐름은 SOURCE ⇄ REVIEW → ROUTE → BUILD → TEST다. REVIEW는 기획이나 원문 변경을 사용자에게 결과로 내놓기 전, 그리고 빌드 직전(배포될 target 전체)에 서는 벽이다. 작성 AI가 그 스킬을 쓸 AI처럼 읽고, 저작 기준과 대조하고, 바꾸기 전 판과 비교해 퇴보를 찾는다. 깊이는 드리프트할 수 있는 만큼이고, 다른 에이전트는 사용자가 요청할 때만 쓴다. 빌드·시험·전달은 사용자가 요청할 때만 시작한다.
+- 저작 흐름은 SOURCE ⇄ REVIEW → ROUTE → BUILD → TEST다. REVIEW는 기획이나 원문 변경을 사용자에게 결과로 내놓기 전, 그리고 빌드 직전(배포될 target 전체)에 서는 벽이다. 작성 AI가 그 스킬을 쓸 AI처럼 읽고, 저작 기준과 대조하고, 바꾸기 전 판과 비교해 퇴보를 찾는다. 깊이는 드리프트할 수 있는 만큼이고, 다른 에이전트는 사용자가 요청할 때만 쓴다. 빌드·시험·전달은 사용자가 요청할 때만 시작한다. 시험 과제와 실행 전에 정한 판정 항목은 target descriptor 옆 `tests/tasks.md`에 원본과 함께 두고(배포되지 않음) 변경마다 다시 쓴다(E-053).
 - 테스트 전용 pilot domain과 fixture는 `tests/fixtures/`에 있다.
 
 ## 배포와 권한

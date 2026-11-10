@@ -1,0 +1,6 @@
+interface:
+  display_name: "Receipt Totals"
+  short_description: "Total card receipts by category"
+  icon_small: "./assets/icon.svg"
+policy:
+  allow_implicit_invocation: false

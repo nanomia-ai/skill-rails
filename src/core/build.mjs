@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { canonicalJson, compareCodePoint, sha256, treeSha256 } from "./canonicalize.mjs";
 import { fail } from "./errors.mjs";
 import { assertArtifactIntegrity } from "./check.mjs";
+import { readSkillFrontmatter } from "./frontmatter.mjs";
 import { buildHeadingIndex } from "./heading-index.mjs";
 import { assertNoCaseFoldCollisions } from "./paths.mjs";
 
@@ -30,10 +31,12 @@ const AUTHORING_CLI_SOURCES = Object.freeze([
   "src/core/check.mjs",
   "src/core/cli.mjs",
   "src/core/errors.mjs",
+  "src/core/frontmatter.mjs",
   "src/core/heading-index.mjs",
   "src/core/human-overview.mjs",
   "src/core/inspect.mjs",
   "src/core/paths.mjs",
+  "src/core/start-rate.mjs",
   "src/core/validate.mjs",
   "src/runtime/common.mjs",
   "src/runtime/exchange.mjs",
@@ -43,12 +46,10 @@ const AUTHORING_CLI_SOURCES = Object.freeze([
   "src/runtime/run-record.mjs",
 ]);
 
-function withGeneratedMarker(entry, logicalSource) {
+function withGeneratedMarker(entry, logicalSource, end) {
   const marker = `<!-- generated; do not edit; source: ${logicalSource}; receipt: .skill-rails-build.json -->`;
-  if (!entry.startsWith("---\n")) fail("ENTRY_INVALID", `${logicalSource} must start with YAML frontmatter.`, "Add a closed skill frontmatter block.");
-  const end = entry.indexOf("\n---\n", 4);
-  if (end < 0) fail("ENTRY_INVALID", `${logicalSource} has no closing YAML frontmatter delimiter.`, "Close the frontmatter with --- on its own line.");
-  return `${entry.slice(0, end + 5)}${marker}\n${entry.slice(end + 5)}`;
+  return `${entry.slice(0, end + 5)}${marker}
+${entry.slice(end + 5)}`;
 }
 
 function artifactPathForModule(id) {
@@ -94,7 +95,8 @@ export async function planTargetBuild(graph, targetId) {
   addSource(sources, `target:${targetId}`, { path: item.path, bytes: item.bytes });
   const entry = item.files.get("entry");
   addSource(sources, "entry", entry);
-  put("SKILL.md", Buffer.from(withGeneratedMarker(entry.text, entry.path), "utf8"), "entry");
+  const { end } = readSkillFrontmatter(entry.text, entry.path, targetId);
+  put("SKILL.md", Buffer.from(withGeneratedMarker(entry.text, entry.path, end), "utf8"), "entry");
 
   for (const id of item.target.imports) {
     const module = graph.modules.get(id);

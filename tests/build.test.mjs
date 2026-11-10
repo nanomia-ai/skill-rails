@@ -17,10 +17,12 @@ const embeddedCoreFiles = [
   "src/core/check.mjs",
   "src/core/cli.mjs",
   "src/core/errors.mjs",
+  "src/core/frontmatter.mjs",
   "src/core/heading-index.mjs",
   "src/core/human-overview.mjs",
   "src/core/inspect.mjs",
   "src/core/paths.mjs",
+  "src/core/start-rate.mjs",
   "src/core/validate.mjs",
   "src/runtime/common.mjs",
   "src/runtime/exchange.mjs",
@@ -267,6 +269,44 @@ test("schema, import, duplicate key, case collision and path escape fail closed"
   await writeFile(join(root, "targets", "one", "target.json"), JSON.stringify({ schemaVersion: 2, targetId: "one", entry: "../../../outside.md", imports: [] }));
   await writeFile(join(sandbox, "outside.md"), "outside\n");
   assert.equal(coreCli("inspect", "--source", manifest, "--id", "p", "--json").json.code, "PATH_OUTSIDE_ROOT");
+});
+
+test("the build refuses a frontmatter name or description that hosts would skip or reject", async (t) => {
+  const root = await temporary(t, "frontmatter");
+  await mkdir(join(root, "targets", "one"), { recursive: true });
+  await writeFile(join(root, "skill-package.json"), JSON.stringify({ schemaVersion: 2, packageId: "p", packageVersion: "1", modules: {}, targets: { one: "targets/one/target.json" } }));
+  await writeFile(join(root, "targets", "one", "target.json"), JSON.stringify({ schemaVersion: 2, targetId: "one", entry: "entry.md", imports: [] }));
+  const build = async (frontmatter) => {
+    await writeFile(join(root, "targets", "one", "entry.md"), `---\n${frontmatter}\n---\nBody\n`);
+    return coreCli("build", "--source", join(root, "skill-package.json"), "--target", "one", "--out", join(root, "out")).json;
+  };
+  for (const [frontmatter, message] of [
+    ["name: other\ndescription: d", /name is "other", but its target is one/u],
+    ["description: d", /name is missing/u],
+    ["name: one", /no description/u],
+    [`name: one\ndescription: ${"x".repeat(1025)}`, /1025 characters; hosts accept at most 1024/u],
+    ["name: one\ndescription: \"unclosed", /not a text value/u],
+    ["name: one\ndescription: \"ok\" garbage", /not a text value/u],
+    ["name: one\ndescription: false", /not a text value/u],
+    ["name: one\ndescription: [a, b]", /not a text value/u],
+    ["name: one\ndescription:\n  - item", /not a text value/u],
+    ["name: one\ndescription: Use when: asked", /not a text value/u],
+    ["name: one\ndescription: \"\\q\"", /not a text value/u],
+    ["name: one\ndescription: okay\n'description': false", /not a text value/u],
+    ["name: one\ndescription: alpha # note\n  beta", /not a text value/u],
+    [`name: one\ndescription: "${"a".repeat(1022)}\n\n\n  b"`, /1025 characters/u],
+    ["name: one\ndescription: \"  \"", /no description/u],
+    [`name: one\ndescription: | # long\n  ${"x".repeat(1030)}`, /1030 characters/u],
+  ]) {
+    const result = await build(frontmatter);
+    assert.equal(result.code, "ENTRY_INVALID", frontmatter);
+    assert.match(result.message, message);
+  }
+  assert.equal((await build(`name: 'one'\ndescription: >-\n  ${"x".repeat(600)}\n  ${"y".repeat(400)}\nlicense: MIT`)).status, "BUILT");
+  assert.equal((await build("name: one\ndescription: Files > 10 MB, compared with a < b # note")).status, "BUILT");
+  assert.equal((await build("name: one\ndescription: Use for \"make a deck about <file>\" requests")).status, "BUILT");
+  assert.equal((await build("name: one\ndescription: 2026-11-10 report builder")).status, "BUILT");
+  assert.equal((await build("name: one\ndescription:\n  \"Solve problems with\n  adversarial checks\"")).status, "BUILT");
 });
 
 test("a target-owned reference is delivered beside imported modules and keeps one owner", async (t) => {

@@ -1,15 +1,9 @@
 import { relative } from "node:path";
 import { canonicalJson, compareCodePoint, sha256 } from "./canonicalize.mjs";
 import { planTargetBuild } from "./build.mjs";
+import { readSkillFrontmatter } from "./frontmatter.mjs";
 
 const GENERATOR_VERSION = 2;
-
-function entryDescription(text) {
-  const frontmatterEnd = text.indexOf("\n---\n", 4);
-  if (!text.startsWith("---\n") || frontmatterEnd < 0) return null;
-  const line = text.slice(4, frontmatterEnd).split("\n").find((candidate) => candidate.startsWith("description:"));
-  return line?.slice("description:".length).trim() || null;
-}
 
 function representativeFlow(target) {
   const tools = target.tools?.length ? ` with tools ${target.tools.map((id) => `\`${id}\``).join(", ")}` : "";
@@ -28,7 +22,7 @@ export async function buildHumanOverview(graph) {
     const plan = await planTargetBuild(graph, item.target.targetId);
     targets.push({
       id: item.target.targetId,
-      role: entryDescription(item.files.get("entry").text),
+      role: readSkillFrontmatter(item.files.get("entry").text, item.files.get("entry").path, item.target.targetId).description,
       source: item.path,
       entry: item.files.get("entry").path,
       imports: [...item.target.imports],
@@ -94,7 +88,7 @@ export async function buildHumanOverview(graph) {
     lines.push(
       `### ${index + 1}. \`${target.id}\``,
       "",
-      `- Role: ${target.role ?? "not declared in entry frontmatter"}`,
+      `- Role: ${target.role}`,
       `- Canonical source: \`${target.source}\`; entry: \`${target.entry}\``,
       `- Imports: ${list(target.imports)}`,
       `- Tools: ${list(target.tools)}; heading index: ${target.headingIndex ? `\`${target.headingIndex}\`` : "none"}`,

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "targetId": "receipt-totals",
+  "entry": "SKILL.source.md",
+  "imports": [],
+  "references": ["references/categories.md"],
+  "tools": ["sum-receipts"],
+  "files": {
+    "agents/openai.yaml": "agents/openai.yaml",
+    "assets/icon.svg": "assets/icon.svg"
+  }
+}

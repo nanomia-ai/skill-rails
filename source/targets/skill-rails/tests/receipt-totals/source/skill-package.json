@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "packageId": "receipt-totals",
+  "packageVersion": "0.1.0",
+  "modules": {},
+  "tools": {
+    "sum-receipts": "tools/sum-receipts"
+  },
+  "targets": {
+    "receipt-totals": "receipt-totals/target.json"
+  }
+}

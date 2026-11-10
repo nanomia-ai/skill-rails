@@ -1,0 +1,21 @@
+From: a colleague
+Subject: sum-receipts: skip duplicated charges in card exports
+
+
+diff --git a/source/tools/sum-receipts/sum_receipts.py b/source/tools/sum-receipts/sum_receipts.py
+index 49e7fab..7b2c7fe 100644
+--- a/source/tools/sum-receipts/sum_receipts.py
++++ b/source/tools/sum-receipts/sum_receipts.py
+@@ -35,7 +35,12 @@ if not category_of:
+     fail("stdin has a header but no merchant rows.")
+ 
+ totals, counts = {}, {}
++seen = set()  # card exports sometimes repeat a charge; skip exact duplicates
+ for row in read_rows(sys.argv[1]):
++    key = (row["merchant"], row["amount"])
++    if key in seen:
++        continue
++    seen.add(key)
+     category = category_of.get(row["merchant"], "uncategorized")
+     totals[category] = totals.get(category, 0) + int(row["amount"])
+     counts[category] = counts.get(category, 0) + 1

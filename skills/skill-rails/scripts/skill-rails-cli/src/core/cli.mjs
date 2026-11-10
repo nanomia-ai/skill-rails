@@ -5,6 +5,7 @@ import { checkTarget } from "./check.mjs";
 import { toResultError, fail } from "./errors.mjs";
 import { buildHumanOverview } from "./human-overview.mjs";
 import { inspectGraph } from "./inspect.mjs";
+import { measureStartRate } from "./start-rate.mjs";
 import { loadSourceGraph } from "./validate.mjs";
 
 const SYNOPSIS = `Skill Rails authoring CLI
@@ -20,6 +21,10 @@ Commands:
   inspect  --source <manifest> (--id <exact-id> | --path <relative-path>) --json
            an ID names the package, a module, a tool, or a target
   overview --source <manifest>
+  start-rate --source <manifest> --target <target-id> --host <claude|codex|host-file>[,...]
+           [--runs <n, default 3>] [--workers <n, default 4>] [--timeout <seconds, default 120>]
+           starts fresh host sessions on the target's unnamed tests/tasks.md tasks and counts
+           how many start it; every run is a real, billed host session
 
 Invalid command arguments return JSON with a task-specific nextAction.
 `;
@@ -76,7 +81,25 @@ async function main() {
     if (!values["--source"]) fail("ARGUMENT_INVALID", "overview requires --source.", "Provide the canonical source package manifest.");
     return { format: "text", ...(await buildHumanOverview(await loadSourceGraph(values["--source"])))};
   }
-  fail("ARGUMENT_INVALID", `Unknown command: ${command ?? "<none>"}.`, "Use build, check, inspect, or overview.");
+  if (command === "start-rate") {
+    allow(values, ["--source", "--target", "--host", "--runs", "--workers", "--timeout"]);
+    if (!values["--source"] || !values["--target"] || !values["--host"]) fail("ARGUMENT_INVALID", "start-rate requires --source, --target, and --host.", "Name the source manifest, the exact targetId, and each host the skill is delivered to.");
+    const count = (key, fallback) => {
+      if (values[key] === undefined) return fallback;
+      if (!/^[1-9][0-9]*$/u.test(values[key])) fail("ARGUMENT_INVALID", `${key} must be a positive whole number.`, "Correct the number.");
+      return Number(values[key]);
+    };
+    const hosts = [...new Set(values["--host"].split(",").map((host) => host.trim()).filter(Boolean))];
+    if (!hosts.length) fail("ARGUMENT_INVALID", "--host names no host.", "Name each host the skill is delivered to, separated by commas.");
+    return measureStartRate(await loadSourceGraph(values["--source"]), {
+      target: values["--target"],
+      hosts,
+      runs: count("--runs", 3),
+      workers: count("--workers", 4),
+      timeoutSeconds: count("--timeout", 120),
+    });
+  }
+  fail("ARGUMENT_INVALID", `Unknown command: ${command ?? "<none>"}.`, "Use build, check, inspect, overview, or start-rate.");
 }
 
 try {
