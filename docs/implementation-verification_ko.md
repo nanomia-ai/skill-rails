@@ -772,3 +772,5 @@ v2.1.0 release·설치·실사용: release commit `fb43e1b17e7f019cfea18eb299e2e
   - 측정 비용에 대한 사용자의 부담감
   - 판독이 받는 형태 밖의 YAML이 호스트와 같게 읽히는지
   - Skill Rails 자기 시험 과제 중 이름으로 부르는 네 과제의 이번 판 실행(그중 세 장면은 E-053 시험에서 관찰)
+
+v2.2.0 release 준비(E-053·E-054): 위 두 후보를 그대로 묶고 버전만 `2.2.0`으로 올렸다. 2회 빌드 tree `511cd5917a0d59083c088484ba7aadb24b8be8296cc6b08fb9ee1f47b31fdbdb` 일치(원문은 `8e66e5af0241…` 판과 같고 버전 문자열만 다르다), `check` artifactIntact·sourceCurrent true, `npm test` 44개 중 43 통과·1 건너뜀이 Node 22.23.4·24.18.0·26.13.0에서 같다. README 한국어판과 영문판은 이 기능을 반영해 사용자 요청으로 새로 썼다(`1b30f94`).

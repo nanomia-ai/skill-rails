@@ -1,6 +1,6 @@
 # Skill Rails 제품·architecture 경계
 
-문서 상태: 현재 채택된 안정 경계 (v2.1.0)
+문서 상태: 현재 채택된 안정 경계 (v2.2.0)
 
 ## 목적
 
@@ -40,6 +40,6 @@ Skill Rails는 AI가 사용할 독립적인 skill을 canonical source package에
 
 - Repository/package identity는 `nanomia-ai/skill-rails`와 private metadata `@nanomia/skill-rails`, generated skill identity는 `skill-rails`다. Public delivery는 repository-based `npx skills@latest` 경로이며 npm registry에 발행하지 않는다.
 - 실제 host 검증은 generated package가 준비된 뒤 표준 installer 경로에서 수행한다. 설치 도구가 건너뛰거나 바꾸는 파일이 있으므로 도구를 싣는 target은 설치본 `check`와 도구 실행으로 route를 확인한다.
-- Release, push, 전역 설치 교체, published identity와 `latest` cutover는 사용자의 명시 승인 범위에서만 수행한다. Force push/history rewrite와 승인 범위(E-049의 방법 문서 링크 경로) 밖의 README 변경은 승인되지 않았다. legacy capsule과 v1 결과는 사용자 승인으로 HEAD에서 지웠고(E-049), 복원에는 별도 승인이 필요하다.
+- Release, push, 전역 설치 교체, published identity와 `latest` cutover는 사용자의 명시 승인 범위에서만 수행한다. Force push/history rewrite는 승인되지 않았다. README는 사용자가 요청할 때만 바꾸며, 2026-11-11 사용자 요청으로 한국어판과 영문판을 새로 썼다(`1b30f94`). legacy capsule과 v1 결과는 사용자 승인으로 HEAD에서 지웠고(E-049), 복원에는 별도 승인이 필요하다.
 
 정확한 구현 계약과 milestone은 동결 상세 계획이, 구현 중 차이는 Evolution 문서가 소유한다.
