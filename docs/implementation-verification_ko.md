@@ -774,3 +774,5 @@ v2.1.0 release·설치·실사용: release commit `fb43e1b17e7f019cfea18eb299e2e
   - Skill Rails 자기 시험 과제 중 이름으로 부르는 네 과제의 이번 판 실행(그중 세 장면은 E-053 시험에서 관찰)
 
 v2.2.0 release 준비(E-053·E-054): 위 두 후보를 그대로 묶고 버전만 `2.2.0`으로 올렸다. 2회 빌드 tree `511cd5917a0d59083c088484ba7aadb24b8be8296cc6b08fb9ee1f47b31fdbdb` 일치(원문은 `8e66e5af0241…` 판과 같고 버전 문자열만 다르다), `check` artifactIntact·sourceCurrent true, `npm test` 44개 중 43 통과·1 건너뜀이 Node 22.23.4·24.18.0·26.13.0에서 같다. README 한국어판과 영문판은 이 기능을 반영해 사용자 요청으로 새로 썼다(`1b30f94`).
+
+v2.2.0 release·설치: release commit `9f1a4bcc350ac3b5eff96c73da4cab5aa873dd10`, tag `v2.2.0`의 peeled commit이 같다(`git ls-remote`). 저장소 밖에서 공식 `npx skills@latest add nanomia-ai/skill-rails --global --skill skill-rails --agent codex claude-code --yes`로 설치했다(`~/.agents/skills/skill-rails`, Claude Code는 symlink). 설치본 내장 CLI를 Node 22.23.4로 돌린 `check --out`은 package `2.2.0`, tree `511cd591…`, artifact-intact였다. 설치본에 `start-rate`가 든 CLI와 `references/build-and-test.md`가 있고, `tests/`는 실리지 않았다. 설치본으로 한 새 실사용 시험은 이번에 하지 않았다(행동 근거는 위 E-053·E-054 후보 시험).
