@@ -4,238 +4,244 @@
 
 <br />
 
-<p align="center"><strong>AI skills can be designed, built, and verified like software.</strong></p>
+<h3 align="center">Build AI skills the way you build code</h3>
 
-<p align="center">Skill Rails connects purpose and judgment written in natural language with executable scripts and verification,<br />then builds a skill directory that an AI tool can discover and run.</p>
-
-<p align="center">
-  <img src="docs/assets/readme-rule.svg" alt="" width="100%" height="1" />
-</p>
+<p align="center">Write a skill's source, review it, build it, then install and test it.<br />Skill Rails is a skill for making skills. It brings the process you take for granted with code to the skills of AI agents such as Claude Code and Codex.</p>
 
 <p align="right">English · <a href="README.ko.md">한국어</a></p>
 
-## AI skills start as small documents
+## What makes a good SKILL.md?
 
-An AI skill is a collection of instructions and tools that tells an AI how to perform a particular kind of work. When a recurring workflow, decision rule, or output format is captured as a skill, the AI can load it when needed and apply it to the task at hand.
+A `SKILL.md` is a single Markdown file, so anyone can write one easily. It is just as easy to call it finished once it gives the result you wanted after a try or two in the session where you wrote it. But the AI in that session remembers the conversation in which the skill was made. Even when something is missing from the text, it fills the gap with the intent it heard in that conversation, so the gaps rarely show at that point.
 
-At first, a short `SKILL.md` is often enough. Once the skill is used in real work, however, exceptions, safety constraints, execution order, output formats, and recovery instructions begin to accumulate. Eventually, one document is carrying not only purpose and judgment, but also conditionals, procedures, state checks, and error handling.
+For a skill you plan to keep using, it is worth checking at least these six things.
 
-As the document grows, the AI must reinterpret more material on every use. The same condition may be read differently in a different context, and a sentence added to prevent one failure may conflict with another rule. Each omission is patched with more prose, making the skill longer and harder to trust with every revision.
+- **Does it behave the same in another session?** When you open a new session tomorrow, or a colleague uses the same skill, the AI works only from what is written in `SKILL.md`. The intent you explained in today's conversation does not carry over.
+- **Does the same file always produce the same result?** If the AI writes new parsing code every time it receives a CSV in the same format, every run costs tokens and time, and the results can vary slightly.
+- **Does it judge correctly in situations the rules do not cover?** If you only pile up a rule for each case, such as "Never miss a refund" or "Don't put the whole installment in the first month," the AI has no standard to fall back on when an item the rules never mention, such as an annual fee or a foreign transaction fee, comes up. Only when it knows why a rule exists can it judge an unfamiliar item by the same standard.
+- **Does it read only what the current task needs?** If every case goes into the one `SKILL.md`, the installment rules are read every time, even in a month with no installments at all, and context and tokens are wasted.
+- **Can you change one rule without breaking other behavior?** If you keep adding a line of rules each time a problem appears, a new rule can conflict with an existing one and break cases that used to work. And that often comes to light only much later.
+- **Are you copying the same rule into several skills?** When several skills use the same rule, it is easy to keep a copy in each. Then, if you fix it in only one skill, the others keep following the old rule, and that is hard to notice until you compare them one by one. A skill fixed in the repository drifting apart from the copy installed in `~/.claude/skills` is the same problem.
 
-```mermaid
-flowchart LR
-    A["New requirements and exceptions"] --> B["More prose and conditions"]
-    B --> C["Interpretation burden and missed relationships"]
-    C --> D["Unexpected execution"]
-    D --> E["Patch with more prose"]
-    E --> A
+Few `SKILL.md` files meet all six from the start. A first-time author may not know what to check in the first place, and even an experienced author can easily miss gaps inside the very session where the skill was written. Even a skill that starts out well drifts here and there as it is fixed and extended. Writing good prompts alone does not solve this. You need a process that checks these points again, not only when the skill is made but every time it is changed.
+
+## What code has, and skills have lacked
+
+With code, we do not leave these problems to individual attention. Logic is written as functions, the same code lives in one place, build output is never edited by hand, and changes ship only after review and testing. With skills, none of this is a given yet. Skill Rails brings these practices to skills, applying them from the first version and keeping them up while the skill is changed.
+
+| What code takes for granted | What skills usually do | Skill Rails |
+| --- | --- | --- |
+| Write logic as code | Ask in sentences for parsing, calculation, and formatting too | Separate work that must be exact into scripts and leave only judgment in prose |
+| Define once and reuse | Copy shared rules into each skill | Keep shared rules in one place in the source and put them into each skill that needs them at build time |
+| Fix the cause instead of patching, and catch regressions in review | Append exception sentences and reread only the changed line | Look for the cause before adding anything, and review again before showing a result and before building |
+| Build from source and confirm the output matches it | Edit the installed `SKILL.md` directly and eyeball whether it matches the repository file | Build the skill folder (`skills/`) from the source folder (`source/`), and confirm with one command whether an installed skill was edited by hand or is older than its source |
+| Keep tests and rerun them in a clean environment after every change | Try it once or twice in the session where it was written | Save test tasks and pass criteria with the source; when you test after a change, an AI in a new session that does not know the conversation performs the same tasks again with the installed skill |
+
+There is no new framework to learn. Skill Rails is itself a skill, so you simply tell the AI what skill you want, as you normally would. The AI creates and manages the source structure, so you will rarely need to touch it yourself. A small skill gets a small structure: with no scripts or reference documents, the source consists of two configuration files and one source for `SKILL.md`, and the build output is just `SKILL.md` and a single build record file.
+
+## What changes
+
+### Written so an AI reading it for the first time can understand it
+
+The AI that uses a skill does not know what conversation the skill came out of. Skill Rails writes `SKILL.md` on that premise. The biggest change is in how rules are written. A skill that organizes card statements is often written like this:
+
+```markdown
+IMPORTANT: Never miss a refund.
+NEVER put the full installment principal in the first month's total.
 ```
 
-Natural language itself is not the problem. The problem is asking a single body of prose to carry both human judgment and execution rules that a machine could repeat.
+Skill Rails writes the same content like this:
 
-## Skill Rails turns a skill into something you build
-
-In a conventional skill, the source a person edits and the artifact placed in an AI tool's skill path are effectively the same document. That is similar to editing a finished program in place. Small changes are easy, but as the skill grows, it becomes harder to tell what the source is and which artifact is current.
-
-Skill Rails separates the **skill source** maintained by people from the **build artifact** used by the AI.
-
-The source keeps the purpose, background, judgment criteria, and exceptions in the author's own language. Principles shared by several skills have one source owner. Conditions, formats, input state, and record safety that must be handled the same way every time can move into Node.js scripts and verifiable rules.
-
-Skill Rails reads that source and builds one skill directory for an AI tool to use. Rebuilding the same source produces the same artifact. Integrity and source currentness are checked separately, so you can tell whether a deployed artifact was modified and whether it became stale after its source changed.
-
-```mermaid
-flowchart LR
-    subgraph S["Skill source maintained by people"]
-        A["Purpose · background · judgment"]
-        B["Shared principles and required material"]
-        C["Executable scripts and verifiable rules"]
-    end
-    A --> D["Skill Rails build"]
-    B --> D
-    C --> D
-    D --> E["One deployable skill directory"]
-    D --> F["Build receipt and currentness check"]
+```markdown
+The monthly total must be the amount the card issuer actually billed that month, because
+the user checks this total against the statement total. So include only this month's
+installment amount, and enter refunds as negative amounts. Before adding an item this
+standard cannot decide, ask the user.
 ```
 
-### What does a build actually produce?
+The first version blocks only the two cases it names. The second explains what the total means and why it must be calculated that way, so even when an item the rules never mention, such as an annual fee or a foreign transaction fee, comes up, the AI can judge it by the same standard.
 
-The result is not a separate application or server. It is a directory in the normal AI skill format. Some folders are optional, but a built skill generally looks like this:
+It also writes skills in these ways:
+
+- **Split so that content is read only when needed.** Only what is needed every time stays in `SKILL.md`. Content needed only occasionally, such as installment handling, moves into a separate file with a condition attached: "Read `installments.md` only when there are installment charges." In a month with no installments, that file is never read.
+- **Show the whole flow first.** For work that goes through several stages, the order of the stages is drawn at the very top, and the format of a result is shown with an example or a template rather than described in words.
+- **Do not invent what has not been decided.** Instead of filling in what the user has not decided with plausible sentences, it asks the user or marks the point as not yet decided.
+
+Before a new or changed skill is shown to the user, the AI that wrote it reviews it first. If the change alters what the skill does, it checks three things. First, it picks one or two real tasks for the skill and, setting aside what it heard in the conversation, traces what an AI following only the text of `SKILL.md` would end up doing. Next, it checks the result against the user's requirements and Skill Rails's writing criteria. Finally, it compares it with the version before the change to see whether anything was lost.
+
+If anything is fixed during the review, it reviews again from the start, and right before a build it looks over the whole skill as it will ship once more. When it shows you the result, it also tells you how it reviewed and what it found. A review by the AI that wrote the skill has its limits, so you can also hand the review to another agent if you want. The final check is the post-install test: say "test it," and an AI in a new session actually uses the installed skill.
+
+### Scripts handle calculation and formatting
+
+Writing "Read every line without missing any and total each card" in `SKILL.md` is like shipping a comment instead of a function. Every time the skill is used, the AI interprets that comment again and writes the same calculation code from scratch.
+
+Skill Rails looks at what a skill does step by step. Steps that must always give the same answer for the same input, such as parsing, aggregation, formatting, and rule checks, become scripts packaged with the skill. Steps that require weighing meaning, such as which category a merchant belongs to or whether to accept an exception, are left to the AI's judgment. When one step mixes the two, it is split: the AI decides the category, and a script takes that result and computes the total.
+
+We built a skill that organizes CSVs from two card issuers with different formats by month, in two ways, and compared them. The prose-only skill was made with a version of Skill Rails from before it could package scripts with a skill, and the script-backed skill with the current version. Then, in new Claude Code sessions with the same model, each skill was given a new month's statements twice, and the results were checked against answers calculated in advance.
+
+| | Prose-only skill | Script-backed skill |
+| --- | --- | --- |
+| Cost per use | about $0.44 | about $0.19 |
+| Time per use | 48 s | 26 s |
+| How it calculated | Wrote about 1,900 characters of calculation code anew on every use | Calculated with the packaged script; identical output both times |
+| Accuracy of the totals | Correct both times | Correct both times |
+
+Accuracy was the same; the difference lay in cost and consistency. Cost fell to less than half and time to nearly half, and the script-backed skill produced identical output both times. In exchange, building the skill cost about $1 more, so it pays for itself after four or five uses. Note that this compares one task on one model.
+
+That does not mean everything becomes a script. Scripts are code that must be maintained too, so one is made only when the effort it saves outweighs the cost of maintaining it. A skill that is all judgment, such as replying to email, is written in prose alone.
+
+If a skill you build needs to write into a file that people also edit, such as a CHANGELOG, you can package the record script that Skill Rails provides with it. The script writes only inside a marked region, and if the file has changed in the meantime, it stops instead of overwriting. It never touches the parts people wrote.
+
+### When fixing, find the cause first
+
+Fixing prompts easily turns into whack-a-mole. Block one spot and a problem pops up somewhere else, and the text only grows longer. When fixing a skill, Skill Rails follows these principles.
+
+- **Fix the cause, not the symptom.** If the same merchant lands in a different category every month, it looks for the cause before rewording the classification instruction yet again. If the cause turns out to be a structure in which the category table is recreated every month and last month's decisions are lost, it fixes that structure, not the sentence.
+- **Stop when the same sentence needs a third fix.** It takes that as a sign that the cause lies somewhere other than the wording, and looks for the cause again.
+- **Look at the purpose of a request rather than the method requested.** Even when asked to "add a rule that blocks this case," if fixing an existing rule would better serve the purpose, it proposes that first, with its reasons. Which way to go is the user's decision.
+
+### After a fix, test again with the same tasks
+
+Whether fixing one rule broke some other behavior can only be known by testing again with the same tasks. The first time you test, Skill Rails proposes test tasks and pass criteria before running anything. For a card statement skill, that means a criterion you can check in the result, such as "the November total is 140,900 won, and the total was computed by the script." You can set the tasks yourself; if you don't, the AI proposes one or two tasks for the skill's main use, along with tasks that check whether the skill is invoked when it is needed and stays out of requests that look similar but call for something else. Once you agree, the tasks are saved in `tests/tasks.md` next to the source and are not included in the skill that ships.
+
+From then on, each time you test after a change, the affected tasks run again and are judged against the saved criteria. Because the criteria were set in advance, you can tell what broke without running the version from before the change again. For example, if a colleague adds "duplicate charge filtering" and it also deletes charges of the same amount made on different dates, the total criterion catches it, and the work stops before the build and points to the cause. An item for which no evidence can be shown does not count as passed, and if a result could vary with the AI's judgment, it does not make a fix based on that single run but runs it again to confirm the result was not chance.
+
+Whether a skill is invoked when it should be cannot be told from a single run. If you want, eight to ten requests of each kind, ones that should invoke the skill and ones that look similar but should not, are saved, and each request is run three times in a new session of every tool that will use the skill, measuring how often the skill was actually invoked. The AI revises the description based on the failed requests and measures again. Some of the requests are held out, and the final description is chosen by their results, which keeps a description that fits only the requests consulted while revising from being picked. Measurement uses the description in the source, so there is no need to build after every revision. Each run, however, is a real session that costs money, so you are told how many runs it will take and asked to agree before it starts.
+
+### Build from one source, and check installed skills
+
+- **Keep shared rules in one place.** Rules that several skills use live in one place in the source, and at build time they are copied into each skill that uses them. When you change a rule, you rebuild only the skills that use it.
+- **The same source always builds to the same result, and a built skill works on its own.** However many times you build, the output does not differ by a single byte. So if the build output changed, the source changed, and you can review that difference as a diff. A built skill is a standard skill folder, so it works without the source repository or Skill Rails. If it contains scripts, all it needs is an environment to run them (for example, Node.js).
+- **You know right away when an installed skill differs from its source.** Each built skill keeps a record of the source it was built from. Run `check` once and it tells you, separately, whether the installed skill was edited by hand after the build and whether it is older than its source. If you edited an installed skill directly in a hurry, the AI moves the changes you want to keep into the source and, when you ask, rebuilds and replaces the installed copy.
+- **You are not tied to one delivery method.** You can copy the skill into an AI tool's skill folder, push it to a repository and install it with a tool such as `npx skills`, bundle it as a plugin, or use a method of your own. Changing the method does not mean remaking the skill.
+
+<details>
+<summary>What the source and build output look like</summary>
 
 ```text
-my-skill/
-├─ SKILL.md                  # The entry document the AI reads first
-├─ references/               # Reference material included for this skill
-├─ scripts/                  # Execution logic and integrity tools
-├─ config/                   # The target declaration
-└─ .skill-rails-build.json   # A receipt identifying the source of the build
-```
-
-Copy this directory—or place it with a standard skill installer—under a project path such as `.agents/skills/my-skill/` or `.claude/skills/my-skill/`. The AI tool discovers `SKILL.md` and can use the material and scripts bundled with it.
-
-This is what *standalone* means here. It does not mean that another program is installed. **The skill directory contains everything it needs at runtime, so it does not have to reach back into the source directory or a Skill Rails installation.**
-
-The goal is not to restrain the AI with a longer prompt. It is to **state meaning more clearly where the AI must judge, and turn work that must repeat the same way into scripts the AI can execute.**
-
-## What does “mechanizing” a skill actually mean?
-
-Suppose you want a skill that reviews a month of expenses and receipts and produces an expense report:
-
-> Check every expense. Require a receipt above the company's threshold. Flag matching dates, merchants, and amounts as possible duplicates. Calculate category totals and the overall amount, then produce a consistent table.
-
-The rules are easy for a person to understand. But a natural-language instruction is not the execution itself. As the number of items and overlapping conditions grows, so does the chance that the AI will skip an item, apply the same rule differently, or make a mistake in the calculations or output format.
-
-| When everything is instructed in prose | When the logic moves into scripts |
-| --- | --- |
-| Ask the AI to “check every item without omissions.” | A loop visits every item and verifies the processed count. |
-| List receipt thresholds and conditions in sentences. | An `if` statement applies the same rule to every item. |
-| Restate the duplicate criteria for each run. | A key built from date, merchant, and amount finds duplicate candidates. |
-| Ask the AI to calculate category totals and rounding. | Functions apply the same arithmetic and rounding rules. |
-| Describe the report's columns and order in prose. | A defined format and checks produce the same report structure. |
-
-Whether an expense has an unclear business purpose, whether an exception is acceptable, and what must be asked of the user remain judgments for the AI and the person. Scripts do not imitate that judgment. They own the repetition, conditions, calculations, and formatting that can be executed reliably.
-
-**If 10 rules must be applied to 100 expenses, the prose-only approach depends on the AI applying rules correctly 1,000 times. A script executes 10 tested rules across 100 items in a loop.**
-
-Skill Rails does not reduce meaning. It removes conditions, repetition, and calculations that do not need to be reinterpreted from the prompt and moves them into code that actually runs. As more of the mechanical work moves into scripts, the amount of prompt text required by the skill can shrink.
-
-This does not guarantee that the AI will always invoke the script at the right time. Once invoked, however, its conditions and calculations are no longer reinterpreted on every run, and they can be tested like ordinary code. When something fails, you can fix the faulty condition or calculation instead of rewriting the entire body of prose.
-
-## Write in your own language, then structure it with AI
-
-You do not need to begin with a complex configuration file. Start by describing the skill you want in ordinary language.
-
-- What work is being repeated because this skill does not exist?
-- What purpose and background must the AI understand?
-- Which parts require contextual judgment by a person or the AI?
-- Which parts should always be checked or produced the same way?
-- What must be observed before the work can honestly be called complete?
-
-The AI uses those answers to structure the skill source. It separates the entry document that every run needs, shared sources used by multiple skills, and targets that will be built independently. If a meaningful decision is missing, it should remain undecided or return to the user rather than being filled with plausible prose.
-
-```text
-my-skill-source/
-├─ skill-package.json
+source/                            ← the source people edit together with the AI
+├─ skill-package.json              # declares which skills to build
 ├─ modules/
-│  └─ shared-policy.md
-└─ targets/
-   ├─ plan/
-   │  ├─ target.json
-   │  └─ entry.md
-   └─ verify/
-      ├─ target.json
-      └─ entry.md
+│  └─ category-rules.md            # shared rules that several skills use
+├─ tools/
+│  └─ card-totals.mjs              # script packaged with the skill
+└─ targets/card-statement/
+   ├─ target.json                  # rules, documents, and scripts this skill uses
+   ├─ SKILL.source.md              # source that becomes SKILL.md
+   └─ installments.md              # document opened only when there are installment charges
+
+skills/card-statement/             ← build output (never edited by hand)
+├─ SKILL.md
+├─ references/
+│  ├─ installments.md
+│  └─ category-rules.md
+├─ scripts/
+│  └─ card-totals.mjs
+└─ .skill-rails-build.json         # record of the source it was built from
 ```
 
-This structure is not a template that replaces the user's language with prescribed wording. The concepts and expressions created by the author remain in the source. The structure makes it explicit where each meaning lives and which skills consume it.
+</details>
 
-## Build several standalone skills from one source
+### The next session picks up the work
 
-Imagine that a planning skill and a verification skill use the same policy. Copying that policy into both `SKILL.md` files is convenient at first. When the policy changes, both copies must be found and edited. Missing one does not prevent installation or execution, so an outdated rule can remain silently active.
+Skill work often does not finish in a single session. When you start a new skill, Skill Rails asks once whether to keep work records in the project. If you choose the recommended set, the current state, decisions that were hard to make and their reasons, and plans in progress are kept as documents in the repository, and the next session reads them and continues right away. Unlike an AI tool's memory, these records live in the repository, so colleagues and other AI tools can start from the same state. You can also start work in Claude Code and continue it in Codex. If you already have your own way of keeping records, it follows that, and if you do not need records, it proceeds without them.
 
-With Skill Rails, the policy has one source owner and both targets declare that they consume it. At build time, each skill receives the material it needs. The planning and verification skills can then be placed and used independently without depending on each other.
+<details>
+<summary>The documents it keeps</summary>
 
-When the shared policy changes, existing artifacts remain intact but become *stale relative to their source*. You can identify the affected targets and rebuild only the skills that need to change.
+At first, it creates `docs/current.md` and adds a short section to `AGENTS.md` saying when to read and update these documents. If there is no `AGENTS.md`, it creates one; if there is, the existing content stays as it is. For a tool that reads its own instruction file, as Claude Code reads `CLAUDE.md`, it adds one line to that file pointing to `AGENTS.md`. The other documents are created only when they are needed.
 
-This matters more as a skill system grows:
-
-- Authors change one owner for one meaning.
-- Maintainers can move directly from a changed source to the skills that consume it.
-- The AI using a generated skill does not need the authoring repository or Skill Rails internals.
-- Each generated skill runs without another skill or a global Skill Rails runtime.
-
-## What changes when you use Skill Rails?
-
-| When a skill is managed as prose alone | When the skill is built with Skill Rails |
+| Document | What it holds |
 | --- | --- |
-| You edit the `SKILL.md` that will be deployed. | You edit maintained source and rebuild the artifact. |
-| Branches, loops, and shared processing are all explained in sentences. | They move into `if` statements, loops, and functions; the document keeps their meaning and invocation rules. |
-| The same rule is copied into several skills. | One shared source feeds several build targets. |
-| Change impact is traced by opening files one by one. | Declared relationships connect sources to their consumers. |
-| Currentness is checked by visually comparing installed files. | Artifact integrity and source currentness are checked separately. |
-| A successful build can be mistaken for successful AI behavior. | Delivery checks and real-use observations remain separate evidence. |
+| `docs/current.md` | The skill's purpose and makeup, where the source and builds live, the delivery method, and questions not yet answered |
+| `docs/decisions/` | The conclusion of each decision that was not easy to make, and the reasons for it |
+| `docs/plans/` | Plans in progress for the next session to take over |
+| `docs/changes/` | Change records worth keeping, such as test results |
+| `docs/research/` | Material confirmed from outside sources, with the date it was checked |
 
-Authors can focus on explaining the problem in their own language, while AI helps organize that material into the recommended structure. The AI using the result receives only the built skill; it does not have to relearn how the skill was authored or how Skill Rails itself works.
+`current.md` is always overwritten with the current state, and past history is left to the change records and Git. So however many records pile up, the document the AI reads first always stays short.
 
-## Mechanize only as much as the skill needs
+</details>
 
-Not every skill needs a script. If an AI can understand the purpose and judgment criteria and then act with files, a terminal, or a browser, a natural-language-centered skill is often the better design. Skill Rails starts with this simplest form.
+## Getting started
 
-When a single declared output must be recorded repeatedly, and input changes, concurrent edits, exact formatting, or reread verification are real risks, only that portion needs to move into a script. Skill Rails calls this optional recording structure `record-only`.
-
-Do not split a document merely because it is long, or mechanize a rule merely because it can be expressed in code. Separate only material that a real task can safely skip, and only when the reading saved is greater than the cost of finding and rereading it.
-
-## Rails do not help when the destination is wrong
-
-Skill Rails does not choose the destination for a skill. If an unclear purpose or missing judgment is built into a precise structure, the wrong skill will simply be produced more consistently.
-
-Skill Rails can still fail when you:
-
-- Fill in file formats before defining purpose and completion.
-- Freeze human judgment and permission decisions into code too early.
-- Split material that must be read and judged together.
-- Edit a generated artifact and allow it to diverge from its source.
-- Treat a passing structural check as proof that an AI understood and followed the skill.
-- Keep adding rules, state, and checks in an attempt to eliminate every uncertainty.
-
-The better approach is the reverse: begin with the smallest natural-language skill, then move only observed interpretation gaps and execution risks into scripts. Build checks establish that the artifact was delivered correctly. A fresh AI using the skill establishes whether it was actually understood and produced the intended effect.
-
-## Install and get started
-
-Skill Rails currently runs on Node.js `24.x`. Install it with:
+Requires Node.js 22 or later.
 
 ```bash
 npx skills@latest add nanomia-ai/skill-rails
 ```
 
-This step installs `skill-rails`, the authoring skill—not the skill you intend to create. You will then use it to create a separate skill source and its build artifacts.
-
-During installation, select `skill-rails`, the AI tools that should receive it, and either a global or project location. Restart the AI tool only if the installed `skill-rails` does not appear in the current session.
-
-Then describe the skill you want in ordinary language:
-
-The example below is not a built-in Skill Rails feature. It is one ordinary workflow a user could describe and turn into a new skill.
+`skills` is a tool that installs skills into many AI tools. During installation you can choose which AI tools to use and where to install. Once it is installed, open the project where you want to build a skill and tell the AI what skill you want.
 
 ```text
-Use Skill Rails to create a skill that reviews a month of expenses.
-
-It should review expense records and receipts and produce a report with each item's status and the totals.
-Keep judgments about unclear business purpose and acceptable exceptions in natural language.
-Use scripts to handle iteration across every item, receipt rules, duplicate detection, totals, and the output format consistently.
-Separate the maintained source from the skill directory the AI tool will use, then build and verify it.
+Using Skill Rails, make a skill that organizes two card issuers' monthly CSVs by category and totals them.
 ```
 
-The AI identifies the purpose and boundaries, writes the required sources and targets, and builds the skill. From then on, edit the source and rebuild rather than changing the artifact directly.
+```mermaid
+flowchart LR
+    A["Describe the skill you want"] --> B["Design and revise the source<br/>Reviewed before each showing"]
+    B -->|"test it"| C["Full review<br/>Choose a delivery method (first time only)<br/>Build and install"]
+    C --> D["A new session uses it<br/>on the saved test tasks"]
+    D -->|"something to fix"| B
+    D -->|"good enough"| E["Done"]
+```
 
-### When you need the commands directly
+The source is created in the project's `source/` folder, and you can refine it together as much as you like. Nothing is built in the meantime. When you say "test it," the whole skill is reviewed once more; the first time, you choose a delivery method together, and the skill is then built (by default into `skills/<skill name>/`) and installed on this computer. Next, a new session or a subagent that does not know the conversation so far does real work with that skill. In the first test, you first agree on test tasks and pass criteria, and it examines not only the results but also how the work went, to see whether the skill caused any unnecessary steps. After that, further fixes are made in the source again, and the next test runs on the saved tasks. If an installed skill falls behind its source, the AI tells you.
 
-Let `<skill-root>` be the directory containing the installed `SKILL.md`. The current command forms are available through:
+If you already have a skill, just say "Move this skill into Skill Rails." The AI leaves the original skill untouched and, before moving anything, first shows a mapping table of where each file goes in the new source (`source/`) and how install paths change. Configuration files that Codex reads directly rather than the AI, such as Codex's `agents/openai.yaml`, move along to the same paths. A large skill with many scripts, or with files shared across several skills, is not moved all at once but over several steps with you. At each step, it checks against the original skill that no behavior is missing, and when testing, it compares the results with the original skill's on the same test tasks.
+
+<details>
+<summary>Using the CLI directly</summary>
+
+Below, `<skill-root>` is the folder that contains the installed `skill-rails`'s `SKILL.md`.
 
 ```bash
 node "<skill-root>/scripts/skill-rails-cli/src/core/cli.mjs" --help
 ```
 
-- `build` builds one target or every target.
-- `check` verifies artifact integrity and source currentness.
-- `inspect` finds an exact source and the targets that consume it.
-- `overview` calculates a human-readable view of the current source graph.
+| Command | What it does |
+| --- | --- |
+| `build` | Builds one skill or all of them |
+| `check` | Checks whether a built skill was edited by hand or is older than its source |
+| `inspect` | Finds which skills use a shared rule or script |
+| `overview` | Prints the whole source structure in a form people can read easily |
+| `start-rate` | Measures how reliably the description gets the skill invoked, in new sessions of each tool (every run is a real session that costs money) |
 
-`overview` is a view for understanding the current structure, not another source document that must be maintained.
+</details>
 
-## What has been verified
+## How is it different from skill-creator?
 
-Skill Rails has been exercised with deterministic rebuilds from the same source, separate integrity and source-currentness checks, multiple targets consuming one shared source, and affected-only rebuilds. Installed Skill Rails was also used to author and build multiple skills, after which separate Codex and Claude Code sessions used the generated skills to produce real outputs.
+There is also `skill-creator`, a skill for making skills. Codex includes it by default, and Claude Code offers it as an official plugin. The three, Skill Rails included, largely agree on what makes a good skill: explain the reasons instead of just listing rules, split off occasionally needed content so it is read only when needed, and move repetitive or exactness-critical work into scripts. The differences lie in how those principles are actually made to hold, and in how much ground each one covers.
 
-That does not establish the same cost reduction or quality improvement for every skill and environment. Structural and build checks establish delivery. Real-use observations establish AI behavior and effects. Effects that have not been observed remain unproven.
+- **It checks at every writing step, even before anything runs.** Claude's `skill-creator` is strong at checking a skill by actually running it and examining the results. But many of the gaps described above do not show unless a test task happens to touch that case, and new ones appear while a skill is being fixed. Skill Rails checks the draft against its writing criteria and the version before the change every time before showing a plan or a changed skill, and right before a build it checks the whole skill as it will ship once more. Tests use the copy actually installed, not the files in the repository.
+- **The work after creation has a process too.** All three handle fixing skills. But neither `skill-creator` has a process for the following: several skills sharing common rules from one place (Codex, in fact, recommends that each skill be fully self-contained), finding every skill that uses a shared rule or script before changing it, confirming that an installed skill matches its source, carrying the state of work across sessions, and moving an existing skill into a source package.
+- **It is not tied to a particular agent.** Each `skill-creator` is complete within its own tool. For example, description optimization runs only on the `claude` CLI, and the start setting is handled only through Codex's `agents/openai.yaml`. Skill Rails is meant for any agent that reads standard skill folders. The way a skill is made, and its source, are one and the same whatever the tool; only the parts that differ by tool, such as the setting that makes a skill start only when called by name, are built in for each tool. How reliably the description gets the skill invoked is also measured in each tool separately. Even if team members use different agents, or you switch tools later, the same source keeps working as it is. The tools actually verified so far are Claude Code and Codex.
 
-## Product boundaries
+The table below follows the order in which a new skill is made and compares what each of the three has the AI do at each stage. The last two rows compare starting from an existing skill and working across multiple sessions.
 
-Skill Rails is an authoring system for creating and maintaining standalone AI skills. It does not orchestrate work across repositories or control an AI's permissions.
+| Stage | Claude `skill-creator` | Codex `skill-creator` | Skill Rails |
+| --- | --- | --- | --- |
+| Understanding the request | Organizes the use, the phrases that should invoke the skill, and the output format through an interview. May also turn work done earlier in the conversation into a skill | Asks only when truly necessary and stays within the requested scope | Looks at the purpose rather than the wording of a request. If there is a better way than the method requested, proposes it first with its reasons, and asks only when an unclear purpose would change the outcome. Leaves decisions that change the purpose or scope to the user |
+| Splitting skills | Not covered | Keeps each skill self-contained; refers to other skills only when truly necessary | Splits off into a separate skill only work that starts independently (a different invocation condition, a separate session, or a review that must be kept apart from the writing). Keeps shared rules in one place in the source and puts them into each skill at build time. Checks that work handed to another skill is also written down on the receiving skill's side |
+| Prose and scripts | Bundles helper code into a script when the same code gets written in every test | Makes a script when the same code is written repeatedly or exact execution matters | Splits the work step by step at design time. Work whose answer is exactly determined and would change the result if wrong goes to scripts, work that weighs meaning goes to the AI, and in mixed steps a script calculates from what the AI judged. Makes a script only when the gain outweighs the maintenance cost. A record script that never overwrites is available for files people also edit |
+| Writing | Explains reasons instead of uppercase MUSTs. Keeps `SKILL.md` under 500 lines and has the rest read when needed | Leaves out what the model already knows and keeps only information that changes decisions. As specific as the risk warrants; read when needed | On top of those principles, writes for an AI that does not know how the skill was made. Puts a map of the whole flow first for multi-stage work, gathers the purpose and criteria for one judgment in one place, calls the same thing by the same name throughout, and marks undecided points instead of inventing them |
+| Description and how it starts | Writes descriptions assertively so the skill gets invoked, and optimizes the description automatically with 20 test queries | Short and distinct from other skills. Uses the setting that starts a skill only when named only if the user asks; even sensitive work keeps automatic start but asks for approval right before acting | Written in the user's words and distinct from similar skills. A skill whose results the user should decide on, such as deploying, sending, or deleting, starts only when called by name, set in both Claude Code's and Codex's own settings. The build stops if the name or description breaks the format the tools accept (a description within 1,024 characters, and so on). When the description changes, sends requests that should start the skill and requests that look similar but should not to new sessions of each tool to check. If you want, expands the requests to eight to ten of each kind, runs each three times to measure the start rate, and revises the description with some requests held out, choosing the final one by their results |
+| Review | Recommends rereading a revised draft with fresh eyes | Runs a format-check script (frontmatter, name, leftover placeholders), then reviews the description, intent, and references | Reviews every time before showing a plan or a changed skill, and the whole skill right before a build. For a change that alters behavior, reads one or two real tasks through as the AI that will use the skill would, checks against the writing criteria, and compares with the version before the change for anything lost. If anything is fixed during review, starts over |
+| Build and install | Uses the skill folder as is; packages it as a `.skill` file at the end only where file delivery is available | Writes directly into the skill folder | Builds from the source to the same result every time and keeps a build record. Chooses and records a delivery method (folder copy, `npx skills`, plugin, and so on). Uses `check` to confirm whether an installed skill was edited by hand or is older than its source |
+| Testing | Saves tasks and, in each iteration, runs them side by side with no skill (or the previous version), measuring pass rate, time, and tokens. Assertions are written during the run and graded with evidence by another agent. People review the results in a viewer; blind comparison is optional | Format check. For complex or risky skills, gives a real task to a subagent that is not told the answer | Sets tasks and pass criteria before running and saves them next to the source; a new session that does not know the conversation uses the actually installed skill. Items without evidence do not count as passed, and both the results and how the work went are examined. After a change, the affected tasks run again and regressions are identified against the saved criteria, so the previous version is not rerun. For skills that contain scripts or configuration files, runs `check` on the installed copy and runs the scripts directly to confirm the installer did not drop or alter files |
+| Fixing | Generalizes rather than fitting a few examples; reads run transcripts and removes unhelpful instructions | Makes narrow fixes grounded in real use and observed failures | Before changing a shared rule or script, finds every skill that uses it and reviews them together. Fixes where the cause is, not where the symptom showed. Before adding anything, first sees whether something can be removed or merged; when the same sentence needs a third fix, stops and looks for the cause again |
+| Existing skills | Saves the previous version and compares it with the new one on the same tasks | Changes only what is needed and keeps the existing start setting | Leaves the original skill as it is, first shows a mapping table of where each file goes, then moves it into the source. Moves a large skill over several steps with the user, giving the original the same work at each step for comparison |
+| Next session | Keeps per-iteration results in a workspace folder | Not covered | Keeps the current state, decisions and their reasons, and plans in progress as documents in the repository, so other sessions, colleagues, and other AI tools can take over |
 
-One source package may contain several build targets, but every generated skill must remain usable on its own. At runtime, it does not depend on this repository, another skill, or a global Skill Rails installation.
+Claude's `skill-creator` is better in some respects, too. In each iteration, it runs side by side with no skill (or the previous version) to compare pass rate, time, and tokens in numbers, and it shows the results in a viewer where people can leave feedback on each task. Both refine descriptions, but `skill-creator` launches a separate Claude to revise the description and never shows it the held-out requests at all. In Skill Rails, the AI in the current conversation revises the description, so it receives the held-out results only as counts, though the requests themselves can be read in the saved file. Skill Rails also compares against running without the skill only when deciding on adoption or release, and it has no results viewer. And because `skill-creator` does not separate source from build, there is less to learn. So if you want to make one skill quickly in Claude and measure the results in numbers, `skill-creator` is the better fit; for skills that share rules with one another and that you will keep revising for a long time across several agents, Skill Rails is the better fit.
 
-## Documentation
+This comparison was compiled in November 2026 from reading each `skill-creator`'s `SKILL.md`.
 
-- [Skill Rails usage procedure](skills/skill-rails/SKILL.md)
-- [Product purpose and architecture (Korean)](docs/skill-rails_ko.md)
+## Further reading
+
+- [The Skill Rails body](skills/skill-rails/SKILL.md): the instructions the skill-building AI reads
+- [How to plan and revise skills (Korean)](source/modules/skill-evolution-method_ko.md)
+- [Product purpose and structure (Korean)](docs/skill-rails_ko.md)
 - [Implementation and verification scope (Korean)](docs/implementation-verification_ko.md)
-- [Method for evolving AI skills (Korean)](source/modules/skill-evolution-method_ko.md)
+
+[Apache-2.0](LICENSE)
