@@ -22,9 +22,11 @@ Commands:
            an ID names the package, a module, a tool, or a target
   overview --source <manifest>
   start-rate --source <manifest> --target <target-id> --host <claude|codex|host-file>[,...]
-           [--runs <n, default 3>] [--workers <n, default 4>] [--timeout <seconds, default 120>]
+           [--beside <target-id|skill-folder>[,...]] [--runs <n, default 3>] [--workers <n, default 4>]
+           [--timeout <seconds, default 120>]
            starts fresh host sessions on the target's unnamed tests/tasks.md tasks and counts
-           how many start it; every run is a real, billed host session
+           how many start it, with the skills named by --beside held beside it and counted apart;
+           every run is a real, billed host session
 
 Invalid command arguments return JSON with a task-specific nextAction.
 `;
@@ -82,7 +84,7 @@ async function main() {
     return { format: "text", ...(await buildHumanOverview(await loadSourceGraph(values["--source"])))};
   }
   if (command === "start-rate") {
-    allow(values, ["--source", "--target", "--host", "--runs", "--workers", "--timeout"]);
+    allow(values, ["--source", "--target", "--host", "--beside", "--runs", "--workers", "--timeout"]);
     if (!values["--source"] || !values["--target"] || !values["--host"]) fail("ARGUMENT_INVALID", "start-rate requires --source, --target, and --host.", "Name the source manifest, the exact targetId, and each host the skill is delivered to.");
     const count = (key, fallback) => {
       if (values[key] === undefined) return fallback;
@@ -94,6 +96,7 @@ async function main() {
     return measureStartRate(await loadSourceGraph(values["--source"]), {
       target: values["--target"],
       hosts,
+      beside: [...new Set((values["--beside"] ?? "").split(",").map((spec) => spec.trim()).filter(Boolean))],
       runs: count("--runs", 3),
       workers: count("--workers", 4),
       timeoutSeconds: count("--timeout", 120),

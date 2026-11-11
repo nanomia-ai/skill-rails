@@ -1,9 +1,9 @@
 import { spawn, spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
-import { dirname, extname, isAbsolute, join, resolve } from "node:path";
+import { basename, dirname, extname, isAbsolute, join, resolve } from "node:path";
 import { compareCodePoint, sha256 } from "./canonicalize.mjs";
 import { fail } from "./errors.mjs";
 import { fileArtifactPath } from "./build.mjs";
@@ -41,7 +41,7 @@ export function readStartTasks(text, logicalPath) {
     const heading = /^## (.+)$/u.exec(line);
     if (heading) { current = { name: heading[1].trim(), fields: {} }; tasks.push(current); field = null; continue; }
     if (!current) continue;
-    const label = /^(Request|Start|Inputs|Must hold):[ \t]*(.*)$/u.exec(line);
+    const label = /^(Request|Start|Inputs|Replies|Must hold):[ \t]*(.*)$/u.exec(line);
     if (label) { field = label[1]; current.fields[field] = label[2]; continue; }
     if (field) current.fields[field] += `\n${line}`;
   }
@@ -72,13 +72,15 @@ function holdOut(tasks) {
 }
 
 async function loadHost(spec) {
-  if (Object.hasOwn(PRESETS, spec)) return { id: spec, ...PRESETS[spec] };
+  if (Object.hasOwn(PRESETS, spec)) return { id: spec, kind: spec, ...PRESETS[spec] };
   let value;
   try { value = JSON.parse(await readFile(resolve(spec), "utf8")); }
   catch { fail("ARGUMENT_INVALID", `--host ${spec} is neither ${Object.keys(PRESETS).join(" nor ")} nor a readable JSON host file.`, "Name a known host, or give a host file {\"id\", \"skillsDir\", \"command\"} whose command reads the request on standard input."); }
   if (typeof value?.id !== "string" || typeof value.skillsDir !== "string" || !Array.isArray(value.command) || !value.command.length || !value.command.every((part) => typeof part === "string")) fail("ARGUMENT_INVALID", `Host file ${spec} needs id, skillsDir, and a non-empty command array of strings.`, "Correct the host file.");
   if (isAbsolute(value.skillsDir) || value.skillsDir.includes("\\") || value.skillsDir.split("/").some((part) => !part || part === "." || part === "..")) fail("ARGUMENT_INVALID", `Host file ${spec} skillsDir must be a relative path inside the run's folder: ${value.skillsDir}`, "Give the folder, relative to a project, where that host finds project skills, using forward slashes.");
-  return { id: value.id, skillsDir: value.skillsDir, command: value.command, userSkillDirs: null };
+  // A host file that runs claude or codex, as one for another model does, keeps that host's hiding of installed copies.
+  const kind = basename(value.command[0]).replace(/\.(?:cmd|exe|bat)$/iu, "").toLowerCase();
+  return { id: value.id, skillsDir: value.skillsDir, command: value.command, ...(Object.hasOwn(PRESETS, kind) ? { kind, userSkillDirs: PRESETS[kind].userSkillDirs } : { userSkillDirs: null }) };
 }
 
 // Same-name copies under a host's user folders, its synced and plugin skills included, a few levels deep.
@@ -98,20 +100,21 @@ export function installedCopies(roots, name) {
   return [...found];
 }
 
-// A copy of this skill installed for the user would be the one the host shows, so the probe must be the only one it sees.
-function isolate(host, name) {
-  if (!host.userSkillDirs) return { ...host, isolation: `not known for this host: a copy of ${name} it loads from elsewhere may be the one it shows, so remove it from the host for the measurement` };
-  const copies = installedCopies(host.userSkillDirs(), name);
+// A copy of a placed skill installed for the user would be the one the host shows, so each probe must be the only one it sees.
+// The options go right after the program, where both hosts take them, whatever order a host file gives the rest in.
+function isolate(host, names) {
+  if (!host.userSkillDirs) return { ...host, isolation: `not known for this host: a copy of ${names.join(", ")} it loads from elsewhere may be the one it shows, so ask the user to take it out of the host's reach for the measurement` };
+  const copies = names.flatMap((name) => installedCopies(host.userSkillDirs(), name));
   if (!copies.length) return { ...host, isolation: null };
-  if (host.id === "codex") {
+  if (host.kind === "codex") {
     const config = `skills.config=[${copies.map((path) => `{path='${path}',enabled=false}`).join(",")}]`;
-    return { ...host, command: [host.command[0], host.command[1], "-c", config, ...host.command.slice(2)], isolation: `disabled the installed copy at ${copies.join(", ")} for each run` };
+    return { ...host, command: [host.command[0], "-c", config, ...host.command.slice(1)], isolation: `disabled the installed copy at ${copies.join(", ")} for each run` };
   }
   // Hiding the user's settings would also drop the model they chose, so it is passed on explicitly.
   let model = null;
   try { model = JSON.parse(readFileSync(join(process.env.CLAUDE_CONFIG_DIR ?? join(homedir(), ".claude"), "settings.json"), "utf8")).model ?? null; } catch { /* no user model */ }
   const keep = typeof model === "string" && !host.command.includes("--model") ? ["--model", model] : [];
-  return { ...host, command: [host.command[0], host.command[1], "--setting-sources", "project", ...keep, ...host.command.slice(2)], isolation: `hid user-level skills, plugins, and settings${keep.length ? ` except the model ${model}` : ""}, since a copy is installed at ${copies.join(", ")}; skills that compete from there are not measured` };
+  return { ...host, command: [host.command[0], "--setting-sources", "project", ...keep, ...host.command.slice(1)], isolation: `hid user-level skills, plugins, and settings${keep.length ? ` except the model ${model}` : ""}, since a copy is installed at ${copies.join(", ")}; skills that compete from there are not measured` };
 }
 
 // Windows starts a .cmd or .bat only through its shell; anything else runs directly, so its arguments arrive intact.
@@ -148,17 +151,22 @@ function stop(child) {
   else child.kill("SIGKILL");
 }
 
-async function probe(host, skill, request, timeoutMs) {
-  const token = `skill-rails-start-${randomBytes(8).toString("hex")}`;
+// Every placed skill gets its own token, so a run shows which one the host opened; the first is the one measured.
+async function probe(host, skills, request, timeoutMs) {
+  const tokens = skills.map((skill) => [`skill-rails-start-${randomBytes(8).toString("hex")}`, skill]);
   const workspace = await mkdtemp(join(tmpdir(), "skill-rails-start-"));
   try {
-    const folder = join(workspace, ...host.skillsDir.split("/"), skill.name);
-    await mkdir(folder, { recursive: true });
-    await writeFile(join(folder, "SKILL.md"), `${skill.frontmatter}\n# ${skill.name}\n\nThis is a start probe. Reply with exactly ${token} and nothing else, and do no other work.\n`);
-    for (const [path, bytes] of skill.files) {
-      await mkdir(dirname(join(folder, path)), { recursive: true });
-      await writeFile(join(folder, path), bytes);
+    for (const [token, skill] of tokens) {
+      const folder = join(workspace, ...host.skillsDir.split("/"), skill.name);
+      await mkdir(folder, { recursive: true });
+      if (skill.folder) await cp(skill.folder, folder, { recursive: true, filter: (path) => !/[\\/](?:\.git|node_modules)$/u.test(path) });
+      await writeFile(join(folder, "SKILL.md"), `${skill.frontmatter}\n# ${skill.name}\n\nThis is a start probe. Reply with exactly ${token} and nothing else, and do no other work.\n`);
+      for (const [path, bytes] of skill.files) {
+        await mkdir(dirname(join(folder, path)), { recursive: true });
+        await writeFile(join(folder, path), bytes);
+      }
     }
+    const keep = tokens[0][0].length;
     const env = { ...process.env };
     delete env.CLAUDECODE;
     return await new Promise((settle) => {
@@ -176,8 +184,9 @@ async function probe(host, skill, request, timeoutMs) {
       const timer = setTimeout(() => finish({ outcome: "timed out" }), timeoutMs);
       const watch = (chunk) => {
         const seen = tail + chunk.toString("utf8");
-        if (seen.includes(token)) finish({ outcome: "started" });
-        tail = seen.slice(-token.length);
+        const opened = tokens.find(([token]) => seen.includes(token));
+        if (opened) finish(opened[1] === skills[0] ? { outcome: "started" } : { outcome: "started beside", name: opened[1].name });
+        tail = seen.slice(-keep);
       };
       child.stdout.on("data", watch);
       child.stderr.on("data", (chunk) => { watch(chunk); errorText = (errorText + chunk.toString("utf8")).slice(-600); });
@@ -197,13 +206,41 @@ function verdict(expect, counts) {
   return expect === "start" ? counts.started * 2 >= ran : counts.started * 2 < ran;
 }
 
+function deliveredFiles(item) {
+  return item.delivered.flatMap((delivered) => delivered.files.map((file) => [fileArtifactPath(delivered, file), file.bytes]));
+}
+
+// A skill the host would hold beside the measured one: another target of the package, or a skill folder from elsewhere,
+// copied whole so the files a host reads beside SKILL.md come too. Its body only marks that it was opened.
+async function besideSkill(graph, spec) {
+  const item = graph.targets.get(spec);
+  if (item) {
+    const entry = item.files.get("entry");
+    const { end } = readSkillFrontmatter(entry.text, entry.path, spec);
+    return { name: spec, frontmatter: entry.text.slice(0, end + 5), files: deliveredFiles(item) };
+  }
+  // The real folder, never a link to it: the probe body is written into the copy and must not reach an installed skill.
+  let folder;
+  let text;
+  try { folder = realpathSync(resolve(spec)); text = (await readFile(join(folder, "SKILL.md"), "utf8")).replace(/\r\n/gu, "\n"); }
+  catch { fail("ARGUMENT_INVALID", `--beside ${spec} is neither a targetId of this package nor a folder holding SKILL.md.`, "Name another target of the package, or the folder of a skill the host would hold beside it."); }
+  const { end } = readSkillFrontmatter(text, `${spec}/SKILL.md`, basename(folder));
+  return { name: basename(folder), frontmatter: text.slice(0, end + 5), files: [], folder };
+}
+
 export async function measureStartRate(graph, options) {
   const item = graph.targets.get(options.target);
   if (!item) fail("TARGET_NOT_FOUND", `Unknown targetId: ${options.target}`, "Choose an exact targetId declared by the source package.");
   const entry = item.files.get("entry");
   const { end, name, description } = readSkillFrontmatter(entry.text, entry.path, options.target);
+  const skill = { name, frontmatter: entry.text.slice(0, end + 5), files: deliveredFiles(item) };
+  const beside = [];
+  for (const spec of options.beside) beside.push(await besideSkill(graph, spec));
+  const names = [name, ...beside.map((other) => other.name)];
+  const twice = names.find((other, at) => names.indexOf(other) !== at);
+  if (twice) fail("ARGUMENT_INVALID", `--beside would place ${twice} twice, or beside itself.`, "Name each skill to place beside the measured target once, and never the target itself.");
   const hosts = [];
-  for (const spec of options.hosts) hosts.push(isolate(await loadHost(spec), name));
+  for (const spec of options.hosts) hosts.push(isolate(await loadHost(spec), names));
   const ids = hosts.map((host) => host.id);
   if (new Set(ids).size !== ids.length) fail("ARGUMENT_INVALID", `Two hosts share the id ${ids.find((id, at) => ids.indexOf(id) !== at)}.`, "Give each host file its own id, such as one per model.");
   const tasksPath = join(dirname(item.physical), "tests", "tasks.md");
@@ -212,16 +249,11 @@ export async function measureStartRate(graph, options) {
   catch { fail("TASKS_MISSING", `No tests/tasks.md beside the descriptor of ${options.target}.`, "Save the target's start tasks in tests/tasks.md beside its descriptor first."); }
   const tasks = readStartTasks(text, `tests/tasks.md of ${options.target}`);
   if (!tasks.length) fail("TASKS_MISSING", `tests/tasks.md of ${options.target} has no unnamed task.`, "Save start tasks with Start: unnamed, should start or unnamed, must not start.");
-  const skill = {
-    name,
-    frontmatter: entry.text.slice(0, end + 5),
-    files: item.delivered.flatMap((delivered) => delivered.files.map((file) => [fileArtifactPath(delivered, file), file.bytes])),
-  };
 
   const counts = new Map();
   const jobs = [];
   for (const task of tasks) for (const host of hosts) {
-    const tally = { started: 0, runs: options.runs, timedOut: 0, errors: 0 };
+    const tally = { started: 0, ...(beside.length ? { startedBeside: {} } : {}), runs: options.runs, timedOut: 0, errors: 0 };
     counts.set(`${task.name}\u0000${host.id}`, tally);
     for (let run = 0; run < options.runs; run += 1) jobs.push({ task, host, tally });
   }
@@ -229,8 +261,9 @@ export async function measureStartRate(graph, options) {
   let timedOut = 0;
   const worker = async () => {
     for (let job = jobs.shift(); job; job = jobs.shift()) {
-      const result = await probe(job.host, skill, job.task.request, options.timeoutSeconds * 1000);
+      const result = await probe(job.host, [skill, ...beside], job.task.request, options.timeoutSeconds * 1000);
       if (result.outcome === "started") job.tally.started += 1;
+      if (result.outcome === "started beside") job.tally.startedBeside[result.name] = (job.tally.startedBeside[result.name] ?? 0) + 1;
       if (result.outcome === "timed out") { job.tally.timedOut += 1; timedOut += 1; }
       if (result.outcome === "error") { job.tally.errors += 1; if (!errors.has(job.host.id)) errors.set(job.host.id, result.detail); }
     }
@@ -258,6 +291,7 @@ export async function measureStartRate(graph, options) {
     targetId: options.target,
     description,
     descriptionCharacters: [...description].length,
+    ...(beside.length ? { beside: beside.map((other) => other.name) } : {}),
     runsPerTask: options.runs,
     hosts: hosts.map(({ id, command, isolation }) => ({ id, command, ...(isolation ? { isolation } : {}) })),
     tuning,

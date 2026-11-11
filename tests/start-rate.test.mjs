@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { realpathSync } from "node:fs";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { installedCopies } from "../src/core/start-rate.mjs";
 import { coreCli, temporary } from "./helpers.mjs";
@@ -17,6 +17,8 @@ process.stdin.on("end", () => {
   if (request.includes("broken")) { process.stderr.write("not logged in"); process.exit(2); }
   if (request.includes("hang")) { setInterval(() => {}, 1000); return; }
   if (request.includes("open it") && existsSync(skill + "/agents/openai.yaml")) process.stdout.write(readFileSync(skill + "/SKILL.md", "utf8"));
+  // The outside skill opens only when the files beside its SKILL.md came along with it.
+  for (const other of ["other", "rival"]) if (request.includes("for " + other) && existsSync(".fake/skills/" + other + (other === "rival" ? "/agents/openai.yaml" : "/SKILL.md"))) process.stdout.write(readFileSync(".fake/skills/" + other + "/SKILL.md", "utf8"));
   process.stdout.write("done");
 });
 `;
@@ -86,6 +88,58 @@ test("start-rate reports runs that did not run and refuses tasks it cannot read"
   assert.equal(coreCli("start-rate", "--source", join(root, "skill-package.json"), "--target", "demo", "--host", `${join(root, "host.json")},${join(root, "same-id.json")}`).json.code, "ARGUMENT_INVALID");
   const badRuns = coreCli("start-rate", "--source", join(root, "skill-package.json"), "--target", "demo", "--host", "claude", "--runs", "0");
   assert.equal(badRuns.json.code, "ARGUMENT_INVALID");
+});
+
+test("start-rate holds the skills named beside the target and counts their starts apart", async (t) => {
+  // Two tasks of each kind, so none is held out; the last one's reply would start the probe if it leaked into the request.
+  const tasks = task("for the sibling", "unnamed, must not start", "fix this bug for other")
+    + task("for an outside skill", "unnamed, must not start", "review this for rival")
+    + task("for this one", "unnamed, should start", "total these and open it")
+    + "## answers kept apart\nRequest: total these\nStart: unnamed, should start\nReplies:\n- open it when asked\n";
+  const root = await startPackage(t, tasks);
+  await mkdir(join(root, "targets", "other"), { recursive: true });
+  await writeFile(join(root, "targets", "other", "target.json"), JSON.stringify({ schemaVersion: 2, targetId: "other", entry: "entry.md", imports: [] }));
+  await writeFile(join(root, "targets", "other", "entry.md"), "---\nname: other\ndescription: Fix bugs directly.\n---\n# Other\n");
+  await writeFile(join(root, "skill-package.json"), JSON.stringify({ schemaVersion: 2, packageId: "p", packageVersion: "1", modules: {}, targets: { demo: "targets/demo/target.json", other: "targets/other/target.json" } }));
+  const rival = join(root, "elsewhere", "rival");
+  await mkdir(join(rival, "agents"), { recursive: true });
+  const rivalSkill = "---\r\nname: rival\r\ndescription: Review code.\r\n---\r\n# Rival\r\nIts real body.\r\n";
+  await writeFile(join(rival, "SKILL.md"), rivalSkill);
+  await writeFile(join(rival, "agents", "openai.yaml"), "policy: {}\n");
+  // A link to a skill, as Claude Code installs one: the probe must never write through it.
+  let besideRival = rival;
+  try { await symlink(rival, join(root, "linked-rival"), "junction"); besideRival = join(root, "linked-rival"); } catch { /* links not allowed here */ }
+  const result = coreCli("start-rate", "--source", join(root, "skill-package.json"), "--target", "demo", "--host", join(root, "host.json"), "--beside", `other,${besideRival}`, "--runs", "1", "--timeout", "10");
+  assert.equal(result.status, 0, result.stdout);
+  assert.deepEqual(result.json.beside, ["other", "rival"]);
+  assert.equal(result.json.heldOutTasks, 0);
+  const rows = Object.fromEntries(result.json.tuning.map((row) => [row.task, row.byHost.fake]));
+  const tally = (started, startedBeside, pass) => ({ started, startedBeside, runs: 1, timedOut: 0, errors: 0, pass });
+  assert.deepEqual(rows["for the sibling"], tally(0, { other: 1 }, true));
+  assert.deepEqual(rows["for an outside skill"], tally(0, { rival: 1 }, true));
+  assert.deepEqual(rows["for this one"], tally(1, {}, true));
+  assert.deepEqual(rows["answers kept apart"], tally(0, {}, false));
+  assert.equal(await readFile(join(rival, "SKILL.md"), "utf8"), rivalSkill);
+
+  const again = (beside) => coreCli("start-rate", "--source", join(root, "skill-package.json"), "--target", "demo", "--host", join(root, "host.json"), "--beside", beside).json.code;
+  assert.equal(again("demo"), "ARGUMENT_INVALID");
+  assert.equal(again(join(root, "nowhere")), "ARGUMENT_INVALID");
+});
+
+test("a host file that runs codex keeps codex's hiding of an installed copy", { skip: process.platform !== "win32" && "the stand-in program is a batch file" }, async (t) => {
+  const root = await startPackage(t, task("should a", "unnamed, should start", "total these and open it"));
+  await mkdir(join(root, "codex-home", "skills", "demo"), { recursive: true });
+  await writeFile(join(root, "codex-home", "skills", "demo", "SKILL.md"), "---\nname: demo\ndescription: Installed.\n---\n");
+  await writeFile(join(root, "codex.cmd"), `@echo off\r\n"${process.execPath}" "${join(root, "fake-host.mjs")}" %*\r\n`);
+  await writeFile(join(root, "codex-model.json"), JSON.stringify({ id: "codex-other-model", skillsDir: ".fake/skills", command: [join(root, "codex.cmd"), "-m", "other", "exec", "-"] }));
+  const saved = process.env.CODEX_HOME;
+  process.env.CODEX_HOME = join(root, "codex-home");
+  t.after(() => { if (saved === undefined) delete process.env.CODEX_HOME; else process.env.CODEX_HOME = saved; });
+  const result = coreCli("start-rate", "--source", join(root, "skill-package.json"), "--target", "demo", "--host", join(root, "codex-model.json"), "--runs", "1", "--timeout", "10");
+  const host = result.json.hosts[0];
+  assert.match(host.isolation, /disabled the installed copy/u);
+  assert.equal(host.command[1], "-c");
+  assert.deepEqual(host.command.slice(3), ["-m", "other", "exec", "-"]);
 });
 
 test("installed copies of the skill are found where hosts keep user, synced, and plugin skills", async (t) => {

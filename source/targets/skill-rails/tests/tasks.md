@@ -6,6 +6,9 @@ Inputs are under this `tests/` folder. Each run works on its own copy of them, a
 Request: /skill-rails 회의록을 받아서 결정 사항과 담당자별 할 일을 뽑아 주는 스킬을 새로 만들고 싶어. 아직 아무것도 없어.
 Start: named
 Inputs: none (an empty git repository)
+Replies:
+- 유지보수 문서는 두지 않는다
+- 회의록은 한국어 마크다운이고, 결과는 결정 사항 목록과 담당자별 할 일 표다
 Must hold:
 - 첫 파일을 만들기 전에 유지보수 문서를 둘지 한 번 물었다(대화 기록으로 확인)
 - 진행 방식을 사용자의 언어로 알렸다: 원문을 `source/`에서 원하는 만큼 다듬고 그동안 빌드하지 않는다, 요청하면 독립 스킬 폴더로 빌드한다, 첫 빌드 전에 배포 방식을 함께 정한다, 그 뒤 변경은 원문에서 한다
@@ -16,6 +19,9 @@ Must hold:
 Request: /skill-rails receipt-totals 스킬 처음으로 테스트해 줘.
 Start: named
 Inputs: receipt-totals/ without `source/receipt-totals/tests/tasks.md` (no saved task yet; its project keeps no maintenance documents)
+Replies:
+- 배포는 프로젝트의 `.claude/skills`에 한다
+- 제안한 과제에 동의하고, 입력 파일은 커밋해도 되는 예시 데이터다
 Must hold:
 - 실행하기 전에 과제를 제안했다: 카드 내역 합계라는 주된 용도의 과제 한두 개와, 이름으로 부를 때만 시작하는 스킬이므로 시작하면 안 되는 근접 요청(대화 기록으로 확인)
 - 합계 과제의 항목은 입력에서 계산한 값을 확인한다: `tests/nov.csv`라면 총합 140,900
@@ -37,6 +43,9 @@ Must hold:
 Request: /skill-rails receipt-totals가 영수증 얘기할 때 잘 안 불리는 것 같아. 설명을 다듬고 실제로 얼마나 불리는지 재 줘.
 Start: named
 Inputs: receipt-totals/ with `disable-model-invocation: true` removed from its entry and `policy.allow_implicit_invocation` set to true
+Replies:
+- 제안한 시작 과제에 동의한다
+- 측정은 claude에서만, 과제마다 3회, 조정은 한 라운드까지
 Must hold:
 - 측정 전에 종류마다 여덟에서 열 개쯤의 시작 과제를 제안했고, 사용자가 동의한 뒤에 저장했다
 - 측정 전에 실행 횟수(과제 × 반복 × 호스트)와 실제 과금 세션임을 알리고 동의를 받았다
